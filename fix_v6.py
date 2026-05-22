@@ -1,0 +1,580 @@
+import json
+
+html = r"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>玄机算命网</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;overflow:hidden;width:100vw;height:100vh;}
+.phone{width:100vw;height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#0a0a0a,#1a1a2e,#0a0a0a);}
+.app{width:100%;max-width:420px;height:100vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#0f0c29,#1a1a2e 30%,#16213e 70%,#0a0a1a);position:relative;overflow:hidden;box-shadow:0 0 80px rgba(255,215,0,0.1);}
+.status{display:flex;justify-content:space-between;align-items:center;padding:0.2rem 1rem;background:rgba(0,0,0,0.7);font-size:0.7rem;color:#fff;flex-shrink:0;height:26px;z-index:1000;}
+.hdr{text-align:center;padding:0.65rem 1rem 0.45rem;background:linear-gradient(180deg,rgba(0,0,0,0.75),transparent);border-bottom:1px solid rgba(255,215,0,0.12);flex-shrink:0;}
+.hdr h1{font-size:1.2rem;font-weight:800;background:linear-gradient(90deg,#ffd700,#ff6b35,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2.5px;}
+.views{position:relative;flex:1;overflow:hidden;}
+.page{position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;display:none;flex-direction:column;}
+.page.active{display:flex;}
+.page::-webkit-scrollbar{display:none;}
+.ft{display:flex;justify-content:space-around;align-items:center;padding:0.3rem 0.5rem 0.45rem;flex-shrink:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(30px);border-top:1px solid rgba(255,255,255,0.08);z-index:1000;}
+.ft .t{display:flex;flex-direction:column;align-items:center;gap:0.1rem;color:rgba(255,255,255,0.3);font-size:0.54rem;cursor:pointer;padding:0.2rem 0.7rem;border-radius:8px;transition:all 0.15s;flex:1;text-align:center;}
+.ft .t .ti{font-size:1.15rem;transition:all 0.15s;}
+.ft .t.a{color:#ffd700;}
+.user-bar{display:flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;cursor:pointer;flex-shrink:0;}
+.user-bar:active{opacity:0.7;}
+.user-avatar{width:35px;height:35px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#ff6b35);display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.user-info{flex:1;}
+.user-name{font-size:0.8rem;color:#fff;font-weight:600;}
+.user-desc{font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:2px;}
+.auth-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);display:none;flex-direction:column;z-index:9999;overflow-y:auto;}
+.auth-overlay.active{display:flex;}
+.auth-hdr{display:flex;justify-content:space-between;align-items:center;padding:1rem;flex-shrink:0;}
+.auth-back{font-size:1.3rem;color:rgba(255,255,255,0.5);cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.auth-back:active{background:rgba(255,255,255,0.1);}
+.auth-title{font-size:1.1rem;color:#fff;font-weight:700;}
+.auth-spacer{width:40px;}
+.auth-body{padding:2rem 1.5rem;flex:1;}
+.auth-logo{text-align:center;margin-bottom:2rem;}
+.auth-logo h2{font-size:1.8rem;font-weight:800;background:linear-gradient(90deg,#ffd700,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px;}
+.auth-logo p{font-size:0.7rem;color:rgba(255,255,255,0.45);margin-top:0.5rem;}
+.auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);}
+.auth-tab{flex:1;text-align:center;padding:0.6rem;font-size:0.85rem;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.2s;border-bottom:2px solid transparent;}
+.auth-tab.a{color:#ffd700;border-bottom-color:#ffd700;font-weight:600;}
+.auth-form{display:flex;flex-direction:column;gap:1rem;}
+.auth-input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.8rem 1rem;color:#fff;font-size:0.85rem;outline:none;transition:all 0.2s;}
+.auth-input:focus{border-color:rgba(255,215,0,0.5);background:rgba(255,255,255,0.1);}
+.auth-input::placeholder{color:rgba(255,255,255,0.25);}
+.auth-btn{background:linear-gradient(135deg,#ffd700,#ff6b35);color:#1a1a2e;font-size:0.9rem;font-weight:700;padding:0.8rem;border:none;border-radius:12px;cursor:pointer;transition:all 0.2s;margin-top:0.5rem;}
+.auth-btn:active{transform:scale(0.97);}
+.auth-link{text-align:center;font-size:0.75rem;color:rgba(255,255,255,0.45);margin-top:1rem;cursor:pointer;}
+.auth-link:active{color:#ffd700;}
+.auth-form .row{display:flex;gap:0.5rem;}
+.auth-form .row .auth-input{flex:1;}
+.auth-form .row button{background:rgba(255,215,0,0.15);color:#ffd700;border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:0.8rem 1rem;font-size:0.75rem;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.auth-form .row button:disabled{opacity:0.4;cursor:not-allowed;}
+.uc-page{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#0f0c29,#1a1a2e 50%,#0a0a1a);display:none;flex-direction:column;z-index:9999;overflow-y:auto;}
+.uc-page.active{display:flex;}
+.uc-hdr{display:flex;justify-content:space-between;align-items:center;padding:1rem;flex-shrink:0;}
+.uc-back{font-size:1.3rem;color:rgba(255,255,255,0.5);cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.uc-title{font-size:1.1rem;color:#fff;font-weight:700;}
+.uc-spacer{width:40px;}
+.uc-body{padding:1.5rem;flex:1;}
+.uc-card{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,107,53,0.06));border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;border:1px solid rgba(255,215,0,0.15);}
+.uc-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#ff6b35);display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:1rem;}
+.uc-name{font-size:1.2rem;color:#fff;font-weight:700;margin-bottom:0.3rem;}
+.uc-phone{font-size:0.75rem;color:rgba(255,255,255,0.45);}
+.uc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin-top:1.2rem;}
+.uc-stat{text-align:center;}
+.uc-stat-v{font-size:1.3rem;color:#ffd700;font-weight:700;}
+.uc-stat-l{font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:3px;}
+.uc-menu{background:rgba(255,255,255,0.04);border-radius:12px;overflow:hidden;}
+.uc-menu-i{display:flex;align-items:center;gap:0.8rem;padding:1rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:all 0.15s;}
+.uc-menu-i:last-child{border-bottom:none;}
+.uc-menu-i:active{background:rgba(255,255,255,0.06);}
+.uc-menu-i .ic{font-size:1.2rem;}
+.uc-menu-i .lb{flex:1;font-size:0.85rem;color:rgba(255,255,255,0.8);}
+.uc-menu-i .ar{color:rgba(255,255,255,0.25);font-size:0.7rem;}
+.logout-btn{background:rgba(255,50,50,0.15);color:#ff5555;border:1px solid rgba(255,50,50,0.3);border-radius:12px;padding:0.8rem;font-size:0.85rem;cursor:pointer;margin-top:1.5rem;text-align:center;transition:all 0.2s;}
+.logout-btn:active{background:rgba(255,50,50,0.25);}
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.88);color:#fff;padding:0.8rem 1.5rem;border-radius:12px;font-size:0.8rem;z-index:10000;display:none;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);pointer-events:none;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;padding:0.5rem 1rem;flex-shrink:0;}
+.item{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015));border-radius:12px;padding:0.6rem 0.1rem;gap:0.28rem;cursor:pointer;border:1px solid rgba(255,215,0,0.06);transition:all 0.15s;}
+.item:active{transform:scale(0.93);background:rgba(255,215,0,0.1);}
+.item .ic{font-size:1.45rem;}
+.item .lb{font-size:0.6rem;color:rgba(255,255,255,0.78);text-align:center;line-height:1.2;font-weight:500;}
+.sec{padding:0.7rem 1rem 0.35rem;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.sec h3{font-size:0.85rem;color:#ffd700;font-weight:700;display:flex;align-items:center;gap:0.3rem;}
+.sec h3:before{content:'';display:inline-block;width:2.5px;height:12px;background:linear-gradient(180deg,#ffd700,#ff6b35);border-radius:2px;}
+.sch{padding:0.5rem 1rem;flex-shrink:0;}
+.sch-i{display:flex;align-items:center;gap:0.5rem;background:rgba(255,255,255,0.06);border-radius:20px;padding:0.5rem 1rem;font-size:0.75rem;color:rgba(255,255,255,0.35);border:1px solid rgba(255,255,255,0.04);}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="app">
+  <!-- 状态栏 -->
+  <div class="status">
+    <span class="t">中国移动</span>
+    <span style="display:flex;align-items:center;gap:4px;">
+      <span class="sig"><i></i><i></i><i></i><i></i></span>
+      <span style="font-size:0.6rem;margin:0 2px;">5G</span>
+      <span class="bat"><span class="bat-b"><span class="bat-f" id="bat-fill"></span></span><span class="bat-t" id="bat-text"></span></span>
+    </span>
+  </div>
+
+  <!-- 头部 -->
+  <div class="hdr">
+    <h1>玄机算命网</h1>
+  </div>
+
+  <!-- 用户栏 -->
+  <div class="user-bar" id="user-bar" onclick="checkLogin()">
+    <div class="user-avatar" id="ub-avatar">👤</div>
+    <div class="user-info">
+      <div class="user-name" id="ub-name">点击登录</div>
+      <div class="user-desc" id="ub-desc">登录后享受更多服务</div>
+    </div>
+  </div>
+
+  <!-- 搜索 -->
+  <div class="sch"><div class="sch-i">🔍 搜索你想要的服务</div></div>
+
+  <!-- 内容区 -->
+  <div class="views">
+    <!-- 首页 -->
+    <div class="page active" id="page-home">
+      <div class="sec"><h3>热门服务</h3><span class="mo">更多 ›</span></div>
+      <div class="grid">
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">🔮</span><span class="lb">八字排盘</span></div>
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">🌟</span><span class="lb">紫微斗数</span></div>
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">🎋</span><span class="lb">塔罗占卜</span></div>
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">🃏</span><span class="lb">易经占卦</span></div>
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">💑</span><span class="lb">姻缘测算</span></div>
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">💰</span><span class="lb">财运分析</span></div>
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">🏠</span><span class="lb">风水布局</span></div>
+        <div class="item" onclick="showToast('功能开发中')"><span class="ic">📅</span><span class="lb">黄道吉日</span></div>
+      </div>
+      <div style="padding:1rem;text-align:center;color:rgba(255,255,255,0.3);font-size:0.7rem;flex-shrink:0;">— 更多功能持续开发中 —</div>
+    </div>
+  </div>
+
+  <!-- 底部标签 -->
+  <div class="ft">
+    <div class="t a" onclick="switchTab('home',this)"><span class="ti">🏠</span>首页</div>
+    <div class="t" onclick="switchTab('shengxiao',this)"><span class="ti">🐉</span>生肖</div>
+    <div class="t" onclick="switchTab('zhanbu',this)"><span class="ti">🔮</span>占卜</div>
+    <div class="t" onclick="switchTab('zhishi',this)"><span class="ti">📚</span>知识</div>
+    <div class="t" onclick="checkLogin()"><span class="ti">👤</span>我的</div>
+  </div>
+</div>
+</div>
+
+<!-- 登录/注册弹层 -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-hdr">
+    <div class="auth-back" onclick="closeAuth()">✕</div>
+    <div class="auth-title">欢迎来到玄机算命网</div>
+    <div class="auth-spacer"></div>
+  </div>
+  <div class="auth-body">
+    <div class="auth-logo">
+      <h2>玄机算命网</h2>
+      <p>专业命理测算 · 传承千年智慧</p>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab a" id="at-code" onclick="switchAuthTab('code')">验证码登录</div>
+      <div class="auth-tab" id="at-pwd" onclick="switchAuthTab('pwd')">密码登录</div>
+      <div class="auth-tab" id="at-reg" onclick="switchAuthTab('reg')">注册</div>
+    </div>
+    <!-- 验证码登录 -->
+    <div class="auth-form" id="af-code">
+      <input class="auth-input" id="login-phone" type="tel" maxlength="11" placeholder="请输入手机号">
+      <div class="row">
+        <input class="auth-input" id="login-code" type="tel" maxlength="6" placeholder="请输入验证码">
+        <button id="login-code-btn" onclick="sendCode('login')">获取验证码</button>
+      </div>
+      <button class="auth-btn" onclick="doLogin()">登 录</button>
+    </div>
+    <!-- 密码登录 -->
+    <div class="auth-form" id="af-pwd" style="display:none;">
+      <input class="auth-input" id="pwd-phone" type="tel" maxlength="11" placeholder="请输入手机号">
+      <input class="auth-input" id="pwd-password" type="password" placeholder="请输入密码">
+      <button class="auth-btn" onclick="doPwdLogin()">登 录</button>
+      <div class="auth-link" onclick="switchAuthTab('forgot')">忘记密码？</div>
+    </div>
+    <!-- 注册 -->
+    <div class="auth-form" id="af-reg" style="display:none;">
+      <input class="auth-input" id="reg-phone" type="tel" maxlength="11" placeholder="请输入手机号">
+      <div class="row">
+        <input class="auth-input" id="reg-code" type="tel" maxlength="6" placeholder="验证码">
+        <button id="reg-code-btn" onclick="sendCode('reg')">获取验证码</button>
+      </div>
+      <input class="auth-input" id="reg-password" type="password" placeholder="设置密码（6-20位）">
+      <button class="auth-btn" onclick="doRegister()">注 册</button>
+    </div>
+    <!-- 忘记密码 -->
+    <div class="auth-form" id="af-forgot" style="display:none;">
+      <input class="auth-input" id="forgot-phone" type="tel" maxlength="11" placeholder="请输入手机号">
+      <div class="row">
+        <input class="auth-input" id="forgot-code" type="tel" maxlength="6" placeholder="验证码">
+        <button id="forgot-code-btn" onclick="sendCode('forgot')">获取验证码</button>
+      </div>
+      <input class="auth-input" id="forgot-password" type="password" placeholder="新密码（6-20位）">
+      <button class="auth-btn" onclick="doForgotPwd()">重置密码</button>
+    </div>
+  </div>
+</div>
+
+<!-- 用户中心页 -->
+<div class="uc-page" id="uc-page">
+  <div class="uc-hdr">
+    <div class="uc-back" onclick="closeUserCenter()">✕</div>
+    <div class="uc-title">个人中心</div>
+    <div class="uc-spacer"></div>
+  </div>
+  <div class="uc-body">
+    <div class="uc-card">
+      <div class="uc-avatar" id="uc-avatar">👤</div>
+      <div class="uc-name" id="uc-name">用户</div>
+      <div class="uc-phone" id="uc-phone">手机号</div>
+      <div class="uc-stats">
+        <div class="uc-stat"><div class="uc-stat-v" id="uc-free">3</div><div class="uc-stat-l">免费次数</div></div>
+        <div class="uc-stat"><div class="uc-stat-v">0</div><div class="uc-stat-l">已测次数</div></div>
+        <div class="uc-stat"><div class="uc-stat-v">0</div><div class="uc-stat-l">分享次数</div></div>
+      </div>
+    </div>
+    <div class="uc-menu">
+      <div class="uc-menu-i"><span class="ic">📜</span><span class="lb">测算历史</span><span class="ar">›</span></div>
+      <div class="uc-menu-i"><span class="ic">❤️</span><span class="lb">我的收藏</span><span class="ar">›</span></div>
+      <div class="uc-menu-i"><span class="ic">🎁</span><span class="lb">邀请有礼</span><span class="ar">›</span></div>
+      <div class="uc-menu-i"><span class="ic">⚙️</span><span class="lb">设置</span><span class="ar">›</span></div>
+      <div class="uc-menu-i"><span class="ic">💬</span><span class="lb">意见反馈</span><span class="ar">›</span></div>
+      <div class="uc-menu-i"><span class="ic">📞</span><span class="lb">联系客服</span><span class="ar">›</span></div>
+    </div>
+    <div class="logout-btn" onclick="doLogout()">退出登录</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+var currentUser = null;
+var codeTimer = null;
+
+// ===== 初始化 =====
+window.onload = function(){
+    updateBattery();
+    checkSavedLogin();
+};
+
+// ===== 电池 =====
+function updateBattery(){
+    var level = Math.floor(Math.random() * 31) + 65;
+    var fill = document.getElementById('bat-fill');
+    var text = document.getElementById('bat-text');
+    fill.style.width = level + '%';
+    text.textContent = level + '%';
+    if(level <= 20){ fill.className = 'bat-f lo'; }
+    else if(level <= 50){ fill.className = 'bat-f mi'; }
+    else { fill.className = 'bat-f'; }
+}
+
+// ===== 检查已保存的登录 =====
+function checkSavedLogin(){
+    var saved = localStorage.getItem('xjsm_user');
+    if(saved){
+        try{
+            currentUser = JSON.parse(saved);
+            updateUserBar();
+        }catch(e){}
+    }
+}
+
+// ===== 更新用户栏 =====
+function updateUserBar(){
+    if(currentUser){
+        document.getElementById('ub-avatar').textContent = currentUser.avatar || '👤';
+        document.getElementById('ub-name').textContent = currentUser.name;
+        document.getElementById('ub-desc').textContent = '欢迎回来';
+    }
+}
+
+// ===== 切换标签 =====
+function switchTab(page, el){
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.ft .t').forEach(function(t){ t.classList.remove('a'); });
+    var target = document.getElementById('page-' + page);
+    if(target){ target.classList.add('active'); }
+    if(el){ el.classList.add('a'); }
+}
+
+// ===== 检查登录 =====
+function checkLogin(){
+    console.log('checkLogin called, currentUser:', currentUser);
+    if(currentUser){
+        openUserCenter();
+    } else {
+        openAuth();
+    }
+}
+
+// ===== 打开登录层 =====
+function openAuth(){
+    document.getElementById('auth-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// ===== 关闭登录层 =====
+function closeAuth(){
+    document.getElementById('auth-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// ===== 切换登录标签 =====
+function switchAuthTab(tab){
+    document.querySelectorAll('.auth-tab').forEach(function(t){ t.classList.remove('a'); });
+    document.querySelectorAll('.auth-form').forEach(function(f){ f.style.display = 'none'; });
+    
+    if(tab === 'code'){
+        document.getElementById('at-code').classList.add('a');
+        document.getElementById('af-code').style.display = 'flex';
+    } else if(tab === 'pwd'){
+        document.getElementById('at-pwd').classList.add('a');
+        document.getElementById('af-pwd').style.display = 'flex';
+    } else if(tab === 'reg'){
+        document.getElementById('at-reg').classList.add('a');
+        document.getElementById('af-reg').style.display = 'flex';
+    } else if(tab === 'forgot'){
+        document.getElementById('at-pwd').classList.add('a');
+        document.getElementById('af-forgot').style.display = 'flex';
+    }
+}
+
+// ===== 发送验证码 =====
+function sendCode(type){
+    var phoneInput = document.getElementById(type === 'login' ? 'login-phone' : (type === 'reg' ? 'reg-phone' : 'forgot-phone'));
+    var phone = phoneInput.value.trim();
+    
+    if(!phone || phone.length !== 11 || !/^1[3-9]\d{9}$/.test(phone)){
+        showToast('请输入正确的手机号');
+        return;
+    }
+    
+    var btnId = type + '-code-btn';
+    var btn = document.getElementById(btnId);
+    if(!btn){ btn = phoneInput.parentElement.querySelector('button'); }
+    btn.disabled = true;
+    btn.textContent = '发送中...';
+    
+    fetch('http://localhost:5000/api/sendCode', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone: phone})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.code === 200){
+            showToast('验证码已发送');
+            var seconds = 60;
+            btn.textContent = seconds + 's';
+            codeTimer = setInterval(function(){
+                seconds--;
+                if(seconds <= 0){
+                    clearInterval(codeTimer);
+                    btn.disabled = false;
+                    btn.textContent = '获取验证码';
+                } else {
+                    btn.textContent = seconds + 's';
+                }
+            }, 1000);
+        } else {
+            showToast(data.msg || '发送失败');
+            btn.disabled = false;
+            btn.textContent = '获取验证码';
+        }
+    })
+    .catch(function(err){
+        console.error('发送失败：', err);
+        showToast('网络错误');
+        btn.disabled = false;
+        btn.textContent = '获取验证码';
+    });
+}
+
+// ===== 验证码登录 =====
+function doLogin(){
+    var phone = document.getElementById('login-phone').value.trim();
+    var code = document.getElementById('login-code').value.trim();
+    
+    if(!phone || phone.length !== 11){
+        showToast('请输入正确的手机号'); return;
+    }
+    if(!code || code.length !== 6){
+        showToast('请输入6位验证码'); return;
+    }
+    
+    fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone: phone, code: code})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.code === 200){
+            currentUser = data.user;
+            localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
+            updateUserBar();
+            closeAuth();
+            showToast('登录成功');
+        } else {
+            showToast(data.msg || '登录失败');
+        }
+    })
+    .catch(function(err){
+        console.error('登录失败：', err);
+        showToast('网络错误');
+    });
+}
+
+// ===== 密码登录 =====
+function doPwdLogin(){
+    var phone = document.getElementById('pwd-phone').value.trim();
+    var pwd = document.getElementById('pwd-password').value;
+    
+    if(!phone || phone.length !== 11){
+        showToast('请输入正确的手机号'); return;
+    }
+    if(!pwd){
+        showToast('请输入密码'); return;
+    }
+    
+    fetch('http://localhost:5000/api/password_login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone: phone, password: pwd})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.code === 200){
+            currentUser = data.user;
+            localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
+            updateUserBar();
+            closeAuth();
+            showToast('登录成功');
+        } else {
+            showToast(data.msg || '登录失败');
+        }
+    })
+    .catch(function(err){
+        console.error('登录失败：', err);
+        showToast('网络错误');
+    });
+}
+
+// ===== 注册 =====
+function doRegister(){
+    var phone = document.getElementById('reg-phone').value.trim();
+    var code = document.getElementById('reg-code').value.trim();
+    var pwd = document.getElementById('reg-password').value;
+    
+    if(!phone || phone.length !== 11){
+        showToast('请输入正确的手机号'); return;
+    }
+    if(!code || code.length !== 6){
+        showToast('请输入6位验证码'); return;
+    }
+    if(!pwd || pwd.length < 6){
+        showToast('密码至少6位'); return;
+    }
+    
+    fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone: phone, code: code, password: pwd})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.code === 200){
+            currentUser = data.user;
+            localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
+            updateUserBar();
+            closeAuth();
+            showToast('注册成功');
+        } else {
+            showToast(data.msg || '注册失败');
+        }
+    })
+    .catch(function(err){
+        console.error('注册失败：', err);
+        showToast('网络错误');
+    });
+}
+
+// ===== 忘记密码 =====
+function doForgotPwd(){
+    var phone = document.getElementById('forgot-phone').value.trim();
+    var code = document.getElementById('forgot-code').value.trim();
+    var pwd = document.getElementById('forgot-password').value;
+    
+    if(!phone || phone.length !== 11){
+        showToast('请输入正确的手机号'); return;
+    }
+    if(!code || code.length !== 6){
+        showToast('请输入6位验证码'); return;
+    }
+    if(!pwd || pwd.length < 6){
+        showToast('密码至少6位'); return;
+    }
+    
+    fetch('http://localhost:5000/api/forgot_password', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone: phone, code: code, password: pwd})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if(data.code === 200){
+            showToast('密码重置成功，请登录');
+            switchAuthTab('code');
+        } else {
+            showToast(data.msg || '重置失败');
+        }
+    })
+    .catch(function(err){
+        console.error('重置失败：', err);
+        showToast('网络错误');
+    });
+}
+
+// ===== 打开用户中心 =====
+function openUserCenter(){
+    console.log('openUserCenter called');
+    if(!currentUser){
+        openAuth();
+        return;
+    }
+    
+    document.getElementById('uc-name').textContent = currentUser.name;
+    document.getElementById('uc-phone').textContent = currentUser.phone.substring(0,3) + '****' + currentUser.phone.substring(7);
+    document.getElementById('uc-free').textContent = currentUser.free_count || 3;
+    document.getElementById('uc-avatar').textContent = currentUser.avatar || '👤';
+    
+    document.getElementById('uc-page').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// ===== 关闭用户中心 =====
+function closeUserCenter(){
+    document.getElementById('uc-page').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// ===== 退出登录 =====
+function doLogout(){
+    currentUser = null;
+    localStorage.removeItem('xjsm_user');
+    updateUserBar();
+    closeUserCenter();
+    showToast('已退出登录');
+}
+
+// ===== Toast =====
+function showToast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(function(){ t.style.display = 'none'; }, 2000);
+}
+</script>
+</body>
+</html>"""
+
+with open('/workspace/index.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+
+print('Done! File size:', len(html), 'bytes')
+print('Functions included: checkLogin, openUserCenter, openAuth, closeAuth')
+print('Test: click "我的" tab should now work!')

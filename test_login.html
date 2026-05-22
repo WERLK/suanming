@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>测试登录跳转</title>
+</head>
+<body>
+<h1>测试登录跳转</h1>
+<button onclick="testCheckLogin()">测试 checkLogin()</button>
+<button onclick="testOpenUserCenter()">测试 openUserCenter()</button>
+
+<script>
+var currentUser = null;
+
+function testCheckLogin(){
+    console.log('testCheckLogin called');
+    if(currentUser){
+        alert('已登录，应该跳转用户中心');
+    } else {
+        alert('未登录，应该打开登录层');
+    }
+}
+
+function testOpenUserCenter(){
+    console.log('testOpenUserCenter called');
+    alert('openUserCenter() 被调用了！');
+}
+</script>
+</body>
+</html>

@@ -1,3 +1,11 @@
-Flask==3.1.2
-flask-cors==5.0.0
-gunicorn==23.0.0
+Flask==3.0.0
+Flask-CORS==4.0.0
+PyJWT==2.8.0
+Werkzeug==3.0.1
+Pillow==10.1.0
+aliyun-python-sdk-core==2.13.37
+aliyun-python-sdk-dysmsapi==2.0.23
+tencentcloud-sdk-python==3.0.1068
+gunicorn==21.2.0
+watchdog==3.0.0
+python-dotenv==1.0.0

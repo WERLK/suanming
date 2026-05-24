@@ -677,7 +677,7 @@ except Exception as e:
 def index():
     from flask import send_from_directory
     import os
-    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
+    return send_from_directory(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'index.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

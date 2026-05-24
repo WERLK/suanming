@@ -673,5 +673,9 @@ try:
 except Exception as e:
     print(f"⚠️ 短信验证码扩展加载失败: {e}")
 
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

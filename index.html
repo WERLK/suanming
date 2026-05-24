@@ -1,1354 +1,363 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>玄机算命网</title>
-<!-- 百度联盟公共JS（如使用百度广告请保留此引用） -->
-<script type="text/javascript" src="//dup.baidustatic.com/js/dm.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>玄机算命网 - 专业在线算命平台</title>
+<link rel="stylesheet" href="/css/style.css">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
-.phone { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #0a0a0a); }
-.app { width: 100%; max-width: 420px; height: 100vh; display: flex; flex-direction: column; background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); position: relative; overflow: hidden; box-shadow: 0 0 80px rgba(255, 215, 0, 0.1); }
-.status { display: flex; justify-content: space-between; align-items: center; padding: 0.2rem 1rem; background: rgba(0, 0, 0, 0.7); font-size: 0.7rem; color: #fff; flex-shrink: 0; height: 26px; z-index: 1000; }
-.hdr { text-align: center; padding: 0.65rem 1rem 0.45rem; background: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent); border-bottom: 1px solid rgba(255, 215, 0, 0.12); flex-shrink: 0; }
-.hdr h1 { font-size: 1.2rem; font-weight: 800; background: linear-gradient(90deg, #ffd700, #ff6b35, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2.5px; }
-.views { position: relative; flex: 1; overflow: hidden; }
-.page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; display: none; flex-direction: column; }
-.page.active { display: flex; }
-.page::-webkit-scrollbar { display: none; }
-.ft { display: flex; justify-content: space-around; align-items: center; padding: 0.3rem 0.5rem 0.45rem; flex-shrink: 0; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(30px); border-top: 1px solid rgba(255, 255, 255, 0.08); z-index: 1000; }
-.ft .t { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; color: rgba(255, 255, 255, 0.3); font-size: 0.54rem; cursor: pointer; padding: 0.2rem 0.7rem; border-radius: 8px; transition: all 0.15s; flex: 1; text-align: center; }
-.ft .t .ti { font-size: 1.15rem; transition: all 0.15s; }
-.ft .t.a { color: #ffd700; }
-.user-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; cursor: pointer; flex-shrink: 0; }
-.user-bar:active { opacity: 0.7; }
-.user-avatar { width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff6b35); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-.user-info { flex: 1; }
-.user-name { font-size: 0.8rem; color: #fff; font-weight: 600; }
-.user-desc { font-size: 0.6rem; color: rgba(255, 255, 255, 0.4); margin-top: 2px; }
-.sch { padding: 0.5rem 1rem; flex-shrink: 0; }
-.sch-i { display: flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 0.5rem 1rem; font-size: 0.75rem; color: rgba(255, 255, 255, 0.35); border: 1px solid rgba(255, 255, 255, 0.04); }
-.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 1rem; flex-shrink: 0; }
-.item { display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)); border-radius: 12px; padding: 0.6rem 0.1rem; gap: 0.28rem; cursor: pointer; border: 1px solid rgba(255, 215, 0, 0.06); transition: all 0.15s; }
-.item:active { transform: scale(0.93); background: rgba(255, 215, 0, 0.1); }
-.item .ic { font-size: 1.45rem; }
-.item .lb { font-size: 0.6rem; color: rgba(255, 255, 255, 0.78); text-align: center; line-height: 1.2; font-weight: 500; }
-.sec { padding: 0.7rem 1rem 0.35rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-.sec h3 { font-size: 0.85rem; color: #ffd700; font-weight: 700; display: flex; align-items: center; gap: 0.3rem; }
-.sec h3:before { content: ''; display: inline-block; width: 2.5px; height: 12px; background: linear-gradient(180deg, #ffd700, #ff6b35); border-radius: 2px; }
-.sec .mo { font-size: 0.65rem; color: rgba(255, 255, 255, 0.35); cursor: pointer; }
-.sec .mo:active { color: #ffd700; }
-.back-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; cursor: pointer; color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; flex-shrink: 0; }
-.back-btn:active { color: #ffd700; }
-.zx-list { padding: 0 1rem; flex-shrink: 0; }
-.zx-item { display: flex; gap: 0.8rem; padding: 0.8rem 0; background: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.15s; }
-.zx-item:last-child { border-bottom: none; }
-.zx-item:active { background: rgba(255, 255, 255, 0.03); }
-.zx-icon { font-size: 1.5rem; flex-shrink: 0; }
-.zx-info { flex: 1; }
-.zx-title { font-size: 0.78rem; color: rgba(255, 255, 255, 0.85); font-weight: 600; margin-bottom: 0.2rem; }
-.zx-desc { font-size: 0.62rem; color: rgba(255, 255, 255, 0.38); line-height: 1.5; }
-.zx-arrow { color: rgba(255, 255, 255, 0.2); font-size: 0.7rem; align-self: center; }
-.zb-list { padding: 0.5rem 1rem; flex-shrink: 0; }
-.zb-card { background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)); border-radius: 14px; padding: 1rem; margin-bottom: 0.6rem; border: 1px solid rgba(255, 215, 0, 0.08); cursor: pointer; transition: all 0.15s; }
-.zb-card:active { transform: scale(0.97); background: rgba(255, 215, 0, 0.08); }
-.zb-title { font-size: 0.85rem; color: #ffd700; font-weight: 700; margin-bottom: 0.4rem; }
-.zb-desc { font-size: 0.65rem; color: rgba(255, 255, 255, 0.5); line-height: 1.6; }
-.zb-tag { display: inline-block; padding: 2px 8px; background: rgba(255, 215, 0, 0.1); color: #ffd700; border-radius: 4px; font-size: 0.55rem; margin-top: 0.4rem; margin-right: 4px; }
-.zs-list { padding: 0.5rem 1rem; flex-shrink: 0; }
-.zs-card { background: rgba(255, 255, 255, 0.04); border-radius: 12px; padding: 0.9rem; margin-bottom: 0.5rem; border-left: 3px solid #ffd700; cursor: pointer; transition: all 0.15s; }
-.zs-card:active { background: rgba(255, 215, 0, 0.06); }
-.zs-title { font-size: 0.78rem; color: rgba(255, 255, 255, 0.85); font-weight: 600; margin-bottom: 0.3rem; }
-.zs-desc { font-size: 0.62rem; color: rgba(255, 255, 255, 0.4); line-height: 1.6; }
-.empty { text-align: center; padding: 3rem 1rem; color: rgba(255, 255, 255, 0.3); font-size: 0.75rem; }
-.card { margin: 0.45rem 1rem; padding: 0.8rem; background: linear-gradient(135deg, rgba(255, 215, 0, 0.09), rgba(255, 107, 53, 0.05)); border-radius: 12px; border: 1px solid rgba(255, 215, 0, 0.13); flex-shrink: 0; }
-.auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.92); display: none; flex-direction: column; z-index: 9999; overflow-y: auto; }
-.auth-overlay.active { display: flex; }
-.auth-hdr { display: flex; justify-content: space-between; align-items: center; padding: 1rem; flex-shrink: 0; }
-.auth-back { font-size: 1.3rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-.auth-back:active { background: rgba(255, 255, 255, 0.1); }
-.auth-title { font-size: 1.1rem; color: #fff; font-weight: 700; }
-.auth-spacer { width: 40px; }
-.auth-body { padding: 2rem 1.5rem; flex: 1; }
-.auth-logo { text-align: center; margin-bottom: 2rem; }
-.auth-logo h2 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(90deg, #ffd700, #ff6b35); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 3px; }
-.auth-logo p { font-size: 0.7rem; color: rgba(255, 255, 255, 0.45); margin-top: 0.5rem; }
-.auth-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-.auth-tab { flex: 1; text-align: center; padding: 0.6rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.4); cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; }
-.auth-tab.a { color: #ffd700; border-bottom-color: #ffd700; font-weight: 600; }
-.auth-form { display: flex; flex-direction: column; gap: 1rem; }
-.auth-input { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.8rem 1rem; color: #fff; font-size: 0.85rem; outline: none; transition: all 0.2s; }
-.auth-input:focus { border-color: rgba(255, 215, 0, 0.5); background: rgba(255, 255, 255, 0.1); }
-.auth-input::placeholder { color: rgba(255, 255, 255, 0.25); }
-.auth-btn { background: linear-gradient(135deg, #ffd700, #ff6b35); color: #1a1a2e; font-size: 0.9rem; font-weight: 700; padding: 0.8rem; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; }
-.auth-btn:active { transform: scale(0.97); }
-.auth-link { text-align: center; font-size: 0.75rem; color: rgba(255, 255, 255, 0.45); margin-top: 1rem; cursor: pointer; }
-.auth-link:active { color: #ffd700; }
-.auth-form .row { display: flex; gap: 0.5rem; }
-.auth-form .row .auth-input { flex: 1; }
-.auth-form .row button { background: rgba(255, 215, 0, 0.15); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.75rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-.auth-form .row button:disabled { opacity: 0.4; cursor: not-allowed; }
-.uc-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #0f0c29, #1a1a2e 50%, #0a0a1a); display: none; flex-direction: column; z-index: 9999; overflow-y: auto; }
-.uc-page.active { display: flex; }
-.uc-hdr { display: flex; justify-content: space-between; align-items: center; padding: 1rem; flex-shrink: 0; }
-.uc-back { font-size: 1.3rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-.uc-back:active { background: rgba(255, 255, 255, 0.1); }
-.uc-title { font-size: 1.1rem; color: #fff; font-weight: 700; }
-.uc-spacer { width: 40px; }
-.uc-body { padding: 1.5rem; flex: 1; }
-.uc-card { background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 107, 53, 0.06)); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255, 215, 0, 0.15); }
-.uc-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff6b35); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1rem; }
-.uc-name { font-size: 1.2rem; color: #fff; font-weight: 700; margin-bottom: 0.3rem; }
-.uc-phone { font-size: 0.75rem; color: rgba(255, 255, 255, 0.45); }
-.uc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-top: 1.2rem; }
-.uc-stat { text-align: center; }
-.uc-stat-v { font-size: 1.3rem; color: #ffd700; font-weight: 700; }
-.uc-stat-l { font-size: 0.6rem; color: rgba(255, 255, 255, 0.4); margin-top: 3px; }
-.uc-menu { background: rgba(255, 255, 255, 0.04); border-radius: 12px; overflow: hidden; }
-.uc-menu-i { display: flex; align-items: center; gap: 0.8rem; padding: 1rem 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06); cursor: pointer; transition: all 0.15s; }
-.uc-menu-i:last-child { border-bottom: none; }
-.uc-menu-i:active { background: rgba(255, 255, 255, 0.06); }
-.uc-menu-i .ic { font-size: 1.2rem; }
-.uc-menu-i .lb { flex: 1; font-size: 0.85rem; color: rgba(255, 255, 255, 0.8); }
-.uc-menu-i .ar { color: rgba(255, 255, 255, 0.3); font-size: 0.7rem; }
-.vip-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #0f0c29, #1a1a2e 50%, #0a0a1a); display: none; flex-direction: column; z-index: 9999; overflow-y: auto; }
-.vip-page.active { display: flex; }
-.vip-hdr { display: flex; justify-content: space-between; align-items: center; padding: 1rem; flex-shrink: 0; }
-.vip-back { font-size: 1.3rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-.vip-back:active { background: rgba(255, 255, 255, 0.1); }
-.vip-title { font-size: 1.1rem; color: #fff; font-weight: 700; }
-.vip-spacer { width: 40px; }
-.vip-body { padding: 1.5rem; flex: 1; }
-.vip-card { background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 107, 53, 0.08)); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; border: 2px solid rgba(255, 215, 0, 0.3); text-align: center; position: relative; overflow: hidden; }
-.vip-badge { display: inline-block; padding: 0.3rem 1rem; background: linear-gradient(90deg, #ffd700, #ff6b35); border-radius: 20px; font-size: 0.75rem; color: #1a1a2e; font-weight: 700; margin-bottom: 1rem; }
-.vip-name { font-size: 1.5rem; color: #ffd700; font-weight: 800; margin-bottom: 0.5rem; }
-.vip-price { font-size: 2.5rem; color: #fff; font-weight: 800; margin: 1rem 0; }
-.vip-price span { font-size: 1rem; color: rgba(255, 255, 255, 0.5); font-weight: 400; }
-.vip-features { text-align: left; margin-top: 1.5rem; }
-.vip-feature { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; font-size: 0.8rem; color: rgba(255, 255, 255, 0.8); }
-.vip-feature .check { color: #ffd700; font-size: 1rem; }
-.vip-btn { background: linear-gradient(135deg, #ffd700, #ff6b35); color: #1a1a2e; font-size: 1rem; font-weight: 700; padding: 1rem; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; margin-top: 1.5rem; width: 100%; }
-.vip-btn:active { transform: scale(0.97); }
-        .vip-free-ad { display: flex; align-items: center; gap: 0.8rem; background: rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,215,0,0.15); }
-        .vip-free-ad:active { background: rgba(255,215,0,0.08); }
-        .vip-ad-icon { font-size: 1.8rem; }
-        .vip-ad-info { flex: 1; }
-        .vip-ad-title { font-size: 0.85rem; color: #fff; font-weight: 600; }
-        .vip-ad-desc { font-size: 0.6rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
-        .vip-ad-btn { background: linear-gradient(135deg, #ffd700, #ff6b35); color: #1a1a2e; font-size: 0.7rem; font-weight: 700; padding: 0.4rem 0.8rem; border-radius: 8px; white-space: nowrap; }
-        .vip-ad-btn:active { transform: scale(0.95); }
+/* 主页面特定样式 */
+.hero-section {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,1) 0%, rgba(26,26,46,0.95) 100%);
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
 
-        /* 广告弹窗 */
-        .ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 99998; }
-        .ad-overlay.active { display: flex; }
-        .ad-overlay .ad-modal { background: #fff; border-radius: 12px; width: 90%; max-width: 360px; overflow: hidden; position: relative; }
-        .ad-overlay .ad-modal .ad-header { background: linear-gradient(135deg, #ffd700, #ff6b35); padding: 0.8rem 1rem; color: #1a1a2e; font-weight: 700; font-size: 0.85rem; text-align: center; }
-        .ad-overlay .ad-modal .ad-body { min-height: 250px; display: flex; align-items: center; justify-content: center; position: relative; background: #f5f5f5; }
-        .ad-overlay .ad-modal .ad-body #baidu-ad-container { width: 100%; min-height: 250px; }
-        .ad-overlay .ad-modal .ad-countdown { background: #f0f0f0; padding: 0.6rem 1rem; text-align: center; font-size: 0.75rem; color: #666; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .ad-overlay .ad-modal .ad-countdown .cd-timer { color: #ff6b35; font-weight: 700; font-size: 1rem; }
-        .ad-overlay .ad-modal .ad-countdown .cd-btn { background: #ccc; color: #999; border: none; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.7rem; cursor: not-allowed; }
-        .ad-overlay .ad-modal .ad-countdown .cd-btn.enabled { background: linear-gradient(135deg, #ffd700, #ff6b35); color: #1a1a2e; font-weight: 700; cursor: pointer; }
-        .ad-loading-text { color: #999; font-size: 0.85rem; text-align: center; padding: 2rem; }
-        .ad-close-x { position: absolute; top: 8px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #fff; cursor: pointer; z-index: 10; }
-        .vip-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1.5rem; }
-.vip-option { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1rem 0.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
-.vip-option.a { border-color: #ffd700; background: rgba(255, 215, 0, 0.1); }
-.vip-option .duration { font-size: 0.85rem; color: #fff; font-weight: 600; margin-bottom: 0.3rem; }
-.vip-option .price { font-size: 1.2rem; color: #ffd700; font-weight: 700; }
-.vip-option .price span { font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); }
-.vip-option .save { font-size: 0.6rem; color: #ff6b35; margin-top: 0.3rem; font-weight: 600; }
-.vip-pay { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1.5rem; }
-.vip-pay-opt { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; cursor: pointer; transition: all 0.2s; }
-.vip-pay-opt.a { border-color: #ffd700; background: rgba(255, 215, 0, 0.1); }
-.vip-pay-opt .ic { font-size: 1.5rem; }
-.vip-pay-opt .lb { font-size: 0.65rem; color: rgba(255, 255, 255, 0.6); }
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.85); color: #fff; padding: 0.8rem 1.5rem; border-radius: 10px; font-size: 0.85rem; z-index: 99999; backdrop-filter: blur(10px); pointer-events: none; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
-.toast.show { opacity: 1; }
+.hero-title {
+    font-size: 2rem;
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(255,215,0,0.3);
+}
+
+.hero-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 1.5rem;
+}
+
+.quick-access {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.quick-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.quick-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.05));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,215,0,0.1);
+}
+
+.quick-card .icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.quick-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.quick-card p {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.4;
+}
+
+.featured-section {
+    padding: 1rem;
+}
+
+.section-title {
+    color: #ffd700;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.module-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.module-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.module-card .icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.module-card h3 {
+    color: #ffd700;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+}
+
+.module-card p {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.3;
+}
+
+.more-btn {
+    display: block;
+    width: calc(100% - 2rem);
+    margin: 1rem auto;
+    padding: 0.8rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 12px;
+    color: #ffd700;
+    font-size: 0.9rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.more-btn:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,215,0,0.1));
+}
+
+.knowledge-preview {
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.knowledge-card-large {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.knowledge-card-large h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.knowledge-card-large p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 1.5rem;
+    }
+    
+    .quick-access {
+        grid-template-columns: 1fr;
+    }
+    
+    .module-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 </style>
 </head>
 <body>
 
-<div class="phone">
-  <div class="app" id="app">
+<div class="stars" id="stars"></div>
 
-    <div class="status" id="status-bar">
-      <span class="time" id="status-time">00:00</span>
-      <span class="center">
-        <span id="carrier">中国移动</span>
-        <span id="net-type">5G</span>
-      </span>
-      <span class="icons">
-        <span id="signal">📶</span>
-        <span id="wifi">📶</span>
-        <span id="battery">🔋</span>
-        <span id="battery-pct">100%</span>
-      </span>
-    </div>
-
-    <div class="hdr">
-      <h1>玄机算命网</h1>
-    </div>
-
-    <div class="user-bar" id="user-bar" onclick="checkLogin()">
-      <div class="user-avatar" id="ub-avatar">👤</div>
-      <div class="user-info">
-        <div class="user-name" id="ub-name">点击登录</div>
-        <div class="user-desc" id="ub-desc">登录后享受更多服务</div>
-      </div>
-    </div>
-
-    <div class="sch"><div class="sch-i">🔍 搜索你想要的服务</div></div>
-
-    <div class="views" id="views">
-      <div class="page active" id="page-home">
-        <div class="grid">
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">☯️</span>
-            <span class="lb">八字排盘</span>
-          </div>
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">🌙</span>
-            <span class="lb">紫微斗数</span>
-          </div>
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">🎎</span>
-            <span class="lb">生肖运势</span>
-          </div>
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">📅</span>
-            <span class="lb">黄道吉日</span>
-          </div>
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">💑</span>
-            <span class="lb">姻缘配对</span>
-          </div>
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">🏠</span>
-            <span class="lb">风水布局</span>
-          </div>
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">🎓</span>
-            <span class="lb">起名改名</span>
-          </div>
-          <div class="item" onclick="showToast('功能开发中...')">
-            <span class="ic">📖</span>
-            <span class="lb">周公解梦</span>
-          </div>
+<div class="app">
+    <div class="hero-section">
+        <h1 class="hero-title">🔮 玄机算命网</h1>
+        <p class="hero-subtitle">传承千年智慧 · 揭秘命运玄机</p>
+        <div style="margin-top: 1rem;">
+            <button class="btn-primary" onclick="openBazi()" style="margin-right: 0.5rem;">八字排盘</button>
+            <button class="btn-secondary" onclick="openMore()">更多功能</button>
         </div>
+    </div>
 
-        <div class="sec">
-          <h3>热门测算</h3>
-          <span class="mo" onclick="switchTab('more', this)">查看更多 ›</span>
+    <div class="quick-access">
+        <div class="quick-card" onclick="openBazi()">
+            <div class="icon">🎴</div>
+            <h3>八字排盘</h3>
+            <p>天干地支 · 五行分析</p>
         </div>
+        <div class="quick-card" onclick="openZiwei()">
+            <div class="icon">⭐</div>
+            <h3>紫微斗数</h3>
+            <p>14主星 · 12宫位</p>
+        </div>
+        <div class="quick-card" onclick="openHeyun()">
+            <div class="icon">💑</div>
+            <h3>合婚配对</h3>
+            <p>八字合婚 · 姻缘分析</p>
+        </div>
+        <div class="quick-card" onclick="openShengxiao()">
+            <div class="icon">🐉</div>
+            <h3>生肖运势</h3>
+            <p>12生肖 · 年度运势</p>
+        </div>
+    </div>
 
-        <div class="zx-list">
-          <div class="zx-item" onclick="showToast('功能开发中...')">
-            <span class="zx-icon">☯️</span>
-            <div class="zx-info">
-              <div class="zx-title">今日财神方位</div>
-              <div class="zx-desc">根据八字五行，测算今日财神方位，助您财运亨通</div>
+    <div class="featured-section">
+        <h2 class="section-title">🌟 热门算命模块</h2>
+        <div class="module-grid">
+            <div class="module-card" onclick="openXingming()">
+                <div class="icon">📝</div>
+                <h3>姓名测试</h3>
+                <p>五格剖象 · 姓名打分</p>
             </div>
-            <span class="zx-arrow">›</span>
-          </div>
-          <div class="zx-item" onclick="showToast('功能开发中...')">
-            <span class="zx-icon">🌙</span>
-            <div class="zx-info">
-              <div class="zx-title">紫微斗数命盘</div>
-              <div class="zx-desc">十二宫位详解，人生运势一目了然</div>
+            <div class="module-card" onclick="openTarot()">
+                <div class="icon">🎴</div>
+                <h3>塔罗牌</h3>
+                <p>78张牌 · 神秘预测</p>
             </div>
-            <span class="zx-arrow">›</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="page" id="page-shengxiao">
-        <div class="back-btn" onclick="switchTab('home', document.querySelectorAll('.ft .t')[0])">
-          <span>‹</span>
-          <span>返回</span>
-        </div>
-        <div class="sec">
-          <h3>十二生肖运势</h3>
-        </div>
-        <div class="zb-list">
-          <div class="zb-card" onclick="showToast('功能开发中...')">
-            <div class="zb-title">🐭 生肖鼠</div>
-            <div class="zb-desc">今日运势：财运亨通，事业顺利。桃花运旺盛，单身者有望脱单。</div>
-            <span class="zb-tag">财运</span>
-            <span class="zb-tag">事业</span>
-          </div>
-          <div class="zb-card" onclick="showToast('功能开发中...')">
-            <div class="zb-title">🐮 生肖牛</div>
-            <div class="zb-desc">今日运势：稳中求进，不宜冒进。注意家人健康。</div>
-            <span class="zb-tag">健康</span>
-            <span class="zb-tag">家庭</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="page" id="page-zhanbu">
-        <div class="back-btn" onclick="switchTab('home', document.querySelectorAll('.ft .t')[0])">
-          <span>‹</span>
-          <span>返回</span>
-        </div>
-        <div class="sec">
-          <h3>占卜问卦</h3>
-        </div>
-        <div class="zs-list">
-          <div class="zs-card" onclick="showToast('功能开发中...')">
-            <div class="zs-title">🎴 塔罗牌占卜</div>
-            <div class="zs-desc">抽取一张塔罗牌，解读你的运势走向</div>
-          </div>
-          <div class="zs-card" onclick="showToast('功能开发中...')">
-            <div class="zs-title">☯️ 易经占卦</div>
-            <div class="zs-desc">六爻占卦，探寻天机</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page" id="page-more">
-        <div class="back-btn" onclick="switchTab('home', document.querySelectorAll('.ft .t')[0])">
-          <span>‹</span>
-          <span>返回</span>
-        </div>
-        <div class="sec">
-          <h3>全部服务</h3>
-        </div>
-        <div class="zx-list">
-          <div class="zx-item" onclick="showToast('功能开发中...')">
-            <span class="zx-icon">🔮</span>
-            <div class="zx-info">
-              <div class="zx-title">六爻占卜</div>
-              <div class="zx-desc">传统六爻卦象解读</div>
+            <div class="module-card" onclick="openFengshui()">
+                <div class="icon">🏠</div>
+                <h3>风水堪舆</h3>
+                <p>家居风水 · 方位吉凶</p>
             </div>
-            <span class="zx-arrow">›</span>
-          </div>
-          <div class="zx-item" onclick="showToast('功能开发中...')">
-            <span class="zx-icon">📿</span>
-            <div class="zx-info">
-              <div class="zx-title">灵签占卜</div>
-              <div class="zx-desc">观音灵签、关帝灵签</div>
+            <div class="module-card" onclick="openZhougong()">
+                <div class="icon">😴</div>
+                <h3>周公解梦</h3>
+                <p>梦境解析 · 预知吉凶</p>
             </div>
-            <span class="zx-arrow">›</span>
-          </div>
+            <div class="module-card" onclick="openHuangdao()">
+                <div class="icon">📅</div>
+                <h3>黄道吉日</h3>
+                <p>择吉日 · 避凶煞</p>
+            </div>
+            <div class="module-card" onclick="openJiexing()">
+                <div class="icon">🔯</div>
+                <h3>流年解星</h3>
+                <p>年度运势 · 吉凶预判</p>
+            </div>
         </div>
-      </div>
+        
+        <button class="more-btn" onclick="openMore()">
+            查看更多算命模块 →
+        </button>
     </div>
 
-    <div class="ft" id="ft">
-      <div class="t a" onclick="switchTab('home', this)">
-        <span class="ti">🏠</span>
-        <span>首页</span>
-      </div>
-      <div class="t" onclick="switchTab('shengxiao', this)">
-        <span class="ti">🐭</span>
-        <span>生肖</span>
-      </div>
-      <div class="t" onclick="switchTab('zhanbu', this)">
-        <span class="ti">🔮</span>
-        <span>占卜</span>
-      </div>
-      <div class="t" onclick="switchTab('more', this)">
-        <span class="ti">📋</span>
-        <span>更多</span>
-      </div>
-      <div class="t" onclick="checkLogin()">
-        <span class="ti">👤</span>
-        <span>我的</span>
-      </div>
+    <div class="knowledge-preview">
+        <h2 class="section-title">📚 算命知识科普</h2>
+        
+        <div class="knowledge-card-large">
+            <h3>什么是八字？</h3>
+            <p>八字，即生辰八字，是一个人出生时的干支历日期。年干和年支组成年柱，月干和月支组成月柱，日干和日支组成日柱，时干和时支组成时柱；一共四柱，四个干和四个支共八个字，所以称为"八字"。</p>
+            <p>八字命理学通过天干地支的五行生克制化关系，分析一个人的性格、事业、婚姻、健康等各方面的运势走向。</p>
+        </div>
+
+        <div class="knowledge-card-large">
+            <h3>紫微斗数的起源</h3>
+            <p>紫微斗数起源于道家，相传为陈抟老祖（陈希夷）所创。它将人的命运分为12宫位，每宫位有14主星坐守，通过星曜的组合和四化飞星的变化，精准推断人生百态。</p>
+            <p>紫微斗数与八字命理并称为"命理双壁"，前者重星曜组合，后者重五行生克，两者相辅相成。</p>
+        </div>
+
+        <div class="knowledge-card-large">
+            <h3>如何正确使用算命工具？</h3>
+            <p>1. <strong>心态端正</strong>：算命是为提供参考，而非绝对定论。命运掌握在自己手中。</p>
+            <p>2. <strong>信息准确</strong>：输入准确的出生时间（最好精确到分钟），确保排盘准确。</p>
+            <p>3. <strong>综合分析</strong>：不要只看单一指标，要结合八字、紫微、面相、手相等多方面综合判断。</p>
+            <p>4. <strong>理性对待</strong>：算命结果仅供参考，重大决策还需结合现实情况理性分析。</p>
+        </div>
     </div>
-
-    <div class="uc-page" id="uc-page">
-      <div class="uc-hdr">
-        <div class="uc-back" onclick="closeUserCenter()">‹</div>
-        <div class="uc-title">个人中心</div>
-        <div class="uc-spacer"></div>
-      </div>
-      <div class="uc-body">
-        <div class="uc-card">
-          <div class="uc-avatar" id="uc-avatar">👤</div>
-          <div class="uc-name" id="uc-name">未登录</div>
-          <div class="uc-phone" id="uc-phone">请登录后查看</div>
-          <div id="uc-vip-status" style="margin-top: 0.5rem; font-size: 0.75rem; color: rgba(255, 255, 255, 0.4);">未开通会员</div>
-          <div class="uc-stats">
-            <div class="uc-stat">
-              <div class="uc-stat-v" id="uc-free">0</div>
-              <div class="uc-stat-l">免费次数</div>
-            </div>
-            <div class="uc-stat">
-              <div class="uc-stat-v" id="uc-count">0</div>
-              <div class="uc-stat-l">测算次数</div>
-            </div>
-            <div class="uc-stat">
-              <div class="uc-stat-v" id="uc-days">0</div>
-              <div class="uc-stat-l">会员天数</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="uc-menu">
-          <div class="uc-menu-i" onclick="openVip()">
-            <span class="ic">⭐</span>
-            <span class="lb">开通会员</span>
-            <span class="ar">›</span>
-          </div>
-          <div class="uc-menu-i" onclick="showToast('功能开发中...')">
-            <span class="ic">📊</span>
-            <span class="lb">测算历史</span>
-            <span class="ar">›</span>
-          </div>
-          <div class="uc-menu-i" onclick="showToast('功能开发中...')">
-            <span class="ic">💰</span>
-            <span class="lb">我的积分</span>
-            <span class="ar">›</span>
-          </div>
-          <div class="uc-menu-i" onclick="showToast('功能开发中...')">
-            <span class="ic">⚙️</span>
-            <span class="lb">设置</span>
-            <span class="ar">›</span>
-          </div>
-          <div class="uc-menu-i" onclick="doLogout()">
-            <span class="ic">🚪</span>
-            <span class="lb">退出登录</span>
-            <span class="ar">›</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="vip-page" id="vip-page">
-      <div class="vip-hdr">
-        <div class="vip-back" onclick="closeVip()">‹</div>
-        <div class="vip-title">开通会员</div>
-        <div class="vip-spacer"></div>
-      </div>
-      <div class="vip-body">
-        <div class="vip-card">
-          <div class="vip-badge">⭐ 会员专属</div>
-          <div class="vip-name" id="vip-name">免费会员</div>
-          <div class="vip-price" id="vip-price">¥0<span>/月</span></div>
-          <div class="vip-features">
-            <div class="vip-feature"><span class="check">✓</span><span>3次免费测算</span></div>
-            <div class="vip-feature"><span class="check">✓</span><span>基础命理分析</span></div>
-            <div class="vip-feature"><span class="check">✓</span><span>每日运势推送</span></div>
-          </div>
-        </div>
-
-        <div class="sec">
-          <h3>选择时长</h3>
-        </div>
-
-        <div class="vip-options">
-          <div class="vip-option" onclick="selectVipDuration(1, this)">
-            <div class="duration">1个月</div>
-            <div class="price">¥29<span>/月</span></div>
-          </div>
-          <div class="vip-option a" onclick="selectVipDuration(3, this)">
-            <div class="duration">3个月</div>
-            <div class="price">¥25<span>/月</span></div>
-            <div class="save">省¥12</div>
-          </div>
-          <div class="vip-option" onclick="selectVipDuration(12, this)">
-            <div class="duration">12个月</div>
-            <div class="price">¥19<span>/月</span></div>
-            <div class="save">省¥120</div>
-          </div>
-        </div>
-
-        <div class="sec">
-          <h3>支付方式</h3>
-        </div>
-
-        <div class="vip-pay">
-          <div class="vip-pay-opt a" onclick="selectPay('wechat', this)">
-            <span class="ic">💚</span>
-            <span class="lb">微信支付</span>
-          </div>
-          <div class="vip-pay-opt" onclick="selectPay('alipay', this)">
-            <span class="ic">💙</span>
-            <span class="lb">支付宝</span>
-          </div>
-          <div class="vip-pay-opt" onclick="selectPay('qq', this)">
-            <span class="ic">💜</span>
-            <span class="lb">QQ钱包</span>
-          </div>
-        </div>
-
-        <div class="sec">
-          <h3>免费获取</h3>
-        </div>
-
-        <div class="vip-free-ad" onclick="watchAd()">
-          <div class="vip-ad-icon">📺</div>
-          <div class="vip-ad-info">
-            <div class="vip-ad-title">看广告免费领会员</div>
-            <div class="vip-ad-desc">观看15秒广告，领取1天免费会员（百度联盟提供）</div>
-          </div>
-          <div class="vip-ad-btn">立即观看</div>
-        </div>
-
-        <button class="vip-btn" onclick="doVipPay()">立即开通</button>
-      </div>
-    </div>
-
-    <div class="auth-overlay" id="auth-overlay">
-      <div class="auth-hdr">
-        <div class="auth-back" onclick="closeAuth()">✕</div>
-        <div class="auth-title">欢迎来到玄机算命网</div>
-        <div class="auth-spacer"></div>
-      </div>
-      <div class="auth-body">
-        <div class="auth-logo">
-          <h2>玄机算命网</h2>
-          <p>汇聚千年智慧 · 解读命运玄机</p>
-        </div>
-
-        <div class="auth-tabs">
-          <div class="auth-tab a" onclick="switchAuthTab('login', this)">验证码登录</div>
-          <div class="auth-tab" onclick="switchAuthTab('password', this)">密码登录</div>
-          <div class="auth-tab" onclick="switchAuthTab('register', this)">注册账号</div>
-        </div>
-
-        <div class="auth-form" id="form-login">
-          <input type="tel" class="auth-input" id="login-phone" placeholder="请输入手机号" maxlength="11">
-          <div class="row">
-            <input type="tel" class="auth-input" id="login-code" placeholder="请输入验证码" maxlength="6">
-            <button onclick="sendCode('login', this)">获取验证码</button>
-          </div>
-          <button class="auth-btn" onclick="doLogin()">登录</button>
-          <div class="auth-link" onclick="switchAuthTab('forgot', document.querySelector('.auth-tab:nth-child(2)'))">忘记密码？</div>
-        </div>
-
-        <div class="auth-form" id="form-password" style="display: none;">
-          <input type="tel" class="auth-input" id="password-phone" placeholder="请输入手机号" maxlength="11">
-          <input type="password" class="auth-input" id="password-pwd" placeholder="请输入密码">
-          <button class="auth-btn" onclick="doPasswordLogin()">登录</button>
-          <div class="auth-link" onclick="switchAuthTab('forgot', document.querySelector('.auth-tab:nth-child(2)'))">忘记密码？</div>
-        </div>
-
-        <div class="auth-form" id="form-register" style="display: none;">
-          <input type="tel" class="auth-input" id="reg-phone" placeholder="请输入手机号" maxlength="11">
-          <div class="row">
-            <input type="tel" class="auth-input" id="reg-code" placeholder="请输入验证码" maxlength="6">
-            <button onclick="sendCode('register', this)">获取验证码</button>
-          </div>
-          <input type="password" class="auth-input" id="reg-password" placeholder="请设置密码（至少6位）">
-          <button class="auth-btn" onclick="doRegister()">注册并登录</button>
-        </div>
-
-        <div class="auth-form" id="form-forgot" style="display: none;">
-          <input type="tel" class="auth-input" id="forgot-phone" placeholder="请输入手机号" maxlength="11">
-          <div class="row">
-            <input type="tel" class="auth-input" id="forgot-code" placeholder="请输入验证码" maxlength="6">
-            <button onclick="sendCode('forgot', this)">获取验证码</button>
-          </div>
-          <input type="password" class="auth-input" id="forgot-password" placeholder="请设置新密码（至少6位）">
-          <button class="auth-btn" onclick="doForgotPassword()">重置密码</button>
-        </div>
-
-        <div style="margin-top: 2rem; text-align: center;">
-          <div style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.3); margin-bottom: 1rem;">——— 第三方登录 ———</div>
-          <div style="display: flex; justify-content: center; gap: 1.5rem;">
-            <div onclick="doTencentLogin()" style="cursor: pointer; font-size: 2rem;">💚</div>
-            <div onclick="doQQLogin()" style="cursor: pointer; font-size: 2rem;">💜</div>
-            <div onclick="doGithubLogin()" style="cursor: pointer; font-size: 2rem;">🖤</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
-
-    <!-- 广告弹窗 -->
-    <div class="ad-overlay" id="ad-overlay">
-      <div class="ad-modal">
-        <div class="ad-header">观看广告 · 免费领取会员</div>
-        <div class="ad-body">
-          <div id="baidu-ad-container"></div>
-          <div class="ad-close-x" id="ad-close-x" onclick="closeAdOverlay()">✕</div>
-        </div>
-        <div class="ad-countdown">
-          <span>还需观看</span>
-          <span class="cd-timer" id="ad-countdown-num">15</span>
-          <span>秒</span>
-          <button class="cd-btn" id="ad-reward-btn" disabled onclick="claimAdReward()">领取奖励</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
 </div>
 
+<nav class="bottom-nav">
+    <a href="/" class="nav-item active">
+        <div class="nav-icon">🏠</div>
+        <span>首页</span>
+    </a>
+    <a href="/more.html" class="nav-item">
+        <div class="nav-icon">🔮</div>
+        <span>更多</span>
+    </a>
+    <a href="/profile.html" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>我的</span>
+    </a>
+</nav>
+
+<script src="/js/main.js"></script>
 <script>
-var API_BASE = '';
-var currentUser = null;
-var vipDuration = 3;
-var vipPayMethod = 'wechat';
-
-function init() {
-    console.log('init called');
-    
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        API_BASE = '<INTERNAL_URL>';
-    } else {
-        API_BASE = window.location.origin;
-    }
-    console.log('API_BASE:', API_BASE);
-    
-    var saved = localStorage.getItem('xjsm_user');
-    if (saved) {
-        try {
-            currentUser = JSON.parse(saved);
-            updateUserBar();
-        } catch (e) {
-            console.error('Parse user error:', e);
-        }
-    }
-    
-    updateStatus();
-    setInterval(updateStatus, 10000);
-    setInterval(updateBattery, 10000);
+// 页面跳转函数
+function openBazi() {
+    window.location.href = '/modules/bazi.html';
 }
 
-function updateStatus() {
-    var now = new Date();
-    var time = (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
-    document.getElementById('status-time').textContent = time;
-    
-    var battery = document.getElementById('battery-pct');
-    var pct = parseInt(battery.textContent);
-    if (pct > 20 && Math.random() > 0.5) {
-        pct--;
-    } else if (pct < 95) {
-        pct++;
-    }
-    battery.textContent = pct + '%';
+function openZiwei() {
+    window.location.href = '/modules/ziwei.html';
 }
 
-function updateBattery() {
-    // 电池模拟
+function openHeyun() {
+    window.location.href = '/modules/heyun.html';
 }
 
-function switchTab(tab, el) {
-    console.log('switchTab:', tab);
-    
-    document.querySelectorAll('.page').forEach(function(p) {
-        p.classList.remove('active');
-    });
-    
-    var targetMap = {
-        'home': 'page-home',
-        'shengxiao': 'page-shengxiao',
-        'zhanbu': 'page-zhanbu',
-        'more': 'page-more'
-    };
-    
-    var targetId = targetMap[tab];
-    if (targetId) {
-        document.getElementById(targetId).classList.add('active');
-    }
-    
-    document.querySelectorAll('.ft .t').forEach(function(t) {
-        t.classList.remove('a');
-    });
-    if (el) {
-        el.classList.add('a');
-    }
+function openShengxiao() {
+    window.location.href = '/modules/shengxiao.html';
 }
 
-function checkLogin() {
-    console.log('checkLogin called, currentUser:', currentUser);
-    if (currentUser && currentUser.phone) {
-        console.log('User is logged in, opening user center...');
-        openUserCenter();
-    } else {
-        console.log('User not logged in, opening auth...');
-        openAuth();
-    }
+function openXingming() {
+    window.location.href = '/modules/xingming.html';
 }
 
-function openAuth() {
-    console.log('openAuth called');
-    document.getElementById('auth-overlay').classList.add('active');
-    document.body.style.overflow = 'hidden';
+function openTarot() {
+    window.location.href = '/modules/tarot.html';
 }
 
-function closeAuth() {
-    console.log('closeAuth called');
-    document.getElementById('auth-overlay').classList.remove('active');
-    document.body.style.overflow = 'auto';
+function openFengshui() {
+    window.location.href = '/modules/fengshui.html';
 }
 
-function switchAuthTab(tab, el) {
-    console.log('switchAuthTab:', tab);
-    
-    document.querySelectorAll('.auth-tab').forEach(function(t) {
-        t.classList.remove('a');
-    });
-    if (el) {
-        el.classList.add('a');
-    }
-    
-    document.getElementById('form-login').style.display = 'none';
-    document.getElementById('form-password').style.display = 'none';
-    document.getElementById('form-register').style.display = 'none';
-    document.getElementById('form-forgot').style.display = 'none';
-    
-    var formMap = {
-        'login': 'form-login',
-        'password': 'form-password',
-        'register': 'form-register',
-        'forgot': 'form-forgot'
-    };
-    
-    var formId = formMap[tab];
-    if (formId) {
-        document.getElementById(formId).style.display = 'flex';
-    }
+function openZhougong() {
+    window.location.href = '/modules/zhougong.html';
 }
 
-function sendCode(type, btn) {
-    console.log('sendCode:', type);
-    
-    var phone = '';
-    if (type === 'login') {
-        phone = document.getElementById('login-phone').value.trim();
-    } else if (type === 'register') {
-        phone = document.getElementById('reg-phone').value.trim();
-    } else if (type === 'forgot') {
-        phone = document.getElementById('forgot-phone').value.trim();
-    }
-    
-    if (!phone || phone.length !== 11) {
-        showToast('请输入正确的手机号');
-        return;
-    }
-    
-    fetch(API_BASE + '/api/sendCode', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({phone: phone})
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (data.code === 200) {
-            showToast('验证码已发送');
-            
-            var seconds = 60;
-            btn.disabled = true;
-            btn.textContent = seconds + 's';
-            var timer = setInterval(function() {
-                seconds--;
-                btn.textContent = seconds + 's';
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.textContent = '获取验证码';
-                }
-            }, 1000);
-        } else {
-            showToast(data.msg || '发送失败');
-        }
-    })
-    .catch(function(err) {
-        console.error('Send code error:', err);
-        showToast('网络错误');
-    });
+function openHuangdao() {
+    window.location.href = '/modules/huangdao.html';
 }
 
-function doLogin() {
-    console.log('doLogin called');
-    
-    var phone = document.getElementById('login-phone').value.trim();
-    var code = document.getElementById('login-code').value.trim();
-    
-    if (!phone || !code) {
-        showToast('请输入手机号和验证码');
-        return;
-    }
-    
-    fetch(API_BASE + '/api/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({phone: phone, code: code})
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (data.code === 200) {
-            currentUser = data.data;
-            localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
-            updateUserBar();
-            closeAuth();
-            showToast('登录成功');
-        } else {
-            showToast(data.msg || '登录失败');
-        }
-    })
-    .catch(function(err) {
-        console.error('Login error:', err);
-        showToast('网络错误');
-    });
+function openJiexing() {
+    window.location.href = '/modules/jiexing.html';
 }
 
-function doPasswordLogin() {
-    console.log('doPasswordLogin called');
-    
-    var phone = document.getElementById('password-phone').value.trim();
-    var password = document.getElementById('password-pwd').value;
-    
-    if (!phone || !password) {
-        showToast('请输入手机号和密码');
-        return;
-    }
-    
-    fetch(API_BASE + '/api/password_login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({phone: phone, password: password})
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (data.code === 200) {
-            currentUser = data.data;
-            localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
-            updateUserBar();
-            closeAuth();
-            showToast('登录成功');
-        } else {
-            showToast(data.msg || '登录失败');
-        }
-    })
-    .catch(function(err) {
-        console.error('Password login error:', err);
-        showToast('网络错误');
-    });
+function openCaishen() {
+    window.location.href = '/modules/caishen.html';
 }
 
-function doRegister() {
-    console.log('doRegister called');
-    
-    var phone = document.getElementById('reg-phone').value.trim();
-    var code = document.getElementById('reg-code').value.trim();
-    var password = document.getElementById('reg-password').value;
-    
-    if (!phone || !code || !password || !password) {
-        showToast('请填写完整信息');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showToast('密码至少6位');
-        return;
-    }
-    
-    fetch(API_BASE + '/api/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({phone: phone, code: code, password: password})
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (data.code === 200) {
-            currentUser = data.data;
-            localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
-            updateUserBar();
-            closeAuth();
-            openUserCenter();
-            showToast('注册成功');
-        } else {
-            showToast(data.msg || '注册失败');
-        }
-    })
-    .catch(function(err) {
-        console.error('Register error:', err);
-        showToast('网络错误');
-    });
+function openMore() {
+    window.location.href = '/more.html';
 }
 
-function doForgotPassword() {
-    console.log('doForgotPassword called');
-    
-    var phone = document.getElementById('forgot-phone').value.trim();
-    var code = document.getElementById('forgot-code').value.trim();
-    var newPassword = document.getElementById('forgot-password').value;
-    
-    if (!phone || !code || !newPassword) {
-        showToast('请填写完整信息');
-        return;
-    }
-    
-    if (newPassword.length < 6) {
-        showToast('密码至少6位');
-        return;
-    }
-    
-    fetch(API_BASE + '/api/forgot_password', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({phone: phone, code: code, new_password: newPassword})
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (data.code === 200) {
-            showToast('密码重置成功，请登录');
-            switchAuthTab('login', document.querySelector('.auth-tab:first-child'));
-        } else {
-            showToast(data.msg || '重置失败');
-        }
-    })
-    .catch(function(err) {
-        console.error('Forgot password error:', err);
-        showToast('网络错误');
-    });
-}
-
-function doTencentLogin() {
-    console.log('doTencentLogin called');
-    showToast('微信登录开发中...');
-}
-
-function doQQLogin() {
-    console.log('doQQLogin called');
-    showToast('QQ登录开发中...');
-}
-
-function doGithubLogin() {
-    console.log('doGithubLogin called');
-    showToast('GitHub登录开发中...');
-}
-
-function openUserCenter() {
-    console.log('openUserCenter called');
-    if (!currentUser) {
-        openAuth();
-        return;
-    }
-    
-    document.getElementById('uc-name').textContent = currentUser.name;
-    document.getElementById('uc-phone').textContent = currentUser.phone.substring(0, 3) + '****' + currentUser.phone.substring(7);
-    document.getElementById('uc-free').textContent = currentUser.free_count || 3;
-    document.getElementById('uc-avatar').textContent = currentUser.avatar || '👤';
-    
-    var vipStatus = document.getElementById('uc-vip-status');
-    if (currentUser.is_vip) {
-        var exp = new Date(currentUser.vip_expire * 1000).toLocaleDateString();
-        vipStatus.textContent = '⭐ ' + (currentUser.vip_type || '会员') + '（有效期至：' + exp + '）';
-        vipStatus.style.color = '#ffd700';
-        
-        var days = Math.ceil((currentUser.vip_expire - Date.now() / 1000) / 86400);
-        document.getElementById('uc-days').textContent = days;
-    } else {
-        vipStatus.textContent = '未开通会员';
-        vipStatus.style.color = 'rgba(255, 255, 255, 0.4)';
-        document.getElementById('uc-days').textContent = '0';
-    }
-    
-    document.getElementById('uc-page').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeUserCenter() {
-    console.log('closeUserCenter called');
-    document.getElementById('uc-page').classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-function doLogout() {
-    console.log('doLogout called');
-    currentUser = null;
-    localStorage.removeItem('xjsm_user');
-    updateUserBar();
-    closeUserCenter();
-    showToast('已退出登录');
-}
-
-function openVip() {
-    console.log('openVip called');
-    if (!currentUser) {
-        showToast('请先登录');
-        return;
-    }
-    document.getElementById('vip-page').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    
-    if (currentUser.is_vip) {
-        var exp = new Date(currentUser.vip_expire * 1000).toLocaleDateString();
-        document.getElementById('vip-name').textContent = currentUser.vip_type || '会员';
-        document.getElementById('vip-price').innerHTML = '¥0<span>/已开通</span>';
-    }
-}
-
-function closeVip() {
-    console.log('closeVip called');
-    document.getElementById('vip-page').classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-function selectVipDuration(months, el) {
-    console.log('selectVipDuration:', months);
-    vipDuration = months;
-    
-    document.querySelectorAll('.vip-option').forEach(function(opt) {
-        opt.classList.remove('a');
-    });
-    el.classList.add('a');
-    
-    var pricePerMonth = 29;
-    if (months == 3) pricePerMonth = 25;
-    if (months == 12) pricePerMonth = 19;
-    var total = pricePerMonth * months;
-    document.getElementById('vip-price').innerHTML = '¥' + total + '<span>/' + months + '个月</span>';
-}
-
-function selectPay(method, el) {
-    console.log('selectPay:', method);
-    vipPayMethod = method;
-    
-    document.querySelectorAll('.vip-pay-opt').forEach(function(opt) {
-        opt.classList.remove('a');
-    });
-    el.classList.add('a');
-}
-
-function doVipPay() {
-    console.log('doVipPay called, duration:', vipDuration, 'pay:', vipPayMethod);
-    
-    if (!currentUser) {
-        showToast('请先登录');
-        return;
-    }
-    
-    var pricePerMonth = 29;
-    if (vipDuration == 3) pricePerMonth = 25;
-    if (vipDuration == 12) pricePerMonth = 19;
-    var total = pricePerMonth * vipDuration;
-    
-    showToast('正在跳转支付...');
-    
-    setTimeout(function() {
-        fetch(API_BASE + '/api/upgrade_vip', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                phone: currentUser.phone,
-                duration: vipDuration,
-                pay_method: vipPayMethod,
-                amount: total
-            })
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (data.code === 200) {
-                currentUser.is_vip = true;
-                currentUser.vip_expire = data.data.vip_expire;
-                currentUser.vip_type = data.data.vip_type;
-                localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
-                
-                updateUserBar();
-                var vipStatus = document.getElementById('uc-vip-status');
-                var exp = new Date(currentUser.vip_expire * 1000).toLocaleDateString();
-                vipStatus.textContent = '⭐ ' + currentUser.vip_type + '（有效期至：' + exp + '）';
-                vipStatus.style.color = '#ffd700';
-                
-                showToast('会员开通成功！');
-                closeVip();
-            } else {
-                showToast(data.msg || '支付失败');
-            }
-        })
-        .catch(function(err) {
-            console.error('Pay error:', err);
-            showToast('网络错误');
-        });
-    }, 1500);
-}
-
-// ============================================================
-// 广告系统配置
-// ============================================================
-// AD_MODE 可选值：
-//   'mock'  — 模拟模式（立即可用，无需真实广告ID）
-//   'baidu' — 百度联盟（需要 cpro_id，见下方配置）
-//   'google' — Google AdSense（需要 pub_id）
-var AD_MODE = 'baidu';   // ← 在这里切换广告模式
-
-// ===== 百度联盟配置 =====
-// 请在百度联盟后台 (https://union.baidu.com) 创建广告位后，把 cpro_id 填在这里
-var BAIDU_CPRO_ID = '';   // ← 填入你的百度联盟广告位ID，如 'u1234567'
-// 如果为空则自动降级为 mock 模式
-
-// ===== Google AdSense 配置 =====
-var GOOGLE_PUB_ID = '';   // ← 填入你的 Google AdSense pub_id，如 'ca-pub-1234567890'
-
-// ============================================================
-// 广告相关变量
-// ============================================================
-var adTimer = null;       // 倒计时定时器
-var adSecondsLeft = 0;    // 剩余秒数
-var baiduAdLoaded = false; // 百度广告是否加载成功
-
-function watchAd() {
-    console.log('watchAd called, mode=' + AD_MODE);
-    if (!currentUser) { showToast('请先登录'); return; }
-
-    if (AD_MODE === 'baidu') {
-        startBaiduAd();
-        return;
-    }
-
-    if (AD_MODE === 'google') {
-        startGoogleAd();
-        return;
-    }
-
-    // 默认 mock
-    startMockAd();
-}
-
-// ============================================================
-// 模式 A：百度联盟（推荐）
-// ============================================================
-function startBaiduAd() {
-    // 如果没有配置 cpro_id，降级为 mock
-    if (!BAIDU_CPRO_ID) {
-        console.log('百度联盟 cpro_id 未配置，降级为模拟模式');
-        showToast('百度联盟未配置广告位ID，使用模拟模式');
-        startMockAd();
-        return;
-    }
-
-    // 打开广告弹窗
-    openAdOverlay();
-
-    // 加载百度联盟广告
-    baiduAdLoaded = false;
-    var container = document.getElementById('baidu-ad-container');
-    container.innerHTML = '<div class="ad-loading-text">广告加载中...</div>';
-
-    // 使用 slotbydup 方式加载百度广告（推荐）
-    try {
-        var slotId = '_' + Math.random().toString(36).slice(2);
-        var adDiv = document.createElement('div');
-        adDiv.id = slotId;
-        container.innerHTML = '';
-        container.appendChild(adDiv);
-
-        (window.slotbydup = window.slotbydup || []).push({
-            id: BAIDU_CPRO_ID,   // 你的广告位ID
-            container: slotId,
-            size: '300,250',     // 广告尺寸 300x250
-            display: 'inlay-fix'
-        });
-
-        baiduAdLoaded = true;
-        console.log('百度联盟广告已推送，cpro_id=' + BAIDU_CPRO_ID);
-
-        // 启动倒计时
-        startAdCountdown(15);
-    } catch (e) {
-        console.error('百度联盟广告加载失败:', e);
-        container.innerHTML = '<div class="ad-loading-text">广告加载失败，使用模拟模式</div>';
-        setTimeout(function() { closeAdOverlay(); startMockAd(); }, 1500);
-    }
-}
-
-// ============================================================
-// 模式 B：Google AdSense
-// ============================================================
-function startGoogleAd() {
-    if (!GOOGLE_PUB_ID) {
-        console.log('Google AdSense pub_id 未配置，降级为模拟模式');
-        showToast('Google AdSense 未配置，使用模拟模式');
-        startMockAd();
-        return;
-    }
-
-    // 纯 Web 端 Google AdSense 只支持展示广告
-    // 激励视频需要 AdMob + App 壳
-    openAdOverlay();
-
-    var container = document.getElementById('baidu-ad-container');
-    container.innerHTML = '<div class="ad-loading-text">广告加载中...</div>';
-
-    try {
-        if (typeof adsbygoogle === 'undefined') {
-            var s = document.createElement('script');
-            s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + GOOGLE_PUB_ID;
-            s.async = true;
-            s.crossOrigin = 'anonymous';
-            s.onload = function() {
-                console.log('Google AdSense SDK 加载成功');
-                loadGoogleAdSlot(container);
-            };
-            s.onerror = function() {
-                console.log('Google AdSense SDK 加载失败');
-                container.innerHTML = '<div class="ad-loading-text">SDK加载失败，使用模拟模式</div>';
-                setTimeout(function() { closeAdOverlay(); startMockAd(); }, 1500);
-            };
-            document.head.appendChild(s);
-        } else {
-            loadGoogleAdSlot(container);
-        }
-    } catch (e) {
-        console.error('Google AdSense 加载失败:', e);
-        closeAdOverlay();
-        startMockAd();
-    }
-}
-
-function loadGoogleAdSlot(container) {
-    container.innerHTML = '';
-    var ins = document.createElement('ins');
-    ins.className = 'adsbygoogle';
-    ins.style.display = 'block';
-    ins.setAttribute('data-ad-client', GOOGLE_PUB_ID);
-    ins.setAttribute('data-ad-slot', 'auto');
-    ins.setAttribute('data-ad-format', 'auto');
-    ins.setAttribute('data-full-width-responsive', 'true');
-    container.appendChild(ins);
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
-    startAdCountdown(15);
-}
-
-// ============================================================
-// 模式 C：模拟模式（立即可用）
-// ============================================================
-function startMockAd() {
-    openAdOverlay();
-
-    var container = document.getElementById('baidu-ad-container');
-    container.innerHTML = '';
-    // 模拟广告展示区域
-    var mockAd = document.createElement('div');
-    mockAd.style.cssText = 'width:100%;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:1.5rem;text-align:center;';
-    mockAd.innerHTML = '<div style="font-size:2.5rem;margin-bottom:0.8rem;">📺</div>' +
-        '<div style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;">赞助商广告</div>' +
-        '<div style="font-size:0.75rem;opacity:0.7;margin-bottom:1rem;">观看完整广告即可领取1天免费会员</div>' +
-        '<div style="font-size:0.65rem;opacity:0.5;">（模拟广告 · 真实模式需配置百度联盟ID）</div>';
-    container.appendChild(mockAd);
-
-    startAdCountdown(15);
-}
-
-// ============================================================
-// 广告弹窗控制
-// ============================================================
-function openAdOverlay() {
-    document.getElementById('ad-overlay').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    // 重置倒计时和按钮
-    adSecondsLeft = 15;
-    var numEl = document.getElementById('ad-countdown-num');
-    var btnEl = document.getElementById('ad-reward-btn');
-    if (numEl) numEl.textContent = adSecondsLeft;
-    if (btnEl) { btnEl.disabled = true; btnEl.classList.remove('enabled'); btnEl.textContent = '领取奖励'; }
-}
-
-function closeAdOverlay() {
-    document.getElementById('ad-overlay').classList.remove('active');
-    document.body.style.overflow = 'auto';
-    if (adTimer) { clearInterval(adTimer); adTimer = null; }
-}
-
-// ============================================================
-// 倒计时逻辑
-// ============================================================
-function startAdCountdown(seconds) {
-    adSecondsLeft = seconds;
-    var numEl = document.getElementById('ad-countdown-num');
-    var btnEl = document.getElementById('ad-reward-btn');
-
-    if (adTimer) { clearInterval(adTimer); adTimer = null; }
-
-    adTimer = setInterval(function() {
-        adSecondsLeft--;
-        if (numEl) numEl.textContent = adSecondsLeft;
-
-        if (adSecondsLeft <= 0) {
-            clearInterval(adTimer);
-            adTimer = null;
-            // 启用领取按钮
-            if (btnEl) {
-                btnEl.disabled = false;
-                btnEl.classList.add('enabled');
-            }
-        }
-    }, 1000);
-}
-
-// ============================================================
-// 领取奖励
-// ============================================================
-function claimAdReward() {
-    if (adSecondsLeft > 0) {
-        showToast('请等待广告播放完毕');
-        return;
-    }
-    closeAdOverlay();
-    grantAdReward();
-}
-
-// ============================================================
-// 发放奖励（所有模式共用）
-// ============================================================
-function grantAdReward() {
-    console.log('grantAdReward');
-    fetch(API_BASE + '/api/watch_ad', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ phone: currentUser.phone })
-    })
-    .then(function(res){ return res.json(); })
-    .then(function(data){
-        if (data.code === 200) {
-            currentUser.is_vip = true;
-            currentUser.vip_expire = data.data.vip_expire;
-            currentUser.vip_type = data.data.vip_type;
-            localStorage.setItem('xjsm_user', JSON.stringify(currentUser));
-            updateUserBar();
-            var vipStatus = document.getElementById('uc-vip-status');
-            var exp = new Date(currentUser.vip_expire * 1000).toLocaleDateString();
-            vipStatus.textContent = '⭐ ' + currentUser.vip_type + '（有效期至：' + exp + '）';
-            vipStatus.style.color = '#ffd700';
-            showToast('🎉 恭喜获得1天免费会员！');
-            closeVip();
-        } else {
-            showToast(data.msg || '领取失败');
-        }
-    })
-    .catch(function(err){
-        console.error('grantAdReward error:', err);
-        showToast('网络错误');
-    });
-}
-
-
-function updateUserBar() {
-    console.log('updateUserBar called, currentUser:', currentUser);
-    if (currentUser && currentUser.phone) {
-        document.getElementById('ub-name').textContent = currentUser.name;
-        document.getElementById('ub-desc').textContent = '免费次数：' + (currentUser.free_count || 3);
-        document.getElementById('ub-avatar').textContent = currentUser.avatar || '👤';
-    } else {
-        document.getElementById('ub-name').textContent = '点击登录';
-        document.getElementById('ub-desc').textContent = '登录后享受更多服务';
-        document.getElementById('ub-avatar').textContent = '👤';
-    }
-}
-
-function showToast(msg) {
-    console.log('showToast:', msg);
-    var toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(function() {
-        toast.classList.remove('show');
-    }, 2000);
-}
-
-document.addEventListener('DOMContentLoaded', init);
+// 初始化星空背景
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
 </script>
 
 </body>

@@ -1,0 +1,1 @@
+#!/bin/bash<br/>cd /root/suanming/suanming<br/>git pull origin master<br/>pkill gunicorn<br/>sleep 3<br/>python3 -c "import subprocess,os; os.chdir('/root/suanming/suanming'); subprocess.Popen('python3 -m gunicorn -c gunicorn_config.py api.app:app', shell=True)"<br/>sleep 3<br/>echo "更新完成"

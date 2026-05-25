@@ -23,10 +23,10 @@ graceful_timeout = 10
 keepalive = 5
 
 # 访问日志文件
-accesslog = '/workspace/logs/access.log'
+accesslog = '/root/suanming/suanming/logs/access.log'
 
 # 错误日志文件
-errorlog = '/workspace/logs/error.log'
+errorlog = '/root/suanming/suanming/logs/error.log'
 
 # 日志级别
 loglevel = 'info'
@@ -44,12 +44,12 @@ max_requests_jitter = 50
 # 热更新配置
 reload = True  # 启用自动重载
 reload_extra_files = [
-    '/workspace/api/app.py',
-    '/workspace/api/sms_extension.py',
-    '/workspace/login.html',
-    '/workspace/register.html',
-    '/workspace/forgot-password.html',
-    '/workspace/reset-password.html'
+    '/root/suanming/suanming/api/app.py',
+    '/root/suanming/suanming/api/sms_extension.py',
+    '/root/suanming/suanming/login.html',
+    '/root/suanming/suanming/register.html',
+    '/root/suanming/suanming/forgot-password.html',
+    '/root/suanming/suanming/reset-password.html'
 ]
 
 # 环境变量

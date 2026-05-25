@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>紫微斗数 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>⭐ 紫微斗数</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>紫微斗数简介</h2>
+            <p>紫微斗数是中国传统命理学的重要分支，与八字命理并称为"命理双壁"。</p>
+            <p>它通过分析命盘中14主星在12宫位的分布，以及四化飞星的影响，来推断一个人的命运走势。</p>
+        </div>
+
+        <div class="section">
+            <h2>14主星</h2>
+            <ul>
+                <li><strong>紫微星</strong>：帝座，代表尊贵、领导</li>
+                <li><strong>天机星</strong>：益算，代表智慧、变动</li>
+                <li><strong>太阳星</strong>：光辉，代表博爱、发散</li>
+                <li><strong>武曲星</strong>：财星，代表刚毅、求财</li>
+                <li><strong>天同星</strong>：福星，代表享受、温和</li>
+                <li><strong>廉贞星</strong>：囚星，代表是非、桃花</li>
+                <li><strong>天府星</strong>：财库，代表稳健、财库</li>
+                <li><strong>太阴星</strong>：富星，代表阴柔、财富</li>
+                <li><strong>贪狼星</strong>：桃花，代表欲望、多才</li>
+                <li><strong>巨门星</strong>：暗星，代表口舌、是非</li>
+                <li><strong>天相星</strong>：印星，代表辅佐、文书</li>
+                <li><strong>天梁星</strong>：荫星，代表逢凶化吉、清高</li>
+                <li><strong>七杀星</strong>：将星，代表冲锋、冒险</li>
+                <li><strong>破军星</strong>：耗星，代表破坏与重建</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>12宫位</h2>
+            <table class="result-table">
+                <tr>
+                    <th>宫位</th>
+                    <th>含义</th>
+                </tr>
+                <tr><td>命宫</td><td>核心性格、先天格局</td></tr>
+                <tr><td>兄弟宫</td><td>兄弟姐妹、合作伙伴</td></tr>
+                <tr><td>夫妻宫</td><td>感情模式、婚姻状况</td></tr>
+                <tr><td>子女宫</td><td>子女缘分、生育状况</td></tr>
+                <tr><td>财帛宫</td><td>赚钱能力、理财观念</td></tr>
+                <tr><td>疾厄宫</td><td>身体健康、体质倾向</td></tr>
+                <tr><td>迁移宫</td><td>外出运势、人际关系</td></tr>
+                <tr><td>交友宫</td><td>朋友、下属、社交圈</td></tr>
+                <tr><td>官禄宫</td><td>事业方向、工作态度</td></tr>
+                <tr><td>田宅宫</td><td>不动产、家庭环境</td></tr>
+                <tr><td>福德宫</td><td>精神世界、潜意识</td></tr>
+                <tr><td>父母宫</td><td>父母关系、长辈缘</td></tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>四化飞星</h2>
+            <ul>
+                <li><strong>化禄</strong>：福气、金钱、人缘</li>
+                <li><strong>化权</strong>：权力、掌控、行动</li>
+                <li><strong>化科</strong>：名声、贵人、教化</li>
+                <li><strong>化忌</strong>：执着、欠债、波折</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

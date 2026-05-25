@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>星座运势 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 星座运势页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.zodiac-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.zodiac-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.zodiac-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+    transform: translateY(-2px);
+}
+
+.zodiac-card.active {
+    border-color: rgba(255,215,0,0.5);
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1));
+}
+
+.zodiac-emoji {
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+}
+
+.zodiac-name {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+}
+
+.fortune-result {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-top: 1rem;
+    display: none;
+}
+
+.fortune-date {
+    font-size: 1.1rem;
+    color: #ffd700;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+}
+
+.fortune-rank {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.rank-top {
+    background: rgba(255,215,0,0.2);
+    color: #ffd700;
+}
+
+.rank-mid {
+    background: rgba(0,255,0,0.15);
+    color: #0f0;
+}
+
+.rank-low {
+    background: rgba(255,0,0,0.15);
+    color: #f00;
+}
+
+.fortune-section {
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255,215,0,0.08);
+}
+
+.fortune-section:last-child {
+    border-bottom: none;
+}
+
+.fortune-section h3 {
+    font-size: 0.9rem;
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+}
+
+.fortune-section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.fortune-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.fortune-tag {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: rgba(255,215,0,0.1);
+    color: rgba(255,255,255,0.7);
+}
+
+.element-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.element-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.element-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.element-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.element-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+@media (max-width: 768px) {
+    .zodiac-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .element-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>✨ 星座运势</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>选择你的星座</h2>
+            <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem;">
+                查看2026年5月你的星座运势详解
+            </p>
+            
+            <div class="zodiac-grid" id="zodiacGrid">
+                <div class="zodiac-card" data-zodiac="白羊座" onclick="selectZodiac('白羊座', '♈')">
+                    <div class="zodiac-emoji">♈</div>
+                    <div class="zodiac-name">白羊座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="金牛座" onclick="selectZodiac('金牛座', '♉')">
+                    <div class="zodiac-emoji">♉</div>
+                    <div class="zodiac-name">金牛座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="双子座" onclick="selectZodiac('双子座', '♊')">
+                    <div class="zodiac-emoji">♊</div>
+                    <div class="zodiac-name">双子座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="巨蟹座" onclick="selectZodiac('巨蟹座', '♋')">
+                    <div class="zodiac-emoji">♋</div>
+                    <div class="zodiac-name">巨蟹座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="狮子座" onclick="selectZodiac('狮子座', '♌')">
+                    <div class="zodiac-emoji">♌</div>
+                    <div class="zodiac-name">狮子座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="处女座" onclick="selectZodiac('处女座', '♍')">
+                    <div class="zodiac-emoji">♍</div>
+                    <div class="zodiac-name">处女座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="天秤座" onclick="selectZodiac('天秤座', '♎')">
+                    <div class="zodiac-emoji">♎</div>
+                    <div class="zodiac-name">天秤座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="天蝎座" onclick="selectZodiac('天蝎座', '♏')">
+                    <div class="zodiac-emoji">♏</div>
+                    <div class="zodiac-name">天蝎座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="射手座" onclick="selectZodiac('射手座', '♐')">
+                    <div class="zodiac-emoji">♐</div>
+                    <div class="zodiac-name">射手座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="摩羯座" onclick="selectZodiac('摩羯座', '♑')">
+                    <div class="zodiac-emoji">♑</div>
+                    <div class="zodiac-name">摩羯座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="水瓶座" onclick="selectZodiac('水瓶座', '♒')">
+                    <div class="zodiac-emoji">♒</div>
+                    <div class="zodiac-name">水瓶座</div>
+                </div>
+                <div class="zodiac-card" data-zodiac="双鱼座" onclick="selectZodiac('双鱼座', '♓')">
+                    <div class="zodiac-emoji">♓</div>
+                    <div class="zodiac-name">双鱼座</div>
+                </div>
+            </div>
+            
+            <div class="fortune-result" id="fortuneResult">
+                <!-- 运势结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>十二星座基础知识</h2>
+            
+            <div class="element-grid">
+                <div class="element-card">
+                    <h3>火象星座</h3>
+                    <p><strong>白羊座、狮子座、射手座</strong></p>
+                    <p>性格：热情、积极、直接、有领导力</p>
+                    <p>优点：勇敢、乐观、行动力强</p>
+                    <p>缺点：冲动、自我、缺乏耐心</p>
+                </div>
+                
+                <div class="element-card">
+                    <h3>土象星座</h3>
+                    <p><strong>金牛座、处女座、摩羯座</strong></p>
+                    <p>性格：稳重、务实、保守、有耐心</p>
+                    <p>优点：可靠、负责、组织力强</p>
+                    <p>缺点：固执、保守、缺乏变通</p>
+                </div>
+                
+                <div class="element-card">
+                    <h3>风象星座</h3>
+                    <p><strong>双子座、天秤座、水瓶座</strong></p>
+                    <p>性格：理性、社交、聪明、善变</p>
+                    <p>优点：沟通力强、思维敏捷、客观</p>
+                    <p>缺点：优柔寡断、表面化、不够深入</p>
+                </div>
+                
+                <div class="element-card">
+                    <h3>水象星座</h3>
+                    <p><strong>巨蟹座、天蝎座、双鱼座</strong></p>
+                    <p>性格：情感、直觉、敏感、有同情心</p>
+                    <p>优点：善解人意、创造力强、有洞察力</p>
+                    <p>缺点：情绪化、多愁善感、难以捉摸</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>星座与爱情配对</h2>
+            <p>星座配对是西方占星学的重要内容，通过太阳星座的元素的mode，可以判断两人的compatibility。</p>
+            
+            <div class="element-grid">
+                <div class="element-card">
+                    <h3>最佳配对</h3>
+                    <p><strong>火象：</strong>白羊-狮子、狮子-射手、射手-白羊</p>
+                    <p><strong>土象：</strong>金牛-处女、处女-摩羯、摩羯-金牛</p>
+                    <p><strong>风象：</strong>双子-天秤、天秤-水瓶、水瓶-双子</p>
+                    <p><strong>水象：</strong>巨蟹-天蝎、天蝎-双鱼、双鱼-巨蟹</p>
+                </div>
+                
+                <div class="element-card">
+                    <h3>还不错</h3>
+                    <p><strong>火+风：</strong>火的热情+风的理性=平衡</p>
+                    <p><strong>土+水：</strong>土的稳重+水的情感=稳定</p>
+                </div>
+                
+                <div class="element-card">
+                    <h3>需要努力</h3>
+                    <p><strong>火+水：</strong>火的热情容易被水浇灭</p>
+                    <p><strong>土+风：</strong>土的保守可能限制风的自由</p>
+                </div>
+                
+                <div class="element-card">
+                    <h3>挑战组合</h3>
+                    <p><strong>同元素：</strong>太相似，缺乏互补</p>
+                    <p><strong>对宫星座：</strong>吸引力强，但冲突也多</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>星座运势的历史渊源</h2>
+            <p>西方占星学起源于古巴比伦，后传入希腊、埃及、罗马等地。公元2世纪，希腊天文学家托勒密著有《占星四书》，系统化了西方占星学。</p>
+            <p>文艺复兴时期，占星学达到鼎盛，许多天文学家同时也是占星学家。现代占星学则更加注重心理分析和自我认知，成为一种流行的文化现象。</p>
+            <p>需要注意的是，星座运势更多是一种娱乐和心理暗示，不应过于迷信。每个人的命运都掌握在自己手中，星座只是参考之一。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+function selectZodiac(zodiac, emoji) {
+    // 移除所有active类
+    document.querySelectorAll('.zodiac-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    // 给当前选择的卡片添加active类
+    event.currentTarget.classList.add('active');
+    
+    // 显示运势结果
+    showFortune(zodiac, emoji);
+}
+
+function showFortune(zodiac, emoji) {
+    const fortunes = {
+        '白羊座': { rank: 'TOP', score: 95, love: '桃花旺盛，单身者有机会遇到心仪对象，有伴侣者感情升温。', career: '事业运佳，有新项目或升职机会，把握展示自己。', wealth: '财运不错，正财稳定，偏财有小收获，但需谨慎投资。', health: '精力充沛，但需注意用眼过度和上火问题。' },
+        '金牛座': { rank: 'MID', score: 75, love: '感情平稳，单身者需主动出击，有伴侣者需多沟通。', career: '工作稳步推进，但需注意细节，避免小错误。', wealth: '财运平稳，适合储蓄和稳健投资，不宜冒险。', health: '健康良好，但需注意饮食规律，避免肠胃问题。' },
+        '双子座': { rank: 'TOP', score: 90, love: '沟通顺畅，单身者魅力四射，有伴侣者甜蜜温馨。', career: '思路敏捷，适合创意工作和谈判，易得贵人相助。', wealth: '财运亨通，正财偏财皆旺，但需节制开支。', health: '精神状态佳，但需注意休息，避免神经衰弱。' },
+        '巨蟹座': { rank: 'MID', score: 78, love: '情感丰富，单身者易怀旧，有伴侣者需给予空间。', career: '工作需耐心，家庭事务可能影响工作，需平衡。', wealth: '财运一般，家庭开支较大，需精打细算。', health: '情绪敏感，需注意心理健康，多参加户外活动。' },
+        '狮子座': { rank: 'TOP', score: 92, love: '魅力十足，单身者易吸引异性，有伴侣者浪漫满满。', career: '领导力展现，适合担当重任，易获得认可和赞赏。', wealth: '财运旺盛，收入增加，但需注意 luxuries 消费。', health: '活力四射，但需避免骄傲导致的意外。' },
+        '处女座': { rank: 'LOW', score: 65, love: '挑剔心重，单身者标准过高，有伴侣者需包容对方。', career: '工作细致，但易陷于完美主义，需学会放手。', wealth: '财运平平，需控制强迫性购物，做好预算。', health: '易焦虑，需注意消化系统，保持规律作息。' },
+        '天秤座': { rank: 'MID', score: 80, love: '优雅迷人，单身者桃花朵朵，有伴侣者需平衡自我与关系。', career: '合作运佳，适合团队工作，但需避免优柔寡断。', wealth: '财运中等，合作生财，但需明确利益分配。', health: '需平衡工作与休息，避免腰肾问题。' },
+        '天蝎座': { rank: 'TOP', score: 88, love: '深情专一，单身者易遇深刻缘分，有伴侣者关系深入。', career: '洞察力强，适合调研和策划，秘密项目易成功。', wealth: '财运不错，偏财尤旺，但需避免赌博心态。', health: '恢复力强，但需避免极端情绪影响健康。' },
+        '射手座': { rank: 'MID', score: 82, love: '自由奔放，单身者易有异地恋，有伴侣者需给予自由。', career: '机会多多，适合拓展和旅行，但需避免三分种热度。', wealth: '财运波动，收入有望增加，但开支也不小。', health: '活力充沛，但需避免运动伤害和盲目乐观。' },
+        '摩羯座': { rank: 'LOW', score: 68, love: '保守谨慎，单身者不易开口，有伴侣者需表达情感。', career: '稳扎稳打，适合长期规划，但需注意工作狂倾向。', wealth: '财运稳定，适合长期投资，但需避免过于保守。', health: '骨骼关节需注意，避免过度疲劳和压抑。' },
+        '水瓶座': { rank: 'MID', score: 85, love: '独立特别，单身者易被与众不同吸引，有伴侣者需保持新鲜感。', career: '创意无限的，适合科技和公益，易得赏识。', wealth: '财运不错，正财为主，但需避免理想化投资。', health: '需注意循环系统，保持创新同时也要接地气。' },
+        '双鱼座': { rank: 'LOW', score: 62, love: '浪漫多感，单身者易陷入幻想，有伴侣者需面对现实。', career: '直觉敏锐，适合艺术和疗愈，但需避免逃避现实。', wealth: '财运不佳，易有意外开支，需做好财务规划。', health: '需注意足部问题，避免沉迷幻想影响健康。' }
+    };
+    
+    const fortune = fortunes[zodiac];
+    const rankClass = fortune.rank === 'TOP' ? 'rank-top' : fortune.rank === 'MID' ? 'rank-mid' : 'rank-low';
+    const rankText = fortune.rank === 'TOP' ? '大吉' : fortune.rank === 'MID' ? '中吉' : '平';
+    
+    let html = `
+        <div class="fortune-date">${emoji} ${zodiac} · 2026年5月运势</div>
+        <div class="fortune-rank ${rankClass}">${rankText}（${fortune.score}分）</div>
+        
+        <div class="fortune-section">
+            <h3>❤️ 爱情运</h3>
+            <p>${fortune.love}</p>
+        </div>
+        
+        <div class="fortune-section">
+            <h3>💼 事业运</h3>
+            <p>${fortune.career}</p>
+        </div>
+        
+        <div class="fortune-section">
+            <h3>💰 财运</h3>
+            <p>${fortune.wealth}</p>
+        </div>
+        
+        <div class="fortune-section">
+            <h3>🏥 健康运</h3>
+            <p>${fortune.health}</p>
+        </div>
+        
+        <div class="fortune-tags">
+            <span class="fortune-tag">幸运颜色：红/蓝/绿</span>
+            <span class="fortune-tag">幸运数字：3/7/9</span>
+            <span class="fortune-tag">幸运方位：东/南</span>
+            <span class="fortune-tag">提醒：把握机会，理性决策</span>
+        </div>
+    `;
+    
+    document.getElementById('fortuneResult').innerHTML = html;
+    document.getElementById('fortuneResult').style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

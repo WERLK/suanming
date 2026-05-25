@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>手相解读 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 手相解读页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.line-diagram {
+    text-align: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+}
+
+.line-diagram h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.palm-lines {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.line-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.line-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.line-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.line-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+.mount-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.mount-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.mount-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.mount-card h3 {
+    color: #ffd700;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.mount-card p {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.7);
+}
+
+.analysis-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    display: none;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-card h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.result-card p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+@media (max-width: 768px) {
+    .palm-lines,
+    .mount-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🖐️ 手相解读</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>手相学简介</h2>
+            <p>手相学是通过观察手掌的纹路、形状、气色等特征，来推断一个人的性格、命运、健康、财运等。手相学认为，"手中有乾坤"，手掌上的每一条纹路都蕴含着命运的信息。</p>
+            <p>手相学起源于印度，后传入中国，与面相学、骨相学并称为"三相"。西方手相学则更注重心理分析和性格解读。</p>
+        </div>
+
+        <div class="section">
+            <h2>三大主线</h2>
+            <p>手相学中最重要的是"三大主线"：生命线、智慧线、感情线。这三条线几乎每个人手上都有，是解读手相的基础。</p>
+            
+            <div class="palm-lines">
+                <div class="line-card">
+                    <h3>生命线</h3>
+                    <p><strong>位置：</strong>环绕大拇指根部，呈弧形</p>
+                    <p><strong>含义：</strong>反映生命力、健康状况、寿命长短</p>
+                    <p><strong>深长清晰：</strong>生命力旺盛、身体健康、寿命较长</p>
+                    <p><strong>浅短断裂：</strong>体质较弱、容易疲劳、注意养生</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>智慧线</h3>
+                    <p><strong>位置：</strong>横贯手掌中部，从虎口延伸至掌边</p>
+                    <p><strong>含义：</strong>反映智力、思维、判断力、记忆力</p>
+                    <p><strong>深长平直：</strong>思维清晰、判断力强、记忆力好</p>
+                    <p><strong>弯曲杂乱：</strong>思维活跃、想象力丰富、但易分心</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>感情线</h3>
+                    <p><strong>位置：</strong>位于智慧线上方，从小指下方延伸至食指或中指下方</p>
+                    <p><strong>含义：</strong>反映情感模式、爱情观、人际关系</p>
+                    <p><strong>深长清晰：</strong>感情丰富、重情重义、人际关系好</p>
+                    <p><strong>浅短断裂：</strong>感情淡薄、理性冷静、不善表达</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>其他重要线纹</h2>
+            
+            <div class="palm-lines">
+                <div class="line-card">
+                    <h3>命运线（事业线）</h3>
+                    <p>从手掌底部向上延伸，反映事业发展、社会地位、人生起伏。</p>
+                    <p><strong>清晰深长：</strong>事业顺利、社会地位高、人生目标明确</p>
+                    <p><strong>断裂弯曲：</strong>职业多变、人生波折、需努力奋斗</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>婚姻线</h3>
+                    <p>位于小指根部侧面，短横线，反映婚姻状况、感情稳定性。</p>
+                    <p><strong>清晰深长：</strong>婚姻美满、感情稳定、夫妻和睦</p>
+                    <p><strong>浅短多条：</strong>感情丰富、桃花运旺、但易有波折</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>财运线</h3>
+                    <p>位于小指根部垂直向下的短竖线，反映财运、理财能力。</p>
+                    <p><strong>清晰深长：</strong>财运亨通、理财有道、积蓄丰厚</p>
+                    <p><strong>浅短杂乱：</strong>财运平平、开支较大、需谨慎理财</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>健康线</h3>
+                    <p>从手掌底部向小指方向延伸的斜线，反映健康状况、疾病倾向。</p>
+                    <p><strong>清晰深长：</strong>身体健康、抵抗力强、少病少灾</p>
+                    <p><strong>断裂杂乱：</strong>体质较弱、易有疾病、需注意养生</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>九大丘（宫位）</h2>
+            <p>手掌上除了线纹，还有九个"丘"（凸起的部位），每个丘对应不同的行星和命运领域：</p>
+            
+            <div class="mount-grid">
+                <div class="mount-card">
+                    <h3>金星丘</h3>
+                    <p>大拇指根部</p>
+                    <p>代表：爱情、魅力、活力</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>木星丘</h3>
+                    <p>食指根部</p>
+                    <p>代表：野心、自信、领导力</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>土星丘</h3>
+                    <p>中指根部</p>
+                    <p>代表：责任感、谨慎、思考</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>太阳丘</h3>
+                    <p>无名指根部</p>
+                    <p>代表：艺术、名声、成功</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>水星丘</h3>
+                    <p>小指根部</p>
+                    <p>代表：商业、沟通、智慧</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>火星丘（上）</h3>
+                    <p>金星丘上方</p>
+                    <p>代表：勇气、行动力、竞争力</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>火星丘（下）</h3>
+                    <p>月丘下方</p>
+                    <p>代表：忍耐力、自制力、谋略</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>月丘</h3>
+                    <p>手掌外侧下方</p>
+                    <p>代表：想象力、直觉、第六感</p>
+                </div>
+                
+                <div class="mount-card">
+                    <h3>金星带</h3>
+                    <p>环绕中指和无名指的弧形</p>
+                    <p>代表：艺术天赋、情感丰富</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>手型与性格</h2>
+            
+            <div class="palm-lines">
+                <div class="line-card">
+                    <h3>金型手（方型手）</h3>
+                    <p><strong>特征：</strong>手掌方正、手指短粗、肉质坚硬</p>
+                    <p><strong>性格：</strong>务实稳重、执行力强、重视物质</p>
+                    <p><strong>适合：</strong>金融、工程、管理等实务性工作</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>木型手（结节手）</h3>
+                    <p><strong>特征：</strong>手指修长、关节明显、手掌较薄</p>
+                    <p><strong>性格：</strong>思维敏捷、理想主义、追求完美</p>
+                    <p><strong>适合：</strong>研究、教育、艺术等创造性工作</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>水型手（圆锥手）</h3>
+                    <p><strong>特征：</strong>手掌柔软、手指圆润、指甲呈圆锥形</p>
+                    <p><strong>性格：</strong>情感丰富、直觉敏锐、善于社交</p>
+                    <p><strong>适合：</strong>演艺、公关、心理咨询等需情感投入的工作</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>火型手（尖型手）</h3>
+                    <p><strong>特征：</strong>手掌尖长、手指尖锐、皮肤细腻</p>
+                    <p><strong>性格：</strong>热情冲动、直觉强、创造力丰富</p>
+                    <p><strong>适合：</strong>创业、销售、艺术创作等需激情的工作</p>
+                </div>
+                
+                <div class="line-card">
+                    <h3>土型手（混合型手）</h3>
+                    <p><strong>特征：</strong>手掌厚实、手指圆润、肉质柔软</p>
+                    <p><strong>性格：</strong>温和稳重、忍耐力强、重视家庭</p>
+                    <p><strong>适合：</strong>农业、医疗、服务等行业</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>手相分析工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                上传你的手掌照片（左手和右手），我们将通过AI技术自动识别掌纹特征，并结合传统手相学知识，为你提供详细的手相分析报告。
+            </p>
+            
+            <div class="analysis-form">
+                <div class="form-group">
+                    <label class="form-label">上传左手照片（清晰无遮挡）</label>
+                    <input type="file" class="form-input" accept="image/*" id="leftHandInput">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">上传右手照片（清晰无遮挡）</label>
+                    <input type="file" class="form-input" accept="image/*" id="rightHandInput">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <select class="form-input" id="genderInput">
+                        <option value="male">男性</option>
+                        <option value="female">女性</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">年龄</label>
+                    <input type="number" class="form-input" id="ageInput" placeholder="请输入年龄" min="1" max="120">
+                </div>
+                
+                <button class="submit-btn" onclick="analyzePalm()">开始分析</button>
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>手相与健康</h2>
+            <p>手相不仅可以看命运，还可以反映健康状况。中医认为，"有诸内必形诸外"，手掌是人体的缩影，通过观察手掌的气色、纹路、温度等，可以判断身体的健康状况。</p>
+            <p><strong>手掌发红：</strong>可能患有高血压、心脏病等心血管疾病，需注意饮食清淡、定期检查。</p>
+            <p><strong>手掌发白：</strong>可能贫血、气血不足，需补充营养、多休息。</p>
+            <p><strong>手掌发青：</strong>可能血液循环不良、受寒，需注意保暖、多运动。</p>
+            <p><strong>手掌发黄：</strong>可能肝胆功能不佳、黄疸，需检查肝功能、注意饮食。</p>
+            <p><strong>手掌发紫：</strong>可能缺氧、呼吸系统疾病，需检查肺功能、戒烟限酒。</p>
+        </div>
+
+        <div class="section">
+            <h2>手相学的历史渊源</h2>
+            <p>手相学起源于公元前3000年的印度，后传入中国、希腊、埃及等地。中国手相学最早见于《黄帝内经》，后世有《麻衣相法》《柳庄相法》等著作。</p>
+            <p>西方手相学在19世纪达到鼎盛，出现了许多手相学大师和专著。现代手相学则结合心理学、生理学等知识，更加注重科学性和实用性。</p>
+            <p>需要注意的是，手相会随着年龄、经历、健康等变化而变化，因此手相分析不是绝对的，而是一种趋势性的参考。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+function analyzePalm() {
+    const leftHand = document.getElementById('leftHandInput').files[0];
+    const rightHand = document.getElementById('rightHandInput').files[0];
+    const gender = document.getElementById('genderInput').value;
+    const age = document.getElementById('ageInput').value;
+    
+    if (!leftHand || !rightHand) {
+        showToast('请上传左右手照片');
+        return;
+    }
+    
+    if (!age || age < 1 || age > 120) {
+        showToast('请输入有效年龄');
+        return;
+    }
+    
+    showToast('正在分析手相...');
+    
+    // 模拟AI分析
+    setTimeout(() => {
+        const result = {
+            score: Math.floor(Math.random() * 30) + 70,
+            lines: {
+                life: ['深长清晰', '中等长度', '偏短但清晰'][Math.floor(Math.random() * 3)],
+                wisdom: ['深长平直', '略微弯曲', '清晰有弧度'][Math.floor(Math.random() * 3)],
+                emotion: ['深长清晰', '略有弯曲', '清晰但偏短'][Math.floor(Math.random() * 3)],
+                fate: ['清晰深长', '中等清晰', '浅淡但连续'][Math.floor(Math.random() * 3)]
+            },
+            fortune: {
+                career: ['事业顺利', '步步高升', '中年后发'][Math.floor(Math.random() * 3)],
+                wealth: ['财运亨通', '积蓄丰厚', '晚年财旺'][Math.floor(Math.random() * 3)],
+                marriage: ['婚姻美满', '夫妻和睦', '晚婚可得'][Math.floor(Math.random() * 3)],
+                health: ['身体强健', '少病少灾', '注意养生'][Math.floor(Math.random() * 3)]
+            },
+            advice: '整体手相' + ['吉祥', '中上', '不错'][Math.floor(Math.random() * 3)] + 
+                    '，建议' + ['保持良好生活习惯', '多运动增强体魄', '注重内心修养'][Math.floor(Math.random() * 3)] + 
+                    '，可进一步提升健康和运势。'
+        };
+        
+        showResult(result);
+    }, 2500);
+}
+
+function showResult(result) {
+    let html = `
+        <div class="result-card fade-in">
+            <h3>🖐️ 手相分析结果</h3>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📊 综合评分</h3>
+            <p style="font-size: 2rem; color: #ffd700; font-weight: bold; text-align: center; margin: 1rem 0;">${result.score}分</p>
+            <p style="text-align: center; color: rgba(255,255,255,0.8);">${result.score >= 90 ? '大吉手相' : result.score >= 80 ? '吉相' : result.score >= 70 ? '中吉相' : '平相'}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>🔍 主线分析</h3>
+            <p><strong>生命线：</strong>${result.lines.life} — ${result.fortune.health}</p>
+            <p><strong>智慧线：</strong>${result.lines.wisdom} — ${result.fortune.career}</p>
+            <p><strong>感情线：</strong>${result.lines.emotion} — ${result.fortune.marriage}</p>
+            <p><strong>命运线：</strong>${result.lines.fate} — ${result.fortune.wealth}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📊 各方面运势</h3>
+            <p><strong>事业运：</strong>${result.fortune.career}</p>
+            <p><strong>财运：</strong>${result.fortune.wealth}</p>
+            <p><strong>婚姻运：</strong>${result.fortune.marriage}</p>
+            <p><strong>健康运：</strong>${result.fortune.health}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💡 改善建议</h3>
+            <p>${result.advice}</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+            <button class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
+        </div>
+    `;
+    
+    document.getElementById('resultArea').innerHTML = html;
+    document.getElementById('resultArea').style.display = 'block';
+    document.querySelector('.analysis-form').style.display = 'none';
+}
+
+function resetForm() {
+    document.querySelector('.analysis-form').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('leftHandInput').value = '';
+    document.getElementById('rightHandInput').value = '';
+    document.getElementById('ageInput').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

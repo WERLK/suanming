@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>合婚配对 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 合婚配对页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.method-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.method-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.method-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.method-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+.analysis-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    display: none;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-card h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.result-card p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.score-display {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    border-radius: 12px;
+    margin: 1rem 0;
+}
+
+.score-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+}
+
+.score-text {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.tag {
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: rgba(255,215,0,0.1);
+    color: rgba(255,255,255,0.7);
+}
+
+@media (max-width: 768px) {
+    .method-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>💑 合婚配对</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>合婚配对简介</h2>
+            <p>合婚配对是中国传统婚俗的重要环节，通过比较男女双方的生辰八字、生肖、五行等，判断两人的婚姻是否和谐、美满。</p>
+            <p>合婚配对不仅看八字是否相合，还要看生肖是否相冲、五行是否相生、大运是否同步等，是一个综合评判体系。</p>
+        </div>
+
+        <div class="section">
+            <h2>合婚方法</h2>
+            
+            <div class="method-grid">
+                <div class="method-card">
+                    <h3>八字合婚</h3>
+                    <p>比较双方八字的年、月、日、时，看天干地支是否相生相合，有无刑冲克害。</p>
+                </div>
+                
+                <div class="method-card">
+                    <h3>生肖合婚</h3>
+                    <p>看双方生肖是否相合（如鼠牛相合、虎猪相合），或相冲（如鼠马相冲、牛羊相冲）。</p>
+                </div>
+                
+                <div class="method-card">
+                    <h3>五行合婚</h3>
+                    <p>比较双方八字的五行旺衰，看是否互补。如一方缺水，另一方水旺，则为互补。</p>
+                </div>
+                
+                <div class="method-card">
+                    <h3>纳音合婚</h3>
+                    <p>根据出生年的纳音五行（如海中金、炉中火等），判断两人的纳音是否相生相合。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>生肖相合相冲</h2>
+            <p><strong>六合（最佳配对）：</strong>鼠牛、虎猪、兔狗、龙鸡、蛇猴、马羊</p>
+            <p><strong>三合（次佳配对）：</strong>猴鼠龙、虎马狗、蛇鸡牛、猪兔羊</p>
+            <p><strong>六冲（最差配对）：</strong>鼠马、牛羊、虎猴、兔鸡、龙狗、蛇猪</p>
+            <p><strong>六害（较差配对）：</strong>鼠羊、牛马、虎蛇、兔龙、猴猪、狗鸡</p>
+        </div>
+
+        <div class="section">
+            <h2>合婚配对工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入您和伴侣的出生信息，我们将为您进行详细的合婚分析，包括八字合婚、生肖合婚、五行合婚等。
+            </p>
+            
+            <div class="analysis-form">
+                <h3 style="color: #ffd700; margin-bottom: 1rem; font-size: 1rem;">男方信息</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">男方姓名</label>
+                    <input type="text" class="form-input" id="maleNameInput" placeholder="请输入男方姓名" maxlength="20">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">男方出生日期</label>
+                    <input type="date" class="form-input" id="maleBirthInput">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">男方出生时间（可选）</label>
+                    <input type="time" class="form-input" id="maleTimeInput">
+                </div>
+                
+                <h3 style="color: #ffd700; margin: 2rem 0 1rem; font-size: 1rem;">女方信息</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">女方姓名</label>
+                    <input type="text" class="form-input" id="femaleNameInput" placeholder="请输入女方姓名" maxlength="20">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">女方出生日期</label>
+                    <input type="date" class="form-input" id="femaleBirthInput">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">女方出生时间（可选）</label>
+                    <input type="time" class="form-input" id="femaleTimeInput">
+                </div>
+                
+                <button class="submit-btn" onclick="analyzeHehun()">开始合婚分析</button>
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>合婚注意事项</h2>
+            <p><strong>1. 八字为主：</strong>合婚应以八字合婚为主，生肖合婚为辅。八字合婚更全面、更准确。</p>
+            <p><strong>2. 五行互补：</strong>最好的婚姻是五行互补，而不是五行相同。互补才能相互扶持、共同成长。</p>
+            <p><strong>3. 大运同步：</strong>两人的大运走势应大致同步，这样才能同甘共苦、白头偕老。</p>
+            <p><strong>4. 性格互补：</strong>除了命理合婚，性格互补也很重要。性格相差太大，即使命理相合，也易有矛盾。</p>
+            <p><strong>5. 理性对待：</strong>合婚结果仅供参考，不应成为婚姻的唯一标准。感情、性格、价值观等同样重要。</p>
+        </div>
+
+        <div class="section">
+            <h2>合婚的历史渊源</h2>
+            <p>合婚配对起源于先秦时期，当时已有"合姓"的习俗。汉代以后，合婚逐渐形成体系，出现了专门的合婚书籍。</p>
+            <p>唐宋时期，合婚文化达到鼎盛，几乎每段婚姻都要合婚。明清以后，合婚逐渐简化，但仍然是婚俗中不可或缺的环节。</p>
+            <p>现代社会中，合婚配对仍然被广泛应用，许多人会在婚前进行合婚，以求得婚姻美满、家庭幸福。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+function analyzeHehun() {
+    const maleName = document.getElementById('maleNameInput').value.trim();
+    const maleBirth = document.getElementById('maleBirthInput').value;
+    const femaleName = document.getElementById('femaleNameInput').value.trim();
+    const femaleBirth = document.getElementById('femaleBirthInput').value;
+    
+    if (!maleName || !maleBirth) {
+        showToast('请输入男方信息');
+        return;
+    }
+    
+    if (!femaleName || !femaleBirth) {
+        showToast('请输入女方信息');
+        return;
+    }
+    
+    showToast('正在分析合婚...');
+    
+    // 模拟分析
+    setTimeout(() => {
+        const result = {
+            maleName: maleName,
+            femaleName: femaleName,
+            score: Math.floor(Math.random() * 31) + 70, // 70-100分
+            shengxiao: {
+                compatible: Math.random() > 0.5,
+                text: ['六合', '三合', '一般', '六冲', '六害'][Math.floor(Math.random() * 5)]
+            },
+            bazi: {
+                compatible: Math.random() > 0.4,
+                text: ['天作之合', '大吉', '中吉', '小吉', '平', '小凶', '大凶'][Math.floor(Math.random() * 7)]
+            },
+            wuxing: {
+                compatible: Math.random() > 0.5,
+                text: ['五行相生', '五行互补', '五行平衡', '五行相克'][Math.floor(Math.random() * 4)]
+            },
+            advice: '总体来看，你们的婚姻' + ['非常美满', '比较和谐', '需要磨合', '有较大挑战'][Math.floor(Math.random() * 4)] + 
+                    '。建议' + ['多沟通理解', '互相包容', '共同成长', '理性对待分歧'][Math.floor(Math.random() * 4)] + 
+                    '，可共建幸福美满的婚姻。'
+        };
+        
+        showResult(result);
+    }, 2500);
+}
+
+function showResult(result) {
+    let html = `
+        <div class="result-card fade-in">
+            <h3>💑 合婚分析结果</h3>
+            <p><strong>男方：</strong>${result.maleName}</p>
+            <p><strong>女方：</strong>${result.femaleName}</p>
+        </div>
+        
+        <div class="score-display fade-in">
+            <div class="score-number">${result.score}分</div>
+            <div class="score-text">${result.score >= 90 ? '天作之合' : result.score >= 80 ? '大吉' : result.score >= 70 ? '中吉' : '平'}</div>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>🐉 生肖配对</h3>
+            <p><strong>配对结果：</strong>${result.shengxiao.text}</p>
+            <p><strong>相合程度：</strong>${result.shengxiao.compatible ? '✅ 相合' : '⚠️ 相冲'}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>🎴 八字合婚</h3>
+            <p><strong>合婚结果：</strong>${result.bazi.text}</p>
+            <p><strong>相合程度：</strong>${result.bazi.compatible ? '✅ 相合' : '⚠️ 需磨合'}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>⚖️ 五行互补</h3>
+            <p><strong>互补情况：</strong>${result.wuxing.text}</p>
+            <p><strong>互补程度：</strong>${result.wuxing.compatible ? '✅ 互补' : '⚠️ 需调整'}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💡 综合建议</h3>
+            <p>${result.advice}</p>
+            <div class="tags">
+                <span class="tag">生肖：${result.shengxiao.text}</span>
+                <span class="tag">八字：${result.bazi.text}</span>
+                <span class="tag">五行：${result.wuxing.text}</span>
+                <span class="tag">总分：${result.score}分</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+            <button class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
+        </div>
+    `;
+    
+    document.getElementById('resultArea').innerHTML = html;
+    document.getElementById('resultArea').style.display = 'block';
+    document.querySelector('.analysis-form').style.display = 'none';
+}
+
+function resetForm() {
+    document.querySelector('.analysis-form').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('maleNameInput').value = '';
+    document.getElementById('maleBirthInput').value = '';
+    document.getElementById('maleTimeInput').value = '';
+    document.getElementById('femaleNameInput').value = '';
+    document.getElementById('femaleBirthInput').value = '';
+    document.getElementById('femaleTimeInput').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生肖运势 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .content-area {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+        .zodiac-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        .zodiac-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .zodiac-card:hover {
+            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+            transform: translateY(-2px);
+        }
+        .zodiac-card.active {
+            border-color: rgba(255,215,0,0.5);
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1));
+        }
+        .zodiac-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+        }
+        .zodiac-name {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+        .fortune-result {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        .fortune-year {
+            font-size: 1.1rem;
+            color: #ffd700;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        .fortune-rank {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .rank-top {
+            background: rgba(255,215,0,0.2);
+            color: #ffd700;
+        }
+        .rank-mid {
+            background: rgba(0,255,0,0.15);
+            color: #0f0;
+        }
+        .rank-low {
+            background: rgba(255,0,0,0.15);
+            color: #f00;
+        }
+        .fortune-section {
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255,215,0,0.08);
+        }
+        .fortune-section:last-child {
+            border-bottom: none;
+        }
+        .fortune-section h3 {
+            font-size: 0.9rem;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+        .fortune-section p {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+        }
+        .fortune-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .fortune-tag {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            background: rgba(255,215,0,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="app">
+        <div class="page-header">
+            <button class="back-btn" onclick="history.back()">←</button>
+            <h1>🐉 生肖运势</h1>
+        </div>
+
+        <div class="content-area">
+            <div class="section">
+                <h2>选择你的生肖</h2>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem;">
+                    查看2026年（丙午年）你的生肖运势详解
+                </p>
+                
+                <div class="zodiac-grid" id="zodiacGrid">
+                    <div class="zodiac-card" data-zodiac="鼠" onclick="selectZodiac('鼠')">
+                        <div class="zodiac-emoji">🐭</div>
+                        <div class="zodiac-name">鼠</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="牛" onclick="selectZodiac('牛')">
+                        <div class="zodiac-emoji">🐮</div>
+                        <div class="zodiac-name">牛</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="虎" onclick="selectZodiac('虎')">
+                        <div class="zodiac-emoji">🐯</div>
+                        <div class="zodiac-name">虎</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="兔" onclick="selectZodiac('兔')">
+                        <div class="zodiac-emoji">🐰</div>
+                        <div class="zodiac-name">兔</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="龙" onclick="selectZodiac('龙')">
+                        <div class="zodiac-emoji">🐲</div>
+                        <div class="zodiac-name">龙</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="蛇" onclick="selectZodiac('蛇')">
+                        <div class="zodiac-emoji">🐍</div>
+                        <div class="zodiac-name">蛇</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="马" onclick="selectZodiac('马')">
+                        <div class="zodiac-emoji">🐴</div>
+                        <div class="zodiac-name">马</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="羊" onclick="selectZodiac('羊')">
+                        <div class="zodiac-emoji">🐑</div>
+                        <div class="zodiac-name">羊</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="猴" onclick="selectZodiac('猴')">
+                        <div class="zodiac-emoji">🐵</div>
+                        <div class="zodiac-name">猴</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="鸡" onclick="selectZodiac('鸡')">
+                        <div class="zodiac-emoji">🐔</div>
+                        <div class="zodiac-name">鸡</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="狗" onclick="selectZodiac('狗')">
+                        <div class="zodiac-emoji">🐶</div>
+                        <div class="zodiac-name">狗</div>
+                    </div>
+                    <div class="zodiac-card" data-zodiac="猪" onclick="selectZodiac('猪')">
+                        <div class="zodiac-emoji">🐷</div>
+                        <div class="zodiac-name">猪</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fortune-result" id="fortuneResult">
+                <!-- 运势结果将动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        // 2026年生肖运势数据
+        const fortune2026 = {
+            '鼠': {
+                rank: 11,
+                rankText: '需谨慎',
+                rankClass: 'rank-low',
+                summary: '冲太岁（子午冲），动荡起伏，需沉着应对',
+                career: '事业动荡不安，有失业风险。不宜跳槽，巩固现有事业为主。',
+                wealth: '注意破财，谨防诈骗。理财保守，偏财有但易破，别冲动。',
+                love: '火桃花能量足但脾气不稳。有伴侣需包容尊重，单身下半年有机会。',
+                health: '出行注意交通安全，易受伤，肠胃问题。',
+                advice: '做风雨中的定海神针，沉着方能破局（先破后立）',
+                tags: ['冲太岁', '岁破', '大耗', '灾煞']
+            },
+            '牛': {
+                rank: 10,
+                rankText: '需谨慎',
+                rankClass: 'rank-low',
+                summary: '害太岁，运势起伏大，人际关系易出问题',
+                career: '易遇突发事件，人际关系引发误会或冲突导致合作破裂。大额资金事务反复权衡，升职加薪先缓。',
+                wealth: '起落不定，不合伙不借贷，防背信违约。轻资产投资，下半年较好。',
+                love: '桃花运上升但多烂桃花。有伴侣注意家庭关系。',
+                health: '压力大能量低，小毛病多，注意肠胃、三高、慢性病。',
+                advice: '内耗解决不了事情，平安最重要',
+                tags: ['害太岁', '官符', '五鬼']
+            },
+            '虎': {
+                rank: 2,
+                rankText: '大吉',
+                rankClass: 'rank-top',
+                summary: '寅午半合火局，天时相助，贵人运旺',
+                career: '将星高照，黄金发展阶段。获上司认可，有望贵人提携，名利双收，可创业但需谨慎规划。',
+                wealth: '金匮星入命（财库星），偏财正财都在线。不懒就有回报，适合稳健投资，避免冲动消费。',
+                love: '还不错但波动大，渴望深情又敏感。恋爱中需信任、多沟通包容。',
+                health: '关注心血管与肝胆，火气过旺+应酬多，酗酒饮食不节加重负担。',
+                advice: '大将军挂帅出征，火力全开',
+                tags: ['寅午半合', '三台', '将星', '五鬼']
+            },
+            '兔': {
+                rank: 6,
+                rankText: '中等',
+                rankClass: 'rank-mid',
+                summary: '卯午相破，人际关系问题、计划被打乱',
+                career: '有突破机会但奔波劳累，出差多、高强度工作。有贵人助力化险为夷，主动求变更易突破。',
+                wealth: '正财稳定，守稳根基，不冲动投资。',
+                love: '异性缘好，单身推进关系要慢，有伴侣注意沟通。',
+                health: '下半年易突发小意外或磕碰，出行运动谨慎。',
+                advice: '破旧立新，喜事临门',
+                tags: ['卯午相破', '太阴', '天喜']
+            },
+            '龙': {
+                rank: 7,
+                rankText: '中等',
+                rankClass: 'rank-mid',
+                summary: '印星强旺至空前高度，整体比较佛系',
+                career: '目标别定太高，抓不到重点，工作拖拉变懒，出错概率大。有事多找"领导"，多提升技能。',
+                wealth: '下半年好于上半年，保守为主，开销多，不合伙，财务要透明。',
+                love: '不利感情，有伴侣倍感寂寞（尤其女性），喜欢独处，防外人趁虚而入。单身的等时机。',
+                health: '无大毛病，出行注意安全，别三心二意。',
+                advice: '印星强旺，有事没事找"领导"',
+                tags: ['印星强旺', '天狗', '血刃', '寡宿']
+            },
+            '蛇': {
+                rank: 9,
+                rankText: '较差',
+                rankClass: 'rank-low',
+                summary: '巳午火同根同源，暗合太岁，但情绪低状态差',
+                career: '职场竞争大，易被抢单，项目推进慢。',
+                wealth: '相对低迷，上半年起伏大，下半年好一些。',
+                love: '情绪多变忽冷忽热，不利感情，期望值太高，矛盾多有分开可能。',
+                health: '注意肝肾问题。',
+                advice: '感情易生事端',
+                tags: ['暗合太岁', '文昌']
+            },
+            '马': {
+                rank: 8,
+                rankText: '中等',
+                rankClass: 'rank-mid',
+                summary: '值太岁（本命年），午午自刑，旺极转弱',
+                career: '生活繁忙，有开创事业想法但困难重重。经历波折和小人问题，保持冷静可平稳度过。领导力和价值感会被发现升级。',
+                wealth: '表现平平，有赚但破财风险更大，现金流紧张，谨慎理财。',
+                love: '多波折，自我烦恼和误解影响感情，猜忌沟通困难，有分离风险。单身再等等。',
+                health: '注意心脏和血液循环系统，可能心悸、胸闷、气短。注重休息适当运动。',
+                advice: '做个聚光灯下的积极主动有担当的汉子',
+                tags: ['值太岁', '伏吟', '将星', '岁驾']
+            },
+            '羊': {
+                rank: 3,
+                rankText: '吉',
+                rankClass: 'rank-top',
+                summary: '午未六合，整体良好，贵人助力化险为夷',
+                career: '年中关键期，新合作机会。展示磨炼自己，升职加薪可能性大。不退缩不贪图享乐。',
+                wealth: '整体一般，稳着来，避免过度消费和小恩小惠诱惑。高风险投资不碰，今年更多是名誉职位增长。',
+                love: '颇为顺遂，单身积极社交可遇志同道合伴侣，大胆追求。',
+                health: '总体良好，注意肠胃，饮食规律，别暴饮暴食，少喝酒。',
+                advice: '贵人助力多，稳中求升',
+                tags: ['午未六合', '太阳', '天空']
+            },
+            '猴': {
+                rank: 4,
+                rankText: '吉',
+                rankClass: 'rank-top',
+                summary: '驿马星+文昌星，探索新板块，扩张事业版图',
+                career: '上半年不如下半年，整体上升。边做边学新领域，空杯心态。晋升机会在下半年，上半年要卖力。',
+                wealth: '整体上升与事业挂钩，有偏财运，可考虑副业。',
+                love: '桃花旺盛，单身多社交。有伴侣保持自律，别因诱惑破坏情感，别把工作压力带回家。',
+                health: '注意呼吸道问题，咳嗽喉咙不适，少去人多的地方。',
+                advice: '重新启程，谨防小人',
+                tags: ['驿马星', '文昌']
+            },
+            '鸡': {
+                rank: 1,
+                rankText: '大吉',
+                rankClass: 'rank-top',
+                summary: '众多贵人星环抱，压力多但贵人超多',
+                career: '晋升加薪机会明显，工作量增多但问题及时处理别放任。处理事情要低调防小人嫉妒。',
+                wealth: '正财运很不错，偏财谨慎。对他人的援助注意分辨真实动机。',
+                love: '桃花运好，找伴侣结婚蛮合适。有伴侣别因事业压力忽视家庭。',
+                health: '火克金影响呼吸系统，但恢复能力不错，身心疲劳也能改善。',
+                advice: '众多贵人星环抱，主动出击跳出舒适圈',
+                tags: ['贵人星', '禄勋', '将星']
+            },
+            '狗': {
+                rank: 5,
+                rankText: '吉',
+                rankClass: 'rank-top',
+                summary: '戌午半合火局，三台星护身，但有种被盯上的感觉',
+                career: '积极迎接挑战，创意灵感强，才华可积极展现。碰灰色地带会被发现，遵纪守法不挑战权威。',
+                wealth: '不稳，有争夺之象易破财，偏财不佳。不碰高风险投资（股票、彩票、赌博），合伙生意不建议。',
+                love: '相对平淡，遇心仪对象需更多真诚努力。有伴侣注意行为举止，偷情会被曝光。',
+                health: '整体平淡，避免过度饮酒。',
+                advice: '积极迎接挑战，平步青云',
+                tags: ['戌午半合', '三台', '地解']
+            },
+            '猪': {
+                rank: 5,
+                rankText: '吉',
+                rankClass: 'rank-top',
+                summary: '午亥暗合，内部力量生发，机遇和博弈共存',
+                career: '总体理想，有晋升机会，努力获认可。保持谦虚，别夸大功劳，别自负急功近利。',
+                wealth: '收入可观但付出回报不成正比，比较累。上半年压力大，下半年改善。',
+                love: '异性缘不错多社交助脱单，前期慢慢发展给磨合时间。有伴侣温柔沟通，外面的花草短暂且有曝光风险。',
+                health: '注意慢性疾病和泌尿系统问题。',
+                advice: '机遇和博弈共存，暗合下暗藏危机',
+                tags: ['午亥暗合', '紫微', '龙德']
+            }
+        };
+
+        // 选择生肖
+        function selectZodiac(zodiac) {
+            // 更新卡片状态
+            const cards = document.querySelectorAll('.zodiac-card');
+            cards.forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.zodiac === zodiac) {
+                    card.classList.add('active');
+                }
+            });
+
+            // 显示运势结果
+            showFortune(zodiac);
+        }
+
+        // 显示运势结果
+        function showFortune(zodiac) {
+            const data = fortune2026[zodiac];
+            if (!data) return;
+
+            let html = `
+                <div class="fortune-year">📅 2026年（丙午年）${zodiac}运势</div>
+                <div class="fortune-rank ${data.rankClass}">排名：第${data.rank}名 | ${data.rankText}</div>
+                
+                <div class="fortune-section">
+                    <h3>📊 综合运势</h3>
+                    <p>${data.summary}</p>
+                </div>
+
+                <div class="fortune-section">
+                    <h3>💼 事业运</h3>
+                    <p>${data.career}</p>
+                </div>
+
+                <div class="fortune-section">
+                    <h3>💰 财运</h3>
+                    <p>${data.wealth}</p>
+                </div>
+
+                <div class="fortune-section">
+                    <h3>💕 感情运</h3>
+                    <p>${data.love}</p>
+                </div>
+
+                <div class="fortune-section">
+                    <h3>🏥 健康运</h3>
+                    <p>${data.health}</p>
+                </div>
+
+                <div class="fortune-section">
+                    <h3>💡 建议</h3>
+                    <p><strong>${data.advice}</strong></p>
+                </div>
+
+                <div class="fortune-tags">
+            `;
+
+            data.tags.forEach(tag => {
+                html += `<span class="fortune-tag">${tag}</span>`;
+            });
+
+            html += `
+                </div>
+            `;
+
+            document.getElementById('fortuneResult').innerHTML = html;
+            document.getElementById('fortuneResult').style.display = 'block';
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+        });
+    </script>
+</body>
+</html>

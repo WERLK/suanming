@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>血型分析 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 血型分析页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.blood-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.blood-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.blood-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.blood-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.blood-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+.analysis-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    display: none;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-card h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.result-card p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.compatibility-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.compatibility-table th,
+.compatibility-table td {
+    padding: 0.8rem;
+    text-align: center;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.compatibility-table th {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.compatibility-table td {
+    color: rgba(255,255,255,0.9);
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.tag {
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: rgba(255,215,0,0.1);
+    color: rgba(255,255,255,0.7);
+}
+
+@media (max-width: 768px) {
+    .blood-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🩸 血型分析</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>血型性格学简介</h2>
+            <p>血型性格学认为，不同血型（A、B、O、AB）的人，在性格、行为模式、思维方式等方面有显著差异。这一理论起源于日本，在现代东亚社会非常流行。</p>
+            <p>虽然血型性格学缺乏严格的科学依据，但作为一种文化现象和娱乐工具，它仍然被广泛应用于人际交往、恋爱配对、团队合作等方面。</p>
+        </div>
+
+        <div class="section">
+            <h2>四大血型特征</h2>
+            
+            <div class="blood-grid">
+                <div class="blood-card">
+                    <h3>A型血</h3>
+                    <p><strong>性格：</strong>内敛、谨慎、责任感强、追求完美</p>
+                    <p><strong>优点：</strong>细心、有耐心、团队合作好</p>
+                    <p><strong>缺点：</strong>杞人忧天、过于保守、不易信任他人</p>
+                    <p><strong>适合职业：</strong>会计、编辑、研究、教育</p>
+                </div>
+                
+                <div class="blood-card">
+                    <h3>B型血</h3>
+                    <p><strong>性格：</strong>外向、自由、好奇心强、我行我素</p>
+                    <p><strong>优点：</strong>行动力强、适应力好、有创意</p>
+                    <p><strong>缺点：</strong>自我中心、缺乏耐性、不擅长细节</p>
+                    <p><strong>适合职业：</strong>艺术、销售、记者、导游</p>
+                </div>
+                
+                <div class="blood-card">
+                    <h3>O型血</h3>
+                    <p><strong>性格：</strong>自信、乐观、领导欲强、现实主义</p>
+                    <p><strong>优点：</strong>决断力强、社交能力好、意志坚定</p>
+                    <p><strong>缺点：</strong>自我中心、好胜心强、不够细腻</p>
+                    <p><strong>适合职业：</strong>管理、政治、律师、创业</p>
+                </div>
+                
+                <div class="blood-card">
+                    <h3>AB型血</h3>
+                    <p><strong>性格：</strong>理性、神秘、双重性格、冷静</p>
+                    <p><strong>优点：</strong>分析力强、客观、有审美观</p>
+                    <p><strong>缺点：</strong>冷漠、难以理解、不够亲切</p>
+                    <p><strong>适合职业：</strong>IT、设计、咨询、学术</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>血型配对分析</h2>
+            <p>不同血型的人在恋爱、婚姻、友谊等方面的compatibility：</p>
+            
+            <table class="compatibility-table">
+                <tr>
+                    <th>血型</th>
+                    <th>最佳配对</th>
+                    <th>配对分析</th>
+                </tr>
+                <tr>
+                    <td>A型</td>
+                    <td>A型、AB型</td>
+                    <td>A-A：互相理解，但易沉闷；A-AB：互补性强，AB的理性可以平衡A的情绪</td>
+                </tr>
+                <tr>
+                    <td>B型</td>
+                    <td>O型、AB型</td>
+                    <td>B-O：O的领导力+B的自由=平衡；B-AB：AB的理性可以引导B的发散思维</td>
+                </tr>
+                <tr>
+                    <td>O型</td>
+                    <td>A型、B型</td>
+                    <td>O-A：O的强硬+A的细腻=稳定；O-B：O的领导力+B的行动力=成功</td>
+                </tr>
+                <tr>
+                    <td>AB型</td>
+                    <td>A型、B型</td>
+                    <td>AB-A：AB的理性+A的责任感=和谐；AB-B：AB的冷静+B的热情=平衡</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>血型健康分析</h2>
+            <p>不同血型的人，在健康状况和疾病易感性方面也有差异：</p>
+            
+            <div class="blood-grid">
+                <div class="blood-card">
+                    <h3>A型血</h3>
+                    <p><strong>体质：</strong>敏感、易紧张、免疫力较弱</p>
+                    <p><strong>易患疾病：</strong>心血管疾病、胃癌、压力过大导致的疾病</p>
+                    <p><strong>健康建议：</strong>保持心情愉快、多运动、饮食清淡</p>
+                </div>
+                
+                <div class="blood-card">
+                    <h3>B型血</h3>
+                    <p><strong>体质：</strong>强壮、适应力强、但易发胖</p>
+                    <p><strong>易患疾病：</strong>糖尿病、关节炎、免疫系统疾病</p>
+                    <p><strong>健康建议：</strong>控制饮食、规律运动、避免过度劳累</p>
+                </div>
+                
+                <div class="blood-card">
+                    <h3>O型血</h3>
+                    <p><strong>体质：</strong>强健、免疫力好、但易患溃疡</p>
+                    <p><strong>易患疾病：</strong>胃溃疡、甲状腺功能异常、皮肤问题</p>
+                    <p><strong>健康建议：</strong>饮食规律、减少压力、保护肠胃</p>
+                </div>
+                
+                <div class="blood-card">
+                    <h3>AB型血</h3>
+                    <p><strong>体质：</strong>复杂、混合A型和B型的特征</p>
+                    <p><strong>易患疾病：</strong>心脏病、肺癌、白血病（概率稍高）</p>
+                    <p><strong>健康建议：</strong>定期体检、戒烟限酒、保持心情平静</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>血型分析工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                选择你的血型，我们将为你提供详细的性格分析、恋爱配对、健康建议等。
+            </p>
+            
+            <div class="analysis-form">
+                <div class="form-group">
+                    <label class="form-label">选择你的血型</label>
+                    <select class="form-input" id="bloodTypeInput">
+                        <option value="A">A型血</option>
+                        <option value="B">B型血</option>
+                        <option value="O">O型血</option>
+                        <option value="AB">AB型血</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <select class="form-input" id="genderInput">
+                        <option value="male">男性</option>
+                        <option value="female">女性</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">年龄</label>
+                    <input type="number" class="form-input" id="ageInput" placeholder="请输入年龄" min="1" max="120">
+                </div>
+                
+                <button class="submit-btn" onclick="analyzeBlood()">开始分析</button>
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>血型性格学的争议</h2>
+            <p>血型性格学虽然在民间广为流传，但在学术界存在较大争议。许多科学家认为，血型与性格之间缺乏直接的科学证据。</p>
+            <p>然而，作为一种文化现象和娱乐工具，血型性格学仍然有其价值。它可以帮助人们更好地了解自己、理解他人，促进人际交往和团队合作。</p>
+            <p>需要注意的是，血型性格学只是一种参考，不应过分迷信或以此作为评判他人的唯一标准。</p>
+        </div>
+
+        <div class="section">
+            <h2>血型性格学的历史渊源</h2>
+            <p>血型性格学起源于1927年，德国科学家Emil von Dungern提出血型与性格可能有关联。但真正将血型性格学推广开来的是日本，20世纪中叶，日本学者提出了系统的血型性格理论。</p>
+            <p>20世纪70年代，日本作家能见正比古出版了《血型人间学》，使血型性格学在日本和东亚社会风靡一时。至今，血型性格学仍是日本、中国、韩国等地流行的文化现象。</p>
+            <p>在现代社会中，血型性格学被广泛应用于综艺节目、恋爱咨询、企业培训等领域，成为一种有趣的心理学分支。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+function analyzeBlood() {
+    const bloodType = document.getElementById('bloodTypeInput').value;
+    const gender = document.getElementById('genderInput').value;
+    const age = document.getElementById('ageInput').value;
+    
+    if (!age || age < 1 || age > 120) {
+        showToast('请输入有效年龄');
+        return;
+    }
+    
+    showToast('正在分析血型...');
+    
+    // 模拟分析
+    setTimeout(() => {
+        const result = {
+            bloodType: bloodType,
+            gender: gender,
+            age: age,
+            personality: {
+                'A': '内敛谨慎，责任感强，追求完美，但易杞人忧天。',
+                'B': '外向自由，好奇心强，我行我素，但易自我中心。',
+                'O': '自信乐观，领导欲强，现实主义，但易好胜心强。',
+                'AB': '理性神秘，双重性格，冷静客观，但易冷漠疏离。'
+            }[bloodType],
+            love: {
+                'A': '恋爱模式：慢热型，重视稳定和安全感。',
+                'B': '恋爱模式：自由型，重视个人空间和新鲜感。',
+                'O': '恋爱模式：主导型，重视控制和占有。',
+                'AB': '恋爱模式：理性型，重视精神和心灵契合。'
+            }[bloodType],
+            career: {
+                'A': '适合职业：会计、编辑、研究、教育等需要细心和耐心的工作。',
+                'B': '适合职业：艺术、销售、记者、导游等需要自由和创意的工作。',
+                'O': '适合职业：管理、政治、律师、创业等需要领导和决断的工作。',
+                'AB': '适合职业：IT、设计、咨询、学术等需要理性和分析的工作。'
+            }[bloodType],
+            health: {
+                'A': '健康注意：心血管疾病、胃癌、压力过大。建议：保持心情愉快、多运动。',
+                'B': '健康注意：糖尿病、关节炎、免疫系统疾病。建议：控制饮食、规律运动。',
+                'O': '健康注意：胃溃疡、甲状腺功能异常、皮肤问题。建议：饮食规律、减少压力。',
+                'AB': '健康注意：心脏病、肺癌、白血病。建议：定期体检、戒烟限酒。'
+            }[bloodType]
+        };
+        
+        showResult(result);
+    }, 2000);
+}
+
+function showResult(result) {
+    const bloodNames = { 'A': 'A型血', 'B': 'B型血', 'O': 'O型血', 'AB': 'AB型血' };
+    
+    let html = `
+        <div class="result-card fade-in">
+            <h3>🩸 血型分析结果</h3>
+            <p><strong>血型：</strong>${bloodNames[result.bloodType]}</p>
+            <p><strong>性别：</strong>${result.gender === 'male' ? '男性' : '女性'}</p>
+            <p><strong>年龄：</strong>${result.age}岁</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📊 性格分析</h3>
+            <p>${result.personality}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>❤️ 恋爱模式</h3>
+            <p>${result.love}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💼 职业建议</h3>
+            <p>${result.career}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>🏥 健康提醒</h3>
+            <p>${result.health}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💡 综合建议</h3>
+            <p>作为${bloodNames[result.bloodType]}的${result.gender === 'male' ? '男性' : '女性'}，你的性格特点是${result.personality.split('，')[0]}。在恋爱中，你${result.love.replace('恋爱模式：', '').toLowerCase()}在职业选择上，${result.career.replace('适合职业：', '').toLowerCase()}在健康方面，${result.health.split('。')[0].toLowerCase()}。总的来说，${result.bloodType === 'A' ? '你是一个可靠而细腻的人，只需学会放松和信任他人。' : result.bloodType === 'B' ? '你是一个自由和创意的人，只需学会坚持和关注细节。' : result.bloodType === 'O' ? '你是一个自信和领导力强的人，只需学会倾听和体谅他人。' : '你是一个理性而客观的人，只需学会表达情感和亲近他人。'}</p>
+            <div class="tags">
+                <span class="tag">性格： ${result.personality.split('，')[0]}</span>
+                <span class="tag">恋爱： ${result.love.replace('恋爱模式：', '').split('，')[0]}</span>
+                <span class="tag">职业： ${result.career.replace('适合职业：', '').split('、')[0]}</span>
+                <span class="tag">健康： 注意${result.health.split('：')[1].split('、')[0]}</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+            <button class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
+        </div>
+    `;
+    
+    document.getElementById('resultArea').innerHTML = html;
+    document.getElementById('resultArea').style.display = 'block';
+    document.querySelector('.analysis-form').style.display = 'none';
+}
+
+function resetForm() {
+    document.querySelector('.analysis-form').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('ageInput').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>流年解星 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 流年解星页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.star-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.star-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.star-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.star-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.star-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+.analysis-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    display: none;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-card h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.result-card p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.nian-star-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.nian-star-table th,
+.nian-star-table td {
+    padding: 0.8rem;
+    text-align: center;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.nian-star-table th {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.nian-star-table td {
+    color: rgba(255,255,255,0.9);
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.tag {
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: rgba(255,215,0,0.1);
+    color: rgba(255,255,255,0.7);
+}
+
+@media (max-width: 768px) {
+    .star-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🔯 流年解星</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>流年解星简介</h2>
+            <p>流年解星是八字命理中的重要内容，通过分析每年飞临的星曜（吉星和凶星），来判断该年的运势吉凶。</p>
+            <p>流年解星包括：岁破、龙德、天德、福德、红鸾、天喜、寡宿、吊客等。不同星曜对不同日干的人影响不同。</p>
+        </div>
+
+        <div class="section">
+            <h2>流年吉星</h2>
+            
+            <div class="star-grid">
+                <div class="star-card">
+                    <h3>岁德星</h3>
+                    <p><strong>影响：</strong>岁德星是年度最吉之星，主喜庆、添丁、晋迁。</p>
+                    <p><strong>适合：</strong>结婚、生子、升职、开业等喜事。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>龙德星</h3>
+                    <p><strong>影响：</strong>龙德星主贵人相助、逢凶化吉、事业顺利。</p>
+                    <p><strong>适合：</strong>求职、创业、投资、签约等事务。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>天德星</h3>
+                    <p><strong>影响：</strong>天德星主天降福德、化解灾厄、平安吉祥。</p>
+                    <p><strong>适合：</strong>祈福、化解、治病、消灾等事务。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>福德星</h3>
+                    <p><strong>影响：</strong>福德星主福气临门、财运亨通、家庭和睦。</p>
+                    <p><strong>适合：</strong>置业、储蓄、家庭聚会、感恩等。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>红鸾星</h3>
+                    <p><strong>影响：</strong>红鸾星主桃花运旺、婚姻喜庆、人际和谐。</p>
+                    <p><strong>适合：</strong>恋爱、结婚、社交、拓展人脉等。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>天喜星</h3>
+                    <p><strong>影响：</strong>天喜星主喜事连连、双喜临门、锦上添花。</p>
+                    <p><strong>适合：</strong>结婚、生子、乔迁、开业等双喜事。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>流年凶星</h2>
+            
+            <div class="star-grid">
+                <div class="star-card">
+                    <h3>岁破星</h3>
+                    <p><strong>影响：</strong>岁破星是年度最凶之星，主破财、破身、破运。</p>
+                    <p><strong>忌讳：</strong>大额投资、远行、签约、结婚等大事。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>寡宿星</h3>
+                    <p><strong>影响：</strong>寡宿星主孤独、寂寞、人缘差、感情波折。</p>
+                    <p><strong>忌讳：</strong>恋爱、结婚、合伙、社交等事务。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>吊客星</h3>
+                    <p><strong>影响：</strong>吊客星主丧事、疾病、哀伤、精神不振。</p>
+                    <p><strong>忌讳：</strong>探病、参加丧礼、投资、远行等。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>病符星</h3>
+                    <p><strong>影响：</strong>病符星主疾病、体弱、意外、健康状况差。</p>
+                    <p><strong>忌讳：</strong>劳累、冒险、忽略健康、不体检等。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>耗财星</h3>
+                    <p><strong>影响：</strong>耗财星主破财、开支大、投资失利、被骗。</p>
+                    <p><strong>忌讳：</strong>投资、借贷、担保、大额消费等。</p>
+                </div>
+                
+                <div class="star-card">
+                    <h3>桃花劫</h3>
+                    <p><strong>影响：</strong>桃花劫主感情纠纷、烂桃花、因色破财或惹祸。</p>
+                    <p><strong>忌讳：</strong>滥情、婚外情、轻信网友、posts裸照等。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>流年解星推算方法</h2>
+            <p><strong>1. 确定岁次：</strong>根据出生年的地支，确定当年的太岁方位和岁破方位。</p>
+            <p><strong>2. 查找吉凶星：</strong>根据当年天干地支，查找飞临的吉星和凶星。</p>
+            <p><strong>3. 分析影响：</strong>分析吉凶星对命主的影响，判断吉凶程度。</p>
+            <p><strong>4. 提出化解：</strong>针对凶星，提出相应的化解方法，如祭拜、佩戴吉祥物等。</p>
+        </div>
+
+        <div class="section">
+            <h2>流年解星工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入您的出生信息，我们将为您详细分析2026年（丙午年）的流年运势，包括吉星、凶星、各方面运势等。
+            </p>
+            
+            <div class="analysis-form">
+                <div class="form-group">
+                    <label class="form-label">出生日期</label>
+                    <input type="date" class="form-input" id="birthInput">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">出生时间（可选）</label>
+                    <input type="time" class="form-input" id="timeInput">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <select class="form-input" id="genderInput">
+                        <option value="male">男性</option>
+                        <option value="female">女性</option>
+                    </select>
+                </div>
+                
+                <button class="submit-btn" onclick="analyzeNian()">开始分析</button>
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年（丙午年）流年概览</h2>
+            <p>2026年为丙午年，天干丙火，地支午火，火旺之年。不同日干的人运势如下：</p>
+            
+            <table class="nian-star-table">
+                <tr>
+                    <th>日干</th>
+                    <th>吉星</th>
+                    <th>凶星</th>
+                    <th>总体运势</th>
+                </tr>
+                <tr>
+                    <td>甲日</td>
+                    <td>岁德、天德</td>
+                    <td>岁破</td>
+                    <td>吉凶参半，需谨慎行事</td>
+                </tr>
+                <tr>
+                    <td>乙日</td>
+                    <td>龙德、福德</td>
+                    <td>寡宿</td>
+                    <td>贵人相助，事业进步</td>
+                </tr>
+                <tr>
+                    <td>丙日</td>
+                    <td>红鸾、天喜</td>
+                    <td>吊客</td>
+                    <td>桃花旺盛，感情顺利</td>
+                </tr>
+                <tr>
+                    <td>丁日</td>
+                    <td>岁德、龙德</td>
+                    <td>病符</td>
+                    <td>运势不错，注意健康</td>
+                </tr>
+                <tr>
+                    <td>戊日</td>
+                    <td>天德、福德</td>
+                    <td>耗财</td>
+                    <td>福气临门，理财需谨慎</td>
+                </tr>
+                <tr>
+                    <td>己日</td>
+                    <td>红鸾、天喜</td>
+                    <td>桃花劫</td>
+                    <td>桃花旺，需防烂桃花</td>
+                </tr>
+                <tr>
+                    <td>庚日</td>
+                    <td>岁德、天德</td>
+                    <td>岁破</td>
+                    <td>吉凶参半，宜静不宜动</td>
+                </tr>
+                <tr>
+                    <td>辛日</td>
+                    <td>龙德、福德</td>
+                    <td>寡宿</td>
+                    <td>贵人运强，人际和谐</td>
+                </tr>
+                <tr>
+                    <td>壬日</td>
+                    <td>红鸾、天喜</td>
+                    <td>吊客</td>
+                    <td>感情丰富，注意家人健康</td>
+                </tr>
+                <tr>
+                    <td>癸日</td>
+                    <td>岁德、龙德</td>
+                    <td>病符</td>
+                    <td>运势不错，需注意休息</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>流年解星的化解方法</h2>
+            <p><strong>1. 祭拜太岁：</strong>年初祭拜太岁，祈求平安顺利，化解岁破等凶星。</p>
+            <p><strong>2. 佩戴吉祥物：</strong>根据命理，佩戴合适的吉祥物（如貔貅、金蟾等），化解凶星、增强吉星。</p>
+            <p><strong>3. 行善积德：</strong>多行善事、积德行善，可以化解凶星、增强福报。</p>
+            <p><strong>4. 风水调理：</strong>调整家居风水，如在吉位摆放招财物品，在凶位摆放化解物品等。</p>
+            <p><strong>5. 择吉行事：</strong>重要事务选择吉日吉时，避开凶星当值的日子和时辰。</p>
+        </div>
+
+        <div class="section">
+            <h2>流年解星的历史渊源</h2>
+            <p>流年解星起源于汉代，当时已有"岁星"、"太岁"等概念。唐宋时期，流年解星理论逐渐完善，出现了许多专著。</p>
+            <p>明清时期，流年解星达到鼎盛，成为八字命理的重要组成部分。现代命理学家则结合心理学、统计学等知识，使流年解星更加科学化和实用化。</p>
+            <p>需要注意的是，流年解星只是一种趋势性的参考，命运掌握在自己手中。通过努力和修行，完全可以化解凶星、增强吉星。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+function analyzeNian() {
+    const birth = document.getElementById('birthInput').value;
+    const time = document.getElementById('timeInput').value;
+    const gender = document.getElementById('genderInput').value;
+    
+    if (!birth) {
+        showToast('请输入出生日期');
+        return;
+    }
+    
+    showToast('正在分析流年...');
+    
+    // 模拟分析
+    setTimeout(() => {
+        const result = {
+            birth: birth,
+            gender: gender,
+            year: '2026年（丙午年）',
+            dayGan: ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'][Math.floor(Math.random() * 10)],
+            luckyStars: ['岁德星、天德星', '龙德星、福德星', '红鸾星、天喜星', '岁德星、龙德星'][Math.floor(Math.random() * 4)],
+            unluckyStars: ['岁破星', '寡宿星', '吊客星', '病符星', '耗财星'][Math.floor(Math.random() * 5)],
+            fortune: {
+                career: ['事业顺利', '步步高升', '中年后发', '稳扎稳打'][Math.floor(Math.random() * 4)],
+                wealth: ['财运亨通', '积蓄丰厚', '晚年财旺', '收支平衡'][Math.floor(Math.random() * 4)],
+                marriage: ['婚姻美满', '夫妻和睦', '晚婚可得', '桃花旺盛'][Math.floor(Math.random() * 4)],
+                health: ['身体强健', '少病少灾', '注意养生', '需防小病'][Math.floor(Math.random() * 4)]
+            },
+            advice: '2026年丙午年，对于' + ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'][Math.floor(Math.random() * 10)] + 
+                    '日干的人来说，是' + ['吉凶参半', '贵人相助', '桃花旺盛', '需谨慎行事'][Math.floor(Math.random() * 4)] + 
+                    '的一年。建议' + ['稳重行事', '把握机遇', '多行善事', '注意健康'][Math.floor(Math.random() * 4)] + 
+                    '，可化解凶星、增强吉星。'
+        };
+        
+        showResult(result);
+    }, 2500);
+}
+
+function showResult(result) {
+    let html = `
+        <div class="result-card fade-in">
+            <h3>🔯 流年分析结果</h3>
+            <p><strong>出生日期：</strong>${result.birth}</p>
+            <p><strong>性别：</strong>${result.gender === 'male' ? '男性' : '女性'}</p>
+            <p><strong>分析年份：</strong>${result.year}</p>
+            <p><strong>日干：</strong>${result.dayGan}日</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>⭐ 吉星高照</h3>
+            <p>${result.luckyStars}</p>
+            <p>这些吉星将为你带来好运和贵人相助，把握机会，积极进取。</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>⚠️ 凶星临门</h3>
+            <p>${result.unluckyStars}</p>
+            <p>这些凶星可能带来挑战和波折，需谨慎行事，提前化解。</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📊 各方面运势</h3>
+            <p><strong>事业运：</strong>${result.fortune.career}</p>
+            <p><strong>财运：</strong>${result.fortune.wealth}</p>
+            <p><strong>婚姻运：</strong>${result.fortune.marriage}</p>
+            <p><strong>健康运：</strong>${result.fortune.health}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💡 综合建议</h3>
+            <p>${result.advice}</p>
+            <div class="tags">
+                <span class="tag">吉星：${result.luckyStars}</span>
+                <span class="tag">凶星：${result.unluckyStars}</span>
+                <span class="tag">建议：谨慎行事</span>
+                <span class="tag">化解：祭拜太岁</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+            <button class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
+        </div>
+    `;
+    
+    document.getElementById('resultArea').innerHTML = html;
+    document.getElementById('resultArea').style.display = 'block';
+    document.querySelector('.analysis-form').style.display = 'none';
+}
+
+function resetForm() {
+    document.querySelector('.analysis-form').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('birthInput').value = '';
+    document.getElementById('timeInput').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

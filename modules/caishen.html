@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>财神方位 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 财神方位页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.direction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.direction-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.direction-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.direction-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.direction-card p {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.7);
+}
+
+.wealth-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.wealth-table th,
+.wealth-table td {
+    padding: 0.8rem;
+    text-align: center;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.wealth-table th {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.wealth-table td {
+    color: rgba(255,255,255,0.9);
+}
+
+.compass-container {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+}
+
+.compass {
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+    position: relative;
+    background: radial-gradient(circle, rgba(255,215,0,0.05), transparent);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 50%;
+}
+
+.compass-direction {
+    position: absolute;
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.compass-direction.north { top: 10px; left: 50%; transform: translateX(-50%); }
+.compass-direction.east { right: 10px; top: 50%; transform: translateY(-50%); }
+.compass-direction.south { bottom: 10px; left: 50%; transform: translateX(-50%); }
+.compass-direction.west { left: 10px; top: 50%; transform: translateY(-50%); }
+
+.wealth-direction {
+    position: absolute;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,215,0,0.2);
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+}
+
+.wealth-direction.today { 
+    top: 50%; left: 50%; 
+    transform: translate(-50%, -50%);
+    background: rgba(255,215,0,0.4);
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.daily-wealth {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.wealth-info {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.wealth-info h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.wealth-info p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.tip-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.tip-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.tip-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.tip-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+@media (max-width: 768px) {
+    .direction-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .compass {
+        width: 200px;
+        height: 200px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>💰 财神方位</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>财神方位简介</h2>
+            <p>财神方位是中国传统风水学中的重要概念，指每日财神所在的方位。根据天干地支和五行生克原理，每日的财神方位都不同。</p>
+            <p>了解每日财神方位，可以在求财、签约、开店、投资等重要事务中选择有利方位，提升财运和成功率。</p>
+        </div>
+
+        <div class="section">
+            <h2>今日财神方位</h2>
+            <div class="compass-container">
+                <div class="compass" id="compass">
+                    <div class="compass-direction north">北</div>
+                    <div class="compass-direction east">东</div>
+                    <div class="compass-direction south">南</div>
+                    <div class="compass-direction west">西</div>
+                    <div class="wealth-direction today" id="todayDirection">财神在此</div>
+                </div>
+                <p style="margin-top: 1rem; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                    今日财神方位：<strong style="color: #ffd700;" id="directionText">正东</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>十二地支财神方位</h2>
+            <p>根据十二地支，不同年份出生的人，其财神方位也不同：</p>
+            
+            <table class="wealth-table">
+                <tr>
+                    <th>地支</th>
+                    <th>生肖</th>
+                    <th>财神方位</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>子</td>
+                    <td>鼠</td>
+                    <td>正北</td>
+                    <td>水主财，正北为旺位</td>
+                </tr>
+                <tr>
+                    <td>丑</td>
+                    <td>牛</td>
+                    <td>东北</td>
+                    <td>土生金，东北为财库</td>
+                </tr>
+                <tr>
+                    <td>寅</td>
+                    <td>虎</td>
+                    <td>正东</td>
+                    <td>木主生发，正东为旺位</td>
+                </tr>
+                <tr>
+                    <td>卯</td>
+                    <td>兔</td>
+                    <td>正东</td>
+                    <td>木主财，正东为大吉</td>
+                </tr>
+                <tr>
+                    <td>辰</td>
+                    <td>龙</td>
+                    <td>东南</td>
+                    <td>土生金，东南为财位</td>
+                </tr>
+                <tr>
+                    <td>巳</td>
+                    <td>蛇</td>
+                    <td>正南</td>
+                    <td>火生土，正南为旺位</td>
+                </tr>
+                <tr>
+                    <td>午</td>
+                    <td>马</td>
+                    <td>正南</td>
+                    <td>火主礼，正南为财位</td>
+                </tr>
+                <tr>
+                    <td>未</td>
+                    <td>羊</td>
+                    <td>西南</td>
+                    <td>土生金，西南为财库</td>
+                </tr>
+                <tr>
+                    <td>申</td>
+                    <td>猴</td>
+                    <td>正西</td>
+                    <td>金主财，正西为大吉</td>
+                </tr>
+                <tr>
+                    <td>酉</td>
+                    <td>鸡</td>
+                    <td>正西</td>
+                    <td>金主财，正西为旺位</td>
+                </tr>
+                <tr>
+                    <td>戌</td>
+                    <td>狗</td>
+                    <td>西北</td>
+                    <td>土生金，西北为财位</td>
+                </tr>
+                <tr>
+                    <td>亥</td>
+                    <td>猪</td>
+                    <td>正北</td>
+                    <td>水主财，正北为旺位</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>每日财神方位推算</h2>
+            <p>每日财神方位根据日干推算：</p>
+            
+            <div class="direction-grid">
+                <div class="direction-card">
+                    <h3>甲乙日</h3>
+                    <p>财神在正东</p>
+                    <p>东方属木，木生火，火旺则财旺</p>
+                </div>
+                
+                <div class="direction-card">
+                    <h3>丙丁日</h3>
+                    <p>财神在正南</p>
+                    <p>南方属火，火生土，土厚则财厚</p>
+                </div>
+                
+                <div class="direction-card">
+                    <h3>戊己日</h3>
+                    <p>财神在中央</p>
+                    <p>中央属土，土生金，金多则财多</p>
+                </div>
+                
+                <div class="direction-card">
+                    <h3>庚辛日</h3>
+                    <p>财神在正西</p>
+                    <p>西方属金，金生水，水活则财活</p>
+                </div>
+                
+                <div class="direction-card">
+                    <h3>壬癸日</h3>
+                    <p>财神在正北</p>
+                    <p>北方属水，水生木，木盛则财盛</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>求财 tips</h2>
+            
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h3>💰 选择吉时</h3>
+                    <p>在财神方位的吉时求财，效果更佳。一般选择上午9-11点（巳时）或下午1-3点（未时）。</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h3>🧭 使用罗盘</h3>
+                    <p>使用罗盘准确测定方位，避免偏差。现代手机也有罗盘APP，可以快速定位。</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h3>🏠 布置财位</h3>
+                    <p>在家中或办公室的财位摆放招财物品，如金蟾、貔貅、发财树等，可以增强财运。</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h3>🙏 诚心祭拜</h3>
+                    <p>在财神方位诚心祭拜财神爷，祈求财运亨通。心诚则灵，不可心存不敬。</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h3>💼 签约择日</h3>
+                    <p>重要签约、投资等事务，应选择财神方位当旺的日子和时辰，可以提高成功率。</p>
+                </div>
+                
+                <div class="tip-card">
+                    <h3>🚫 避免破财</h3>
+                    <p>避免在破财方位进行大额投资或消费。破财方位一般指与财神方位相冲的方位。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>财神信仰</h2>
+            <p>中国民间信仰中，财神有多种，最常见的有：</p>
+            <p><strong>文财神：</strong>比干、范蠡。适合文职人员、公务员等祭拜。</p>
+            <p><strong>武财神：</strong>赵公明、关公。适合经商、创业、军警等祭拜。</p>
+            <p><strong>五路财神：</strong>东路财神、南路财神、西路财神、北路财神、中路财神。代表五方财运。</p>
+            <p><strong>财神祭拜时间：</strong>一般选择农历初五（破五）、十五、二十五等日子，或者自己的财神日。</p>
+        </div>
+
+        <div class="section">
+            <h2>财神方位的历史渊源</h2>
+            <p>财神方位的起源可以追溯到汉代，当时已有"财神"的概念。唐宋时期，财神信仰逐渐普及，出现了专门的财神庙。</p>
+            <p>明清时期，财神方位的推算方法更加系统化，出现了许多风水著作，如《阳宅三要》《八宅》等，详细论述了财神方位的推算和应用。</p>
+            <p>现代社会中，财神方位仍然被广泛应用于商业、投资、择业等领域，许多人会在重要决策前查询当日财神方位，以求得好运。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+// 初始化今日财神方位
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+    updateWealthDirection();
+});
+
+function updateWealthDirection() {
+    // 模拟根据日期计算财神方位
+    const directions = ['正北', '正东', '正南', '正西', '东北', '东南', '西南', '西北'];
+    const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+    
+    document.getElementById('directionText').textContent = randomDirection;
+    
+    // 在罗盘上标记方位（简化版）
+    const directionElement = document.getElementById('todayDirection');
+    directionElement.textContent = randomDirection;
+    
+    // 根据方位调整位置（简化版）
+    switch(randomDirection) {
+        case '正北':
+            directionElement.style.top = '20%';
+            directionElement.style.left = '50%';
+            directionElement.style.transform = 'translate(-50%, -50%)';
+            break;
+        case '正东':
+            directionElement.style.top = '50%';
+            directionElement.style.left = '80%';
+            directionElement.style.transform = 'translate(-50%, -50%)';
+            break;
+        case '正南':
+            directionElement.style.top = '80%';
+            directionElement.style.left = '50%';
+            directionElement.style.transform = 'translate(-50%, -50%)';
+            break;
+        case '正西':
+            directionElement.style.top = '50%';
+            directionElement.style.left = '20%';
+            directionElement.style.transform = 'translate(-50%, -50%)';
+            break;
+        default:
+            directionElement.style.top = '50%';
+            directionElement.style.left = '50%';
+            directionElement.style.transform = 'translate(-50%, -50%)';
+    }
+}
+</script>
+
+</body>
+</html>

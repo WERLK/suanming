@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>面相分析 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 面相分析页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.face-diagram {
+    text-align: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+}
+
+.face-diagram img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.feature-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.feature-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.feature-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+.analysis-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    display: none;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-card h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.result-card p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.score-display {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    border-radius: 12px;
+    margin: 1rem 0;
+}
+
+.score-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+}
+
+.score-text {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.tag {
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: rgba(255,215,0,0.1);
+    color: rgba(255,255,255,0.7);
+}
+
+@media (max-width: 768px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>👤 面相分析</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>面相学简介</h2>
+            <p>面相学是中国传统相术的重要组成部分，通过观察人的面部特征（五官、气色、纹路等），来推断一个人的性格、命运、健康、财运等。</p>
+            <p>古人云："相由心生"，面相不仅反映先天的命运，也体现后天的修养和心境变化。因此，面相学不仅用于预测，更用于自我修养和改造命运。</p>
+        </div>
+
+        <div class="section">
+            <h2>面部十二宫</h2>
+            <p>面相学将面部划分为十二个区域，称为"十二宫"，每个区域对应人生的不同方面：</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>命宫（印堂）</h3>
+                    <p>位于两眉之间，反映一个人的基本命运、性格和气质。印堂宽阔明亮者，主心胸宽广、运势顺利；印堂狭窄灰暗者，主心胸狭窄、运势坎坷。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>财帛宫（鼻翼）</h3>
+                    <p>位于鼻翼两侧，反映财运和理财能力。鼻翼丰满有肉者，主财运亨通、积蓄丰厚；鼻翼薄弱露骨者，主财运不济、开支大手大脚。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>兄弟宫（眉）</h3>
+                    <p>位于眉毛区域，反映兄弟姐妹的关系和助力。眉毛清秀弯长者，主兄弟和睦、互相扶持；眉毛杂乱逆生者，主兄弟不和、各自为政。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>夫妻宫（眼角）</h3>
+                    <p>位于眼尾区域（奸门），反映婚姻状况和感情运势。夫妻宫丰满光泽者，主婚姻美满、感情顺利；夫妻宫凹陷灰暗者，主婚姻波折、感情不顺。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>子女宫（泪堂）</h3>
+                    <p>位于下眼睑区域，反映子女缘分、生育能力和子女运势。子女宫丰满润泽者，主子女缘厚、子孙兴旺；子女宫凹陷枯槁者，主子女缘薄、求子艰难。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>疾厄宫（山根）</h3>
+                    <p>位于两眼之间的鼻梁根部，反映健康状况和疾病倾向。疾厄宫高耸丰满者，主身体强健、少病少灾；疾厄宫低陷断裂者，主体弱多病、易有意外。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>五官与命运</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>眼睛（监察官）</h3>
+                    <p><strong>大眼：</strong>性格开朗、情感丰富、洞察力强</p>
+                    <p><strong>小眼：</strong>性格内敛、心思缜密、专注力强</p>
+                    <p><strong>双眼皮：</strong>感情丰富、善于表达、人缘好</p>
+                    <p><strong>单眼皮：</strong>性格独立、意志坚定、思维理性</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>鼻子（审辨官）</h3>
+                    <p><strong>高鼻梁：</strong>自信心强、有主见、事业心重</p>
+                    <p><strong>低鼻梁：</strong>性格温和、依赖心强、随遇而安</p>
+                    <p><strong>鼻头丰满：</strong>财运好、积蓄丰厚、生活富足</p>
+                    <p><strong>鼻头尖薄：</strong>财运差、开支大、难聚财</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>嘴巴（出纳官）</h3>
+                    <p><strong>大嘴：</strong>性格外向、善于交际、表达力强</p>
+                    <p><strong>小嘴：</strong>性格内向、谨慎小心、注重细节</p>
+                    <p><strong>厚唇：</strong>重感情、心地善良、乐于助人</p>
+                    <p><strong>薄唇：</strong>理性冷静、口才伶俐、善于辩论</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>耳朵（采听官）</h3>
+                    <p><strong>大耳：</strong>福气好、寿命长、聪明好学</p>
+                    <p><strong>小耳：</strong>精明能干、行动力强、适应力好</p>
+                    <p><strong>厚耳：</strong>身体健康、意志坚定、抗衰老</p>
+                    <p><strong>薄耳：</strong>敏感细腻、感受力强、易疲劳</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>面相分析工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                上传你的正面照片，我们将通过AI技术自动识别面部特征，并结合传统面相学知识，为你提供详细的面相分析报告。
+            </p>
+            
+            <div class="analysis-form">
+                <div class="form-group">
+                    <label class="form-label">上传正面照片（清晰无遮挡）</label>
+                    <input type="file" class="form-input" accept="image/*" id="photoInput">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <select class="form-input" id="genderInput">
+                        <option value="male">男性</option>
+                        <option value="female">女性</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">年龄</label>
+                    <input type="number" class="form-input" id="ageInput" placeholder="请输入年龄" min="1" max="120">
+                </div>
+                
+                <button class="submit-btn" onclick="analyzeFace()">开始分析</button>
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>面相调整与改造</h2>
+            <p>面相并非一成不变，通过以下方式可以改善面相，从而改变命运：</p>
+            <p><strong>1. 修心养性：</strong>保持善良、宽容的心态，久而久之，面相会变得更加慈祥、和善。</p>
+            <p><strong>2. 修饰仪容：</strong>通过发型、胡须、化妆等方式，可以调整面部气场，改善运势。</p>
+            <p><strong>3. 医学美容：</strong>现代医美技术可以通过微调面部特征，改善面相中的"凶相"或"苦相"。</p>
+            <p><strong>4. 表情管理：</strong>常带笑容、眼神温和，可以消除面相中的"戾气"，提升人缘和运势。</p>
+            <p><strong>5. 风水调理：</strong>通过调整家居风水、佩戴吉祥物等方式，也可以间接改善面相和气色。</p>
+        </div>
+
+        <div class="section">
+            <h2>面相学的历史渊源</h2>
+            <p>面相学起源于先秦时期，最早见于《左传》《国语》等古籍。汉代许负所著《许负相法》，是现存最早的相术专著。</p>
+            <p>唐宋时期，面相学达到鼎盛，出现了《麻衣相法》《柳庄相法》等经典著作。明代袁忠彻所著《古今识鉴》，进一步系统化了面相理论。</p>
+            <p>清代以后，面相学逐渐与八字、紫微、风水等术数融合，形成了完整的命理体系。现代面相学则结合心理学、生理学等知识，更加注重科学性和实用性。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+function analyzeFace() {
+    const photo = document.getElementById('photoInput').files[0];
+    const gender = document.getElementById('genderInput').value;
+    const age = document.getElementById('ageInput').value;
+    
+    if (!photo) {
+        showToast('请上传照片');
+        return;
+    }
+    
+    if (!age || age < 1 || age > 120) {
+        showToast('请输入有效年龄');
+        return;
+    }
+    
+    showToast('正在分析面相...');
+    
+    // 模拟AI分析
+    setTimeout(() => {
+        const result = {
+            score: Math.floor(Math.random() * 30) + 70,
+            features: {
+                eyes: ['大而有神', '细长澄清', '双目有神'][Math.floor(Math.random() * 3)],
+                nose: ['鼻梁高挺', '鼻头丰满', '山根饱满'][Math.floor(Math.random() * 3)],
+                mouth: ['唇红齿白', '嘴角上扬', '口方唇厚'][Math.floor(Math.random() * 3)],
+                ears: ['耳垂肥厚', '耳轮分明', '双耳贴脑'][Math.floor(Math.random() * 3)]
+            },
+            fortune: {
+                career: ['事业有成', '步步高升', '中年后发'][Math.floor(Math.random() * 3)],
+                wealth: ['财运亨通', '积蓄丰厚', '晚年财旺'][Math.floor(Math.random() * 3)],
+                marriage: ['婚姻美满', '夫妻和睦', '晚婚可得'][Math.floor(Math.random() * 3)],
+                health: ['身体强健', '少病少灾', '注意养生'][Math.floor(Math.random() * 3)]
+            },
+            advice: '整体面相' + ['吉祥', '中上', '不错'][Math.floor(Math.random() * 3)] + 
+                    '，建议' + ['保持善良心态', '多行善事', '注重修养'][Math.floor(Math.random() * 3)] + 
+                    '，可进一步提升运势。'
+        };
+        
+        showResult(result);
+    }, 2000);
+}
+
+function showResult(result) {
+    let html = `
+        <div class="result-card fade-in">
+            <h3>👤 面相分析结果</h3>
+        </div>
+        
+        <div class="score-display fade-in">
+            <div class="score-number">${result.score}分</div>
+            <div class="score-text">${result.score >= 90 ? '大吉相' : result.score >= 80 ? '吉相' : result.score >= 70 ? '中吉相' : '平相'}</div>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>🔍 面部特征分析</h3>
+            <p><strong>眼睛：</strong>${result.features.eyes} — ${result.fortune.career}</p>
+            <p><strong>鼻子：</strong>${result.features.nose} — ${result.fortune.wealth}</p>
+            <p><strong>嘴巴：</strong>${result.features.mouth} — ${result.fortune.marriage}</p>
+            <p><strong>耳朵：</strong>${result.features.ears} — ${result.fortune.health}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📊 各方面运势</h3>
+            <p><strong>事业运：</strong>${result.fortune.career}</p>
+            <p><strong>财运：</strong>${result.fortune.wealth}</p>
+            <p><strong>婚姻运：</strong>${result.fortune.marriage}</p>
+            <p><strong>健康运：</strong>${result.fortune.health}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💡 改善建议</h3>
+            <p>${result.advice}</p>
+            <div class="tags">
+                <span class="tag">修心养性</span>
+                <span class="tag">修饰仪容</span>
+                <span class="tag">表情管理</span>
+                <span class="tag">风水调理</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+            <button class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
+        </div>
+    `;
+    
+    document.getElementById('resultArea').innerHTML = html;
+    document.getElementById('resultArea').style.display = 'block';
+    document.querySelector('.analysis-form').style.display = 'none';
+}
+
+function resetForm() {
+    document.querySelector('.analysis-form').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('photoInput').value = '';
+    document.getElementById('ageInput').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

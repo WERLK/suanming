@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>太阳卦 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 太阳卦页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.gua-explanation {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.gua-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+}
+
+.gua-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.gua-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.gua-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+
+.divination-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    display: none;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-card h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.result-card p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+.sun-symbol {
+    text-align: center;
+    font-size: 5rem;
+    margin: 1rem 0;
+    color: #ffd700;
+    text-shadow: 0 0 30px rgba(255,215,0,0.5);
+}
+
+@media (max-width: 768px) {
+    .gua-explanation {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>☀️ 太阳卦</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>太阳卦简介</h2>
+            <p>太阳卦是民间流传的一种简易占卜方法，通过默念问题后随机得到"太阳"或"太阴"的卦象，来判断吉凶祸福。</p>
+            <p>太阳卦源于古代太阳崇拜，认为太阳代表阳刚、正气、吉祥，太阴（月亮）代表阴柔、变化、 uncertainty。通过太阳卦可以快速得到问题的答案或指引。</p>
+        </div>
+
+        <div class="section">
+            <h2>卦象解释</h2>
+            
+            <div class="gua-explanation">
+                <div class="gua-card">
+                    <h3>☀️ 太阳卦（阳卦）</h3>
+                    <p><strong>象征：</strong>阳气、正气、光明、顺利</p>
+                    <p><strong>含义：</strong>所求之事顺利、吉祥、可成</p>
+                    <p><strong>适用：</strong>事业、求财、婚姻、健康等</p>
+                    <p><strong>建议：</strong>积极行动、把握机遇、勇往直前</p>
+                </div>
+                
+                <div class="gua-card">
+                    <h3>🌙 太阴卦（阴卦）</h3>
+                    <p><strong>象征：</strong>阴气、变化、曲折、 wait</p>
+                    <p><strong>含义：</strong>所求之事波折、延迟、需等待</p>
+                    <p><strong>适用：</strong>决策、投资、出行、签约等</p>
+                    <p><strong>建议：</strong>谨慎行事、等待时机、三思后行</p>
+                </div>
+                
+                <div class="gua-card">
+                    <h3>☯ 阴阳和合卦</h3>
+                    <p><strong>象征：</strong>平衡、和谐、中和、 compromise</p>
+                    <p><strong>含义：</strong>所求之事需平衡各方、 compromise</p>
+                    <p><strong>适用：</strong>谈判、合作、纠纷、选择等</p>
+                    <p><strong>建议：</strong>寻求平衡、化解矛盾、中庸之道</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>占卜方法</h2>
+            <p><strong>1. 准备：</strong>找一个安静的地方，放松心情，排除杂念。</p>
+            <p><strong>2. 默念：</strong>心中默念你想问的问题，要具体、明确。</p>
+            <p><strong>3. 起卦：</strong>点击下方按钮，系统将随机生成太阳卦或太阴卦。</p>
+            <p><strong>4. 解卦：</strong>根据得到的卦象，参考卦象解释，理解其含义。</p>
+            <p><strong>5. 决策：</strong>结合卦象含义和现实情况，做出最佳决策。</p>
+        </div>
+
+        <div class="section">
+            <h2>太阳卦占卜工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                心中默念你想问的问题，然后点击下方按钮开始占卜。太阳卦适合问一些"是"或"否"类型的问题，或者需要指引的决策问题。
+            </p>
+            
+            <div class="divination-form">
+                <div class="form-group">
+                    <label class="form-label">请输入你想问的问题</label>
+                    <input type="text" class="form-input" id="questionInput" placeholder="例如：我应该接受这份工作吗？" maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">问题类型</label>
+                    <select class="form-input" id="typeInput">
+                        <option value="yesno">是/否问题</option>
+                        <option value="choice">选择问题</option>
+                        <option value="prediction">预测问题</option>
+                        <option value="advice">寻求建议</option>
+                    </select>
+                </div>
+                
+                <button class="submit-btn" onclick="startDivination()">开始占卜</button>
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>太阳卦的应用场景</h2>
+            
+            <div class="gua-explanation">
+                <div class="gua-card">
+                    <h3>💼 事业决策</h3>
+                    <p>问：我应该换工作吗？</p>
+                    <p>太阳卦：适合换，新工作有机会</p>
+                    <p>太阴卦：不宜换，当前工作更稳定</p>
+                </div>
+                
+                <div class="gua-card">
+                    <h3>💰 投资理财</h3>
+                    <p>问：我应该投资这个项目吗？</p>
+                    <p>太阳卦：可以投资，有盈利机会</p>
+                    <p>太阴卦：不宜投资，风险较大</p>
+                </div>
+                
+                <div class="gua-card">
+                    <h3>❤️ 感情婚姻</h3>
+                    <p>问：我应该和他/她结婚吗？</p>
+                    <p>太阳卦：适合结婚，婚姻美满</p>
+                    <p>太阴卦：需等待，感情还需磨合</p>
+                </div>
+                
+                <div class="gua-card">
+                    <h3>🏥 健康疾病</h3>
+                    <p>问：我的病会好转吗？</p>
+                    <p>太阳卦：会好转，积极治疗</p>
+                    <p>太阴卦：需耐心，康复需时日</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>太阳卦的注意事项</h2>
+            <p><strong>1. 心诚则灵：</strong>占卜时要专心致志，不要三心二意。</p>
+            <p><strong>2. 一事一占：</strong>每次只能问一个问题，不要同时问多个问题。</p>
+            <p><strong>3. 不可反复占：</strong>同一个问题不要反复占卜，否则结果会不准。</p>
+            <p><strong>4. 理性对待：</strong>占卜结果仅供参考，重大决策还需结合现实情况理性分析。</p>
+            <p><strong>5. 心存善念：</strong>占卜的目的是趋吉避凶，而不是为了满足好奇心或恶作剧。</p>
+        </div>
+
+        <div class="section">
+            <h2>太阳卦的历史渊源</h2>
+            <p>太阳卦起源于古代太阳崇拜，古人认为太阳是万物之源，代表着光明、正义、生命力。</p>
+            <p>在民间，太阳卦常用于简单快速地预测吉凶，尤其是在缺乏专业占卜工具时，太阳卦是一种方便易行的占卜方法。</p>
+            <p>现代社会中，太阳卦仍然被许多人使用，尤其是在面临重要决策时，用来寻求心理指引和安慰。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+function startDivination() {
+    const question = document.getElementById('questionInput').value.trim();
+    const type = document.getElementById('typeInput').value;
+    
+    if (!question) {
+        showToast('请输入你想问的问题');
+        return;
+    }
+    
+    showToast('正在占卜...');
+    
+    // 模拟占卜过程
+    setTimeout(() => {
+        const isSun = Math.random() > 0.5;
+        const result = {
+            question: question,
+            type: type,
+            isSun: isSun,
+            gua: isSun ? '太阳卦（阳卦）' : '太阴卦（阴卦）',
+            meaning: isSun ? '吉祥、顺利、可成' : '波折、延迟、需等待',
+            advice: isSun ? 
+                ['积极行动', '把握机遇', '勇往直前', '果断决策'][Math.floor(Math.random() * 4)] : 
+                ['谨慎行事', '等待时机', '三思后行', '暂缓决策'][Math.floor(Math.random() * 4)]
+        };
+        
+        showResult(result);
+    }, 1500);
+}
+
+function showResult(result) {
+    const guaSymbol = result.isSun ? '☀️' : '🌙';
+    
+    let html = `
+        <div class="result-card fade-in">
+            <h3>${guaSymbol} 占卜结果</h3>
+            <p><strong>所问之事：</strong>${result.question}</p>
+            <p><strong>问题类型：</strong>${document.getElementById('typeInput').options[document.getElementById('typeInput').selectedIndex].text}</p>
+        </div>
+        
+        <div class="sun-symbol fade-in">
+            ${guaSymbol}
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📊 卦象</h3>
+            <p style="font-size: 1.5rem; color: #ffd700; font-weight: bold; text-align: center; margin: 1rem 0;">${result.gua}</p>
+            <p><strong>含义：</strong>${result.meaning}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💡 建议</h3>
+            <p>根据卦象，建议你：<strong>${result.advice}</strong></p>
+            <p>具体来说：</p>
+            ${result.isSun ? 
+                '<p>✅ 这是一个积极的信号，你可以放心前进。</p><p>✅ 抓住机会，积极行动，成功的可能性很大。</p><p>✅ 但也要注意细节，不要盲目乐观。</p>' : 
+                '<p>⚠️ 这不是一个理想的时机，建议谨慎行事。</p><p>⚠️ 可以等待更好的时机，或者重新评估你的计划。</p><p>⚠️ 不要气馁，太阴卦只是提醒你需要更多耐心和准备。</p>'
+            }
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📝 综合分析</h3>
+            <p>针对你的问题"${result.question}"，${result.gua}的启示是：</p>
+            <p>${result.isSun ? 
+                '当前形势对你有利，可以积极行动，把握机遇。但也要注意不要过于冒进，要保持清醒的头脑。' : 
+                '当前形势不太明朗，建议谨慎行事，等待更好的时机。可以利用这段时间做好准备，提升自己，为未来的机会打下基础。'
+            }</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+            <button class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新占卜</button>
+        </div>
+    `;
+    
+    document.getElementById('resultArea').innerHTML = html;
+    document.getElementById('resultArea').style.display = 'block';
+    document.querySelector('.divination-form').style.display = 'none';
+}
+
+function resetForm() {
+    document.querySelector('.divination-form').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('questionInput').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

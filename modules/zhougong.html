@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周公解梦 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .content-area {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+        .dream-intro {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .dream-intro h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+        }
+        .dream-intro p {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+        }
+        .dream-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .dream-category {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dream-category:hover {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+            transform: translateY(-2px);
+        }
+        .dream-category h3 {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .dream-category p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.7);
+        }
+        .common-dreams {
+            margin-top: 1.5rem;
+        }
+        .common-dreams h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        .dream-item {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .dream-item h3 {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .dream-item p {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+        }
+        .dream-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .dream-tag {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            background: rgba(255,215,0,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+        .dream-tag.lucky {
+            background: rgba(0,255,0,0.15);
+            color: #0f0;
+        }
+        .dream-tag.unlucky {
+            background: rgba(255,0,0,0.15);
+            color: #f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="app">
+        <div class="page-header">
+            <button class="back-btn" onclick="history.back()">←</button>
+            <h1>😴 周公解梦</h1>
+        </div>
+
+        <div class="content-area">
+            <div class="dream-intro">
+                <h2>周公解梦简介</h2>
+                <p>周公解梦是中国古代流传下来的一套解梦方法，基于《周公解梦》一书。它认为梦境不是随机的大脑活动，而是潜意识对未来事件的预感和暗示。</p>
+                <p>通过解读梦境中的意象，可以了解自己的潜意识、预测未来趋势、获取人生指引。</p>
+            </div>
+
+            <div class="dream-categories">
+                <div class="dream-category" onclick="showDreamDetail('animal')">
+                    <h3>🐉 动物类</h3>
+                    <p>梦见蛇、鱼、龙、虎等动物的含义...</p>
+                </div>
+                <div class="dream-category" onclick="showDreamDetail('nature')">
+                    <h3>🌊 自然类</h3>
+                    <p>梦见水、火、山、风等自然现象的含义...</p>
+                </div>
+                <div class="dream-category" onclick="showDreamDetail('people')">
+                    <h3>👥 人物类</h3>
+                    <p>梦见去世亲人、陌生人、恋人等人的含义...</p>
+                </div>
+                <div class="dream-category" onclick="showDreamDetail('buildings')">
+                    <h3>🏠 建筑类</h3>
+                    <p>梦见房屋、礼堂、厕所等建筑物的含义...</p>
+                </div>
+            </div>
+
+            <div class="common-dreams">
+                <h2>🔍 常见梦境解析</h2>
+                
+                <div class="dream-item">
+                    <h3>🐍 梦见蛇</h3>
+                    <p><strong>基本寓意：</strong>蛇象征财富和智慧，通常预示有财运到来或贵人相助。</p>
+                    <p><strong>变体解析：</strong></p>
+                    <ul style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-left: 1.5rem;">
+                        <li>被蛇咬 → 需注意小人暗算</li>
+                        <li>蛇缠身 → 提醒注意健康</li>
+                        <li>打死蛇 → 克服困难，战胜对手</li>
+                    </ul>
+                    <div class="dream-tags">
+                        <span class="dream-tag lucky">财运</span>
+                        <span class="dream-tag">智慧</span>
+                        <span class="dream-tag unlucky">小人</span>
+                    </div>
+                </div>
+
+                <div class="dream-item">
+                    <h3>💧 梦见水</h3>
+                    <p><strong>基本寓意：</strong>水象征情感和财运。</p>
+                    <p><strong>变体解析：</strong></p>
+                    <ul style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-left: 1.5rem;">
+                        <li>清水 → 主吉，预示财源滚滚、心情愉悦</li>
+                        <li>浑水 → 主凶，提醒注意情感纠纷或财务风险</li>
+                        <li>大水漫灌 → 预示有大的转变即将来临</li>
+                    </ul>
+                    <div class="dream-tags">
+                        <span class="dream-tag lucky">财运</span>
+                        <span class="dream-tag">情感</span>
+                        <span class="dream-tag">转变</span>
+                    </div>
+                </div>
+
+                <div class="dream-item">
+                    <h3>👤 梦见去世亲人</h3>
+                    <p><strong>基本寓意：</strong>逝者对您的牵挂和庇佑，预示得到祖先福荫保护。</p>
+                    <p><strong>变体解析：</strong></p>
+                    <ul style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-left: 1.5rem;">
+                        <li>亲人面带微笑 → 大吉，预示家运昌隆</li>
+                        <li>亲人哭泣 → 需留意家人健康</li>
+                        <li>与亲人说话 → 可能得到重要指引</li>
+                    </ul>
+                    <div class="dream-tags">
+                        <span class="dream-tag lucky">庇佑</span>
+                        <span class="dream-tag">家运</span>
+                        <span class="dream-tag">指引</span>
+                    </div>
+                </div>
+
+                <div class="dream-item">
+                    <h3>🏠 梦见房屋</h3>
+                    <p><strong>基本寓意：</strong>房屋象征家庭和内自我世界。</p>
+                    <p><strong>变体解析：</strong></p>
+                    <ul style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-left: 1.5rem;">
+                        <li>新房 → 家运亨通、生活改善</li>
+                        <li>老房子 → 对过去的怀念</li>
+                        <li>房屋倒塌 → 需注意家庭关系或身体健康问题</li>
+                    </ul>
+                    <div class="dream-tags">
+                        <span class="dream-tag lucky">家运</span>
+                        <span class="dream-tag">家庭</span>
+                        <span class="dream-tag unlucky">健康</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" style="margin-top: 1.5rem;">
+                <h2>💡 解梦方法论</h2>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-bottom: 0.8rem;">
+                    <strong>1. 象征对应原理</strong>：梦境中的意象与现实吉凶存在象征性对应关系。
+                </p>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-bottom: 0.8rem;">
+                    <strong>2. 吉凶判定方法</strong>：同物异象（清水主吉、浑水主凶）、程度递进（飞得越高成就越大）、反梦逻辑（捡大量金钱反可能破财）。
+                </p>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-bottom: 0.8rem;">
+                    <strong>3. 分类解读框架</strong>：解梦报告包含八个维度：梦境解析、吉凶判定、财运预兆、感情暗示、事业启示、健康提示、心理分析、化解建议。
+                </p>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
+                    <strong>4. 传统与现代融合</strong>：当代解梦将传统周公解梦与现代心理学分析相结合，既看象征吉凶，也看潜意识映射。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        // 显示梦境详情
+        function showDreamDetail(category) {
+            let content = '';
+            
+            switch(category) {
+                case 'animal':
+                    content = '<div class="section"><h2>🐉 动物类梦境</h2><p>动物在梦境中通常代表本能、情感、或特定人物。</p><ul><li><strong>蛇</strong>：财富、智慧、贵人/小人</li><li><strong>鱼</strong>：财运、机遇</li><li><strong>龙</strong>：权力、成功、大贵人</li><li><strong>虎</strong>：权威、挑战、困难</li></ul></div>';
+                    break;
+                case 'nature':
+                    content = '<div class="section"><h2>🌊 自然类梦境</h2><p>自然现象在梦境中通常代表情绪状态、人生变化。</p><ul><li><strong>水</strong>：情感、财运</li><li><strong>火</strong>：激情、愤怒、危险</li><li><strong>山</strong>：障碍、目标、依靠</li><li><strong>风</strong>：变化、消息、自由</li></ul></div>';
+                    break;
+                case 'people':
+                    content = '<div class="section"><h2>👥 人物类梦境</h2><p>人物在梦境中通常代表关系、自我投射。</p><ul><li><strong>去世亲人</strong>：庇佑、牵挂、指引</li><li><strong>陌生人</strong>：未知、新机遇</li><li><strong>恋人</strong>：感情状态、内心渴望</li><li><strong>小孩</strong>：纯真、新开始、内在本能</li></ul></div>';
+                    break;
+                case 'buildings':
+                    content = '<div class="section"><h2>🏠 建筑类梦境</h2><p>建筑物在梦境中通常代表自我、家庭、人生状态。</p><ul><li><strong>房屋</strong>：家庭、内自我</li><li><strong>礼堂</strong>：庆典、成功、喜事</li><li><strong>厕所</strong>：净化、释放、隐私</li><li><strong>楼梯</strong>：上升/下降、进步/退步</li></ul></div>';
+                    break;
+            }
+            
+            // 创建弹窗显示
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
+            modal.onclick = () => modal.remove();
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
+            modalContent.onclick = (e) => e.stopPropagation();
+            modalContent.innerHTML = content + '<button style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
+            
+            modal.className = 'modal';
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+        });
+    </script>
+</body>
+</html>

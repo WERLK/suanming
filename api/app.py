@@ -23,7 +23,7 @@ try:
 except Exception as e:
     print(f"⚠️ 短信验证码扩展加载失败: {e}")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../', static_url_path='')
 app.secret_key = 'xuanji_fortune_secret_key_2026'
 CORS(app)
 
@@ -679,12 +679,21 @@ def index():
     import os
     return send_from_directory(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'index.html')
 
-# 静态HTML文件路由
-@app.route('/<path:filename>')
-def serve_static(filename):
-    from flask import send_from_directory
-    import os
-    return send_from_directory(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), filename)
+# 自动部署接口（只有你知道这个网址）
+@app.route('/update-secret-2026')
+def auto_update():
+    import subprocess
+    result = ''
+    try:
+        r1 = subprocess.run(['git', 'fetch', 'origin'], cwd='/root/suanming', capture_output=True, text=True, timeout=30)
+        r2 = subprocess.run(['git', 'reset', '--hard', 'origin/master'], cwd='/root/suanming', capture_output=True, text=True, timeout=30)
+        r3 = subprocess.run(['pkill', '-f', 'gunicorn'], capture_output=True, text=True, timeout=10)
+        import time
+        time.sleep(2)
+        r4 = subprocess.Popen(['python3', '-m', 'gunicorn', '-c', 'gunicorn_config.py', 'api.app:app'], cwd='/root/suanming', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return f'更新成功！{r2.stdout}', 200
+    except Exception as e:
+        return f'更新失败：{str(e)}', 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

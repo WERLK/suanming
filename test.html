@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>测试页面 - 玄机算命网</title>
+<style>
+body {
+    background: #000;
+    color: #fff;
+    font-family: sans-serif;
+    padding: 2rem;
+}
+button {
+    padding: 1rem 2rem;
+    margin: 1rem;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+}
+a {
+    display: block;
+    margin: 1rem 0;
+    color: #ffd700;
+}
+</style>
+</head>
+<body>
+
+<h1>🔮 测试页面</h1>
+<p>测试所有链接和按钮的点击跳转功能</p>
+
+<h2>1. 按钮点击测试</h2>
+<button onclick="testBazi()">测试：八字排盘</button>
+<button onclick="testMore()">测试：更多功能</button>
+
+<h2>2. 链接点击测试</h2>
+<a href="/modules/bazi.html">链接：八字排盘</a>
+<a href="/more.html">链接：更多页面</a>
+
+<h2>3. 控制台输出</h2>
+<div id="console" style="background: #111; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.8rem;"></div>
+
+<script>
+function testBazi() {
+    log('点击了：八字排盘按钮');
+    log('准备跳转到：/modules/bazi.html');
+    setTimeout(() => {
+        window.location.href = '/modules/bazi.html';
+    }, 1000);
+}
+
+function testMore() {
+    log('点击了：更多功能按钮');
+    log('准备跳转到：/more.html');
+    setTimeout(() => {
+        window.location.href = '/more.html';
+    }, 1000);
+}
+
+function log(msg) {
+    const console = document.getElementById('console');
+    const line = document.createElement('div');
+    line.textContent = `> ${new Date().toLocaleTimeString()}: ${msg}`;
+    console.appendChild(line);
+    console.scrollTop = console.scrollHeight;
+}
+
+// 页面加载完成
+log('测试页面加载完成');
+log('点击上方按钮测试跳转功能...');
+</script>
+
+</body>
+</html>

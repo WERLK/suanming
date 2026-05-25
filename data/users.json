@@ -1,0 +1,15 @@
+[
+  {
+    "id": "user_wtJiPcilmbwSsSQdDEWD58OnX30kim2B",
+    "username": "testuser123_updated",
+    "password": "CvliX7FfQBPYecDcqEAUgyopwtYjJX6g$f8f3d7dadf7c0438a5fc6375e2e3bfc5c08765e0fc6d1e36e18597bad9e3e698",
+    "email": "updated@example.com",
+    "phone": "13800138000",
+    "avatar": "",
+    "birthday": "",
+    "gender": "male",
+    "create_time": "2026-05-23T11:28:48.888545",
+    "last_login": "2026-05-23T11:28:48.936152",
+    "status": "active"
+  }
+]

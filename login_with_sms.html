@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>用户登录 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* 登录页面特定样式 */
+        .login-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-top: 2rem;
+        }
+        
+        .login-header h1 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        .login-form {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 10px rgba(255,215,0,0.1);
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .captcha-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .captcha-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .captcha-image {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .captcha-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        
+        .captcha-refresh {
+            background: none;
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 8px;
+            color: #ffd700;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .captcha-refresh:hover {
+            background: rgba(255,215,0,0.1);
+        }
+        
+        .slider-container {
+            margin-bottom: 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .slider-track {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(90deg, rgba(255,215,0,0.1), rgba(255,215,0,0.3));
+            border-radius: 20px;
+            position: relative;
+            margin: 1rem 0;
+        }
+        
+        .slider-button {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            user-select: none;
+            transition: left 0.1s;
+        }
+        
+        .slider-button:active {
+            cursor: grabbing;
+        }
+        
+        .slider-hint {
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .slider-target {
+            width: 4px;
+            height: 40px;
+            background: #ff6b6b;
+            position: absolute;
+            top: 0;
+            border-radius: 2px;
+        }
+        
+        .captcha-type-switch {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .captcha-type-btn {
+            background: none;
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.7);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .captcha-type-btn.active {
+            background: rgba(255,215,0,0.1);
+            color: #ffd700;
+            border-color: rgba(255,215,0,0.5);
+        }
+        
+        .captcha-type-btn:hover {
+            background: rgba(255,215,0,0.05);
+        }
+        
+        .sms-captcha-container {
+            margin-bottom: 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .sms-phone-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sms-phone-input:focus {
+            outline: none;
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .sms-phone-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .sms-code-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sms-code-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .sms-code-input:focus {
+            outline: none;
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .sms-code-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .sms-send-btn {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .sms-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+        
+        .sms-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .sms-hint {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .remember-me input {
+            margin-right: 0.3rem;
+        }
+        
+        .forgot-password {
+            color: #ffd700;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .forgot-password:hover {
+            color: #ffed4e;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .register-link {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        .register-link a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,215,0,0.2);
+        }
+        
+        .divider span {
+            padding: 0 1rem;
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-btn {
+            flex: 1;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .social-btn:hover {
+            background: rgba(255,215,0,0.1);
+            border-color: rgba(255,215,0,0.3);
+        }
+        
+        .error-message {
+            display: none;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .success-message {
+            display: none;
+            background: rgba(0,255,0,0.1);
+            border: 1px solid rgba(0,255,0,0.3);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            color: #51cf66;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="app">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🔮 用户登录</h1>
+                <p>登录您的账户，享受更多功能</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+                
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="username">用户名 / 手机号 / 邮箱</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="请输入用户名、手机号或邮箱"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="请输入密码"
+                            required
+                        >
+                    </div>
+                    
+                    <!-- 验证码类型切换 -->
+                    <div class="captcha-type-switch">
+                        <button type="button" class="captcha-type-btn active" onclick="switchCaptchaType('image')">图片验证码</button>
+                        <button type="button" class="captcha-type-btn" onclick="switchCaptchaType('slider')">滑块验证码</button>
+                        <button type="button" class="captcha-type-btn" onclick="switchCaptchaType('sms')">📱 短信验证码</button>
+                    </div>
+                    
+                    <!-- 图片验证码 -->
+                    <div class="captcha-container" id="imageCaptcha">
+                        <div class="captcha-display">
+                            <div class="captcha-image" onclick="refreshCaptcha()">
+                                <img id="captchaImage" src="" alt="验证码">
+                            </div>
+                            <button type="button" class="captcha-refresh" onclick="refreshCaptcha()">刷新</button>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="captchaText" 
+                            name="captcha_text" 
+                            placeholder="请输入验证码"
+                            required
+                            style="width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; color: #ffffff; font-size: 0.95rem; box-sizing: border-box;"
+                        >
+                        <input type="hidden" id="captchaId" name="captcha_id" value="">
+                    </div>
+                    
+                    <!-- 滑块验证码 -->
+                    <div class="slider-container" id="sliderCaptcha" style="display: none;">
+                        <div class="slider-track" id="sliderTrack">
+                            <div class="slider-button" id="sliderButton">→</div>
+                            <div class="slider-target" id="sliderTarget"></div>
+                        </div>
+                        <div class="slider-hint">请拖动滑块到指定位置</div>
+                        <input type="hidden" id="sliderId" name="slider_id" value="">
+                        <input type="hidden" id="sliderX" name="slider_x" value="">
+                    </div>
+                    
+                    <!-- 短信验证码 -->
+                    <div class="sms-captcha-container" id="smsCaptcha" style="display: none;">
+                        <input 
+                            type="tel" 
+                            class="sms-phone-input" 
+                            id="smsPhone" 
+                            name="sms_phone" 
+                            placeholder="请输入手机号"
+                            maxlength="11"
+                        >
+                        <div class="sms-code-display">
+                            <input 
+                                type="text" 
+                                class="sms-code-input" 
+                                id="smsCode" 
+                                name="sms_code" 
+                                placeholder="验证码"
+                                maxlength="6"
+                                style="flex: 1;"
+                            >
+                            <button 
+                                type="button" 
+                                class="sms-send-btn" 
+                                id="smsSendBtn"
+                                onclick="sendSMSCaptcha()"
+                            >发送验证码</button>
+                        </div>
+                        <div class="sms-hint" id="smsHint">验证码已发送到您的手机，5分钟内有效</div>
+                        <input type="hidden" id="smsPhoneStored" name="sms_phone_stored" value="">
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>记住我</span>
+                        </label>
+                        <a href="/forgot-password.html" class="forgot-password">忘记密码？</a>
+                    </div>
+                    
+                    <button type="submit" class="btn-login" id="loginBtn">登录</button>
+                </form>
+                
+                <div class="divider">
+                    <span>或使用以下方式登录</span>
+                </div>
+                
+                <div class="social-login">
+                    <button class="social-btn" onclick="showToast('微信登录功能开发中...')">
+                        📱 微信
+                    </button>
+                    <button class="social-btn" onclick="showToast('QQ登录功能开发中...')">
+                        🐧 QQ
+                    </button>
+                </div>
+                
+                <div class="register-link">
+                    还没有账户？<a href="/register.html">立即注册</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/main.js"></script>
+    <script>
+        // 创建星空背景
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            checkLogin();
+            loadCaptcha();
+            initSlider();
+        });
+        
+        // 当前验证码类型
+        let currentCaptchaType = 'image';
+        
+        // 切换验证码类型
+        function switchCaptchaType(type) {
+            currentCaptchaType = type;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.captcha-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 显示对应的验证码
+            if (type === 'image') {
+                document.getElementById('imageCaptcha').style.display = 'block';
+                document.getElementById('sliderCaptcha').style.display = 'none';
+                document.getElementById('smsCaptcha').style.display = 'none';
+                loadCaptcha();
+            } else if (type === 'slider') {
+                document.getElementById('imageCaptcha').style.display = 'none';
+                document.getElementById('sliderCaptcha').style.display = 'block';
+                document.getElementById('smsCaptcha').style.display = 'none';
+                loadSlider();
+            } else if (type === 'sms') {
+                document.getElementById('imageCaptcha').style.display = 'none';
+                document.getElementById('sliderCaptcha').style.display = 'none';
+                document.getElementById('smsCaptcha').style.display = 'block';
+            }
+        }
+        
+        // 加载图片验证码
+        async function loadCaptcha() {
+            try {
+                const response = await fetch('/api/captcha/generate');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('captchaImage').src = data.captcha_image;
+                    document.getElementById('captchaId').value = data.captcha_id;
+                }
+            } catch (error) {
+                console.error('加载验证码失败:', error);
+            }
+        }
+        
+        // 刷新验证码
+        function refreshCaptcha() {
+            loadCaptcha();
+        }
+        
+        // 加载滑块验证码
+        async function loadSlider() {
+            try {
+                const response = await fetch('/api/slider/generate');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('sliderId').value = data.slider_id;
+                    
+                    // 设置目标位置
+                    const target = document.getElementById('sliderTarget');
+                    target.style.left = data.target_y + '%';
+                }
+            } catch (error) {
+                console.error('加载滑块验证码失败:', error);
+            }
+        }
+        
+        // 初始化滑块
+        function initSlider() {
+            const sliderButton = document.getElementById('sliderButton');
+            const sliderTrack = document.getElementById('sliderTrack');
+            let isDragging = false;
+            
+            sliderButton.addEventListener('mousedown', startDrag);
+            sliderButton.addEventListener('touchstart', startDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                
+                e.preventDefault();
+                
+                const trackRect = sliderTrack.getBoundingClientRect();
+                let clientX;
+                
+                if (e.type === 'touchmove') {
+                    clientX = e.touches[0].clientX;
+                } else {
+                    clientX = e.clientX;
+                }
+                
+                let newLeft = clientX - trackRect.left - 20;
+                newLeft = Math.max(0, Math.min(newLeft, trackRect.width - 40));
+                
+                sliderButton.style.left = newLeft + 'px';
+                
+                // 计算百分比
+                const percent = Math.round((newLeft / (trackRect.width - 40)) * 100);
+                document.getElementById('sliderX').value = percent;
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+            }
+        }
+        
+        // 发送短信验证码
+        async function sendSMSCaptcha() {
+            const phone = document.getElementById('smsPhone').value.trim();
+            const sendBtn = document.getElementById('smsSendBtn');
+            
+            // 验证手机号
+            if (!phone) {
+                showError('请输入手机号');
+                return;
+            }
+            
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                showError('请输入正确的手机号');
+                return;
+            }
+            
+            // 禁用按钮
+            sendBtn.disabled = true;
+            sendBtn.textContent = '发送中...';
+            
+            try {
+                // 调用后端API
+                const response = await fetch('/api/sms/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 发送成功
+                    showSuccess('验证码已发送！');
+                    
+                    // 存储手机号
+                    document.getElementById('smsPhoneStored').value = phone;
+                    
+                    // 演示模式：显示验证码
+                    if (data.code) {
+                        showSuccess(`【演示模式】验证码：${data.code}`);
+                        document.getElementById('smsCode').value = data.code;
+                    }
+                    
+                    // 倒计时
+                    let countdown = 60;
+                    const timer = setInterval(() => {
+                        countdown--;
+                        sendBtn.textContent = `${countdown}秒后重发`;
+                        
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            sendBtn.disabled = false;
+                            sendBtn.textContent = '重新发送';
+                        }
+                    }, 1000);
+                } else {
+                    // 发送失败
+                    showError(data.message || '发送失败，请重试');
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送验证码';
+                }
+            } catch (error) {
+                showError('网络错误，请稍后重试');
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送验证码';
+            }
+        }
+        
+        // 显示错误信息
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 显示成功信息
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.add('show');
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 检查是否已登录
+        async function checkLogin() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            if (!token) {
+                return; // 未登录，停留在登录页
+            }
+            
+            try {
+                // 验证token
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    // 已登录，跳转到个人中心
+                    window.location.href = '/profile.html';
+                } else {
+                    // token无效，清除
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('currentUser');
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('currentUser');
+                }
+            } catch (error) {
+                // 网络错误，允许用户在离线模式下使用localStorage
+                const currentUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (currentUser) {
+                    window.location.href = '/profile.html';
+                }
+            }
+        }
+        
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // 验证输入
+            if (!username) {
+                showError('请输入用户名、手机号或邮箱');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+                return;
+            }
+            
+            if (!password) {
+                showError('请输入密码');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+                return;
+            }
+            
+            // 验证验证码
+            if (currentCaptchaType === 'image') {
+                const captchaId = document.getElementById('captchaId').value;
+                const captchaText = document.getElementById('captchaText').value.trim();
+                
+                if (!captchaText) {
+                    showError('请输入验证码');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                    return;
+                }
+                
+                // 验证验证码
+                try {
+                    const verifyResponse = await fetch('/api/captcha/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            captcha_id: captchaId,
+                            captcha_text: captchaText
+                        })
+                    });
+                    
+                    const verifyData = await verifyResponse.json();
+                    
+                    if (!verifyData.success) {
+                        showError(verifyData.message || '验证码错误');
+                        refreshCaptcha();
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = '登录';
+                        return;
+                    }
+                } catch (error) {
+                    showError('验证码验证失败，请重试');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                    return;
+                }
+            } else if (currentCaptchaType === 'slider') {
+                const sliderId = document.getElementById('sliderId').value;
+                const sliderX = document.getElementById('sliderX').value;
+                
+                if (!sliderX) {
+                    showError('请完成滑块验证');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                    return;
+                }
+                
+                // 验证滑块
+                try {
+                    const verifyResponse = await fetch('/api/slider/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            slider_id: sliderId,
+                            slider_x: parseInt(sliderX)
+                        })
+                    });
+                    
+                    const verifyData = await verifyResponse.json();
+                    
+                    if (!verifyData.success) {
+                        showError(verifyData.message || '滑块验证失败');
+                        loadSlider();
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = '登录';
+                        return;
+                    }
+                } catch (error) {
+                    showError('滑块验证失败，请重试');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                    return;
+                }
+            } else if (currentCaptchaType === 'sms') {
+                const smsPhone = document.getElementById('smsPhoneStored').value;
+                const smsCode = document.getElementById('smsCode').value.trim();
+                
+                if (!smsPhone || !smsCode) {
+                    showError('请完成短信验证码');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                    return;
+                }
+                
+                // 验证短信验证码
+                try {
+                    const verifyResponse = await fetch('/api/sms/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            phone: smsPhone,
+                            code: smsCode
+                        })
+                    });
+                    
+                    const verifyData = await verifyResponse.json();
+                    
+                    if (!verifyData.success) {
+                        showError(verifyData.message || '验证码错误');
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = '登录';
+                        return;
+                    }
+                } catch (error) {
+                    showError('验证码验证失败，请重试');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                    return;
+                }
+            }
+            
+            try {
+                // 调用后端API
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        remember: rememberMe
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 登录成功
+                    showSuccess('登录成功！正在跳转...');
+                    
+                    // 保存token和用户信息
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('rememberMe', 'true');
+                    } else {
+                        sessionStorage.setItem('token', data.token);
+                        sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+                    }
+                    
+                    // 延迟跳转
+                    setTimeout(() => {
+                        window.location.href = '/profile.html';
+                    }, 1500);
+                } else {
+                    // 登录失败
+                    showError(data.message || '登录失败，请重试');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                    
+                    // 刷新验证码
+                    if (currentCaptchaType === 'image') {
+                        refreshCaptcha();
+                    } else if (currentCaptchaType === 'slider') {
+                        loadSlider();
+                    }
+                }
+            } catch (error) {
+                showError('网络错误，请稍后重试');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+            }
+        }
+    </script>
+</body>
+</html>

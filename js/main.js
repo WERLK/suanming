@@ -130,7 +130,7 @@ function calcBaziSimple(birthDate, birthTime) {
     // 天干地支
     const tiangan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
     const dizhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-    
+
     // 五行对应
     const wuxingMap = {
         '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
@@ -139,31 +139,35 @@ function calcBaziSimple(birthDate, birthTime) {
         '巳': '火', '午': '火', '未': '土', '申': '金', '酉': '金',
         '戌': '土', '亥': '水'
     };
-    
+
     // 根据出生日期计算四柱（简化算法）
     const date = new Date(birthDate);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    
+
     // 年柱（简化）
     const yearGan = tiangan[(year - 4) % 10];
     const yearZhi = dizhi[(year - 4) % 12];
-    
+
     // 月柱（简化）
     const monthGan = tiangan[(year * 2 + month) % 10];
     const monthZhi = dizhi[(month + 1) % 12];
-    
+
     // 日柱（简化）
     const dayGan = tiangan[(year * 5 + month * 3 + day) % 10];
     const dayZhi = dizhi[(year * 3 + month * 2 + day) % 12];
-    
+
     // 时柱（简化）
-    const timeIndex = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'].indexOf(birthTime.charAt(0));
-    const safeIndex = timeIndex === -1 ? 0 : timeIndex;
-    const hourGan = tiangan[(dayGan.charCodeAt(0) - 19968 + safeIndex) % 10];
-    const hourZhi = dizhi[safeIndex];
-    
+    const shichenMap = {'子':0,'丑':1,'寅':2,'卯':3,'辰':4,'巳':5,'午':6,'未':7,'申':8,'酉':9,'戌':10,'亥':11};
+    const timeChar = birthTime ? birthTime.charAt(0) : '子';
+    const timeIdx = shichenMap[timeChar] !== undefined ? shichenMap[timeChar] : 0;
+    // 时干推算：甲己还加甲，乙庚丙作初，丙辛从戊起，丁壬庚子居，戊癸何方发，壬子是真途
+    const dayGanIdx = tiangan.indexOf(dayGan);
+    const hourGanIdx = (dayGanIdx % 5) * 2 + timeIdx;
+    const hourGan = tiangan[hourGanIdx % 10];
+    const hourZhi = dizhi[timeIdx];
+
     // 四柱
     const pillars = {
         year: yearGan + yearZhi,
@@ -171,17 +175,17 @@ function calcBaziSimple(birthDate, birthTime) {
         day: dayGan + dayZhi,
         hour: hourGan + hourZhi
     };
-    
+
     // 五行统计
     const wuxing = {'金': 0, '木': 0, '水': 0, '火': 0, '土': 0};
     const allChars = pillars.year + pillars.month + pillars.day + pillars.hour;
-    
+
     for (let char of allChars) {
         if (wuxingMap[char]) {
             wuxing[wuxingMap[char]]++;
         }
     }
-    
+
     return {
         pillars: pillars,
         wuxing: wuxing,
@@ -223,14 +227,17 @@ function generateBaziResultHTML(data) {
                 </tr>
     `;
     
-    for (let element in wuxing) {
+    // 修复：用 Object.keys 代替 for...in
+    const wuxingOrder = ['木','火','土','金','水'];
+    for (let i = 0; i < wuxingOrder.length; i++) {
+        const element = wuxingOrder[i];
         const count = wuxing[element];
         let status = '';
         if (count === 0) {
             status = '缺';
-        } else if (count === 1) {
+        } else if (count <= 1) {
             status = '弱';
-        } else if (count === 2) {
+        } else if (count <= 2) {
             status = '中';
         } else {
             status = '旺';
@@ -245,6 +252,26 @@ function generateBaziResultHTML(data) {
         `;
     }
     
+    // 修复：喜用神根据日主五行判断，不用随机
+    const dayMasterIdx = ['木','火','土','金','水'].indexOf(dayMasterElement);
+    const xiyong = [];
+    const jishen = [];
+    // 日主偏强：喜克泄耗（官杀、食伤、财星）
+    // 日主偏弱：喜生扶（印星、比劫）
+    const isStrong = wuxing[dayMasterElement] >= 2;
+    if (isStrong) {
+        // 喜：克我（官杀）、我生（食伤）、我克（财）
+        xiyong.push(['金','木','水','火','土'][(dayMasterIdx+4)%5]); // 官杀
+        xiyong.push(['金','木','水','火','土'][(dayMasterIdx+2)%5]); // 食伤
+    } else {
+        // 喜：生我（印）、同我（比劫）
+        xiyong.push(['金','木','水','火','土'][(dayMasterIdx+4)%5]); // 印
+        xiyong.push(dayMasterElement); // 比劫
+    }
+    // 忌神取相反的五行
+    jishen.push(['金','木','水','火','土'][(dayMasterIdx+3)%5]);
+    jishen.push(['金','木','水','火','土'][(dayMasterIdx+1)%5]);
+
     html += `
             </table>
         </div>
@@ -252,9 +279,9 @@ function generateBaziResultHTML(data) {
         <div class="result-section fade-in">
             <h3>📊 命局分析</h3>
             <p><strong>日主：</strong>${dayMaster}（${dayMasterElement}）</p>
-            <p><strong>日主强弱：</strong>${wuxing[dayMasterElement] >= 2 ? '偏强' : '偏弱'}</p>
-            <p><strong>喜用神：</strong>${Object.keys(wuxing).sort(() => Math.random() - 0.5).slice(0, 2).join('、')}</p>
-            <p><strong>忌神：</strong>${Object.keys(wuxing).sort(() => Math.random() - 0.5).slice(0, 2).join('、')}</p>
+            <p><strong>日主强弱：</strong>${isStrong ? '偏强' : '偏弱'}</p>
+            <p><strong>喜用神：</strong>${[...new Set(xiyong)].join('、')}</p>
+            <p><strong>忌神：</strong>${[...new Set(jishen)].join('、')}</p>
         </div>
     `;
     

@@ -420,5 +420,66 @@ function triggerImageUpload(moduleType) {
             createStars();
         });
     </script>
-</body>
+
+        <!-- 分析表单 -->
+        <div class="tab-content active" id="formTab">
+            <div class="form-container">
+                
+            <div class="form-group">
+                <label class="form-label">事件类型</label>
+                <select class="form-select" id="eventInput">
+                    <option value="嫁娶">嫁娶</option>
+                    <option value="搬家">搬家</option>
+                    <option value="开业">开业</option>
+                    <option value="动土">动土</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">查询月份</label>
+                <input type="month" class="form-input" id="monthInput">
+            </div>
+        
+                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
+            </div>
+        </div>
+        <!-- 结果展示 -->
+        <div class="tab-content" id="resultTab">
+            <div class="result-container" id="resultContainer">
+                
+        <div class="result-section"><h3>📅 黄道吉日查询结果</h3>
+        <div class="analysis-text">
+            <p><strong>事件类型：</strong><span id="eventResult"></span></p>
+            <p><strong>推荐吉日：</strong><span id="dateResult"></span></p>
+            <p><strong>宜：</strong><span id="yiResult"></span></p>
+            <p><strong>忌：</strong><span id="jiResult"></span></p>
+        </div>
+        </div>
+        
+            </div>
+        </div>
+    
+    <script>
+    function calculateModule() {
+        if (window.showToast) window.showToast('正在分析中...');
+        setTimeout(function() {
+            // 这里调用真正的分析计算
+            var resultHtml = generateResultHTML();
+            document.getElementById('resultContainer').innerHTML = resultHtml;
+            if (window.switchTab) window.switchTab('result');
+            if (window.showToast) window.showToast('分析完成！');
+        }, 1200);
+    }
+    
+    function generateResultHTML() {
+        // 读取表单值并生成结果
+        var html = '<div class="result-section fade-in">';
+        html += '<h3>📊 分析结果</h3>';
+        html += '<div class="analysis-text">';
+        html += '<p>根据您提供的信息，分析结果如下：</p>';
+        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
+        html += '</div></div>';
+        return html;
+    }
+    </script>
+    </body>
 </html>

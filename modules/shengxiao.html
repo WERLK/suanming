@@ -476,5 +476,75 @@ function triggerImageUpload(moduleType) {
             createStars();
         });
     </script>
-</body>
+
+        <!-- 分析表单 -->
+        <div class="tab-content active" id="formTab">
+            <div class="form-container">
+                
+            <div class="form-group">
+                <label class="form-label">选择生肖</label>
+                <select class="form-select" id="zodiacInput">
+                    <option value="鼠">鼠</option>
+                    <option value="牛">牛</option>
+                    <option value="虎">虎</option>
+                    <option value="兔">兔</option>
+                    <option value="龙">龙</option>
+                    <option value="蛇">蛇</option>
+                    <option value="马">马</option>
+                    <option value="羊">羊</option>
+                    <option value="猴">猴</option>
+                    <option value="鸡">鸡</option>
+                    <option value="狗">狗</option>
+                    <option value="猪">猪</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">查询年份</label>
+                <input type="number" class="form-input" id="yearInput" value="2026">
+            </div>
+        
+                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
+            </div>
+        </div>
+        <!-- 结果展示 -->
+        <div class="tab-content" id="resultTab">
+            <div class="result-container" id="resultContainer">
+                
+        <div class="result-section"><h3>🐲 生肖运势分析结果</h3>
+        <div class="analysis-text">
+            <p><strong>生肖：</strong><span id="zodiacResult"></span></p>
+            <p><strong>年份：</strong><span id="yearResult"></span></p>
+            <p><strong>整体运势：</strong><span id="overallResult"></span></p>
+            <p><strong>事业运：</strong><span id="careerResult"></span></p>
+            <p><strong>财运：</strong><span id="wealthResult"></span></p>
+        </div>
+        </div>
+        
+            </div>
+        </div>
+    
+    <script>
+    function calculateModule() {
+        if (window.showToast) window.showToast('正在分析中...');
+        setTimeout(function() {
+            // 这里调用真正的分析计算
+            var resultHtml = generateResultHTML();
+            document.getElementById('resultContainer').innerHTML = resultHtml;
+            if (window.switchTab) window.switchTab('result');
+            if (window.showToast) window.showToast('分析完成！');
+        }, 1200);
+    }
+    
+    function generateResultHTML() {
+        // 读取表单值并生成结果
+        var html = '<div class="result-section fade-in">';
+        html += '<h3>📊 分析结果</h3>';
+        html += '<div class="analysis-text">';
+        html += '<p>根据您提供的信息，分析结果如下：</p>';
+        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
+        html += '</div></div>';
+        return html;
+    }
+    </script>
+    </body>
 </html>

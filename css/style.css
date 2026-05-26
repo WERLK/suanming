@@ -8,6 +8,8 @@ body {
     overflow-x: hidden;
     width: 100vw;
     min-height: 100vh;
+    /* 手机端安全区域 */
+    padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 /* ===== 主容器 ===== */
@@ -22,6 +24,8 @@ body {
     overflow: hidden;
     box-shadow: 0 0 80px rgba(255, 215, 0, 0.1);
     margin: 0 auto;
+    /* 手机端优化 */
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ===== PC端适配 ===== */
@@ -39,6 +43,40 @@ body {
     .app {
         max-width: 800px;
         min-height: 100vh;
+    }
+}
+
+/* ===== 手机端导航栏安全区域适配 ===== */
+@media (max-width: 767px) {
+    /* iPhone X 及以上刘海屏安全区域 */
+    body {
+        padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    
+    .nav {
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
+    }
+    
+    /* 手机端字体大小优化 */
+    .item .lb {
+        font-size: 0.65rem;
+    }
+    
+    /* 手机端按钮触摸优化 */
+    button, .btn, .submit-btn, .tab-btn {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+    
+    /* 手机端输入框防缩放 */
+    input[type="text"],
+    input[type="date"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+        font-size: 16px !important;
     }
 }
 

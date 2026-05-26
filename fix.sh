@@ -25,30 +25,30 @@ else
     # ========== 2. 热更新: 只覆盖核心文件 ==========
     echo "=== 热更新: 下载最新核心文件 ==="
     rm -rf api/__pycache__
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/app.py -O api/app.py
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/__init__.py -O api/__init__.py
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/gunicorn_config.py -O gunicorn_config.py
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/icon-192.png -O icon-192.png
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/manifest.json -O manifest.json
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/auto_update_daemon.py -O auto_update_daemon.py
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/index.html -O index.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/js/main.js -O js/main.js
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/css/style.css -O css/style.css
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/tarot.html -O modules/tarot.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/fengshui.html -O modules/fengshui.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/shengxiao.html -O modules/shengxiao.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/ziwei.html -O modules/ziwei.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/more.html -O more.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/profile.html -O profile.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/login.html -O login.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/register.html -O register.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/bazi.html -O modules/bazi.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/xingzuo.html -O modules/xingzuo.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/login_backup_v2.html -O login_backup_v2.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/login_with_sms.html -O login_with_sms.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/register_backup.html -O register_backup.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/register_with_captcha.html -O register_with_captcha.html
-    wget -q https://raw.githubusercontent.com/WERLK/suanming/master/sms_login_patch.html -O sms_login_patch.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/api/app.py -O api/app.py
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/api/__init__.py -O api/__init__.py
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/gunicorn_config.py -O gunicorn_config.py
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/icon-192.png -O icon-192.png
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/manifest.json -O manifest.json
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/auto_update_daemon.py -O auto_update_daemon.py
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/index.html -O index.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/js/main.js -O js/main.js
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/css/style.css -O css/style.css
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/modules/tarot.html -O modules/tarot.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/modules/fengshui.html -O modules/fengshui.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/modules/shengxiao.html -O modules/shengxiao.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/modules/ziwei.html -O modules/ziwei.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/more.html -O more.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/profile.html -O profile.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/login.html -O login.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/register.html -O register.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/modules/bazi.html -O modules/bazi.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/modules/xingzuo.html -O modules/xingzuo.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/login_backup_v2.html -O login_backup_v2.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/login_with_sms.html -O login_with_sms.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/register_backup.html -O register_backup.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/register_with_captcha.html -O register_with_captcha.html
+    wget -q https://raw.githubusercontent.com/WERLK/suanming/main/sms_login_patch.html -O sms_login_patch.html
     echo "热更新完成"
 fi
 

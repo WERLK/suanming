@@ -1,5 +1,9 @@
 # Gunicorn 配置文件
+import os
 import multiprocessing
+
+# 自动检测项目根目录（本文件所在目录）
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 绑定 IP 和端口
 bind = "0.0.0.0:5000"
@@ -23,10 +27,10 @@ graceful_timeout = 10
 keepalive = 5
 
 # 访问日志文件
-accesslog = '/root/suanming/suanming/logs/access.log'
+accesslog = os.path.join(BASE_DIR, 'logs', 'access.log')
 
 # 错误日志文件
-errorlog = '/root/suanming/suanming/logs/error.log'
+errorlog = os.path.join(BASE_DIR, 'logs', 'error.log')
 
 # 日志级别
 loglevel = 'info'
@@ -44,23 +48,23 @@ max_requests_jitter = 50
 # 热更新配置
 reload = True  # 启用自动重载
 reload_extra_files = [
-    '/root/suanming/suanming/api/app.py',
-    '/root/suanming/suanming/api/sms_extension.py',
-    '/root/suanming/suanming/index.html',
-    '/root/suanming/suanming/login.html',
-    '/root/suanming/suanming/register.html',
-    '/root/suanming/suanming/profile.html',
-    '/root/suanming/suanming/more.html',
-    '/root/suanming/suanming/forgot-password.html',
-    '/root/suanming/suanming/reset-password.html',
-    '/root/suanming/suanming/css/style.css',
-    '/root/suanming/suanming/js/main.js',
-    '/root/suanming/suanming/modules/bazi.html',
-    '/root/suanming/suanming/modules/xingzuo.html',
-    '/root/suanming/suanming/modules/tarot.html',
-    '/root/suanming/suanming/modules/shengxiao.html',
-    '/root/suanming/suanming/modules/fengshui.html',
-    '/root/suanming/suanming/modules/ziwei.html',
+    os.path.join(BASE_DIR, 'api', 'app.py'),
+    os.path.join(BASE_DIR, 'api', 'sms_extension.py'),
+    os.path.join(BASE_DIR, 'index.html'),
+    os.path.join(BASE_DIR, 'login.html'),
+    os.path.join(BASE_DIR, 'register.html'),
+    os.path.join(BASE_DIR, 'profile.html'),
+    os.path.join(BASE_DIR, 'more.html'),
+    os.path.join(BASE_DIR, 'forgot-password.html'),
+    os.path.join(BASE_DIR, 'reset-password.html'),
+    os.path.join(BASE_DIR, 'css', 'style.css'),
+    os.path.join(BASE_DIR, 'js', 'main.js'),
+    os.path.join(BASE_DIR, 'modules', 'bazi.html'),
+    os.path.join(BASE_DIR, 'modules', 'xingzuo.html'),
+    os.path.join(BASE_DIR, 'modules', 'tarot.html'),
+    os.path.join(BASE_DIR, 'modules', 'shengxiao.html'),
+    os.path.join(BASE_DIR, 'modules', 'fengshui.html'),
+    os.path.join(BASE_DIR, 'modules', 'ziwei.html'),
 ]
 
 # 环境变量

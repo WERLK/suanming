@@ -1,32 +1,28 @@
 #!/bin/bash
 # 玄机算命网 - 一键修复/部署脚本
 # 支持: 首次部署(空目录) 或 热更新(已有代码)
+# 用法: cd 到项目目录后执行 bash fix.sh
 
 set -e
 
-TARGET_DIR="/root/suanming/suanming"
+# 使用当前目录作为目标目录（不再硬编码）
+TARGET_DIR="$(pwd)"
 
-# ========== 1. 确保目录存在 ==========
-if [ ! -d "$TARGET_DIR" ]; then
-    echo "=== 创建目录 ==="
-    mkdir -p "$TARGET_DIR"
-fi
-cd "$TARGET_DIR"
+echo "=== 目标目录: $TARGET_DIR ==="
 
-# ========== 2. 首次部署: 目录为空时 git clone ==========
+# ========== 1. 检查核心文件是否存在 ==========
 if [ ! -f "api/app.py" ]; then
     echo "=== 首次部署: 从 GitHub 克隆完整代码 ==="
-    if [ -d ".git" ]; then
-        echo "检测到 .git 但缺少文件,执行 git reset"
-        git fetch origin
-        git reset --hard origin/master
-    else
-        echo "正在 git clone (约 5MB, 221个模块文件)..."
-        git clone https://github.com/WERLK/suanming.git "$TARGET_DIR"
-    fi
+    TMP_DIR="/tmp/suanming_clone_$$"
+    rm -rf "$TMP_DIR"
+    git clone --depth=1 https://github.com/WERLK/suanming.git "$TMP_DIR"
+    # 移动文件到当前目录
+    cp -r "$TMP_DIR"/* "$TARGET_DIR/" 2>/dev/null || true
+    cp -r "$TMP_DIR"/.[!.]* "$TARGET_DIR/" 2>/dev/null || true
+    rm -rf "$TMP_DIR"
     echo "代码克隆完成"
 else
-    # ========== 热更新: 只覆盖核心文件 ==========
+    # ========== 2. 热更新: 只覆盖核心文件 ==========
     echo "=== 热更新: 下载最新核心文件 ==="
     rm -rf api/__pycache__
     wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/app.py -O api/app.py

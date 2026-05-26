@@ -22,6 +22,15 @@ wget -q https://raw.githubusercontent.com/WERLK/suanming/master/auto_update_daem
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/fix.sh -O fix.sh
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/index.html -O index.html
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/js/main.js -O js/main.js
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/css/style.css -O css/style.css
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/tarot.html -O modules/tarot.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/fengshui.html -O modules/fengshui.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/shengxiao.html -O modules/shengxiao.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/ziwei.html -O modules/ziwei.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/more.html -O more.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/profile.html -O profile.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/login.html -O login.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/register.html -O register.html
 echo "OK"
 
 echo "=== 3. 验证代码 ==="

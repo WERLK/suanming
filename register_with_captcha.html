@@ -286,6 +286,7 @@
                         <button type="button" class="captcha-refresh" onclick="loadCaptcha()">刷新</button>
                     </div>
                     <input type="text" id="captchaInput" placeholder="请输入验证码" maxlength="4">
+                    <input type="hidden" id="captchaId" value="">
                 </div>
                 
                 <div id="sliderCaptcha" style="display:none;">
@@ -328,14 +329,68 @@
             }
         }
         
-        function loadCaptcha() {
-            document.getElementById('captchaImage').src = '/api/captcha/image?' + Date.now();
+        async function loadCaptcha() {
+            try {
+                var response = await fetch('/api/captcha/generate');
+                var data = await response.json();
+                if (data.success) {
+                    document.getElementById('captchaImage').src = data.captcha_image;
+                    document.getElementById('captchaId').value = data.captcha_id;
+                }
+            } catch (error) {
+                console.error('加载验证码失败:', error);
+            }
+        }
+        
+        function showError(msg) {
+            alert(msg);
         }
         
         async function handleRegister(event) {
             event.preventDefault();
-            // Registration logic would go here
-            alert('注册功能开发中，请使用 /register.html');
+            
+            var username = document.getElementById('username').value.trim();
+            var phone = document.getElementById('phone').value.trim();
+            var email = document.getElementById('email').value.trim();
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!username || username.length < 3) { showError('用户名至少3个字符'); return; }
+            if (!password || password.length < 6) { showError('密码至少6个字符'); return; }
+            if (password !== confirmPassword) { showError('两次密码不一致'); return; }
+            
+            if (currentCaptchaType === 'image') {
+                var captchaText = document.getElementById('captchaInput').value.trim();
+                var captchaId = document.getElementById('captchaId').value;
+                if (!captchaText) { showError('请输入验证码'); return; }
+                
+                var verifyResp = await fetch('/api/captcha/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ captcha_id: captchaId, captcha_text: captchaText })
+                });
+                var verifyData = await verifyResp.json();
+                if (!verifyData.success) { showError(verifyData.message || '验证码错误'); loadCaptcha(); return; }
+            }
+            
+            try {
+                var resp = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: password, email: email, phone: phone })
+                });
+                var data = await resp.json();
+                if (data.success) {
+                    alert('注册成功！');
+                    window.location.href = '/login.html';
+                } else {
+                    showError(data.message || '注册失败');
+                    loadCaptcha();
+                }
+            } catch (error) {
+                showError('网络错误，请重试');
+                loadCaptcha();
+            }
         }
         
         // Password strength

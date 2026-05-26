@@ -18,6 +18,10 @@ wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/__init__.py 
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/gunicorn_config.py -O gunicorn_config.py
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/icon-192.png -O icon-192.png
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/manifest.json -O manifest.json
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/auto_update_daemon.py -O auto_update_daemon.py
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/fix.sh -O fix.sh
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/index.html -O index.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/js/main.js -O js/main.js
 echo "OK"
 
 echo "=== 3. 验证代码 ==="

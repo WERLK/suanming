@@ -20,6 +20,7 @@ CORS(app)
 
 # 验证码存储（实际项目中应使用Redis或数据库）
 captcha_store = {}
+slider_store = {}
 
 # 用户数据存储文件（使用绝对路径）
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -64,7 +65,7 @@ def verify_token(token):
     try:
         payload = jwt.decode(token, app.secret_key, algorithms=['HS256'])
         return payload['user_id']
-    except:
+    except Exception:
         return None
 
 # 读取用户数据
@@ -108,13 +109,15 @@ def index():
 
 @app.route('/<path:filename>')
 def serve_static(filename):
-    # 安全过滤：不允许访问上级目录
-    if '..' in filename or filename.startswith('/'):
+    # 安全过滤：解析真实路径防路径穿越
+    import os.path
+    safe_path = os.path.realpath(os.path.join(PROJECT_ROOT, filename))
+    if not safe_path.startswith(os.path.realpath(PROJECT_ROOT) + os.sep):
         return 'Forbidden', 403
-    file_path = os.path.join(PROJECT_ROOT, filename)
-    if os.path.exists(file_path) and os.path.isfile(file_path):
+    try:
         return send_from_directory(PROJECT_ROOT, filename)
-    return 'Not Found', 404
+    except FileNotFoundError:
+        return 'Not Found', 404
 
 # ========== API路由 ==========
 
@@ -183,9 +186,6 @@ def verify_captcha():
         return jsonify({'success': True, 'message': '验证成功'}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'验证验证码失败: {str(e)}'}), 500
-
-# 滑块验证码存储
-slider_store = {}
 
 @app.route('/api/slider/generate', methods=['GET'])
 def generate_slider():
@@ -427,12 +427,14 @@ def forgot_password():
         if not user:
             return jsonify({'success': False, 'message': '邮箱未注册'}), 404
         reset_token = ''.join(random.choices(string.ascii_letters + string.digits, k=64))
-        tokens = json.load(open(TOKENS_FILE, 'r', encoding='utf-8'))
+        with open(TOKENS_FILE, 'r', encoding='utf-8') as f:
+            tokens = json.load(f)
         tokens[reset_token] = {
             'user_id': user['id'],
             'expire_time': (datetime.now() + timedelta(hours=1)).isoformat()
         }
-        json.dump(tokens, open(TOKENS_FILE, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        with open(TOKENS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(tokens, f, ensure_ascii=False, indent=2)
         reset_link = f"http://localhost:8080/reset-password.html?token={reset_token}"
         email_body = f"""
         <h2>重置密码</h2>
@@ -466,7 +468,8 @@ def reset_password():
         expire_time = datetime.fromisoformat(token_data['expire_time'])
         if datetime.now() > expire_time:
             del tokens[token]
-            json.dump(tokens, open(TOKENS_FILE, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+            with open(TOKENS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(tokens, f, ensure_ascii=False, indent=2)
             return jsonify({'success': False, 'message': '重置链接已过期'}), 400
         users = load_users()
         user_index = None
@@ -479,7 +482,8 @@ def reset_password():
         users[user_index]['password'] = hash_password(new_password)
         save_users(users)
         del tokens[token]
-        json.dump(tokens, open(TOKENS_FILE, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        with open(TOKENS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(tokens, f, ensure_ascii=False, indent=2)
         return jsonify({'success': True, 'message': '密码重置成功'}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'重置密码失败: {str(e)}'}), 500

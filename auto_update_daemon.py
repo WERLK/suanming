@@ -6,12 +6,11 @@
 import time
 import subprocess
 import os
-import hashlib
 import logging
+import socket
 
 # 配置
 REPO_DIR = '/root/suanming/suanming'
-GUNICORN_CONFIG = os.path.join(REPO_DIR, 'gunicorn_config.py')
 CHECK_INTERVAL = 300  # 5分钟
 LOG_FILE = '/tmp/auto_update.log'
 
@@ -54,10 +53,20 @@ def get_local_commit():
         logging.error(f'获取本地commit失败: {e}')
     return None
 
+def check_gunicorn_running():
+    """检查gunicorn是否在运行"""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        result = sock.connect_ex(('127.0.0.1', 5000))
+        sock.close()
+        return result == 0
+    except:
+        return False
+
 def update_and_restart():
     """拉取最新代码并重启服务"""
     try:
-        # 拉取最新代码
         logging.info('检测到新提交，开始更新...')
         result = subprocess.run(
             ['git', 'fetch', 'origin'],
@@ -70,7 +79,6 @@ def update_and_restart():
             logging.error(f'git fetch 失败: {result.stderr}')
             return False
         
-        # 强制重置到远程master
         result = subprocess.run(
             ['git', 'reset', '--hard', 'origin/master'],
             cwd=REPO_DIR,
@@ -84,21 +92,45 @@ def update_and_restart():
             
         logging.info(f'代码更新成功: {result.stdout.strip()}')
         
+        # 创建 api/__init__.py 如果不存在
+        init_file = os.path.join(REPO_DIR, 'api', '__init__.py')
+        if not os.path.exists(init_file):
+            with open(init_file, 'w') as f:
+                f.write('# api package init\n')
+            logging.info('创建 api/__init__.py')
+        
         # 重启gunicorn
         logging.info('重启gunicorn服务...')
-        subprocess.run(['pkill', '-f', 'gunicorn'], timeout=10)
+        # 先尝试温和退出
+        subprocess.run(['pkill', '-f', 'gunicorn_config'], timeout=10)
         time.sleep(3)
+        # 强制清理残留
+        subprocess.run(['pkill', '-9', '-f', 'gunicorn'], timeout=5)
+        time.sleep(1)
         
-        # 启动gunicorn
-        subprocess.Popen(
+        # 使用 fuser 释放端口
+        subprocess.run(['fuser', '-k', '5000/tcp'], timeout=5, capture_output=True)
+        time.sleep(2)
+        
+        # 启动gunicorn（独立进程组）
+        process = subprocess.Popen(
             ['python3', '-m', 'gunicorn', '-c', 'gunicorn_config.py', 'api.app:app'],
             cwd=REPO_DIR,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            start_new_session=True,
+            stdout=open(os.path.join(REPO_DIR, 'logs', 'gunicorn.log'), 'a'),
+            stderr=open(os.path.join(REPO_DIR, 'logs', 'gunicorn_error.log'), 'a')
         )
         
-        logging.info('服务重启完成')
-        return True
+        # 等待启动
+        time.sleep(5)
+        
+        # 验证启动
+        if check_gunicorn_running():
+            logging.info('服务重启成功')
+            return True
+        else:
+            logging.error('服务重启后端口5000无响应！')
+            return False
         
     except Exception as e:
         logging.error(f'更新失败: {e}')

@@ -160,8 +160,9 @@ function calcBaziSimple(birthDate, birthTime) {
     
     // 时柱（简化）
     const timeIndex = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'].indexOf(birthTime.charAt(0));
-    const hourGan = tiangan[(dayGan.charCodeAt(0) - 19968 + timeIndex) % 10];
-    const hourZhi = dizhi[timeIndex];
+    const safeIndex = timeIndex === -1 ? 0 : timeIndex;
+    const hourGan = tiangan[(dayGan.charCodeAt(0) - 19968 + safeIndex) % 10];
+    const hourZhi = dizhi[safeIndex];
     
     // 四柱
     const pillars = {

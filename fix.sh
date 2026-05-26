@@ -92,3 +92,11 @@ curl -s -o /dev/null -w "模块列表: HTTP %{http_code}\n" http://localhost:500
 echo ""
 echo "=== 全部完成 ==="
 echo "访问: http://你的IP:5000"
+
+# ========== 9. 显示运行状态 ==========
+echo ""
+if [ -f "status.sh" ]; then
+    bash status.sh
+else
+    echo "(status.sh 不存在，跳过状态检查)"
+fi

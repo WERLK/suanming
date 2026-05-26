@@ -75,7 +75,13 @@ mkdir -p logs
 nohup python3 -m gunicorn -c gunicorn_config.py api.app:app > logs/gunicorn.log 2>&1 &
 sleep 3
 
-# ========== 7. 测试 ==========
+# ========== 7. 启动自动更新守护进程 ==========
+echo "=== 启动自动更新守护进程 ==="
+nohup python3 auto_update_daemon.py > logs/auto_update.log 2>&1 &
+sleep 1
+echo "自动更新进程已启动（每5分钟检查更新）"
+
+# ========== 8. 测试 ==========
 echo "=== 测试 ==="
 curl -s -o /dev/null -w "首页:     HTTP %{http_code}\n" http://localhost:5000
 curl -s -o /dev/null -w "登录:     HTTP %{http_code}\n" http://localhost:5000/login.html

@@ -260,16 +260,33 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadModuleData() {
     showToast('正在加载模块数据...');
     
-    // 模拟从 JSON 文件加载数据
-    setTimeout(function() {
-        // 这里应该是从 /workspace/module_list.json 加载
-        // 为了演示，我们生成演示数据
-        generateDemoData();
-        renderCategoryTabs();
-        renderAllModules();
-        updateStats();
-        showToast('加载完成！');
-    }, 1000);
+    // 从 module_list.json 加载真实模块数据
+    fetch('/module_list.json')
+        .then(function(response) {
+            if (!response.ok) throw new Error('加载失败');
+            return response.json();
+        })
+        .then(function(data) {
+            window.moduleData = data;
+            // 提取所有分类
+            var cats = {};
+            for (var i = 0; i < data.length; i++) {
+                cats[data[i].category] = true;
+            }
+            window.categories = Object.keys(cats);
+            renderCategoryTabs();
+            renderAllModules();
+            updateStats();
+            showToast('加载完成！共 ' + data.length + ' 个模块');
+        })
+        .catch(function(error) {
+            console.error('加载模块数据失败:', error);
+            showToast('加载失败，使用演示数据');
+            generateDemoData();
+            renderCategoryTabs();
+            renderAllModules();
+            updateStats();
+        });
 }
 
 // 生成演示数据（实际应该从 JSON 文件加载）

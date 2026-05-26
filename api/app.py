@@ -435,7 +435,7 @@ def forgot_password():
         }
         with open(TOKENS_FILE, 'w', encoding='utf-8') as f:
             json.dump(tokens, f, ensure_ascii=False, indent=2)
-        reset_link = f"http://localhost:8080/reset-password.html?token={reset_token}"
+        reset_link = f"{request.host_url.rstrip('/')}/reset-password.html?token={reset_token}"
         email_body = f"""
         <h2>重置密码</h2>
         <p>请点击以下链接重置您的密码（1小时内有效）：</p>

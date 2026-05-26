@@ -46,10 +46,21 @@ reload = True  # 启用自动重载
 reload_extra_files = [
     '/root/suanming/suanming/api/app.py',
     '/root/suanming/suanming/api/sms_extension.py',
+    '/root/suanming/suanming/index.html',
     '/root/suanming/suanming/login.html',
     '/root/suanming/suanming/register.html',
+    '/root/suanming/suanming/profile.html',
+    '/root/suanming/suanming/more.html',
     '/root/suanming/suanming/forgot-password.html',
-    '/root/suanming/suanming/reset-password.html'
+    '/root/suanming/suanming/reset-password.html',
+    '/root/suanming/suanming/css/style.css',
+    '/root/suanming/suanming/js/main.js',
+    '/root/suanming/suanming/modules/bazi.html',
+    '/root/suanming/suanming/modules/xingzuo.html',
+    '/root/suanming/suanming/modules/tarot.html',
+    '/root/suanming/suanming/modules/shengxiao.html',
+    '/root/suanming/suanming/modules/fengshui.html',
+    '/root/suanming/suanming/modules/ziwei.html',
 ]
 
 # 环境变量

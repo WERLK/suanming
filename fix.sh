@@ -16,6 +16,8 @@ rm -rf api/__pycache__
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/app.py -O api/app.py
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/__init__.py -O api/__init__.py
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/gunicorn_config.py -O gunicorn_config.py
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/icon-192.png -O icon-192.png
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/manifest.json -O manifest.json
 echo "OK"
 
 echo "=== 3. 验证代码 ==="

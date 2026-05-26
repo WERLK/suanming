@@ -272,3 +272,17 @@ window.closeResult = closeResult;
 window.showPage = showPage;
 window.calcBaziSimple = calcBaziSimple;
 window.generateBaziResultHTML = generateBaziResultHTML;
+
+// ===== 首页模块跳转函数 =====
+function openBazi() { window.location.href = '/modules/bazi.html'; }
+function openZiwei() { window.location.href = '/modules/ziwei.html'; }
+function openHeyun() { window.location.href = '/modules/heyun.html'; }
+function openShengxiao() { window.location.href = '/modules/shengxiao.html'; }
+function openXingming() { window.location.href = '/modules/xingming.html'; }
+function openTarot() { window.location.href = '/modules/tarot.html'; }
+function openFengshui() { window.location.href = '/modules/fengshui.html'; }
+function openZhougong() { window.location.href = '/modules/zhougong.html'; }
+function openHuangdao() { window.location.href = '/modules/huangdao.html'; }
+function openJiexing() { window.location.href = '/modules/jiexing.html'; }
+function openCaishen() { window.location.href = '/modules/caishen.html'; }
+function openMore() { window.location.href = '/more.html'; }

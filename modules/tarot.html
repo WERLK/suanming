@@ -123,7 +123,7 @@
 
     <div class="app">
         <div class="page-header">
-            <button class="back-btn" onclick="history.back()">←</button>
+            <button type="button" type="button" class="back-btn" onclick="history.back()">←</button>
             <h1>🎴 塔罗牌</h1>
         </div>
 
@@ -295,7 +295,7 @@
             const modalContent = document.createElement('div');
             modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
             modalContent.onclick = (e) => e.stopPropagation();
-            modalContent.innerHTML = html + '<button style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
+            modalContent.innerHTML = html + '<button type="button" type="button" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
             
             modal.className = 'modal';
             modal.appendChild(modalContent);

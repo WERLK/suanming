@@ -266,7 +266,7 @@
 <div class="app">
     <!-- 页面头部 -->
     <div class="page-header">
-        <button class="back-btn" onclick="history.back()">←</button>
+        <button type="button" class="back-btn" onclick="history.back()">←</button>
         <h1>☯ 八字排盘</h1>
     </div>
 
@@ -274,9 +274,9 @@
     <div class="content-area">
         <!-- 标签页导航 -->
         <div class="tab-container">
-            <button class="tab-btn active" data-tab="form" onclick="switchTab('form', this)">排盘</button>
-            <button class="tab-btn" data-tab="knowledge" onclick="switchTab('knowledge', this)">知识</button>
-            <button class="tab-btn" data-tab="result" onclick="switchTab('result', this)">结果</button>
+            <button type="button" class="tab-btn active" data-tab="form" onclick="switchTab('form', this)">排盘</button>
+            <button type="button" class="tab-btn" data-tab="knowledge" onclick="switchTab('knowledge', this)">知识</button>
+            <button type="button" class="tab-btn" data-tab="result" onclick="switchTab('result', this)">结果</button>
         </div>
 
         <!-- 排盘表单 -->
@@ -380,7 +380,20 @@
     </div>
 </div>
 
-<script src="/js/main.js"></script>
+<script src="/js/main.js">
+// 显示提示
+function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
 <script>
 // ===== 标签页切换 =====
 function switchTab(tabName, btnElement) {

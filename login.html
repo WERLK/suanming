@@ -481,9 +481,9 @@
                     
                     <!-- 验证码类型切换 -->
                     <div class="captcha-type-switch">
-                        <button type="button" class="captcha-type-btn active" onclick="switchCaptchaType('image')">图片验证码</button>
-                        <button type="button" class="captcha-type-btn" onclick="switchCaptchaType('slider')">滑块验证码</button>
-                        <button type="button" class="captcha-type-btn" onclick="switchCaptchaType('sms')">📱 短信验证码</button>
+                        <button type="button" class="captcha-type-btn active" data-type="image" onclick="switchCaptchaType('image')">图片验证码</button>
+                        <button type="button" class="captcha-type-btn" data-type="slider" onclick="switchCaptchaType('slider')">滑块验证码</button>
+                        <button type="button" class="captcha-type-btn" data-type="sms" onclick="switchCaptchaType('sms')">📱 短信验证码</button>
                     </div>
                     
                     <!-- 图片验证码 -->
@@ -599,7 +599,8 @@
             document.querySelectorAll('.captcha-type-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            var targetBtn = document.querySelector('.captcha-type-btn[data-type="' + type + '"]');
+            if (targetBtn) targetBtn.classList.add('active');
             
             // 显示对应的验证码
             if (type === 'image') {

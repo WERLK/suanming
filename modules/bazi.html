@@ -274,9 +274,9 @@
     <div class="content-area">
         <!-- 标签页导航 -->
         <div class="tab-container">
-            <button class="tab-btn active" onclick="switchTab('form')">排盘</button>
-            <button class="tab-btn" onclick="switchTab('knowledge')">知识</button>
-            <button class="tab-btn" onclick="switchTab('result')">结果</button>
+            <button class="tab-btn active" data-tab="form" onclick="switchTab('form', this)">排盘</button>
+            <button class="tab-btn" data-tab="knowledge" onclick="switchTab('knowledge', this)">知识</button>
+            <button class="tab-btn" data-tab="result" onclick="switchTab('result', this)">结果</button>
         </div>
 
         <!-- 排盘表单 -->
@@ -383,12 +383,18 @@
 <script src="/js/main.js"></script>
 <script>
 // ===== 标签页切换 =====
-function switchTab(tabName) {
+function switchTab(tabName, btnElement) {
     // 更新标签按钮状态
     const tabBtns = document.querySelectorAll('.tab-btn');
     tabBtns.forEach(btn => btn.classList.remove('active'));
     
-    event.target.classList.add('active');
+    // 激活对应按钮（通过参数或 DOM 查找）
+    if (btnElement) {
+        btnElement.classList.add('active');
+    } else {
+        const targetBtn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+        if (targetBtn) targetBtn.classList.add('active');
+    }
     
     // 显示对应的内容
     const tabContents = document.querySelectorAll('.tab-content');

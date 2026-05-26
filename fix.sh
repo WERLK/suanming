@@ -31,6 +31,13 @@ wget -q https://raw.githubusercontent.com/WERLK/suanming/master/more.html -O mor
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/profile.html -O profile.html
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/login.html -O login.html
 wget -q https://raw.githubusercontent.com/WERLK/suanming/master/register.html -O register.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/bazi.html -O modules/bazi.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/modules/xingzuo.html -O modules/xingzuo.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/login_backup_v2.html -O login_backup_v2.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/login_with_sms.html -O login_with_sms.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/register_backup.html -O register_backup.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/register_with_captcha.html -O register_with_captcha.html
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/sms_login_patch.html -O sms_login_patch.html
 echo "OK"
 
 echo "=== 3. 验证代码 ==="

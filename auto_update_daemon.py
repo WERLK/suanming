@@ -16,7 +16,7 @@ import json
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 配置
-CHECK_INTERVAL = 300  # 5分钟（秒）
+CHECK_INTERVAL = 120  # 2分钟（秒）
 LOG_FILE = os.path.join(BASE_DIR, 'logs', 'auto_update.log')
 GITHUB_API = 'https://api.github.com/repos/WERLK/suanming/commits?per_page=1'
 LAST_COMMIT_FILE = os.path.join(BASE_DIR, '.last_commit')

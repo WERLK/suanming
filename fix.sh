@@ -79,7 +79,7 @@ sleep 3
 echo "=== 启动自动更新守护进程 ==="
 nohup python3 auto_update_daemon.py > logs/auto_update.log 2>&1 &
 sleep 1
-echo "自动更新进程已启动（每5分钟检查更新）"
+echo "自动更新进程已启动（每2分钟检查更新）"
 
 # ========== 8. 测试 ==========
 echo "=== 测试 ==="

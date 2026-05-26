@@ -1,0 +1,38 @@
+#!/bin/bash
+# 玄机算命网 - 一键修复脚本
+# 用法: bash fix.sh
+
+set -e
+cd /root/suanming/suanming
+
+echo "=== 1. 停止旧进程 ==="
+pkill -f auto_update 2>/dev/null || true
+pkill -f gunicorn 2>/dev/null || true
+sleep 2
+echo "OK"
+
+echo "=== 2. 下载最新代码 ==="
+rm -rf api/__pycache__
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/app.py -O api/app.py
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/api/__init__.py -O api/__init__.py
+wget -q https://raw.githubusercontent.com/WERLK/suanming/master/gunicorn_config.py -O gunicorn_config.py
+echo "OK"
+
+echo "=== 3. 验证代码 ==="
+python3 -c "from api.app import app; print('导入成功')"
+echo "OK"
+
+echo "=== 4. 启动服务 ==="
+mkdir -p logs
+nohup python3 -m gunicorn -c gunicorn_config.py api.app:app > logs/gunicorn.log 2>&1 &
+sleep 3
+
+echo "=== 5. 测试 ==="
+curl -s -o /dev/null -w "首页: HTTP %{http_code}\n" http://localhost:5000
+curl -s -o /dev/null -w "登录: HTTP %{http_code}\n" http://localhost:5000/login.html
+curl -s -o /dev/null -w "八字: HTTP %{http_code}\n" http://localhost:5000/modules/bazi.html
+curl -s -o /dev/null -w "CSS:  HTTP %{http_code}\n" http://localhost:5000/css/style.css
+
+echo ""
+echo "=== 全部完成 ==="
+echo "访问: http://你的IP:5000"

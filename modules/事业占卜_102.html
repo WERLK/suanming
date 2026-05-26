@@ -78,7 +78,10 @@
     </div>
 
     <div class="content-area">
-        <div class="section">
+                <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('事业占卜_102')">📷 上传图片分析</button>
+        </div>
+<div class="section">
             <h2>事业占卜简介</h2>
             <p>六爻占卜是中国传统命理学的重要分支，具有悠久的历史和深厚的文化底蕴。</p>
             <p>通过专业的分析和解读，可以帮助人们了解自己的命运走势，趋吉避凶，改善运势。</p>
@@ -176,7 +179,46 @@
     </div>
 </div>
 
-<script src="/js/main.js"></script>
+<script src="/js/main.js">
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     createStars();

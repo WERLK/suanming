@@ -285,4 +285,71 @@ function openZhougong() { window.location.href = '/modules/zhougong.html'; }
 function openHuangdao() { window.location.href = '/modules/huangdao.html'; }
 function openJiexing() { window.location.href = '/modules/jiexing.html'; }
 function openCaishen() { window.location.href = '/modules/caishen.html'; }
+
+// ===== 图片上传智能分析（通用） =====
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showImageAnalysisResult(data.analysis, data.image_info);
+                } else {
+                    showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+function showImageAnalysisResult(analysisText, imageInfo) {
+    let html = '<div class="image-analysis-result" style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.5rem;margin-top:1rem;">';
+    html += '<h3 style="color:#ffd700;margin-bottom:1rem;">📷 图片分析结果</h3>';
+    html += '<pre style="white-space:pre-wrap;font-family:inherit;color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + analysisText + '</pre>';
+    if (imageInfo) {
+        html += '<div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);color:rgba(255,255,255,0.5);font-size:0.8rem;">';
+        html += '图片信息：' + imageInfo.width + '×' + imageInfo.height + ' | 主色调：' + imageInfo.dominant_color + ' | 亮度：' + imageInfo.brightness;
+        html += '</div>';
+    }
+    html += '<button onclick="this.parentElement.remove();" style="margin-top:1rem;background:rgba(255,215,0,0.2);color:#ffd700;border:1px solid rgba(255,215,0,0.3);border-radius:8px;padding:0.5rem 1rem;cursor:pointer;">关闭</button>';
+    html += '</div>';
+
+    // 尝试插入到结果区域
+    const resultArea = document.getElementById('resultArea') || document.getElementById('analysisResult') || document.querySelector('.result-area');
+    if (resultArea) {
+        resultArea.innerHTML = html;
+        resultArea.style.display = 'block';
+    } else {
+        // 如果找不到结果区域，就追加到 content-area
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            contentArea.appendChild(div.firstChild);
+        } else {
+            showToast('分析完成！请在页面查看结果');
+            console.log('图片分析结果：', analysisText);
+        }
+    }
+}
+
 function openMore() { window.location.href = '/more.html'; }

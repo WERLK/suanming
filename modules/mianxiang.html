@@ -243,7 +243,10 @@
     </div>
 
     <div class="content-area">
-        <div class="section">
+                <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('mianxiang')">📷 上传图片分析</button>
+        </div>
+<div class="section">
             <h2>面相学简介</h2>
             <p>面相学是中国传统相术的重要组成部分，通过观察人的面部特征（五官、气色、纹路等），来推断一个人的性格、命运、健康、财运等。</p>
             <p>古人云："相由心生"，面相不仅反映先天的命运，也体现后天的修养和心境变化。因此，面相学不仅用于预测，更用于自我修养和改造命运。</p>
@@ -389,6 +392,45 @@ function showToast(msg) {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
+
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
 </script>
 <script>
 function analyzeFace() {
@@ -397,16 +439,16 @@ function analyzeFace() {
     const age = document.getElementById('ageInput').value;
     
     if (!photo) {
-        showToast('请上传照片');
+        window.showToast('请上传照片');
         return;
     }
     
     if (!age || age < 1 || age > 120) {
-        showToast('请输入有效年龄');
+        window.showToast('请输入有效年龄');
         return;
     }
     
-    showToast('正在分析面相...');
+    window.showToast('正在分析面相...');
     
     // 模拟AI分析
     setTimeout(() => {

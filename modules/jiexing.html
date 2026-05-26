@@ -232,7 +232,10 @@
     </div>
 
     <div class="content-area">
-        <div class="section">
+                <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('jiexing')">📷 上传图片分析</button>
+        </div>
+<div class="section">
             <h2>流年解星简介</h2>
             <p>流年解星是八字命理中的重要内容，通过分析每年飞临的星曜（吉星和凶星），来判断该年的运势吉凶。</p>
             <p>流年解星包括：岁破、龙德、天德、福德、红鸾、天喜、寡宿、吊客等。不同星曜对不同日干的人影响不同。</p>
@@ -468,6 +471,45 @@ function showToast(msg) {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
+
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
 </script>
 <script>
 function analyzeNian() {
@@ -476,11 +518,11 @@ function analyzeNian() {
     const gender = document.getElementById('genderInput').value;
     
     if (!birth) {
-        showToast('请输入出生日期');
+        window.showToast('请输入出生日期');
         return;
     }
     
-    showToast('正在分析流年...');
+    window.showToast('正在分析流年...');
     
     // 模拟分析
     setTimeout(() => {

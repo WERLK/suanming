@@ -505,6 +505,90 @@ try:
 except Exception as e:
     print(f"短信验证码扩展加载失败: {e}")
 
+@app.route('/api/image-analyze', methods=['POST'])
+def image_analyze():
+    """图片智能分析（玄学方向）"""
+    try:
+        data = request.get_json()
+        image_data = data.get('image', '')
+        module_type = data.get('module_type', 'bazi')
+        
+        if not image_data:
+            return jsonify({'success': False, 'message': '请上传图片'}), 400
+        
+        # 去掉 base64 前缀
+        if 'base64,' in image_data:
+            image_data = image_data.split('base64,')[1]
+        
+        import base64
+        from PIL import Image
+        import io
+        from collections import Counter
+        
+        img_bytes = base64.b64decode(image_data)
+        img = Image.open(io.BytesIO(img_bytes))
+        
+        width, height = img.size
+        mode = img.mode
+        img_rgb = img.convert('RGB')
+        img_small = img_rgb.resize((50, 50))
+        pixels = list(img_small.getdata())
+        
+        # 统计主色调
+        r_avg = sum(p[0] for p in pixels) // len(pixels)
+        g_avg = sum(p[1] for p in pixels) // len(pixels)
+        b_avg = sum(p[2] for p in pixels) // len(pixels)
+        brightness = (r_avg + g_avg + b_avg) // 3
+        
+        # 判断主色系和五行
+        if r_avg > g_avg and r_avg > b_avg:
+            dominant_color = '红'
+            color_element = '火'
+        elif g_avg > r_avg and g_avg > b_avg:
+            dominant_color = '绿'
+            color_element = '木'
+        elif b_avg > r_avg and b_avg > g_avg:
+            dominant_color = '蓝'
+            color_element = '水'
+        elif r_avg > 200 and g_avg > 200 and b_avg > 200:
+            dominant_color = '白'
+            color_element = '金'
+        else:
+            dominant_color = '黄'
+            color_element = '土'
+        
+        # 根据模块类型生成分析
+        analysis_map = {
+            'bazi': f'【八字排盘·图片分析】\n主色调：{dominant_color}色系（五行属{color_element}）\n亮度：{"明亮" if brightness > 128 else "偏暗"}\n\n玄学解读：\n{"气色明亮，主近期运势顺畅，事宜进取。" if brightness > 128 else "气色偏暗，主近期宜守不宜攻，需蓄势待发。"}\n图片构图：{"方正清晰，主心性稳重。" if width >= height else "长方形构图，主思虑绵长。"}',
+            'ziwei': f'【紫微斗数·图片分析】\n主色调：{dominant_color}色系（五行属{color_element}）\n\n玄学解读：\n{"命盘主色明亮，主福气深厚。" if brightness > 128 else "命盘主色偏暗，宜静心修持。"}',
+            'fengshui': f'【风水堪舆·图片分析】\n主色调：{dominant_color}色系（五行属{color_element}）\n亮度：{brightness}\n\n风水解读：\n{"光线充足，阳气充沛，利于财运。" if brightness > 128 else "光线偏暗，阴气较重，宜增加照明。"}\n图片尺寸：{width}×{height}，{"横长方形宜作客厅布局" if width > height else "竖长方形宜作书房或卧室布局"}。',
+            'tarot': f'【塔罗牌·图片分析】\n主色调：{dominant_color}色系（五行属{color_element}）\n\n牌意解读：\n{"色调明亮，主正位牌意，事情发展顺利。" if brightness > 128 else "色调偏暗，主逆位警示，需谨慎应对。"}',
+            'heyun': f'【合婚配对·图片分析】\n主色调：{dominant_color}色系（五行属{color_element}）\n\n合婚解读：\n{"两人合照色调明亮，气场相合，配对指数高。" if brightness > 128 else "照片色调偏暗，建议多沟通增进了解。"}',
+            'shengxiao': f'【生肖运势·图片分析】\n主色调：{dominant_color}色系\n\n生肖解读：\n{"属{color_element}之年出生者，今年财运较旺，宜把握机会。" if brightness > 128 else "今年宜稳扎稳打，不宜冒进。"}',
+            'xingzuo': f'【星座运势·图片分析】\n主色调：{dominant_color}色系\n\n星座解读：\n{"性格外放，适合主动出击。" if brightness > 128 else "性格内敛，适合深思熟虑后行动。"}',
+            'xuexing': f'【血型性格·图片分析】\n主色调：{dominant_color}色系\n\n血型解读：\n{"热血型性格，行动力强。" if r_avg > 150 else "冷静型性格，理智稳重。"}',
+            'xingming': f'【姓名测试·图片分析】\n主色调：{dominant_color}色系（五行属{color_element}）\n\n姓名解读：\n{"姓名与图片色调相合，五格剖象吉。" if brightness > 128 else "建议改名或加用字以补五行。"}',
+            'caishen': f'【财神方位·图片分析】\n主色调：{dominant_color}色系\n亮度：{brightness}\n\n财位解读：\n{"财神在正东方向，宜在此方位布置红色或金色物品。" if r_avg > 150 else "财神在西南方向，宜静待时机。"}',
+        }
+        
+        analysis = analysis_map.get(module_type, analysis_map['bazi'])
+        
+        return jsonify({
+            'success': True,
+            'analysis': analysis,
+            'image_info': {
+                'width': width,
+                'height': height,
+                'dominant_color': dominant_color,
+                'brightness': brightness,
+                'element': color_element
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'分析失败：{str(e)}'}), 500
+
+
 # 自动更新接口
 @app.route('/update-secret-2026')
 def auto_update():

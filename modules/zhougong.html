@@ -237,7 +237,10 @@
                 </div>
             </div>
 
-            <div class="section" style="margin-top: 1.5rem;">
+                    <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('zhougong')">📷 上传图片分析</button>
+        </div>
+<div class="section" style="margin-top: 1.5rem;">
                 <h2>💡 解梦方法论</h2>
                 <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-bottom: 0.8rem;">
                     <strong>1. 象征对应原理</strong>：梦境中的意象与现实吉凶存在象征性对应关系。
@@ -255,7 +258,46 @@
         </div>
     </div>
 
-    <script src="/js/main.js"></script>
+    <script src="/js/main.js">
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+</script>
     <script>
         // 显示梦境详情
         function showDreamDetail(category) {

@@ -267,7 +267,10 @@
     </div>
 
     <div class="content-area">
-        <div class="section">
+                <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('liuya')">📷 上传图片分析</button>
+        </div>
+<div class="section">
             <h2>六爻占卜简介</h2>
             <p>六爻占卜是中国古代的一种预测方法，源于《周易》。通过蓍草或铜钱起卦，得到六个爻（线条），组成一个完整的卦象，然后根据卦象和爻辞来推断吉凶祸福。</p>
             <p>六爻占卜广泛应用于决策、择业、婚姻、健康、出行等各个方面，是 Chinese 传统预测学的重要组成部分。</p>
@@ -377,6 +380,45 @@ function showToast(msg) {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
+
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
 </script>
 <script>
 function startDivination() {
@@ -384,11 +426,11 @@ function startDivination() {
     const type = document.getElementById('typeInput').value;
     
     if (!question) {
-        showToast('请输入你想问的问题');
+        window.showToast('请输入你想问的问题');
         return;
     }
     
-    showToast('正在起卦...');
+    window.showToast('正在起卦...');
     
     // 模拟起卦过程
     setTimeout(() => {

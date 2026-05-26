@@ -15,7 +15,7 @@ import io
 import base64
 
 app = Flask(__name__, static_folder='../', static_url_path='')
-app.secret_key = 'xuanji_fortune_secret_key_2026'
+app.secret_key = 'xuanji_fortune_secret_key_2026!!'  # 32+ chars for HS256
 CORS(app)
 
 # 验证码存储（实际项目中应使用Redis或数据库）

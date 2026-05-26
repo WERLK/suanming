@@ -495,9 +495,11 @@
     
     <script src="/js/main.js"></script>
     <script>
-        // 创建星空背景
+        // 创建星空背景 & 初始化验证码
         document.addEventListener('DOMContentLoaded', function() {
-            createStars();
+            if (typeof createStars === 'function') createStars();
+            loadCaptcha();
+            initSlider();
         });
         
         // 显示错误信息

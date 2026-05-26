@@ -536,6 +536,63 @@ body {
     height: 50px;
 }
 
+/* ===== 底部导航 ===== */
+.bottom-nav {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, rgba(26,26,46,0.95), rgba(15,12,41,0.98));
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,215,0,0.15);
+    display: flex;
+    z-index: 100;
+}
+
+.bottom-nav .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.bottom-nav .nav-item.active {
+    color: #ffd700;
+}
+
+.bottom-nav .nav-icon {
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+}
+
+.bottom-nav .nav-item span {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.5);
+}
+
+.bottom-nav .nav-item.active span {
+    color: #ffd700;
+}
+
+@media (min-width: 1024px) {
+    .bottom-nav {
+        max-width: 1200px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .bottom-nav {
+        max-width: 800px;
+    }
+}
+
 /* ===== PC端顶部导航适配 ===== */
 @media (min-width: 1024px) {
     .top-nav {

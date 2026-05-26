@@ -136,7 +136,7 @@ def generate_captcha():
             draw.point((x, y), fill=color)
         try:
             font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 24)
-        except:
+        except (OSError, IOError):
             font = ImageFont.load_default()
         for i, char in enumerate(captcha_text):
             color = (random.randint(0, 100), random.randint(0, 100), random.randint(0, 100))
@@ -461,7 +461,8 @@ def reset_password():
             return jsonify({'success': False, 'message': '参数不完整'}), 400
         if len(new_password) < 6:
             return jsonify({'success': False, 'message': '密码长度至少6个字符'}), 400
-        tokens = json.load(open(TOKENS_FILE, 'r', encoding='utf-8'))
+        with open(TOKENS_FILE, 'r', encoding='utf-8') as f:
+            tokens = json.load(f)
         if token not in tokens:
             return jsonify({'success': False, 'message': '重置链接无效'}), 400
         token_data = tokens[token]

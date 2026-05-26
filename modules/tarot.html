@@ -1,8 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>塔罗牌 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
@@ -11,8 +18,8 @@
             align-items: center;
             gap: 1rem;
             padding: 1rem;
-            background: linear-gradient(180deg, rgba(15,12,41,8), rgba(26,26,46,5));
-            border-bottom: 1px solid rgba(255,215,0,15);
+            background: linear-gradient(180deg, rgba(15,12,41,0.8), rgba(26,26,46,0.5))
+            border-bottom: 1px solid rgba(255,215,0,0.15);
         }
         .page-header h1 {
             font-size: 1.2rem;
@@ -32,8 +39,8 @@
             padding-bottom: 80px;
         }
         .tarot-intro {
-            background: linear-gradient(135deg, rgba(255,215,0,5), rgba(255,215,0,2));
-            border: 1px solid rgba(255,215,0,1));
+            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2))
+            border: 1px solid rgba(255,215,0,0.1));
             border-radius: 12px;
             padding: 1.2rem;
             margin-bottom: 1.5rem;
@@ -46,7 +53,7 @@
         .tarot-intro p {
             font-size: 0.85rem;
             line-height: 1.8;
-            color: rgba(255,255,255,8));
+            color: rgba(255,255,255,0.8));
             margin-bottom: 0.5rem;
         }
         .tarot-types {
@@ -56,8 +63,8 @@
             margin-bottom: 1.5rem;
         }
         .tarot-type-card {
-            background: linear-gradient(135deg, rgba(255,215,0,5), rgba(255,215,0,2));
-            border: 1px solid rgba(255,215,0,1));
+            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2))
+            border: 1px solid rgba(255,215,0,0.1));
             border-radius: 12px;
             padding: 1rem;
         }
@@ -69,7 +76,7 @@
         .tarot-type-card p {
             font-size: 0.8rem;
             line-height: 1.6;
-            color: rgba(255,255,255,7));
+            color: rgba(255,255,255,0.7));
         }
         .major-arcana {
             margin-bottom: 1.5rem;
@@ -79,7 +86,7 @@
             font-size: 1rem;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255,215,0,2));
+            border-bottom: 1px solid rgba(255,215,0,0.2));
         }
         .card-grid {
             display: grid;
@@ -87,8 +94,8 @@
             gap: 0.8rem;
         }
         .tarot-card {
-            background: linear-gradient(135deg, rgba(255,215,0,8), rgba(255,215,0,3));
-            border: 1px solid rgba(255,215,0,15));
+            background: linear-gradient(135deg, rgba(255,215,0,0.8), rgba(255,215,0,0.3))
+            border: 1px solid rgba(255,215,0,0.15));
             border-radius: 8px;
             padding: 0.8rem;
             text-align: center;
@@ -97,16 +104,16 @@
         }
         .tarot-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255,215,0,2));
+            box-shadow: 0 5px 15px rgba(255,215,0,0.2));
         }
         .card-number {
             font-size: 0.7rem;
-            color: rgba(255,255,255,5));
+            color: rgba(255,255,255,0.5));
             margin-bottom: 0.3rem;
         }
         .card-name {
             font-size: 0.8rem;
-            color: rgba(255,255,255,9));
+            color: rgba(255,255,255,0.9));
             font-weight: 500;
         }
     </style>
@@ -194,7 +201,7 @@
 
             <div class="section">
                 <h2>💡 如何使用塔罗牌</h2>
-                <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,8)); margin-bottom: 0.8rem;">
+                <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8)); margin-bottom: 0.8rem;">
                     1. <strong>准备</strong>：选择安静的环境，放松心情，专注于你的问题。<br>
                     2. <strong>洗牌</strong>：将牌面朝下，专心洗牌，同时心中默念你的问题。<br>
                     3. <strong>抽牌</strong>：根据需要选择合适的牌阵（如三张牌阵、凯尔特十字阵等），然后抽牌。<br>
@@ -265,30 +272,30 @@
             if (!meaning) return;
 
             let html = `
-                <div style="background: linear-gradient(135deg, rgba(255,215,0,5), rgba(255,215,0,2)); border: 1px solid rgba(255,215,0,1)); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
+                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2)); border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
                     <h3 style="color: #ffd700; font-size: 1.1rem; margin-bottom: 1rem;">🎴 ${cardName}</h3>
                     
                     <div style="margin-bottom: 1rem;">
-                        <h4 style="color: rgba(255,255,255,9)); font-size: 0.9rem; margin-bottom: 0.5rem;">正位含义</h4>
-                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,8));">${meaning.upright}</p>
+                        <h4 style="color: rgba(255,255,255,0.9)); font-size: 0.9rem; margin-bottom: 0.5rem;">正位含义</h4>
+                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8));">${meaning.upright}</p>
                     </div>
                     
                     <div>
-                        <h4 style="color: rgba(255,255,255,9)); font-size: 0.9rem; margin-bottom: 0.5rem;">逆位含义</h4>
-                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,8));">${meaning.reversed}</p>
+                        <h4 style="color: rgba(255,255,255,0.9)); font-size: 0.9rem; margin-bottom: 0.5rem;">逆位含义</h4>
+                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8));">${meaning.reversed}</p>
                     </div>
                 </div>
             `;
 
             // 创建弹窗显示
             const modal = document.createElement('div');
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,8)); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8)); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
             modal.onclick = () => modal.remove();
             
             const modalContent = document.createElement('div');
-            modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,2)); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
+            modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
             modalContent.onclick = (e) => e.stopPropagation();
-            modalContent.innerHTML = html + '<button style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
+            modalContent.innerHTML = html + '<button style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e) color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
             
             modal.className = 'modal';
             modal.appendChild(modalContent);

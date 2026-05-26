@@ -16,7 +16,7 @@ import json
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 配置
-CHECK_INTERVAL = 120  # 2分钟（秒）
+CHECK_INTERVAL = 300  # 5分钟（秒）
 LOG_FILE = os.path.join(BASE_DIR, 'logs', 'auto_update.log')
 GITHUB_API = 'https://api.github.com/repos/WERLK/suanming/commits?per_page=1'
 LAST_COMMIT_FILE = os.path.join(BASE_DIR, '.last_commit')
@@ -42,15 +42,23 @@ def get_remote_commit():
     """通过 GitHub API 获取远程最新 commit hash"""
     try:
         result = subprocess.run(
-            ['curl', '-s', GITHUB_API],
+            ['curl', '-s', '--connect-timeout', '10', '--max-time', '30', '-H', 'Accept: application/vnd.github.v3+json', GITHUB_API],
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=35
         )
-        if result.returncode == 0:
+        if result.returncode == 0 and result.stdout.strip():
             data = json.loads(result.stdout)
             if isinstance(data, list) and len(data) > 0:
                 return data[0]['sha']
+            else:
+                logging.warning('GitHub API 返回数据格式异常')
+        else:
+            logging.error(f'curl 请求失败: returncode={result.returncode}, stderr={result.stderr}')
+    except subprocess.TimeoutExpired:
+        logging.error('获取远程 commit 超时（curl 执行超时）')
+    except json.JSONDecodeError as e:
+        logging.error(f'解析 GitHub API 响应失败: {e}, 响应内容: {result.stdout[:200]}')
     except Exception as e:
         logging.error(f'获取远程commit失败: {e}')
     return None
@@ -150,6 +158,22 @@ def update_and_restart():
             return False
 
         log('代码更新成功')
+
+        # 安装/更新依赖
+        req_file = os.path.join(BASE_DIR, 'requirements.txt')
+        if os.path.exists(req_file):
+            log('检测到 requirements.txt，更新依赖...')
+            pip_result = subprocess.run(
+                [sys.executable, '-m', 'pip', 'install', '-r', req_file],
+                cwd=BASE_DIR,
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            if pip_result.returncode != 0:
+                logging.error(f'pip install 失败: {pip_result.stderr}')
+            else:
+                log('依赖更新完成')
 
         # 确保 api/__init__.py 存在
         init_file = os.path.join(BASE_DIR, 'api', '__init__.py')

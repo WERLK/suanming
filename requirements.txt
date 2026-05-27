@@ -6,6 +6,7 @@ Pillow==10.1.0
 aliyun-python-sdk-core==2.13.37
 aliyun-python-sdk-dysmsapi==2.0.23
 tencentcloud-sdk-python==3.0.1068
+alibabacloud_dypnsapi20170525==2.0.0
 gunicorn==21.2.0
 watchdog==3.0.0
 python-dotenv==1.0.0

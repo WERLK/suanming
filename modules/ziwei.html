@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>紫微斗数 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+.form-group {
+    margin-bottom: 1.2rem;
+}
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+.form-select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+}
+.form-select option {
+    background: #1a1a2e;
+    color: #fff;
+}
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+.submit-btn:hover { transform: scale(1.02); }
+.submit-btn:active { transform: scale(0.98); }
+
+/* 结果展示 */
+.result-container { max-width: 600px; margin: 0 auto; }
+.result-section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.5s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.result-section h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+.result-table th,
+.result-table td {
+    padding: 0.6rem;
+    text-align: center;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.result-table th {
+    color: #ffd700;
+    font-weight: 600;
+    background: rgba(255,215,0,0.05);
+}
+.result-table td {
+    color: rgba(255,255,255,0.85);
+}
+
+/* 命盘表格 */
+.chart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 0.8rem;
+}
+.chart-table th,
+.chart-table td {
+    border: 1px solid rgba(255,215,0,0.2);
+    padding: 0.5rem 0.3rem;
+    min-width: 70px;
+    vertical-align: top;
+}
+.chart-table th {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
+    font-size: 0.8rem;
+}
+.chart-table td {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+.star-name {
+    color: #ffd700;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+.major-star { color: #ff6b6b; font-weight: 700; }
+.aux-star { color: #51cf66; }
+.hua-lu { color: #ffd700; font-weight: 700; }
+.hua-quan { color: #ff922b; font-weight: 700; }
+.hua-ke { color: #339af0; font-weight: 700; }
+.hua-ji { color: #fa5252; font-weight: 700; }
+
+/* 标签页 */
+.tab-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+    overflow-x: auto;
+}
+.tab-btn {
+    padding: 0.6rem 1rem;
+    border: none;
+    background: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+.tab-btn.active {
+    color: #ffd700;
+    border-bottom-color: #ffd700;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* 知识卡片 */
+.knowledge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.knowledge-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.knowledge-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+.knowledge-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+.knowledge-card p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button type="button" class="back-btn" onclick="history.back()">←</button>
+        <h1>⭐ 紫微斗数</h1>
+    </div>
+
+    <div class="content-area">
+        <!-- 标签页导航 -->
+        <div class="tab-container">
+            <button type="button" class="tab-btn active" data-tab="form" onclick="switchTab('form', this)">排盘</button>
+            <button type="button" class="tab-btn" data-tab="knowledge" onclick="switchTab('knowledge', this)">知识</button>
+            <button type="button" class="tab-btn" data-tab="result" onclick="switchTab('result', this)">结果</button>
+        </div>
+
+        <!-- 排盘表单 -->
+        <div class="tab-content active" id="formTab">
+            <div class="form-container">
+                <div class="form-group">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-input" id="nameInput" placeholder="请输入姓名">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <select class="form-select" id="genderInput">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">出生日期（公历）</label>
+                    <input type="date" class="form-input" id="dateInput">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">出生时辰</label>
+                    <select class="form-select" id="timeInput">
+                        <option value="子时(23-1)">子时 (23:00-01:00)</option>
+                        <option value="丑时(1-3)">丑时 (01:00-03:00)</option>
+                        <option value="寅时(3-5)">寅时 (03:00-05:00)</option>
+                        <option value="卯时(5-7)">卯时 (05:00-07:00)</option>
+                        <option value="辰时(7-9)">辰时 (07:00-09:00)</option>
+                        <option value="巳时(9-11)">巳时 (09:00-11:00)</option>
+                        <option value="午时(11-13)">午时 (11:00-13:00)</option>
+                        <option value="未时(13-15)">未时 (13:00-15:00)</option>
+                        <option value="申时(15-17)">申时 (15:00-17:00)</option>
+                        <option value="酉时(17-19)">酉时 (17:00-19:00)</option>
+                        <option value="戌时(19-21)">戌时 (19:00-21:00)</option>
+                        <option value="亥时(21-23)">亥时 (21:00-23:00)</option>
+                    </select>
+                </div>
+                <button type="button" class="submit-btn" onclick="calculateZiwei()">开始排盘</button>
+            </div>
+
+            <!-- 图片分析入口 -->
+            <div style="margin-top:1.5rem;text-align:center;">
+                <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,215,0,0.1));color:#ffd700;border:1px solid rgba(255,215,0,0.3);" onclick="triggerImageUpload('ziwei')">📷 上传图片智能分析</button>
+            </div>
+        </div>
+
+        <!-- 知识内容 -->
+        <div class="tab-content" id="knowledgeTab">
+            <div class="knowledge-grid">
+                <div class="knowledge-card" onclick="showKnowledgeDetail('basics')">
+                    <h3>📖 紫微斗数基础</h3>
+                    <p>了解命盘结构、十二宫位、十四主星等核心概念...</p>
+                </div>
+                <div class="knowledge-card" onclick="showKnowledgeDetail('major14')">
+                    <h3>⭐ 十四主星详解</h3>
+                    <p>紫微、天机、太阳、武曲等十四颗主星的详细含义...</p>
+                </div>
+                <div class="knowledge-card" onclick="showKnowledgeDetail('12palaces')">
+                    <h3>🏛️ 十二宫位含义</h3>
+                    <p>命宫、兄弟宫、夫妻宫等十二宫位的详细解释...</p>
+                </div>
+                <div class="knowledge-card" onclick="showKnowledgeDetail('4hua')">
+                    <h3>✨ 四化飞星</h3>
+                    <p>化禄、化权、化科、化忌的含义与应用...</p>
+                </div>
+                <div class="knowledge-card" onclick="showKnowledgeDetail('auxstars')">
+                    <h3>🌟 辅星与杂曜</h3>
+                    <p>左辅、右弼、文昌、文曲等辅星的作用...</p>
+                </div>
+                <div class="knowledge-card" onclick="showKnowledgeDetail('doushu')">
+                    <h3>📊 如何看命盘</h3>
+                    <p>命盘阅读方法、宫位叠加、星曜组合解读...</p>
+                </div>
+            </div>
+
+            <div style="margin-top:1.5rem;text-align:center;">
+                <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,215,0,0.1));color:#ffd700;border:1px solid rgba(255,215,0,0.3);" onclick="triggerImageUpload('ziwei')">📷 上传图片智能分析</button>
+            </div>
+        </div>
+
+        <!-- 结果展示 -->
+        <div class="tab-content" id="resultTab">
+            <div class="result-container" id="resultContainer">
+                <div class="section">
+                    <p style="text-align:center;color:rgba(255,255,255,0.5);padding:2rem 0;">请填写信息并点击"开始排盘"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图片分析结果区域 -->
+        <div id="imageAnalysisArea" style="display:none;margin-top:1rem;">
+            <div class="result-section">
+                <h3>📷 图片智能分析结果</h3>
+                <div id="imageAnalysisResult" style="white-space:pre-wrap;font-family:inherit;color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+// ===== 标签页切换 =====
+function switchTab(tabName, btnElement) {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => btn.classList.remove('active'));
+    if (btnElement) {
+        btnElement.classList.add('active');
+    } else {
+        const targetBtn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+        if (targetBtn) targetBtn.classList.add('active');
+    }
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => content.classList.remove('active'));
+    const targetTab = document.getElementById(tabName + 'Tab');
+    if (targetTab) targetTab.classList.add('active');
+}
+
+// ===== 十四主星列表 =====
+const ZIWEI_MAJOR_STARS = [
+    '紫微','天机','太阳','武曲','天同','廉贞',
+    '天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'
+];
+
+// 四化映射（简化：按年干决定哪颗星化禄/权/科/忌）
+const HUA_MAP = {
+    '甲': {禄:'廉贞',权:'破军',科:'武曲',忌:'太阳'},
+    '乙': {禄:'天机',权:'天梁',科:'紫微',忌:'太阴'},
+    '丙': {禄:'天同',权:'天机',科:'文昌',忌:'廉贞'},
+    '丁': {禄:'太阴',权:'天同',科:'天机',忌:'巨门'},
+    '戊': {禄:'贪狼',权:'太阴',科:'右弼',忌:'天机'},
+    '己': {禄:'武曲',权:'贪狼',科:'天梁',忌:'文曲'},
+    '庚': {禄:'太阳',权:'武曲',科:'太阴',忌:'天同'},
+    '辛': {禄:'巨门',权:'太阳',科:'文曲',忌:'文昌'},
+    '壬': {禄:'天梁',权:'紫微',科:'左辅',忌:'武曲'},
+    '癸': {禄:'破军',权:'巨门',科:'太阳',忌:'贪狼'}
+};
+
+// 时辰 -> 地支（用于命宫计算）
+const SHICHEN_TO_ZHI = {
+    '子':0,'丑':1,'寅':2,'卯':3,'辰':4,'巳':5,
+    '午':6,'未':7,'申':8,'酉':9,'戌':10,'亥':11
+};
+
+// 十二宫位顺序（从命宫开始逆时针）
+const PALACES = ['命宫','兄弟宫','夫妻宫','子女宫','财帛宫','疾厄宫','迁移宫','交友宫','官禄宫','田宅宫','福德宫','父母宫'];
+
+// ===== 计算命宫地支 =====
+function calcMingGongZhi(month, hourZhiIndex) {
+    // 命宫公式：命宫 = (寅宫起始 + 月份 - 时辰索引) % 12
+    // 简化处理：以寅宫为1，顺数到生月，逆数到生时
+    let mg = (2 + month - hourZhiIndex + 12) % 12;
+    if (mg === 0) mg = 12;
+    return (mg - 1 + 12) % 12; // 转为0-11索引
+}
+
+// ===== 简易紫微斗数排盘 =====
+function calcZiweiSimple(birthDate, birthTime, gender) {
+    const date = new Date(birthDate);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    // 年干索引（用于四化）
+    const tiangan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const yearGanIndex = (year - 4) % 10;
+    const yearGan = tiangan[yearGanIndex];
+
+    // 时辰地支索引
+    const hourZhiChar = birthTime.charAt(0);
+    const hourZhiIndex = SHICHEN_TO_ZHI[hourZhiChar] || 0;
+
+    // 命宫地支索引
+    const mingGongIndex = calcMingGongZhi(month, hourZhiIndex);
+
+    // 十二宫位地支分配（命宫起始，逆时针排列）
+    const dizhiList = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+    const palaceZhi = [];
+    for (let i = 0; i < 12; i++) {
+        palaceZhi.push(dizhiList[(mingGongIndex + i) % 12]);
+    }
+
+    // 主星排入十二宫（简化算法：用出生信息做伪随机分布）
+    const starDistribution = {};
+    for (let i = 0; i < 12; i++) {
+        starDistribution[i] = [];
+    }
+
+    // 用出生年月日做种子，分配14主星
+    let seed = year * 10000 + month * 100 + day;
+    function seededRandom() {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+    }
+
+    // 紫微星位置（以年干支为参考）
+    let ziweiPos = (yearGanIndex + month) % 12;
+    starDistribution[ziweiPos].push('紫微');
+
+    // 天机星（紫微星顺数3位）
+    starDistribution[(ziweiPos + 3) % 12].push('天机');
+
+    // 其他主星随机分布（简化）
+    const otherStars = ['太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+    otherStars.forEach((star, idx) => {
+        const pos = Math.floor(seededRandom() * 12);
+        starDistribution[pos].push(star);
+    });
+
+    // 四化
+    const hua = HUA_MAP[yearGan] || HUA_MAP['甲'];
+
+    // 生年化禄/权/科/忌所在宫位（简化：随机）
+    const huaPositions = {};
+    ['禄','权','科','忌'].forEach(h => {
+        huaPositions[h] = Math.floor(seededRandom() * 12);
+    });
+
+    // 组装命盘
+    const chart = [];
+    for (let i = 0; i < 12; i++) {
+        chart.push({
+            palace: PALACES[i],
+            zhi: palaceZhi[i],
+            stars: starDistribution[i],
+            hua: Object.keys(huaPositions).filter(h => huaPositions[h] === i).map(h => {
+                const starName = hua[h];
+                return { type: h, star: starName };
+            })
+        });
+    }
+
+    // 命宫主星（用于命局分析）
+    const mingGongStars = starDistribution[0];
+
+    // 身宫（简化：与命宫同宫或对宫）
+    const shenGongIndex = (mingGongIndex + 6) % 12;
+
+    return {
+        yearGan: yearGan,
+        yearGanIndex: yearGanIndex,
+        mingGongIndex: mingGongIndex,
+        shenGongIndex: shenGongIndex,
+        chart: chart,
+        mingGongStars: mingGongStars,
+        hua: hua,
+        palaceZhi: palaceZhi,
+        gender: gender
+    };
+}
+
+// ===== 生成命盘 HTML =====
+function generateZiweiResultHTML(data, name, gender, date, time) {
+    const { chart, mingGongStars, hua, yearGan } = data;
+
+    // 命盘表格 HTML
+    let chartHTML = '<table class="chart-table"><tr>';
+    chart.forEach(p => {
+        chartHTML += '<th>' + p.palace + '<br><small style="color:rgba(255,255,255,0.5);">' + p.zhi + '宫</small></th>';
+    });
+    chartHTML += '</tr><tr>';
+    chart.forEach(p => {
+        let cell = '';
+        p.stars.forEach(s => {
+            // 检查是否有四化
+            const huaInfo = p.hua.find(h => h.star === s);
+            let cls = 'major-star';
+            if (huaInfo) {
+                const huaClass = {'禄':'hua-lu','权':'hua-quan','科':'hua-ke','忌':'hua-ji'};
+                cls = huaClass[huaInfo.type] || 'major-star';
+            }
+            cell += '<div class="' + cls + '">' + s + '</div>';
+        });
+        if (cell === '') cell = '<span style="color:rgba(255,255,255,0.2);">空宫</span>';
+        chartHTML += '<td>' + cell + '</td>';
+    });
+    chartHTML += '</tr></table>';
+
+    // 命局分析
+    let analysisHTML = '<p><strong>命宫主星：</strong>' + (mingGongStars.length > 0 ? mingGongStars.join('、') : '无主星（空宫）') + '</p>';
+    analysisHTML += '<p><strong>生年四化：</strong>';
+    analysisHTML += '禄→' + hua['禄'] + '　权→' + hua['权'] + '　科→' + hua['科'] + '　忌→' + hua['忌'];
+    analysisHTML += '</p>';
+
+    // 性格分析（根据命宫主星）
+    let personality = '';
+    if (mingGongStars.includes('紫微')) personality += '尊贵自信，有领导气质，注重尊严与地位。';
+    else if (mingGongStars.includes('天机')) personality += '聪明机智，思维敏捷，善于策划与谋略。';
+    else if (mingGongStars.includes('太阳')) personality += '热情开朗，光明磊落，注重名誉与事业。';
+    else if (mingGongStars.includes('武曲')) personality += '刚毅果断，重信守义，具有商业头脑。';
+    else if (mingGongStars.includes('天同')) personality += '温和善良，注重享受，性格随和乐天。';
+    else if (mingGongStars.includes('廉贞')) personality += '耿直忠贞，重感情，但易陷入是非纠结。';
+    else if (mingGongStars.length === 0) personality += '命宫无主星，性格较为随和，易受环境与他人影响。';
+    else personality += '性格综合，需结合全盘分析。';
+
+    analysisHTML += '<p><strong>性格特点：</strong>' + personality + '</p>';
+
+    // 事业/感情/财运简述
+    const careerStars = chart[8] ? chart[8].stars : [];
+    const wealthStars = chart[4] ? chart[4].stars : [];
+    analysisHTML += '<p><strong>事业宫主星：</strong>' + (careerStars.length > 0 ? careerStars.join('、') : '空宫') + '</p>';
+    analysisHTML += '<p><strong>财帛宫主星：</strong>' + (wealthStars.length > 0 ? wealthStars.join('、') : '空宫') + '</p>';
+
+    let html = '';
+    html += '<div class="result-section fade-in"><h3>⭐ ' + (name || '命主') + ' 的紫微命盘</h3>';
+    html += '<p style="font-size:0.85rem;color:rgba(255,255,255,0.6);">生年天干：' + yearGan + '｜性别：' + (gender || '未填') + '｜出生：' + date + ' ' + time + '</p>';
+    html += '</div>';
+
+    html += '<div class="result-section fade-in"><h3>📊 十二宫命盘</h3>' + chartHTML + '</div>';
+
+    html += '<div class="result-section fade-in"><h3>📖 命局分析</h3>' + analysisHTML + '</div>';
+
+    html += '<div class="result-section fade-in"><h3>💡 综合建议</h3>';
+    html += '<p>紫微斗数命盘是一门精深的学问，以上为简易排盘结果，仅供参考。</p>';
+    html += '<p>如需深入分析，建议结合大运、流年、四化飞星叠加等因素综合判断。</p>';
+    html += '</div>';
+
+    return html;
+}
+
+// ===== 开始排盘 =====
+function calculateZiwei() {
+    const name = document.getElementById('nameInput').value;
+    const gender = document.getElementById('genderInput').value;
+    const date = document.getElementById('dateInput').value;
+    const time = document.getElementById('timeInput').value;
+
+    if (!name || !date || !time) {
+        window.showToast('请填写完整信息');
+        return;
+    }
+
+    window.showToast('正在排盘...');
+
+    setTimeout(() => {
+        const result = calcZiweiSimple(date, time, gender);
+        const resultHTML = generateZiweiResultHTML(result, name, gender, date, time);
+        document.getElementById('resultContainer').innerHTML = resultHTML;
+        switchTab('result');
+
+        const toast = document.querySelector('.toast');
+        if (toast) toast.remove();
+    }, 1500);
+}
+
+// ===== 显示知识详情 =====
+function showKnowledgeDetail(topic) {
+    let content = '';
+    switch(topic) {
+        case 'basics':
+            content = '<div class="section"><h2>📖 紫微斗数基础</h2>'
+                + '<p>紫微斗数，相传为陈抟老祖（陈希夷）所创，是中国古代最精密的命理学之一。它以人的出生年月日时为依据，排出十二宫命盘，再根据十四主星及其他辅星在十二宫中的分布，推断人一生的命运走势。</p>'
+                + '<h3>命盘结构</h3><ul>'
+                + '<li><strong>十二宫</strong>：命宫、兄弟宫、夫妻宫、子女宫、财帛宫、疾厄宫、迁移宫、交友宫、官禄宫、田宅宫、福德宫、父母宫</li>'
+                + '<li><strong>十四主星</strong>：紫微、天机、太阳、武曲、天同、廉贞（紫微星系）+ 天府、太阴、贪狼、巨门、天相、天梁、七杀、破军（天府星系）</li>'
+                + '<li><strong>四化飞星</strong>：化禄、化权、化科、化忌，随年干变化</li></ul></div>';
+            break;
+        case 'major14':
+            content = '<div class="section"><h2>⭐ 十四主星详解</h2>'
+                + '<table class="result-table"><tr><th>主星</th><th>属性</th><th>含义</th></tr>'
+                + '<tr><td>紫微</td><td>阴土</td><td>帝座，尊贵，领导力</td></tr>'
+                + '<tr><td>天机</td><td>阴木</td><td>智慧，谋略，变动</td></tr>'
+                + '<tr><td>太阳</td><td>阳火</td><td>光明，博爱，事业</td></tr>'
+                + '<tr><td>武曲</td><td>阴金</td><td>财富，刚毅，果断</td></tr>'
+                + '<tr><td>天同</td><td>阳水</td><td>福气，享受，温和</td></tr>'
+                + '<tr><td>廉贞</td><td>阴火</td><td>忠贞，感情，是非</td></tr>'
+                + '<tr><td>天府</td><td>阳土</td><td>财库，稳健，保守</td></tr>'
+                + '<tr><td>太阴</td><td>阴水</td><td>阴柔，财富，内敛</td></tr>'
+                + '<tr><td>贪狼</td><td>阳木/水</td><td>桃花，欲望，多才</td></tr>'
+                + '<tr><td>巨门</td><td>阴水/金</td><td>口舌，是非，研究</td></tr>'
+                + '<tr><td>天相</td><td>阳水</td><td>印星，辅佐，端庄</td></tr>'
+                + '<tr><td>天梁</td><td>阳土</td><td>荫星，逢凶化吉</td></tr>'
+                + '<tr><td>七杀</td><td>阴金/火</td><td>将星，冒险，冲锋</td></tr>'
+                + '<tr><td>破军</td><td>阴水/金</td><td>耗星，破坏与重建</td></tr>'
+                + '</table></div>';
+            break;
+        case '12palaces':
+            content = '<div class="section"><h2>🏛️ 十二宫位含义</h2>'
+                + '<table class="result-table"><tr><th>宫位</th><th>含义</th><th>看什么</th></tr>'
+                + '<tr><td>命宫</td><td>性格、先天格局</td><td>主星决定核心性格</td></tr>'
+                + '<tr><td>兄弟宫</td><td>兄弟姐妹、朋友伙伴</td><td>与手足的关系</td></tr>'
+                + '<tr><td>夫妻宫</td><td>婚姻、感情模式</td><td>配偶性格、感情走势</td></tr>'
+                + '<tr><td>子女宫</td><td>子女、生育、桃花</td><td>子女缘分、性生活</td></tr>'
+                + '<tr><td>财帛宫</td><td>收入、理财方式</td><td>赚钱能力、金钱观</td></tr>'
+                + '<tr><td>疾厄宫</td><td>健康、疾病</td><td>体质、易患疾病</td></tr>'
+                + '<tr><td>迁移宫</td><td>外出、旅行、人际</td><td>外地发展、贵人</td></tr>'
+                + '<tr><td>交友宫</td><td>朋友、下属、人际</td><td>社交能力、下属运</td></tr>'
+                + '<tr><td>官禄宫</td><td>事业、工作、学业</td><td>职业方向、工作运</td></tr>'
+                + '<tr><td>田宅宫</td><td>不动产、家庭</td><td>房产运、家居环境</td></tr>'
+                + '<tr><td>福德宫</td><td>精神、福气、内心</td><td>精神世界、晚运</td></tr>'
+                + '<tr><td>父母宫</td><td>父母、长辈、学历</td><td>父母关系、贵人运</td></tr>'
+                + '</table></div>';
+            break;
+        case '4hua':
+            content = '<div class="section"><h2>✨ 四化飞星</h2>'
+                + '<p>四化是紫微斗数中最核心的动态分析工具。每颗主星在特定年干下会产生"化禄、化权、化科、化忌"四种变化。</p>'
+                + '<h3>四化含义</h3><ul>'
+                + '<li><strong>化禄</strong>：福气、财富、人缘、顺利。化禄所到之处，该星的力量得到增强，带来好运。</li>'
+                + '<li><strong>化权</strong>：权力、掌控、行动力、竞争力。化权让该星更具主动性和掌控力。</li>'
+                + '<li><strong>化科</strong>：名声、贵人、考试、声誉。化科带来名声和贵人运，利于考试和公开事务。</li>'
+                + '<li><strong>化忌</strong>：阻碍、执着、欠债、波折。化忌所在之处表示该领域有阻碍或需要特别留意。</li>'
+                + '</ul>'
+                + '<h3>年生四化查法</h3><p>甲年：廉贞禄、破军权、武曲科、太阳忌</p>'
+                + '<p>乙年：天机禄、天梁权、紫微科、太阴忌</p>'
+                + '<p>丙年：天同禄、天机权、文昌科、廉贞忌</p>'
+                + '<p>丁年：太阴禄、天同权、天机科、巨门忌</p></div>';
+            break;
+        case 'auxstars':
+            content = '<div class="section"><h2>🌟 辅星与杂曜</h2>'
+                + '<p>除十四主星外，紫微斗数还有众多辅星和杂曜，它们对命盘起辅助修饰作用。</p>'
+                + '<h3>重要辅星</h3><ul>'
+                + '<li><strong>左辅、右弼</strong>：贵人星，增助力，左辅为阳贵，右弼为阴贵</li>'
+                + '<li><strong>文昌、文曲</strong>：文采星，利于学业、艺术、考试</li>'
+                + '<li><strong>天魁、天钺</strong>：魁钺双星，代表贵人运和机遇</li>'
+                + '<li><strong>禄存、天马</strong>：禄存主财富，天马主变动和远行</li>'
+                + '</ul>'
+                + '<h3>煞星</h3><ul>'
+                + '<li><strong>擎羊、陀罗</strong>：羊刃煞，主伤残、纠纷</li>'
+                + '<li><strong>火星、铃星</strong>：火铃煞，主突发、激烈</li>'
+                + '<li><strong>地空、地劫</strong>：空劫煞，主破财、空虚</li>'
+                + '</ul></div>';
+            break;
+        case 'doushu':
+            content = '<div class="section"><h2>📊 如何看命盘</h2>'
+                + '<p>紫微斗数命盘阅读有一定的次序和方法：</p>'
+                + '<h3>阅读步骤</h3><ol>'
+                + '<li><strong>先看命宫</strong>：了解命主的核心性格和先天格局</li>'
+                + '<li><strong>再看身宫</strong>：身宫代表后天努力方向和晚年运势</li>'
+                + '<li><strong>看十二宫</strong>：逐一分析各宫位的主星和辅星</li>'
+                + '<li><strong>看四化飞星</strong>：了解哪些星被激活，影响力如何</li>'
+                + '<li><strong>看大运和流年</strong>：时间维度上的运势变化</li>'
+                + '</ol>'
+                + '<h3>判断原则</h3><ul>'
+                + '<li>庙旺利陷：星曜在不同地支宫位有强弱之分</li>'
+                + '<li>星曜组合：多颗星同宫会产生复合效应</li>'
+                + '<li>四化引动：生年化忌未必凶，大运化禄未必吉</li>'
+                + '</ul></div>';
+            break;
+        default:
+            content = '<div class="section"><p>内容建设中...</p></div>';
+    }
+
+    document.getElementById('resultContainer').innerHTML = content;
+    switchTab('result');
+}
+
+// ===== 图片上传（复用 main.js 的 triggerImageUpload）=====
+// triggerImageUpload 已在 main.js 中定义
+
+// ===== 页面初始化 =====
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof createStars === 'function') createStars();
+});
+</script>
+
+</body>
+</html>

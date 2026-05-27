@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>六爻占卜 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* 六爻占卜页面特定样式 */
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.yao-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+}
+
+.yao-item {
+    text-align: center;
+    padding: 0.8rem 0.3rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.yao-item:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+}
+
+.yao-item.active {
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1));
+    border-color: rgba(255,215,0,0.5);
+}
+
+.yao-name {
+    font-size: 0.75rem;
+    color: #ffd700;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.yao-symbol {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.yao-desc {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.6);
+}
+
+.gua-container {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+}
+
+.gua-name {
+    font-size: 1.5rem;
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.gua-desc {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.8;
+}
+
+.trigram-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.trigram-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.trigram-card:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    transform: translateY(-2px);
+}
+
+.trigram-card h3 {
+    color: #ffd700;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.trigram-card p {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.7);
+}
+
+.divination-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+}
+
+.result-area {
+    display: none;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-card h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.result-card p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+}
+
+@media (max-width: 768px) {
+    .yao-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .trigram-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button type="button" class="back-btn" onclick="history.back()">←</button>
+        <h1>🎋 六爻占卜</h1>
+    </div>
+
+    <div class="content-area">
+                <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('liuya')">📷 上传图片分析</button>
+        </div>
+<div class="section">
+            <h2>六爻占卜简介</h2>
+            <p>六爻占卜是中国古代的一种预测方法，源于《周易》。通过蓍草或铜钱起卦，得到六个爻（线条），组成一个完整的卦象，然后根据卦象和爻辞来推断吉凶祸福。</p>
+            <p>六爻占卜广泛应用于决策、择业、婚姻、健康、出行等各个方面，是 Chinese 传统预测学的重要组成部分。</p>
+        </div>
+
+        <div class="section">
+            <h2>六爻基础知识</h2>
+            
+            <div class="trigram-grid">
+                <div class="trigram-card">
+                    <h3>阴阳爻</h3>
+                    <p><strong>阳爻（—）：</strong>表示阳性、刚健、主动</p>
+                    <p><strong>阴爻（--）：</strong>表示阴性、柔顺、被动</p>
+                </div>
+                
+                <div class="trigram-card">
+                    <h3>八卦</h3>
+                    <p>乾、坤、震、巽、坎、离、艮、兑</p>
+                    <p>分别代表天、地、雷、风、水、火、山、泽</p>
+                </div>
+                
+                <div class="trigram-card">
+                    <h3>六十四卦</h3>
+                    <p>由八卦两两组合而成</p>
+                    <p>如乾为天、坤为地、水火既济等</p>
+                </div>
+                
+                <div class="trigram-card">
+                    <h3>世应爻</h3>
+                    <p><strong>世爻：</strong>代表问卦者自己</p>
+                    <p><strong>应爻：</strong>代表所问之事或对方</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>六爻占卜方法</h2>
+            <p><strong>1. 起卦：</strong>使用三枚铜钱，抛掷六次，每次记录阴阳（正面为阳，反面为阴），从下往上排列，得到一个六爻卦。</p>
+            <p><strong>2. 定世应：</strong>根据卦象确定世爻和应爻的位置，世爻代表自己，应爻代表对方或所问之事。</p>
+            <p><strong>3. 装六亲：</strong>根据卦象和世爻的五行属性，确定各爻的六亲关系（父母、兄弟、妻财、官鬼、子孙）。</p>
+            <p><strong>4. 分析爻位：</strong>分析各爻的阴阳属性、位置关系、生克冲合等，判断吉凶。</p>
+            <p><strong>5. 断卦：</strong>综合以上信息，结合卦辞、爻辞、世应关系等，给出预测结果和建议。</p>
+        </div>
+
+        <div class="section">
+            <h2>六爻占卜工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                心中默念你想问的问题，然后点击下方按钮开始起卦。系统将模拟抛掷铜钱的过程，为你生成一个六爻卦象，并给出详细的解释和建议。
+            </p>
+            
+            <div class="divination-form">
+                <div class="form-group">
+                    <label class="form-label">请输入你想问的问题</label>
+                    <input type="text" class="form-input" id="questionInput" placeholder="例如：我今年的财运如何？" maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">占卜类型</label>
+                    <select class="form-input" id="typeInput">
+                        <option value="career">事业运势</option>
+                        <option value="wealth">财运求财</option>
+                        <option value="marriage">婚姻感情</option>
+                        <option value="health">健康疾病</option>
+                        <option value="study">学业考试</option>
+                        <option value="travel">出行迁移</option>
+                        <option value=" lawsuit">官司诉讼</option>
+                        <option value="lost">失物寻找</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="submit-btn" onclick="startDivination()">开始起卦</button>
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>六爻占卜的注意事项</h2>
+            <p><strong>1. 心诚则灵：</strong>占卜时要专心致志，心中默念问题，不要三心二意。</p>
+            <p><strong>2. 一事一占：</strong>每次只能问一个问题，不要同时问多个问题。</p>
+            <p><strong>3. 不可反复占：</strong>同一个问题不要反复占卜，否则结果会不准。</p>
+            <p><strong>4. 理性对待：</strong>占卜结果仅供参考，重大决策还需结合现实情况理性分析。</p>
+            <p><strong>5. 心存善念：</strong>占卜的目的是趋吉避凶，而不是为了满足好奇心或恶作剧。</p>
+        </div>
+
+        <div class="section">
+            <h2>六爻占卜的历史渊源</h2>
+            <p>六爻占卜起源于周代，以《周易》为基础。《周易》是中国最古老的占卜经典，被誉为"群经之首，大道之源"。</p>
+            <p>汉代京房将六爻占卜系统化，创立了"纳甲法"，使六爻占卜更加完善。后世出现了许多六爻占卜的专著，如《火珠林》《卜筮正宗》《增删卜易》等。</p>
+            <p>现代六爻占卜则结合心理学、概率论等知识，更加注重科学性和实用性。许多人在重大决策前都会用六爻占卜来参考，以帮助自己做出更好的选择。</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js">
+// 显示提示
+function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+</script>
+<script>
+function startDivination() {
+    const question = document.getElementById('questionInput').value.trim();
+    const type = document.getElementById('typeInput').value;
+    
+    if (!question) {
+        window.showToast('请输入你想问的问题');
+        return;
+    }
+    
+    window.showToast('正在起卦...');
+    
+    // 模拟起卦过程
+    setTimeout(() => {
+        const result = {
+            question: question,
+            type: type,
+            gua: {
+                name: ['乾为天', '坤为地', '水雷屯', '山水蒙', '水天需', '天水讼', '地水师', '水地比'][Math.floor(Math.random() * 8)],
+                yaos: Array.from({length: 6}, () => Math.random() > 0.5 ? '阳爻' : '阴爻')
+            },
+            analysis: '此卦象显示' + ['大吉', '中吉', '小吉', '平', '小凶', '中凶', '大凶'][Math.floor(Math.random() * 7)] + 
+                      '，建议' + ['积极进取', '稳重行事', '等待时机', '谨慎决策'][Math.floor(Math.random() * 4)] + 
+                      '，' + ['可得好运', '能化险为夷', '需多加小心', '宜静不宜动'][Math.floor(Math.random() * 4)] + '。',
+            advice: '针对你的问题"' + question + '"，此卦象的启示是：' + 
+                    ['顺应天时', '把握机遇', '稳中求进', '韬光养晦'][Math.floor(Math.random() * 4)] + 
+                    '，' + ['必有好结果', '可避凶趋吉', '需付出努力', '应耐心等待'][Math.floor(Math.random() * 4)] + '。'
+        };
+        
+        showResult(result);
+    }, 2000);
+}
+
+function showResult(result) {
+    const yaoSymbols = result.gua.yaos.map(yao => yao === '阳爻' ? '—' : '--');
+    
+    let html = `
+        <div class="result-card fade-in">
+            <h3>🎋 占卜结果</h3>
+            <p><strong>所问之事：</strong>${result.question}</p>
+            <p><strong>占卜类型：</strong>${document.getElementById('typeInput').options[document.getElementById('typeInput').selectedIndex].text}</p>
+        </div>
+        
+        <div class="gua-container fade-in">
+            <div class="gua-name">${result.gua.name}</div>
+            <div style="margin: 1.5rem 0; font-size: 2rem; letter-spacing: 0.5rem;">
+                ${yaoSymbols.reverse().map(symbol => `<div>${symbol}</div>`).join('')}
+            </div>
+            <div class="gua-desc">
+                ${result.analysis}
+            </div>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📊 卦象分析</h3>
+            <p>${result.analysis}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>💡 建议与启示</h3>
+            <p>${result.advice}</p>
+        </div>
+        
+        <div class="result-card fade-in">
+            <h3>📝 断卦提要</h3>
+            <p>1. <strong>世爻分析：</strong>世爻${['旺相', '休囚', '空亡'][Math.floor(Math.random() * 3)]}，说明问卦者目前状态${['较好', '一般', '不佳'][Math.floor(Math.random() * 3)]}。</p>
+            <p>2. <strong>应爻分析：</strong>应爻${['生世', '克世', '比和'][Math.floor(Math.random() * 3)]}，说明所问之事${['有利', '不利', '平顺'][Math.floor(Math.random() * 3)]}。</p>
+            <p>3. <strong>六亲分析：</strong>${['父母爻', '兄弟爻', '妻财爻', '官鬼爻', '子孙爻'][Math.floor(Math.random() * 5)]}${['旺相', '休囚'][Math.floor(Math.random() * 2)]}，说明${['长辈助力大', '朋友关系复杂', '财运不错', '工作有阻碍', '子女缘分深'][Math.floor(Math.random() * 5)]}。</p>
+            <p>4. <strong>综合判断：</strong>${result.analysis}</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+            <button type="button" class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新占卜</button>
+        </div>
+    `;
+    
+    document.getElementById('resultArea').innerHTML = html;
+    document.getElementById('resultArea').style.display = 'block';
+    document.querySelector('.divination-form').style.display = 'none';
+}
+
+function resetForm() {
+    document.querySelector('.divination-form').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('questionInput').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

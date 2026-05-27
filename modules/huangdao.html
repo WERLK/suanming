@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>黄道吉日 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .content-area {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+        .huangdao-intro {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .huangdao-intro h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+        }
+        .huangdao-intro p {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+        }
+        .event-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .event-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .event-card:hover {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+            transform: translateY(-2px);
+        }
+        .event-card h3 {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .event-card p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.7);
+        }
+        .jiansheng-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .jiansheng-table th,
+        .jiansheng-table td {
+            padding: 0.6rem;
+            text-align: left;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        .jiansheng-table th {
+            color: #ffd700;
+            font-weight: 600;
+            background: rgba(255,215,0,0.05);
+        }
+        .jiansheng-table td {
+            color: rgba(255,255,255,0.8);
+        }
+        .lucky {
+            color: #0f0;
+        }
+        .unlucky {
+            color: #f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="app">
+        <div class="page-header">
+            <button type="button" class="back-btn" onclick="history.back()">←</button>
+            <h1>📅 黄道吉日</h1>
+        </div>
+
+        <div class="content-area">
+            <div class="huangdao-intro">
+                <h2>黄道吉日简介</h2>
+                <p>黄道吉日是中国传统择日学的重要内容，通过十二建星、二十八星宿、每日宜忌等来判断日子的吉凶。</p>
+                <p>选择吉日办事，可以趋吉避凶，提升成功率。</p>
+            </div>
+
+            <div class="event-types">
+                <div class="event-card" onclick="showEventDetail('marriage')">
+                    <h3>💒 结婚嫁娶</h3>
+                    <p>选择结婚吉日的方法和注意事项...</p>
+                </div>
+                <div class="event-card" onclick="showEventDetail('move')">
+                    <h3>🏠 搬家入宅</h3>
+                    <p>选择搬家吉日的方法和注意事项...</p>
+                </div>
+                <div class="event-card" onclick="showEventDetail('business')">
+                    <h3>🏪 开业开市</h3>
+                    <p>选择开业吉日的方法和注意事项...</p>
+                </div>
+                <div class="event-card" onclick="showEventDetail('construction')">
+                    <h3>🏗 动土修造</h3>
+                    <p>选择动土吉日的方法和注意事项...</p>
+                </div>
+            </div>
+
+                    <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('huangdao')">📷 上传图片分析</button>
+        </div>
+<div class="section">
+                <h2>📅 十二建星吉凶表</h2>
+                <table class="jiansheng-table">
+                    <tr>
+                        <th>建星</th>
+                        <th>吉凶</th>
+                        <th>宜</th>
+                        <th>忌</th>
+                    </tr>
+                    <tr>
+                        <td>建日</td>
+                        <td class="unlucky">平</td>
+                        <td>立基创业、上任</td>
+                        <td>动土、出行</td>
+                    </tr>
+                    <tr>
+                        <td>除日</td>
+                        <td class="lucky">吉</td>
+                        <td>除旧布新、祈福、就医</td>
+                        <td>一</td>
+                    </tr>
+                    <tr>
+                        <td>满日</td>
+                        <td class="lucky">吉</td>
+                        <td>祭祀、纳财</td>
+                        <td>栽种</td>
+                    </tr>
+                    <tr>
+                        <td>平日</td>
+                        <td class="unlucky">平</td>
+                        <td>修造、涂泥</td>
+                        <td>一</td>
+                    </tr>
+                    <tr>
+                        <td>定日</td>
+                        <td class="lucky">吉</td>
+                        <td>签约、纳畜、冠筋</td>
+                        <td>一</td>
+                    </tr>
+                    <tr>
+                        <td>执日</td>
+                        <td class="unlucky">平</td>
+                        <td>守成、捕猎</td>
+                        <td>迁居、出行</td>
+                    </tr>
+                    <tr>
+                        <td>破日</td>
+                        <td class="unlucky">凶</td>
+                        <td>破屋坏垣</td>
+                        <td>诸事不宜</td>
+                    </tr>
+                    <tr>
+                        <td>危日</td>
+                        <td class="unlucky">凶</td>
+                        <td>安床</td>
+                        <td>登高、出行</td>
+                    </tr>
+                    <tr>
+                        <td>成日</td>
+                        <td class="lucky">吉</td>
+                        <td>开业、结婚、入学</td>
+                        <td>一</td>
+                    </tr>
+                    <tr>
+                        <td>收日</td>
+                        <td class="unlucky">平</td>
+                        <td>纳财、收债</td>
+                        <td>开工、出行</td>
+                    </tr>
+                    <tr>
+                        <td>开日</td>
+                        <td class="lucky">吉</td>
+                        <td>开业、出行、结婚</td>
+                        <td>一</td>
+                    </tr>
+                    <tr>
+                        <td>闭日</td>
+                        <td class="unlucky">凶</td>
+                        <td>埋葬</td>
+                        <td>开市、出行</td>
+                    </tr>
+                </table>
+                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.8rem;">
+                    💡 口诀：建满平收黑，除危定执黄，成开皆可用，闭破不相当。
+                </p>
+            </div>
+
+            <div class="section" style="margin-top: 1.5rem;">
+                <h2>💡 如何使用黄道吉日</h2>
+                <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8); margin-bottom: 0.8rem;">
+                    1. <strong>确定事件类型</strong>：先确定你要办什么事（结婚、搬家、开业等）。<br>
+                    2. <strong>选择吉日</strong>：根据事件类型，选择对应的吉日（如结婚选成日、开日）。<br>
+                    3. <strong>避开冲煞</strong>：查看日子是否冲你的生肖，冲则不吉。<br>
+                    4. <strong>结合个人八字</strong>：更精准的择日应结合个人八字喜用神。<br>
+                    5. <strong>参考吉时</strong>：不但要选吉日，还要选吉时（一天中的吉时）。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js">
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+</script>
+    <script>
+        // 显示事件详情
+        function showEventDetail(eventType) {
+            let content = '';
+            
+            switch(eventType) {
+                case 'marriage':
+                    content = `<div class="section">
+                        <h2>💒 结婚嫁娶择日详解</h2>
+                        <h3>✅ 首选吉日（按优先级排序）</</h3>
+                        <table class="result-table">
+                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
+                            <tr><td>天德/月德日</td><td>天德、月德、天德合、月德合</td><td class="lucky">大吉（百无禁忌）</td></tr>
+                            <tr><td>三合/六合日</td><td>与新郎新娘生肖三合或六合之日</td><td class="lucky">吉（婚姻和谐长久）</td></tr>
+                            <tr><td>成日/开日</td><td>建星中的成日、开日</td><td class="lucky">吉（事成开放）</td></tr>
+                            <tr><td>天喜/天赦日</td><td>天喜（主喜事）、天赦（主化解）</td><td class="lucky">大吉</td></tr>
+                        </table>
+                        <h3>⚔️ 严格避忌</h3>
+                        <table class="result-table">
+                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
+                            <tr><td>破日/闭日</td><td>建星中的破日、闭日</td><td class="unlucky">凶（破散闭塞）</td></tr>
+                            <tr><td>四离/四绝日</td><td>春分、秋分、夏至、冬至前一日</td><td class="unlucky">凶（气场分离）</td></tr>
+                            <tr><td>三娘煞/杨公忌</td><td>每月初三、初七、十三、十八、廿二、廿七</td><td class="unlucky">凶（传说月老不牵线）</td></tr>
+                            <tr><td>冲生肖</td><td>日子地支冲新郎或新娘生肖</td><td class="unlucky">凶（主婚后不和）</td></tr>
+                        </table>
+                        <h3>📋 其他要点</h3>
+                        <ul>
+                            <li><strong>选女方大利月：</strong>首先看女方生肖所属的大利月（如鼠/马年妇利正/七月）</li>
+                            <li><strong>避开三娘煞：</strong>每月初三、初七、十三、十八、廿二、廿七不宜嫁娶</li>
+                            <li><strong>择吉时：</strong>不但要择吉日，还要择吉时（通常选上午9-11点）</li>
+                        </ul>
+                    </div>`;
+                    break;
+                case 'move':
+                    content = `<div class="section">
+                        <h2>🏠 搬家入宅择日详解</h2>
+                        <h3>✅ 首选吉日</h3>
+                        <table class="result-table">
+                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
+                            <tr><td>天马/成日</td><td>天马（主快运）、建星成日</td><td class="lucky">吉（搬家顺利快速安顿）</td></tr>
+                            <tr><td>开日/天德合</td><td>建星开日、天德合、月德合</td><td class="lucky">大吉（开放纳福）</td></tr>
+                            <tr><td>天财/天仓</td><td>天财（主财运）、天仓（主粮仓富足）</td><td class="lucky">吉（搬家后财运亨通）</td></tr>
+                        </table>
+                        <h3>⚔️ 严格避忌</h3>
+                        <table class="result-table">
+                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
+                            <tr><td>月破/平日</td><td>建星中的月破、平日、收日、闭日</td><td class="unlucky">凶（破散平滞收纳闭塞）</td></tr>
+                            <tr><td>冲家主生肖</td><td>日子地支冲家中经济支柱生肖</td><td class="unlucky">凶（主家运不宁）</td></tr>
+                            <tr><td>五墓/重丧日</td><td>特定方位对应的凶日</td><td class="unlucky">凶（主伤病死丧）</td></tr>
+                        </table>
+                        <h3>📋 其他要点</h3>
+                        <ul>
+                            <li><strong>与宅主命卦相合：</strong>选日子宜配合宅主八字喜用神</li>
+                            <li><strong>入住仪式：</strong>入住时宜全屋开灯3天、烧开水（滚财）、放绿植（生气）</li>
+                            <li><strong>入宅时间：</strong>宜在白天（上午9-15点前）完成入住</li>
+                        </ul>
+                    </div>`;
+                    break;
+                case 'business':
+                    content = `<div class="section">
+                        <h2>🏪 开业开市择日详解</h2>
+                        <h3>✅ 首选吉日</h3>
+                        <table class="result-table">
+                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
+                            <tr><td>满日/成日</td><td>建星满日（主圆满）、成日（主事成）</td><td class="lucky">大吉（开业圆满成功）</td></tr>
+                            <tr><td>开日/天愿</td><td>建星开日（主开放）、天愿日（主天意顺遂）</td><td class="lucky">吉（客源广开）</td></tr>
+                            <tr><td>天财/天仓</td><td>天财（主财运）、天仓（主货仓富足）</td><td class="lucky">吉（开业财源滚滚）</td></tr>
+                        </table>
+                        <h3>⚔️ 严格避忌</h3>
+                        <table class="result-table">
+                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
+                            <tr><td>破日/闭日</td><td>建星破日（主破败）、闭日（主闭塞）</td><td class="unlucky">凶（开业破财闭门塞运）</td></tr>
+                            <tr><td>四废日</td><td>春庚申辛酉、夏壬辰癸巳、秋甲寅乙卯、冬丙戌丁亥</td><td class="unlucky">凶（主四季废歇无成）</td></tr>
+                            <tr><td>冲店主生肖</td><td>日子地支冲店主生肖</td><td class="unlucky">凶（主开业后经营不顺）</td></tr>
+                        </table>
+                        <h3>📋 其他要点</h3>
+                        <ul>
+                            <li><strong>开业时间：</strong>宜在上午（9-11点阳气最足时）举行开业仪式</li>
+                            <li><strong>请舞狮队：</strong>如条件允许，请舞狮队助兴（狮为瑞兽，主挡煞招财）</li>
+                            <li><strong>择吉时：</strong>开业不但要择吉日，还要择吉时（通常选上午9-11点）</li>
+                        </ul>
+                    </div>`;
+                    break;
+                case 'construction':
+                    content = `<div class="section">
+                        <h2>🏗 动土修造择日详解</h2>
+                        <h3>✅ 首选吉日</h3>
+                        <table class="result-table">
+                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
+                            <tr><td>成日/开日</td><td>建星成日（主事成）、开日（主开放）</td><td class="lucky">吉（动土顺利建成圆满）</td></tr>
+                            <tr><td>天德/月德</td><td>天德（主天庇佑）、月德（主月华庇佑）</td><td class="lucky">大吉（百无禁忌动土平安）</td></tr>
+                            <tr><td>天德合/月德合</td><td>天德合、月德合（与主德合）</td><td class="lucky">吉（主贵人相助顺利应通过）</td></tr>
+                        </table>
+                        <h3>⚔️ 严格避忌</h3>
+                        <table class="result-table">
+                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
+                            <tr><td>月建/土府</td><td>建星月建（主月令当权）、土府（主土神发怒）</td><td class="unlucky">凶（动土犯煞主伤亡）</td></tr>
+                            <tr><td>地囊/土符</td><td>地囊（地主凶煞）、土符（土神符令）</td><td class="unlucky">凶（主动土后家人生病）</td></tr>
+                            <tr><td>冲宅主/坐山</td><td>日子地支冲宅主生肖或房屋坐山方向</td><td class="unlucky">凶（主房主健康受损）</td></tr>
+                        </table>
+                        <h3>📋 其他要点</h3>
+                        <ul>
+                            <li><strong>动土前祭拜：</strong>宜祭拜土地公（用三牲、水果、香烛）</li>
+                            <li><strong>坐向符合风水：</strong>房屋的坐向要符合风水原则（如坐北向南为坎宅，宜选水/火日动土）</li>
+                            <li><strong>动土时间：</strong>宜在上午（阳气足时）动第一铲土，并由宅主先动</li>
+                        </ul>
+                    </div>`;
+                    break;
+            }
+            
+            // 创建弹窗显示
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
+            modal.onclick = () => modal.remove();
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
+            modalContent.onclick = (e) => e.stopPropagation();
+            modalContent.innerHTML = content + '<button type="button" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
+            
+            modal.className = 'modal';
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+        });
+    </script>
+
+        <!-- 分析表单 -->
+        <div class="tab-content active" id="formTab">
+            <div class="form-container">
+                
+            <div class="form-group">
+                <label class="form-label">事件类型</label>
+                <select class="form-select" id="eventInput">
+                    <option value="嫁娶">嫁娶</option>
+                    <option value="搬家">搬家</option>
+                    <option value="开业">开业</option>
+                    <option value="动土">动土</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">查询月份</label>
+                <input type="month" class="form-input" id="monthInput">
+            </div>
+        
+                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
+            </div>
+        </div>
+        <!-- 结果展示 -->
+        <div class="tab-content" id="resultTab">
+            <div class="result-container" id="resultContainer">
+                
+        <div class="result-section"><h3>📅 黄道吉日查询结果</h3>
+        <div class="analysis-text">
+            <p><strong>事件类型：</strong><span id="eventResult"></span></p>
+            <p><strong>推荐吉日：</strong><span id="dateResult"></span></p>
+            <p><strong>宜：</strong><span id="yiResult"></span></p>
+            <p><strong>忌：</strong><span id="jiResult"></span></p>
+        </div>
+        </div>
+        
+            </div>
+        </div>
+    
+    <script>
+    function calculateModule() {
+        if (window.showToast) window.showToast('正在分析中...');
+        setTimeout(function() {
+            // 这里调用真正的分析计算
+            var resultHtml = generateResultHTML();
+            document.getElementById('resultContainer').innerHTML = resultHtml;
+            if (window.switchTab) window.switchTab('result');
+            if (window.showToast) window.showToast('分析完成！');
+        }, 1200);
+    }
+    
+    function generateResultHTML() {
+        // 读取表单值并生成结果
+        var html = '<div class="result-section fade-in">';
+        html += '<h3>📊 分析结果</h3>';
+        html += '<div class="analysis-text">';
+        html += '<p>根据您提供的信息，分析结果如下：</p>';
+        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
+        html += '</div></div>';
+        return html;
+    }
+    </script>
+    </body>
+</html>

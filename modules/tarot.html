@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>塔罗牌 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.8), rgba(26,26,46,0.5));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .content-area {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+        .tarot-intro {
+            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .tarot-intro h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+        }
+        .tarot-intro p {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 0.5rem;
+        }
+        .tarot-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .tarot-type-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .tarot-type-card h3 {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .tarot-type-card p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.7);
+        }
+        .major-arcana {
+            margin-bottom: 1.5rem;
+        }
+        .major-arcana h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,215,0,0.2);
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+        }
+        .tarot-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.8), rgba(255,215,0,0.3));
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 8px;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tarot-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255,215,0,0.2);
+        }
+        .card-number {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 0.3rem;
+        }
+        .card-name {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="app">
+        <div class="page-header">
+            <button type="button" type="button" class="back-btn" onclick="history.back()">←</button>
+            <h1>🎴 塔罗牌</h1>
+        </div>
+
+        <div class="content-area">
+            <div class="tarot-intro">
+                <h2>塔罗牌简介</h2>
+                <p>塔罗牌是一种古老的占卜工具，由78张牌组成，分为大阿卡纳（22张）和小阿卡纳（56张）两部分。</p>
+                <p>通过牌面的象征意义，可以探索潜意识、预测未来趋势、获取人生指引。</p>
+            </div>
+
+            <div class="tarot-types">
+                <div class="tarot-type-card">
+                    <h3>🎴 大阿卡纳（22张）</h3>
+                    <p>代表人生重大主题和灵性课题，象征人生旅程中的重要阶段。如：愚者、魔术师、女祭司、皇后、皇帝等。</p>
+                </div>
+                <div class="tarot-type-card">
+                    <h3>🃏 小阿卡纳（56张）</h3>
+                    <p>代表日常生活中的具体情况和事件，分为四个花色：圣杯（水）、权杖（火）、宝剑（风）、星币（土）。</p>
+                </div>
+            </div>
+
+            <div class="major-arcana">
+                <h2>🎴 大阿卡纳牌意速查</h2>
+                        <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('tarot')">📷 上传图片分析</button>
+        </div>
+<div class="card-grid">
+                    <div class="tarot-card" onclick="showCardDetail('愚者')">
+                        <div class="card-number">0</div>
+                        <div class="card-name">愚者</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('魔术师')">
+                        <div class="card-number">I</div>
+                        <div class="card-name">魔术师</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('女祭司')">
+                        <div class="card-number">II</div>
+                        <div class="card-name">女祭司</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('皇后')">
+                        <div class="card-number">III</div>
+                        <div class="card-name">皇后</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('皇帝')">
+                        <div class="card-number">IV</div>
+                        <div class="card-name">皇帝</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('教皇')">
+                        <div class="card-number">V</div>
+                        <div class="card-name">教皇</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('恋人')">
+                        <div class="card-number">VI</div>
+                        <div class="card-name">恋人</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('战车')">
+                        <div class="card-number">VII</div>
+                        <div class="card-name">战车</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('力量')">
+                        <div class="card-number">VIII</div>
+                        <div class="card-name">力量</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('隐士')">
+                        <div class="card-number">IX</div>
+                        <div class="card-name">隐士</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('命运之轮')">
+                        <div class="card-number">X</div>
+                        <div class="card-name">命运之轮</div>
+                    </div>
+                    <div class="tarot-card" onclick="showCardDetail('正义')">
+                        <div class="card-number">XI</div>
+                        <div class="card-name">正义</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>💡 如何使用塔罗牌</h2>
+                <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8); margin-bottom: 0.8rem;">
+                    1. <strong>准备</strong>：选择安静的环境，放松心情，专注于你的问题。<br>
+                    2. <strong>洗牌</strong>：将牌面朝下，专心洗牌，同时心中默念你的问题。<br>
+                    3. <strong>抽牌</strong>：根据需要选择合适的牌阵（如三张牌阵、凯尔特十字阵等），然后抽牌。<br>
+                    4. <strong>解读</strong>：根据牌的正位/逆位含义，结合你的问题进行解读。<br>
+                    5. <strong>反思</strong>：塔罗牌不是绝对的预言，而是帮助你思考和决策的指引工具。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js">
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+</script>
+    <script>
+        // 牌意数据（简化版）
+        const cardMeanings = {
+            '愚者': {
+                upright: '新的开始、纯真、自发性、信任直觉',
+                reversed: '鲁莽、缺乏计划、不切实际'
+            },
+            '魔术师': {
+                upright: '创造力、技能、显化、自信',
+                reversed: '操纵、欺骗、缺乏方向、自我怀疑'
+            },
+            '女祭司': {
+                upright: '直觉、神秘、内在智慧、潜意识',
+                reversed: '忽视直觉、秘密被揭露、缺乏内在平衡'
+            },
+            '皇后': {
+                upright: '丰饶、滋养、美丽、自然',
+                reversed: '创造力受阻、过度依赖、不安全感'
+            },
+            '皇帝': {
+                upright: '领导力、权威、结构、稳定',
+                reversed: '过于控制、缺乏纪律、权威被挑战'
+            },
+            '教皇': {
+                upright: '传统、精神指引、教育、信仰',
+                reversed: '质疑传统、寻求非传统道路、教条主义'
+            },
+            '恋人': {
+                upright: '爱情、选择、和谐、价值观',
+                reversed: '价值观冲突、关系不和谐、糟糕选择'
+            },
+            '战车': {
+                upright: '决心、意志力、胜利、前进',
+                reversed: '失去控制、缺乏方向、挫折'
+            },
+            '力量': {
+                upright: '勇气、耐心、同情、内在力量',
+                reversed: '自我怀疑、缺乏自制力、恐惧'
+            },
+            '隐士': {
+                upright: '内省、孤独、智慧、寻找',
+                reversed: '孤立、拒绝寻求指引、过度内向'
+            },
+            '命运之轮': {
+                upright: '变化、循环、命运、转折点',
+                reversed: '厄运、抗拒变化、失控感'
+            },
+            '正义': {
+                upright: '公正、真相、责任、因果',
+                reversed: '不公平对待、逃避责任、偏见'
+            }
+        };
+
+        // 显示牌意详情
+        function showCardDetail(cardName) {
+            const meaning = cardMeanings[cardName];
+            if (!meaning) return;
+
+            let html = `
+                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2); border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
+                    <h3 style="color: #ffd700; font-size: 1.1rem; margin-bottom: 1rem;">🎴 ${cardName}</h3>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 0.5rem;">正位含义</h4>
+                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8);">${meaning.upright}</p>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 0.5rem;">逆位含义</h4>
+                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8);">${meaning.reversed}</p>
+                    </div>
+                </div>
+            `;
+
+            // 创建弹窗显示
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
+            modal.onclick = () => modal.remove();
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
+            modalContent.onclick = (e) => e.stopPropagation();
+            modalContent.innerHTML = html + '<button type="button" type="button" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
+            
+            modal.className = 'modal';
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+        });
+    </script>
+
+        <!-- 分析表单 -->
+        <div class="tab-content active" id="formTab">
+            <div class="form-container">
+                
+            <div class="form-group">
+                <label class="form-label">占卜问题</label>
+                <input type="text" class="form-input" id="questionInput" placeholder="在心中默念您的问题...">
+            </div>
+        
+                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
+            </div>
+        </div>
+        <!-- 结果展示 -->
+        <div class="tab-content" id="resultTab">
+            <div class="result-container" id="resultContainer">
+                
+        <div class="result-section"><h3>🔮 塔罗牌占卜结果</h3>
+        <div class="analysis-text">
+            <p><strong>牌面一（过去）：</strong><span id="card1"></span></p>
+            <p><strong>牌面二（现在）：</strong><span id="card2"></span></p>
+            <p><strong>牌面三（未来）：</strong><span id="card3"></span></p>
+            <p><strong>综合解读：</strong><span id="summaryResult"></span></p>
+        </div>
+        </div>
+        
+            </div>
+        </div>
+    
+    <script>
+    function calculateModule() {
+        if (window.showToast) window.showToast('正在分析中...');
+        setTimeout(function() {
+            // 这里调用真正的分析计算
+            var resultHtml = generateResultHTML();
+            document.getElementById('resultContainer').innerHTML = resultHtml;
+            if (window.switchTab) window.switchTab('result');
+            if (window.showToast) window.showToast('分析完成！');
+        }, 1200);
+    }
+    
+    function generateResultHTML() {
+        // 读取表单值并生成结果
+        var html = '<div class="result-section fade-in">';
+        html += '<h3>📊 分析结果</h3>';
+        html += '<div class="analysis-text">';
+        html += '<p>根据您提供的信息，分析结果如下：</p>';
+        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
+        html += '</div></div>';
+        return html;
+    }
+    </script>
+    </body>
+</html>

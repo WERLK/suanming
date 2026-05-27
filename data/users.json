@@ -1,0 +1,67 @@
+[
+  {
+    "id": "user_demo123",
+    "username": "demo",
+    "password": "SjUQRedgncr8BZ8NZV90rOMBYWDmwOyS$2697384d2ee3f69439e296942d2b3f7cd4a38c7e2e8bcd19436611e836947c07",
+    "email": "demo@example.com",
+    "phone": "13800000000",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T01:41:58.592762",
+    "last_login": "2026-05-27T01:42:39.937119",
+    "status": "active"
+  },
+  {
+    "id": "user_PpF5MgKnfQAjQuInZSbzBrncCKijutJZ",
+    "username": "newuser99",
+    "password": "BFqtCgdZT8WDbWscQVmsuvfcBTeR9INC$9316f85c6246671b83fb50759cf49c82c8d80a420cd2d26d7634d28319b044ba",
+    "email": "new99@example.com",
+    "phone": "13900139000",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T01:42:11.352315",
+    "last_login": "2026-05-27T01:42:11.381777",
+    "status": "active"
+  },
+  {
+    "id": "user_gXdPbGp1Xn0Sa10NIIizDEomkaEQ5jIH",
+    "username": "logintest",
+    "password": "AyxEQFZXHXxXLmnRtCywyPrAnJHFRy2R$216bbb5f8ddcebf4de2c4040ada54f49be432f08b2e152d3418e9c145a29fed7",
+    "email": "login@test.com",
+    "phone": "13912345678",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T01:42:39.966886",
+    "last_login": "2026-05-27T01:42:39.996361",
+    "status": "active"
+  },
+  {
+    "id": "user_YwFkPxFqVDfbP2LFOJ7xEmvhoG8EIIaW",
+    "username": "zztest111",
+    "password": "QcIJlnnxcU2zWTpSiH8afdQ1SL8Hn9ba$7b90b6f92c9be9596570a4338755a04b4dd85037a043e575fc843bbfef0df8c2",
+    "email": "zztest@example.com",
+    "phone": "13600136000",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T04:33:42.191340",
+    "last_login": "2026-05-27T04:33:42.229722",
+    "status": "active"
+  },
+  {
+    "id": "user_B8nKhGB4OqVXcKnOmEB7MUng4dN3ZsAe",
+    "username": "smstest1",
+    "password": "2AcyK11F2wteRKhac0Z3C5UUKbxiYlxV$b76cb7905d4261948d7bf815815dc6c524395576926b8678b3fac843a68dc6b2",
+    "email": "",
+    "phone": "",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T04:41:08.593708",
+    "last_login": "2026-05-27T04:41:08.593718",
+    "status": "active"
+  }
+]

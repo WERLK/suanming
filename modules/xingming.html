@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>姓名测试 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .content-area {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus {
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .submit-btn:hover {
+            transform: scale(1.02);
+        }
+        .result-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .wuge-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .wuge-table th,
+        .wuge-table td {
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .wuge-table th {
+            background: rgba(255,215,0,0.1);
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .wuge-table td {
+            color: rgba(255,255,255,0.9);
+        }
+        .score-display {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        .score-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+        .score-text {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="app">
+        <div class="page-header">
+            <button type="button" class="back-btn" onclick="history.back()">←</button>
+            <h1>📝 姓名测试</h1>
+        </div>
+
+        <div class="content-area">
+                    <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('xingming')">📷 上传图片分析</button>
+        </div>
+<div class="section">
+                <h2>五格剖象法</h2>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1rem;">
+                    姓名测试采用传统的"五格剖象法"，通过分析姓名的三才配置、五格数理，
+                    来判断姓名的吉凶和运势影响。
+                </p>
+            </div>
+
+            <div class="form-container" id="formArea">
+                <div class="form-group">
+                    <label class="form-label">请输入姓名</label>
+                    <input type="text" class="form-input" id="nameInput" placeholder="例如：张三" maxlength="4">
+                </div>
+                
+                <button type="button" class="submit-btn" onclick="analyzeName()">开始测试</button>
+            </div>
+
+            <div class="result-container" id="resultArea" style="display: none;">
+                <!-- 结果将动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js">
+// 显示提示
+function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+</script>
+    <script>
+        function analyzeName() {
+            const name = document.getElementById('nameInput').value.trim();
+            
+            if (!name) {
+                window.showToast('请输入姓名');
+                return;
+            }
+
+            window.showToast('正在分析姓名...');
+
+            setTimeout(() => {
+                // 模拟API调用
+                const result = {
+                    name: name,
+                    wuge: {
+                        tiange: Math.floor(Math.random() * 81) + 1,
+                        renge: Math.floor(Math.random() * 81) + 1,
+                        dige: Math.floor(Math.random() * 81) + 1,
+                        waige: Math.floor(Math.random() * 81) + 1,
+                        zongge: Math.floor(Math.random() * 81) + 1
+                    },
+                    sancai: ['木', '火', '土'][Math.floor(Math.random() * 3)] + '、' + 
+                             ['火', '土', '金'][Math.floor(Math.random() * 3)] + '、' + 
+                             ['土', '金', '水'][Math.floor(Math.random() * 3)],
+                    score: Math.floor(Math.random() * 26) + 70,
+                    analysis: '姓名三才配置' + ['吉祥', '大吉', '中吉'][Math.floor(Math.random() * 3)] + 
+                              '，五行相' + ['生', '克'][Math.floor(Math.random() * 2)] + 
+                              '，寓意' + ['美好', '深刻', '独特'][Math.floor(Math.random() * 3)] + 
+                              '，是一个' + ['好名字', '不错的名字', '有潜力的名字'][Math.floor(Math.random() * 3)] + '。'
+                };
+
+                showResult(result);
+            }, 1500);
+        }
+
+        function showResult(result) {
+            let html = `
+                <div class="section fade-in">
+                    <h3>📝 姓名：${result.name}</h3>
+                </div>
+
+                <div class="score-display fade-in">
+                    <div class="score-number">${result.score}分</div>
+                    <div class="score-text">${result.score >= 90 ? '大吉' : result.score >= 80 ? '吉' : result.score >= 70 ? '中吉' : '一般'}</div>
+                </div>
+
+                <div class="section fade-in">
+                    <h3>📊 五格数理</h3>
+                    <table class="wuge-table">
+                        <tr>
+                            <th>格局</th>
+                            <th>数理</th>
+                            <th>吉凶</th>
+                        </tr>
+                        <tr>
+                            <td>天格</td>
+                            <td>${result.wuge.tiange}</td>
+                            <td>${result.wuge.tiange <= 21 || result.wuge.tiange === 23 || result.wuge.tiange === 24 || result.wuge.tiange === 31 || result.wuge.tiange === 32 ? '吉' : '凶'}</td>
+                        </tr>
+                        <tr>
+                            <td>人格</td>
+                            <td>${result.wuge.renge}</td>
+                            <td>${result.wuge.renge <= 21 || result.wuge.renge === 23 || result.wuge.renge === 24 || result.wuge.renge === 31 || result.wuge.renge === 32 ? '吉' : '凶'}</td>
+                        </tr>
+                        <tr>
+                            <td>地格</td>
+                            <td>${result.wuge.dige}</td>
+                            <td>${result.wuge.dige <= 21 || result.wuge.dige === 23 || result.wuge.dige === 24 || result.wuge.dige === 31 || result.wuge.dige === 32 ? '吉' : '凶'}</td>
+                        </tr>
+                        <tr>
+                            <td>外格</td>
+                            <td>${result.wuge.waige}</td>
+                            <td>${result.wuge.waige <= 21 || result.wuge.waige === 23 || result.wuge.waige === 24 || result.wuge.waige === 31 || result.wuge.waige === 32 ? '吉' : '凶'}</td>
+                        </tr>
+                        <tr>
+                            <td>总格</td>
+                            <td>${result.wuge.zongge}</td>
+                            <td>${result.wuge.zongge <= 21 || result.wuge.zongge === 23 || result.wuge.zongge === 24 || result.wuge.zongge === 31 || result.wuge.zongge === 32 ? '吉' : '凶'}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="section fade-in">
+                    <h3>⚖️ 三才配置</h3>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
+                        三才（天格、人格、地格）五行配置：<strong>${result.sancai}</strong>
+                    </p>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6; margin-top: 0.5rem;">
+                        ${result.sancai.includes('木') && result.sancai.includes('火') ? '三才配置吉祥，木火相生，主事业顺利、财运亨通。' : 
+                          result.sancai.includes('火') && result.sancai.includes('土') ? '三才配置大吉，火土相生，主名声远扬、地位提升。' : 
+                          '三才配置中等，需注意五行平衡，可通过改名或调整来改善。'}
+                    </p>
+                </div>
+
+                <div class="section fade-in">
+                    <h3>💡 综合分析</h3>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
+                        ${result.analysis}
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+                    <button type="button" class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新测试</button>
+                </div>
+            `;
+
+            document.getElementById('formArea').style.display = 'none';
+            document.getElementById('resultArea').innerHTML = html;
+            document.getElementById('resultArea').style.display = 'block';
+        }
+
+        function resetForm() {
+            document.getElementById('formArea').style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('nameInput').value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>个人中心 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* 个人中心页面特定样式 */
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .profile-header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(180deg, rgba(255,215,0,0.1), transparent);
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05));
+            border: 2px solid rgba(255,215,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            border-color: rgba(255,215,0,0.5);
+        }
+        
+        .profile-name {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .profile-info {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+        }
+        
+        .stat-value {
+            color: #ffd700;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        
+        .stat-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+        }
+        
+        .profile-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        
+        .menu-list {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,215,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,215,0,0.05);
+        }
+        
+        .menu-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .menu-text {
+            flex: 1;
+            color: #ffffff;
+            font-size: 0.95rem;
+        }
+        
+        .menu-arrow {
+            color: rgba(255,255,255,0.3);
+            font-size: 1.2rem;
+        }
+        
+        .btn-logout {
+            width: 100%;
+            padding: 0.9rem;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 12px;
+            color: #ff6b6b;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255,0,0,0.2);
+        }
+        
+        .edit-profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .edit-profile-modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-close:hover {
+            color: #ffffff;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .btn-save {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+    </style>
+<style>
+    .back-btn {
+        background: none;
+        border: none;
+        color: #ffd700;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+        border-bottom: 1px solid rgba(255,215,0,0.15);
+    }
+    .page-header h1 {
+        font-size: 1.2rem;
+        color: #ffd700;
+        font-weight: 600;
+    }
+</style>
+</head>
+<body>
+<div class="page-header">
+        <button class="back-btn" onclick="window.location.href='/'">←</button>
+        <h1>个人中心</h1>
+    </div>
+    <div class="content-area">
+    <div class="stars" id="stars"></div>
+    
+    <div class="app">
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar" onclick="openEditProfile()">
+                    👤
+                </div>
+                <h2 class="profile-name" id="profileName">加载中...</h2>
+                <p class="profile-info" id="profileInfo">请登录</p>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="divinationCount">0</div>
+                    <div class="stat-label">算命次数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="favoriteCount">0</div>
+                    <div class="stat-label">收藏模块</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="daysCount">0</div>
+                    <div class="stat-label">使用天数</div>
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <h3 class="section-title">📋 我的服务</h3>
+                <div class="menu-list">
+                    <div class="menu-item" onclick="showToast('历史记录功能开发中...')">
+                        <div class="menu-icon">📜</div>
+                        <div class="menu-text">算命历史</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('收藏功能开发中...')">
+                        <div class="menu-icon">⭐</div>
+                        <div class="menu-text">我的收藏</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('分享功能开发中...')">
+                        <div class="menu-icon">🔗</div>
+                        <div class="menu-text">分享记录</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('报告功能开发中...')">
+                        <div class="menu-icon">📊</div>
+                        <div class="menu-text">我的报告</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <h3 class="section-title">⚙️ 设置</h3>
+                <div class="menu-list">
+                    <div class="menu-item" onclick="openEditProfile()">
+                        <div class="menu-icon">✏️</div>
+                        <div class="menu-text">编辑资料</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('通知设置功能开发中...')">
+                        <div class="menu-icon">🔔</div>
+                        <div class="menu-text">通知设置</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('隐私设置功能开发中...')">
+                        <div class="menu-icon">🔒</div>
+                        <div class="menu-text">隐私设置</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('帮助中心功能开发中...')">
+                        <div class="menu-icon">❓</div>
+                        <div class="menu-text">帮助中心</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('关于我们功能开发中...')">
+                        <div class="menu-icon">ℹ️</div>
+                        <div class="menu-text">关于我们</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-logout" id="logoutBtn" onclick="handleLogout()">退出登录</button>
+        </div>
+    </div>
+    
+    <!-- 编辑资料弹窗 -->
+    <div class="edit-profile-modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑资料</h3>
+                <button class="modal-close" onclick="closeEditProfile()">×</button>
+            </div>
+            
+            <form id="editProfileForm" onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label for="editUsername">用户名</label>
+                    <input 
+                        type="text" 
+                        id="editUsername" 
+                        name="username" 
+                        placeholder="请输入用户名"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editPhone">手机号</label>
+                    <input 
+                        type="tel" 
+                        id="editPhone" 
+                        name="phone" 
+                        placeholder="请输入手机号"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEmail">邮箱</label>
+                    <input 
+                        type="email" 
+                        id="editEmail" 
+                        name="email" 
+                        placeholder="请输入邮箱"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editBirthday">生日</label>
+                    <input 
+                        type="date" 
+                        id="editBirthday" 
+                        name="birthday"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editGender">性别</label>
+                    <select id="editGender" name="gender">
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-save">保存资料</button>
+            </form>
+        </div>
+    </div>
+    
+    <nav class="bottom-nav">
+        <a href="/" class="nav-item">
+            <div class="nav-icon">🏠</div>
+            <span>首页</span>
+        </a>
+        <a href="/more.html" class="nav-item">
+            <div class="nav-icon">🔮</div>
+            <span>更多</span>
+        </a>
+        <a href="/profile.html" class="nav-item active">
+            <div class="nav-icon">👤</div>
+            <span>我的</span>
+        </a>
+    </nav>
+    
+    <script src="/js/main.js"></script>
+    <script>
+        // 创建星空背景
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            checkLoginStatus();
+        });
+        
+        // 检查登录状态
+        async function checkLoginStatus() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            if (!token) {
+                // 未登录，跳转到登录页面
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                // 从后端API获取用户信息
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    // token无效，清除并跳转
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('currentUser');
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('currentUser');
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message);
+                }
+                
+                const user = data.user;
+                
+                // 更新页面显示
+                document.getElementById('profileName').textContent = user.username || '未设置用户名';
+                
+                let infoText = '';
+                if (user.phone) infoText += user.phone;
+                if (user.email) infoText += (infoText ? ' · ' : '') + user.email;
+                document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
+                
+                // 保存用户信息到本地（用于离线访问）
+                if (localStorage.getItem('rememberMe')) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                } else {
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
+                }
+                
+                // 加载用户统计数据
+                loadUserStats(user);
+                
+                // 填充编辑表单
+                document.getElementById('editUsername').value = user.username || '';
+                document.getElementById('editPhone').value = user.phone || '';
+                document.getElementById('editEmail').value = user.email || '';
+                document.getElementById('editBirthday').value = user.birthday || '';
+                document.getElementById('editGender').value = user.gender || '';
+                
+            } catch (error) {
+                console.error('获取用户信息失败:', error);
+                showToast('获取用户信息失败，请重试');
+                
+                // 尝试从本地存储加载
+                const localUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (localUser) {
+                    const user = JSON.parse(localUser);
+                    document.getElementById('profileName').textContent = user.username || '未设置用户名';
+                    
+                    let infoText = '';
+                    if (user.phone) infoText += user.phone;
+                    if (user.email) infoText += (infoText ? ' · ' : '') + user.email;
+                    document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
+                    
+                    loadUserStats(user);
+                }
+            }
+        }
+        
+        // 加载用户统计数据
+        function loadUserStats(user) {
+            // 从localStorage获取用户统计数据
+            const stats = JSON.parse(localStorage.getItem('userStats_' + user.id) || '{}');
+            
+            document.getElementById('divinationCount').textContent = stats.divinationCount || 0;
+            document.getElementById('favoriteCount').textContent = (stats.favorites || []).length;
+            
+            // 计算使用天数
+            if (user.create_time) {
+                const createTime = new Date(user.create_time);
+                const now = new Date();
+                const days = Math.floor((now - createTime) / (1000 * 60 * 60 * 24));
+                document.getElementById('daysCount').textContent = days;
+            } else {
+                document.getElementById('daysCount').textContent = 0;
+            }
+        }
+        
+        // 打开编辑资料弹窗
+        function openEditProfile() {
+            document.getElementById('editProfileModal').classList.add('show');
+        }
+        
+        // 关闭编辑资料弹窗
+        function closeEditProfile() {
+            document.getElementById('editProfileModal').classList.remove('show');
+        }
+        
+        // 保存资料
+        async function saveProfile(event) {
+            event.preventDefault();
+            
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            if (!token) {
+                showToast('请先登录');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // 获取表单数据
+            const username = document.getElementById('editUsername').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const birthday = document.getElementById('editBirthday').value;
+            const gender = document.getElementById('editGender').value;
+            
+            // 验证用户名
+            if (!username) {
+                showToast('用户名不能为空');
+                return;
+            }
+            
+            try {
+                // 调用后端API更新用户信息
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        phone: phone,
+                        email: email,
+                        birthday: birthday,
+                        gender: gender
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 更新成功
+                    const user = data.user;
+                    
+                    // 更新页面显示
+                    document.getElementById('profileName').textContent = user.username;
+                    
+                    let infoText = '';
+                    if (user.phone) infoText += user.phone;
+                    if (user.email) infoText += (infoText ? ' · ' : '') + user.email;
+                    document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
+                    
+                    // 保存用户信息到本地
+                    if (localStorage.getItem('rememberMe')) {
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                    } else {
+                        sessionStorage.setItem('currentUser', JSON.stringify(user));
+                    }
+                    
+                    // 关闭弹窗
+                    closeEditProfile();
+                    
+                    showToast('资料保存成功！');
+                } else {
+                    showToast(data.message || '保存失败，请重试');
+                }
+            } catch (error) {
+                console.error('保存资料失败:', error);
+                showToast('保存失败，请检查网络');
+            }
+        }
+        
+        // 处理退出登录
+        async function handleLogout() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            try {
+                // 调用后端API登出
+                if (token) {
+                    await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
+            } catch (error) {
+                // 忽略错误，继续登出
+            }
+            
+            // 清除本地存储
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('rememberMe');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('currentUser');
+            
+            showToast('已退出登录');
+            
+            // 延迟跳转
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 1000);
+        }
+        
+        // 点击弹窗外部关闭弹窗
+        document.getElementById('editProfileModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeEditProfile();
+            }
+        });
+    </script>
+</div>
+    </body>
+</html>

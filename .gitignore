@@ -1,7 +1,1 @@
-*.pyc
 __pycache__/
-*.log
-*.json.bak
-.env
-nodes/
-.env

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>官司占卜 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button type="button" type="button" class="back-btn" onclick="history.back()">←</button>
+        <h1>🔮 官司占卜</h1>
+    </div>
+
+    <div class="content-area">
+                <div style="margin-bottom:1rem;">
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('官司占卜_110')">📷 上传图片分析</button>
+        </div>
+<div class="section">
+            <h2>官司占卜简介</h2>
+            <p>六爻占卜是中国传统命理学的重要分支，具有悠久的历史和深厚的文化底蕴。</p>
+            <p>通过专业的分析和解读，可以帮助人们了解自己的命运走势，趋吉避凶，改善运势。</p>
+            <p>本模块将为你提供详细的官司占卜分析，包括基础知识、实用方法、案例分析等丰富内容。</p>
+        </div>
+
+        <div class="section">
+            <h2>基础知识</h2>
+            <p><strong>起源：</strong>六爻占卜起源于古代中国，经过数千年的发展和完善，形成了完整的理论体系。</p>
+            <p><strong>核心理论：</strong>基于阴阳五行、天干地支、八卦九宫等理论，构建起宏大的预测体系。</p>
+            <p><strong>应用领域：</strong>广泛应用于命运预测、婚姻合婚、择吉日、风水调理、命名改运等方面。</p>
+            <p><strong>现代价值：</strong>在传承传统文化的同时，结合现代心理学、统计学等知识，更加注重科学性和实用性。</p>
+        </div>
+
+        <div class="section">
+            <h2>详细解读</h2>
+            <p>1. <strong>理论基础：</strong>官司占卜的理论基础十分扎实，包括阴阳学说、五行学说、天干地支学说等。</p>
+            <p>2. <strong>分析方法：</strong>采用传统的分析方法，结合现代科技手段，提供准确、详细的分析报告。</p>
+            <p>3. <strong>实战应用：</strong>在实际生活中，官司占卜可以帮助人们做出更好的决策，改善运势和生活质量。</p>
+            <p>4. <strong>注意事项：</strong>虽然官司占卜可以提供参考，但命运掌握在自己手中，需要结合现实情况理性对待。</p>
+        </div>
+
+        <div class="section">
+            <h2>实用技巧</h2>
+            <p><strong>技巧一：</strong>选择专业的分析师或平台，确保分析结果的准确性和权威性。</p>
+            <p><strong>技巧二：</strong>提供准确的个人信息（如出生时间、地点等），避免因信息错误导致分析偏差。</p>
+            <p><strong>技巧三：</strong>结合多种命理学说进行综合分析，避免单一方法的局限性。</p>
+            <p><strong>技巧四：</strong>理性对待分析结果，将其作为参考，而不是绝对定论。</p>
+            <p><strong>技巧五：</strong>根据分析结果，积极调整自己的行为和决策，主动改善运势。</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户通过官司占卜分析，发现自己的财运在某个时段较好，于是抓住机会投资，获得了不错的收益。</p>
+            <p><strong>案例二：</strong>某用户通过官司占卜合婚分析，发现两人八字相合，最终步入婚姻殿堂，生活幸福美满。</p>
+            <p><strong>案例三：</strong>某用户通过官司占卜择吉日分析，选择了合适的开业日期，生意兴隆，财源广进。</p>
+            <p><strong>案例四：</strong>某用户通过官司占卜健康分析，提前发现健康隐患，及时调理，避免了疾病的发生。</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>官司占卜准确吗？</p>
+            <p><strong>A：</strong>官司占卜是一种传统的预测方法，具有一定的参考价值，但不应盲目迷信。命运掌握在自己手中，需要结合现实情况理性对待。</p>
+            <p><strong>Q2：</strong>如何选择靠谱的官司占卜分析师？</p>
+            <p><strong>A：</strong>选择有资质、有经验、口碑好的分析师或平台。可以通过查看案例、用户评价等方式进行判断。</p>
+            <p><strong>Q3：</strong>官司占卜可以改变命运吗？</p>
+            <p><strong>A：</strong>官司占卜不能直接改变命运，但可以提供参考和建议，帮助人们做出更好的决策，从而间接改善命运。</p>
+            <p><strong>Q4：</strong>官司占卜分析结果不满意怎么办？</p>
+            <p><strong>A：</strong>可以寻求多位分析师的意见，或者结合其他命理学说进行综合分析。同时，保持积极的心态，主动改善自己的行为和决策。</p>
+        </div>
+
+        <div class="section">
+            <h2>历史文化</h2>
+            <p>六爻占卜在中国有着悠久的历史，可以追溯到几千年前的古代社会。</p>
+            <p>历代先贤通过长期的观察和实践，总结出丰富的经验和方法，形成了完整的理论体系。</p>
+            <p>在现代社会，六爻占卜仍然被广泛应用，成为许多人生活中不可或缺的一部分。</p>
+            <p>同时，随着科技的进步和文化的交流，六爻占卜也在不断发展和完善，吸收现代科学的成果，提高其准确性和实用性。</p>
+        </div>
+
+        <div class="section">
+            <h2>在线分析工具</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，我们将为你提供详细的官司占卜分析，包括基础知识、实用方法、案例分析等丰富内容。
+            </p>
+            
+            <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                
+                <button style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;">开始分析</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>84分（满分100分）</p>
+            <p><strong>运势概况：</strong>中吉</p>
+            <p><strong>事业运：</strong>事业顺利，有升职机会</p>
+            <p><strong>财运：</strong>财运中等，需谨慎投资</p>
+            <p><strong>婚姻运：</strong>婚姻美满，夫妻和睦</p>
+            <p><strong>健康运：</strong>身体健康，精力充沛</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js">
+// 触发图片上传
+function triggerImageUpload(moduleType) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+        const file = this.files[0];
+        if (!file) return;
+        window.showToast('正在分析图片...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            fetch('/api/image-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64, module_type: moduleType })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.showToast('分析完成！');
+                    const area = document.getElementById('imageAnalysisArea');
+                    const result = document.getElementById('imageAnalysisResult');
+                    if (area) area.style.display = 'block';
+                    if (result) result.textContent = data.analysis;
+                } else {
+                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                }
+            })
+            .catch(err => {
+                window.showToast('分析失败，请检查网络');
+                console.error('图片分析错误：', err);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
+</html>

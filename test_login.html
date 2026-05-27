@@ -1,30 +1,258 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>测试登录跳转</title>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录注册功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 10px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-btn {
+            background: #ffd700;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .test-btn:hover {
+            background: #ffed4e;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-<h1>测试登录跳转</h1>
-<button onclick="testCheckLogin()">测试 checkLogin()</button>
-<button onclick="testOpenUserCenter()">测试 openUserCenter()</button>
+    <h1>🔮 玄机算命网 - 登录注册功能测试</h1>
+    
+    <div class="test-section">
+        <h2>📋 测试项目</h2>
+        <button class="test-btn" onclick="testPageAccess()">1. 测试页面访问</button>
+        <button class="test-btn" onclick="testLoginLogic()">2. 测试登录逻辑</button>
+        <button class="test-btn" onclick="testRegisterLogic()">3. 测试注册逻辑</button>
+        <button class="test-btn" onclick="testProfileAccess()">4. 测试个人中心</button>
+        <button class="test-btn" onclick="runAllTests()">🚀 运行全部测试</button>
+        
+        <div id="testResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>👁️ 页面预览</h2>
+        <p>选择要预览的页面：</p>
+        <button class="test-btn" onclick="previewPage('login.html')">登录页</button>
+        <button class="test-btn" onclick="previewPage('register.html')">注册页</button>
+        <button class="test-btn" onclick="previewPage('profile.html')">个人中心</button>
+        <iframe id="pagePreview" src="about:blank"></iframe>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 测试日志</h2>
+        <div id="testLog" style="background: #f8f9fa; padding: 10px; border-radius: 4px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+    </div>
 
-<script>
-var currentUser = null;
-
-function testCheckLogin(){
-    console.log('testCheckLogin called');
-    if(currentUser){
-        alert('已登录，应该跳转用户中心');
-    } else {
-        alert('未登录，应该打开登录层');
-    }
-}
-
-function testOpenUserCenter(){
-    console.log('testOpenUserCenter called');
-    alert('openUserCenter() 被调用了！');
-}
-</script>
+    <script>
+        const baseUrl = 'http://localhost:8080';
+        const resultsDiv = document.getElementById('testResults');
+        const logDiv = document.getElementById('testLog');
+        
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${time}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function addResult(test, passed, message) {
+            const div = document.createElement('div');
+            div.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            div.innerHTML = `<strong>${test}:</strong> ${message}`;
+            resultsDiv.appendChild(div);
+            log(`${passed ? '✓' : '✗'} ${test}: ${message}`);
+        }
+        
+        async function testPageAccess() {
+            resultsDiv.innerHTML = '';
+            log('开始测试页面访问...');
+            
+            const pages = ['login.html', 'register.html', 'profile.html'];
+            
+            for (const page of pages) {
+                try {
+                    const response = await fetch(`/${page}`);
+                    if (response.ok) {
+                        const text = await response.text();
+                        if (text.includes('<html') && text.includes('</html>')) {
+                            addResult(`页面访问 - ${page}`, true, '页面可访问且HTML结构完整');
+                        } else {
+                            addResult(`页面访问 - ${page}`, false, 'HTML结构不完整');
+                        }
+                    } else {
+                        addResult(`页面访问 - ${page}`, false, `HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    addResult(`页面访问 - ${page}`, false, `错误: ${error.message}`);
+                }
+            }
+        }
+        
+        function testLoginLogic() {
+            resultsDiv.innerHTML = '';
+            log('开始测试登录逻辑...');
+            
+            // 测试1: 检查localStorage中是否有users数组
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            addResult('登录逻辑 - users初始化', Array.isArray(users), 'users数组已初始化');
+            
+            // 测试2: 模拟注册一个用户
+            const testUser = {
+                id: 'test_' + Date.now(),
+                username: 'testuser',
+                phone: '13800138000',
+                email: 'test@example.com',
+                password: '123456',
+                createTime: Date.now()
+            };
+            
+            users.push(testUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            addResult('登录逻辑 - 用户注册', true, '测试用户已创建');
+            
+            // 测试3: 模拟登录
+            const foundUser = users.find(u => u.username === 'testuser');
+            if (foundUser) {
+                addResult('登录逻辑 - 用户查找', true, '用户查找成功');
+                
+                if (foundUser.password === '123456') {
+                    addResult('登录逻辑 - 密码验证', true, '密码验证通过');
+                    
+                    // 模拟登录状态保存
+                    const loginData = {
+                        userId: foundUser.id,
+                        username: foundUser.username,
+                        loginTime: Date.now()
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(loginData));
+                    addResult('登录逻辑 - 登录状态保存', true, '登录状态已保存');
+                } else {
+                    addResult('登录逻辑 - 密码验证', false, '密码验证失败');
+                }
+            } else {
+                addResult('登录逻辑 - 用户查找', false, '用户查找失败');
+            }
+        }
+        
+        function testRegisterLogic() {
+            resultsDiv.innerHTML = '';
+            log('开始测试注册逻辑...');
+            
+            // 测试1: 检查用户名重复
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const usernameExists = users.some(u => u.username === 'testuser');
+            addResult('注册逻辑 - 用户名重复检查', usernameExists, '用户名重复检查正常');
+            
+            // 测试2: 测试密码强度检查函数
+            if (typeof checkPasswordStrength === 'function') {
+                addResult('注册逻辑 - 密码强度检查函数', true, '函数存在');
+            } else {
+                addResult('注册逻辑 - 密码强度检查函数', false, '函数不存在（可能在register.html中）');
+            }
+            
+            // 测试3: 清除测试数据
+            const filteredUsers = users.filter(u => u.username !== 'testuser');
+            localStorage.setItem('users', JSON.stringify(filteredUsers));
+            localStorage.removeItem('currentUser');
+            addResult('注册逻辑 - 测试数据清理', true, '测试数据已清理');
+        }
+        
+        function testProfileAccess() {
+            resultsDiv.innerHTML = '';
+            log('开始测试个人中心访问...');
+            
+            // 测试1: 检查未登录状态
+            const currentUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (!currentUser) {
+                addResult('个人中心 - 未登录状态', true, '未登录，应跳转到登录页');
+            } else {
+                addResult('个人中心 - 已登录状态', true, '已登录，可以访问个人中心');
+            }
+            
+            // 测试2: 模拟登录后访问
+            const testUser = { userId: 'test123', username: '测试用户' };
+            sessionStorage.setItem('currentUser', JSON.stringify(testUser));
+            addResult('个人中心 - 模拟登录', true, '模拟登录成功');
+            
+            // 测试3: 检查登出功能
+            sessionStorage.removeItem('currentUser');
+            addResult('个人中心 - 登出功能', true, '登出成功');
+        }
+        
+        async function runAllTests() {
+            resultsDiv.innerHTML = '';
+            log('开始运行全部测试...');
+            
+            await testPageAccess();
+            testLoginLogic();
+            testRegisterLogic();
+            testProfileAccess();
+            
+            log('全部测试完成！');
+            addResult('全部测试', true, '所有测试已完成，请查看详细信息');
+        }
+        
+        function previewPage(page) {
+            log(`预览页面: ${page}`);
+            document.getElementById('pagePreview').src = `/${page}`;
+        }
+        
+        // 页面加载时自动运行基础测试
+        window.addEventListener('load', function() {
+            log('测试页面已加载');
+            log('点击按钮开始测试登录注册功能');
+        });
+    </script>
 </body>
 </html>

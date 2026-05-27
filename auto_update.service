@@ -1,0 +1,16 @@
+[Unit]
+Description=Xuanji Fortune Auto Update Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/suanming/suanming
+ExecStart=/usr/bin/python3 /root/suanming/suanming/auto_update_daemon.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/tmp/auto_update.log
+StandardError=append:/tmp/auto_update.log
+
+[Install]
+WantedBy=multi-user.target

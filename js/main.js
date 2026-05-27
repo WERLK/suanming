@@ -123,7 +123,43 @@ function initSearch() {
 // ===== 初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     initSearch();
+    initDesktopSidebar();
 });
+
+// ===== 桌面端侧边栏初始化 =====
+function initDesktopSidebar() {
+    var sidebarUser = document.getElementById('sidebarUser');
+    var sidebarUserName = document.getElementById('sidebarUserName');
+    if (!sidebarUser || !sidebarUserName) return;
+    
+    var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+        var user = null;
+        try {
+            var raw = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (raw) user = JSON.parse(raw);
+        } catch(e) {}
+        if (user && user.username) {
+            sidebarUserName.textContent = user.username;
+            sidebarUser.querySelector('.user-status').textContent = '已登录';
+            sidebarUser.href = '/profile.html';
+        }
+    } else {
+        sidebarUserName.textContent = '未登录';
+        sidebarUser.querySelector('.user-status').textContent = '点击登录';
+        sidebarUser.href = '/login.html';
+    }
+    
+    // 高亮当前页面
+    var currentPath = window.location.pathname;
+    var sidebarItems = document.querySelectorAll('.sidebar-nav-item');
+    sidebarItems.forEach(function(item) {
+        var href = item.getAttribute('href');
+        if (href === currentPath || (currentPath === '/' && href === '/')) {
+            item.classList.add('active');
+        }
+    });
+}
 
 // ===== 八字排盘计算（简化版） =====
 function calcBaziSimple(birthDate, birthTime) {
@@ -380,3 +416,56 @@ function showImageAnalysisResult(analysisText, imageInfo) {
 }
 
 function openMore() { window.location.href = '/more.html'; }
+
+// ===== 桌面端侧边栏用户信息更新 =====
+(function() {
+    // 仅在桌面端（有侧边栏时）执行
+    var sidebar = document.getElementById('desktopSidebar');
+    if (!sidebar) return;
+    
+    var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return;
+    
+    // 尝试从本地存储读取用户信息
+    var user = null;
+    try {
+        var raw = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+        if (raw) user = JSON.parse(raw);
+    } catch(e) {}
+    
+    if (!user || !user.username) {
+        // 如果有token但没有本地用户信息，从API获取
+        fetch('/api/profile', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(function(resp) { return resp.json(); })
+        .then(function(data) {
+            if (data.success && data.user) {
+                updateSidebarUser(data.user);
+            }
+        })
+        .catch(function() {});
+        return;
+    }
+    
+    updateSidebarUser(user);
+    
+    function updateSidebarUser(u) {
+        var nameEl = document.getElementById('sidebarUserName');
+        var statusEl = sidebar.querySelector('.user-status');
+        if (nameEl) nameEl.textContent = u.username || '用户';
+        if (statusEl) statusEl.textContent = '已登录';
+        
+        // 更新VIP等级显示
+        if (u.vip_level && u.vip_level !== 'free') {
+            var badge = document.createElement('span');
+            badge.className = 'nav-badge';
+            badge.textContent = u.vip_level === 'premium' ? '高级' : '基础';
+            badge.style.cssText = 'margin-left:auto;font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:10px;background:rgba(255,215,0,0.15);color:#ffd700;';
+            var sidebarUserEl = document.getElementById('sidebarUser');
+            if (sidebarUserEl && !sidebarUserEl.querySelector('.nav-badge')) {
+                sidebarUserEl.querySelector('.user-info').appendChild(badge);
+            }
+        }
+    }
+})();

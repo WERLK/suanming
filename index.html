@@ -10,7 +10,7 @@
 <meta name="msapplication-TileImage" content="/icon-192.png">
 <meta name="msapplication-TileColor" content="#ffd700">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>玄机算命网 - 专业在线算命平台</title>
 <link rel="stylesheet" href="/css/style.css">
 <style>
@@ -33,6 +33,43 @@
     font-size: 0.9rem;
     color: rgba(255,255,255,0.7);
     margin-bottom: 1.5rem;
+}
+
+.hero-buttons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(135deg, #ffd700, #ffc107);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+}
+.btn-secondary {
+    padding: 0.7rem 1.5rem;
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 8px;
+    color: #ffd700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-secondary:hover {
+    background: rgba(255,215,0,0.2);
 }
 
 .quick-access {
@@ -86,6 +123,9 @@
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(255,215,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .module-grid {
@@ -171,26 +211,112 @@
     margin-bottom: 0.5rem;
 }
 
-@media (max-width: 768px) {
+/* 桌面端知识区双栏布局 */
+@media (min-width: 1024px) {
+    .knowledge-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+    .knowledge-card-large {
+        margin-bottom: 0;
+    }
+    .knowledge-preview {
+        padding: 1.5rem 2.5rem !important;
+    }
+    .featured-section {
+        padding: 1.5rem 2.5rem;
+    }
+    .hero-buttons .btn-primary,
+    .hero-buttons .btn-secondary {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 767px) {
     .hero-title {
         font-size: 1.5rem;
     }
-    
     .quick-access {
         grid-template-columns: 1fr;
     }
-    
     .module-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 </style>
 </head>
-<body>
+<body class="has-desktop-sidebar">
 
 <div class="stars" id="stars"></div>
 
+<!-- 桌面端侧边栏 -->
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div>
+            <span class="logo-text">玄机算命网</span>
+            <span class="logo-sub">传承千年智慧</span>
+        </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">主导航</div>
+            <a href="/" class="sidebar-nav-item active">
+                <span class="nav-icon">🏠</span> 首页
+            </a>
+            <a href="/more.html" class="sidebar-nav-item">
+                <span class="nav-icon">🔮</span> 更多模块
+            </a>
+            <a href="/profile.html" class="sidebar-nav-item">
+                <span class="nav-icon">👤</span> 个人中心
+            </a>
+        </div>
+        
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">热门功能</div>
+            <a href="/modules/bazi.html" class="sidebar-nav-item">
+                <span class="nav-icon">🎴</span> 八字排盘
+            </a>
+            <a href="/modules/ziwei.html" class="sidebar-nav-item">
+                <span class="nav-icon">⭐</span> 紫微斗数
+            </a>
+            <a href="/modules/heyun.html" class="sidebar-nav-item">
+                <span class="nav-icon">💑</span> 合婚配对
+            </a>
+            <a href="/modules/shengxiao.html" class="sidebar-nav-item">
+                <span class="nav-icon">🐉</span> 生肖运势
+            </a>
+            <a href="/modules/tarot.html" class="sidebar-nav-item">
+                <span class="nav-icon">🎴</span> 塔罗牌
+            </a>
+            <a href="/modules/zhougong.html" class="sidebar-nav-item">
+                <span class="nav-icon">😴</span> 周公解梦
+            </a>
+            <a href="/modules/fengshui.html" class="sidebar-nav-item">
+                <span class="nav-icon">🏠</span> 风水堪舆
+            </a>
+            <a href="/modules/huangdao.html" class="sidebar-nav-item">
+                <span class="nav-icon">📅</span> 黄道吉日
+            </a>
+        </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+        <a href="/profile.html" class="sidebar-user" id="sidebarUser">
+            <div class="user-avatar">👤</div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">未登录</div>
+                <div class="user-status">点击登录</div>
+            </div>
+        </a>
+    </div>
+</aside>
+
 <div class="app">
+    <!-- 手机端顶部导航 -->
     <nav class="top-nav">
         <a href="/" class="nav-item active">
             <div class="nav-icon">🏠</div>
@@ -209,8 +335,8 @@
     <div class="hero-section">
         <h1 class="hero-title">🔮 玄机算命网</h1>
         <p class="hero-subtitle">传承千年智慧 · 揭秘命运玄机</p>
-        <div style="margin-top: 1rem;">
-            <button class="btn-primary" onclick="openBazi()" style="margin-right: 0.5rem;">八字排盘</button>
+        <div class="hero-buttons">
+            <button class="btn-primary" onclick="openBazi()">八字排盘</button>
             <button class="btn-secondary" onclick="openMore()">更多功能</button>
         </div>
     </div>
@@ -285,79 +411,77 @@
 
     <div class="knowledge-preview">
         <h2 class="section-title">📚 算命知识科普</h2>
-        
-        <div class="knowledge-card-large">
-            <h3>什么是八字？</h3>
-            <p>八字，即生辰八字，是一个人出生时的干支历日期。年干和年支组成年柱，月干和月支组成月柱，日干和日支组成日柱，时干和时支组成时柱；一共四柱，四个干和四个支共八个字，所以称为"八字"。</p>
-            <p>八字命理学通过天干地支的五行生克制化关系，分析一个人的性格、事业、婚姻、健康等各方面的运势走向。</p>
-        </div>
+        <div class="knowledge-grid">
+            <div class="knowledge-card-large">
+                <h3>什么是八字？</h3>
+                <p>八字，即生辰八字，是一个人出生时的干支历日期。年干和年支组成年柱，月干和月支组成月柱，日干和日支组成日柱，时干和时支组成时柱；一共四柱，四个干和四个支共八个字，所以称为"八字"。</p>
+                <p>八字命理学通过天干地支的五行生克制化关系，分析一个人的性格、事业、婚姻、健康等各方面的运势走向。</p>
+            </div>
 
-        <div class="knowledge-card-large">
-            <h3>紫微斗数的起源</h3>
-            <p>紫微斗数起源于道家，相传为陈抟老祖（陈希夷）所创。它将人的命运分为12宫位，每宫位有14主星坐守，通过星曜的组合和四化飞星的变化，精准推断人生百态。</p>
-            <p>紫微斗数与八字命理并称为"命理双壁"，前者重星曜组合，后者重五行生克，两者相辅相成。</p>
-        </div>
+            <div class="knowledge-card-large">
+                <h3>紫微斗数的起源</h3>
+                <p>紫微斗数起源于道家，相传为陈抟老祖（陈希夷）所创。它将人的命运分为12宫位，每宫位有14主星坐守，通过星曜的组合和四化飞星的变化，精准推断人生百态。</p>
+                <p>紫微斗数与八字命理并称为"命理双壁"，前者重星曜组合，后者重五行生克，两者相辅相成。</p>
+            </div>
 
-        <div class="knowledge-card-large">
-            <h3>如何正确使用算命工具？</h3>
-            <p>1. <strong>心态端正</strong>：算命是为提供参考，而非绝对定论。命运掌握在自己手中。</p>
-            <p>2. <strong>信息准确</strong>：输入准确的出生时间（最好精确到分钟），确保排盘准确。</p>
-            <p>3. <strong>综合分析</strong>：不要只看单一指标，要结合八字、紫微、面相、手相等多方面综合判断。</p>
-            <p>4. <strong>理性对待</strong>：算命结果仅供参考，重大决策还需结合现实情况理性分析。</p>
+            <div class="knowledge-card-large">
+                <h3>如何正确使用算命工具？</h3>
+                <p>1. <strong>心态端正</strong>：算命是为提供参考，而非绝对定论。命运掌握在自己手中。</p>
+                <p>2. <strong>信息准确</strong>：输入准确的出生时间（最好精确到分钟），确保排盘准确。</p>
+                <p>3. <strong>综合分析</strong>：不要只看单一指标，要结合八字、紫微、面相、手相等多方面综合判断。</p>
+                <p>4. <strong>理性对待</strong>：算命结果仅供参考，重大决策还需结合现实情况理性分析。</p>
+            </div>
         </div>
     </div>
+    
+    <!-- 手机端底部导航 -->
+    <nav class="bottom-nav">
+        <a href="/" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <span>首页</span>
+        </a>
+        <a href="/more.html" class="nav-item">
+            <div class="nav-icon">🔮</div>
+            <span>更多</span>
+        </a>
+        <a href="/profile.html" class="nav-item">
+            <div class="nav-icon">👤</div>
+            <span>我的</span>
+        </a>
+    </nav>
 </div>
 
 <script src="/js/main.js"></script>
 <script>
 // 页面跳转函数
-function openBazi() {
-    window.location.href = '/modules/bazi.html';
-}
+function openBazi() { window.location.href = '/modules/bazi.html'; }
+function openZiwei() { window.location.href = '/modules/ziwei.html'; }
+function openHeyun() { window.location.href = '/modules/heyun.html'; }
+function openShengxiao() { window.location.href = '/modules/shengxiao.html'; }
+function openXingming() { window.location.href = '/modules/xingming.html'; }
+function openTarot() { window.location.href = '/modules/tarot.html'; }
+function openFengshui() { window.location.href = '/modules/fengshui.html'; }
+function openZhougong() { window.location.href = '/modules/zhougong.html'; }
+function openHuangdao() { window.location.href = '/modules/huangdao.html'; }
+function openJiexing() { window.location.href = '/modules/jiexing.html'; }
+function openCaishen() { window.location.href = '/modules/caishen.html'; }
+function openMore() { window.location.href = '/more.html'; }
 
-function openZiwei() {
-    window.location.href = '/modules/ziwei.html';
-}
-
-function openHeyun() {
-    window.location.href = '/modules/heyun.html';
-}
-
-function openShengxiao() {
-    window.location.href = '/modules/shengxiao.html';
-}
-
-function openXingming() {
-    window.location.href = '/modules/xingming.html';
-}
-
-function openTarot() {
-    window.location.href = '/modules/tarot.html';
-}
-
-function openFengshui() {
-    window.location.href = '/modules/fengshui.html';
-}
-
-function openZhougong() {
-    window.location.href = '/modules/zhougong.html';
-}
-
-function openHuangdao() {
-    window.location.href = '/modules/huangdao.html';
-}
-
-function openJiexing() {
-    window.location.href = '/modules/jiexing.html';
-}
-
-function openCaishen() {
-    window.location.href = '/modules/caishen.html';
-}
-
-function openMore() {
-    window.location.href = '/more.html';
-}
+// 桌面端侧边栏用户信息
+(function() {
+    var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+        var user = null;
+        try {
+            var raw = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (raw) user = JSON.parse(raw);
+        } catch(e) {}
+        if (user && user.username) {
+            document.getElementById('sidebarUserName').textContent = user.username;
+            document.getElementById('sidebarUser').querySelector('.user-status').textContent = '已登录';
+        }
+    }
+})();
 </script>
 
 </body>

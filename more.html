@@ -10,7 +10,7 @@
 <meta name="msapplication-TileImage" content="/icon-192.png">
 <meta name="msapplication-TileColor" content="#ffd700">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>更多算命模块 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
 <style>
@@ -197,9 +197,102 @@
         flex-wrap: wrap;
     }
 }
+
+@media (min-width: 1024px) {
+    .module-list {
+        grid-template-columns: repeat(5, 1fr) !important;
+    }
+    .category-tabs {
+        flex-wrap: wrap;
+        gap: 0.8rem;
+    }
+    .content-area {
+        padding: 2rem 2.5rem !important;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .stats {
+        max-width: 1100px;
+        margin: 0 auto 1.5rem;
+    }
+}
+
+/* 桌面端优化 */
+@media (min-width: 1024px) {
+    .module-list {
+        grid-template-columns: repeat(5, 1fr) !important;
+    }
+    .category-tabs {
+        flex-wrap: wrap;
+        gap: 0.8rem;
+    }
+    .content-area {
+        padding: 2rem 2.5rem !important;
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding-bottom: 2rem !important;
+    }
+    .stats {
+        max-width: 1100px;
+        margin: 0 auto 1.5rem !important;
+    }
+    .search-box {
+        max-width: 1100px;
+        margin: 0 auto 1.5rem !important;
+    }
+}
 </style>
 </head>
-<body>
+<body class="has-desktop-sidebar">
+
+<!-- 桌面端侧边栏 -->
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div>
+            <span class="logo-text">玄机算命网</span>
+            <span class="logo-sub">传承千年智慧</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">主导航</div>
+            <a href="/" class="sidebar-nav-item">
+                <span class="nav-icon">🏠</span> 首页
+            </a>
+            <a href="/more.html" class="sidebar-nav-item active">
+                <span class="nav-icon">🔮</span> 更多模块
+            </a>
+            <a href="/profile.html" class="sidebar-nav-item">
+                <span class="nav-icon">👤</span> 个人中心
+            </a>
+        </div>
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">热门功能</div>
+            <a href="/modules/bazi.html" class="sidebar-nav-item">
+                <span class="nav-icon">🎴</span> 八字排盘
+            </a>
+            <a href="/modules/ziwei.html" class="sidebar-nav-item">
+                <span class="nav-icon">⭐</span> 紫微斗数
+            </a>
+            <a href="/modules/heyun.html" class="sidebar-nav-item">
+                <span class="nav-icon">💑</span> 合婚配对
+            </a>
+            <a href="/modules/shengxiao.html" class="sidebar-nav-item">
+                <span class="nav-icon">🐉</span> 生肖运势
+            </a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/profile.html" class="sidebar-user" id="sidebarUser">
+            <div class="user-avatar">👤</div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">未登录</div>
+                <div class="user-status">点击登录</div>
+            </div>
+        </a>
+    </div>
+</aside>
 
 <div class="stars" id="stars"></div>
 

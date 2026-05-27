@@ -10,13 +10,13 @@
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="msapplication-TileImage" content="/icon-192.png">
 <meta name="msapplication-TileColor" content="#ffd700">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>用户登录 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css?v=20260527">
     <style>
         /* 登录页面特定样式 */
         .login-container {
-            max-width: 400px;
+            max-width: 420px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
@@ -440,6 +440,27 @@
         .success-message.show {
             display: block;
         }
+        
+        /* 桌面端优化 */
+        @media (min-width: 768px) {
+            .login-container {
+                max-width: 480px !important;
+            }
+            .login-header h1 {
+                font-size: 2rem !important;
+            }
+            .login-form {
+                padding: 2.5rem !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .login-container {
+                margin: 4rem auto !important;
+            }
+            .login-header {
+                padding-top: 0 !important;
+            }
+        }
     </style>
 <style>
     .back-btn {
@@ -470,6 +491,27 @@
         font-size: 1.2rem;
         color: #ffd700;
         font-weight: 600;
+    }
+
+    /* 桌面端优化 */
+    @media (min-width: 1024px) {
+        .login-container {
+            max-width: 480px !important;
+            margin: 4rem auto !important;
+        }
+        .login-header {
+            padding-top: 3rem !important;
+        }
+        .login-header h1 {
+            font-size: 2rem !important;
+        }
+        .login-form {
+            padding: 2.5rem !important;
+        }
+        .btn-login {
+            padding: 1rem !important;
+            font-size: 1.1rem !important;
+        }
     }
 </style>
 </head>

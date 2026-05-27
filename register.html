@@ -10,13 +10,13 @@
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="msapplication-TileImage" content="/icon-192.png">
 <meta name="msapplication-TileColor" content="#ffd700">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>用户注册 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css?v=20260527">
     <style>
         /* 注册页面特定样式 */
         .register-container {
-            max-width: 400px;
+            max-width: 420px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
@@ -364,6 +364,27 @@
         
         .sms-captcha-container{background:rgba(255,255,255,0.03);border:1px solid rgba(255,215,0,0.1);border-radius:10px;padding:1rem;margin-bottom:1.2rem}
         .sms-send-btn:disabled{opacity:0.5;cursor:not-allowed}
+        
+        /* 桌面端优化 */
+        @media (min-width: 768px) {
+            .register-container {
+                max-width: 480px !important;
+            }
+            .register-header h1 {
+                font-size: 2rem !important;
+            }
+            .register-form {
+                padding: 2.5rem !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .register-container {
+                margin: 4rem auto !important;
+            }
+            .register-header {
+                padding-top: 0 !important;
+            }
+        }
     </style>
 <style>
     .back-btn {
@@ -394,6 +415,27 @@
         font-size: 1.2rem;
         color: #ffd700;
         font-weight: 600;
+    }
+
+    /* 桌面端优化 */
+    @media (min-width: 1024px) {
+        .register-container {
+            max-width: 480px !important;
+            margin: 3rem auto !important;
+        }
+        .register-header {
+            padding-top: 2rem !important;
+        }
+        .register-header h1 {
+            font-size: 2rem !important;
+        }
+        .register-form {
+            padding: 2.5rem !important;
+        }
+        .btn-register {
+            padding: 1rem !important;
+            font-size: 1.1rem !important;
+        }
     }
 </style>
 </head>

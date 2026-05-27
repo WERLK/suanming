@@ -161,6 +161,15 @@ def update_and_restart():
             logging.error(f'git fetch 失败: {result.stderr}')
             return False
 
+        # 清理 untracked 文件（如日志），防止阻塞更新
+        subprocess.run(
+            ['git', 'clean', '-fd'],
+            cwd=BASE_DIR,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+
         result = subprocess.run(
             ['git', 'reset', '--hard', 'origin/main'],
             cwd=BASE_DIR,

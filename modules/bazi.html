@@ -187,8 +187,9 @@ body{margin:0;padding:0;background:#0f0c29;color:#fff;font-family:-apple-system,
 .dayun-grid{grid-template-columns:repeat(8,1fr)}
 }
 
-/* 隐藏/显示 */
-.hidden{display:none}
+/* ========== 视图内容区 ========== */
+.view-content{display:none}
+.view-content.active{display:block}
 </style>
 </head>
 <body>
@@ -392,9 +393,10 @@ function calcBaziFull(name,gender,birthDate,birthTime,regionLon){
 
   // 太阳时校正
   const region=parseFloat(regionLon)||120;
-  const solarOffset=(region-120)*4; // 每度4分钟
-  const solarHour=Math.floor(solarOffset/60);
-  const solarMin=Math.abs(solarOffset%60);
+  const solarOffset=(region-120)*4; // 每度4分钟，东经为正，西经为负
+  const solarSign=solarOffset>=0?'+':'-';
+  const solarHourAbs=Math.floor(Math.abs(solarOffset)/60);
+  const solarMinAbs=Math.abs(solarOffset)%60;
 
   // 四柱
   const yearGan=tiangan[(year-4)%10];
@@ -505,7 +507,8 @@ function calcBaziFull(name,gender,birthDate,birthTime,regionLon){
     dayMaster:dayGan,dayMasterElement:wuxingMap[dayGan],shishenMap,wuxing,
     taiyuan,minggong,shengong,nayin,changsheng,xunkong,xiyong,
     zodiac,constellation:constellationName,jieqi,lunar,
-    dayun,liunian,shensha,solarTime:{hour:solarHour,min:solarMin,region},
+    dayun,liunian,shensha,
+    solarTime:{sign:solarSign,hour:solarHourAbs,min:solarMinAbs,region:region},
     birthInfo:{year,month,day,time:birthTime||'子时'}
   };
 }
@@ -621,13 +624,35 @@ function calculateBazi(){
   document.getElementById('formSection').classList.add('hidden');
   document.getElementById('resultArea').classList.remove('hidden');
 
-  renderUserInfo(data);
-  renderWuxingStats(data);
-  renderXipan(data);
-  renderHengban(data);
-  renderShuban(data);
-  renderFenxi(data);
-  renderZhishi(data);
+  // 根据模式渲染
+  if(mode==='simple'){
+    // 新手模式：只显示用户信息和简要分析，隐藏细盘/横版/竖版/知识 tab
+    document.getElementById('tab-xipan').style.display='none';
+    document.getElementById('tab-hengban').style.display='none';
+    document.getElementById('tab-shuban').style.display='none';
+    document.getElementById('tab-zhishi').style.display='none';
+    document.getElementById('wuxingStats').style.display='block';
+    renderUserInfo(data);
+    renderWuxingStats(data);
+    renderSimpleAnalysis(data);
+    // 默认显示分析 tab
+    switchView('fenxi');
+    document.getElementById('tab-fenxi').style.display='';
+  }else{
+    // 专业模式：显示所有 tab
+    ['tab-xipan','tab-hengban','tab-shuban','tab-fenxi','tab-zhishi'].forEach(id=>{
+      document.getElementById(id).style.display='';
+    });
+    document.getElementById('wuxingStats').style.display='block';
+    renderUserInfo(data);
+    renderWuxingStats(data);
+    renderXipan(data);
+    renderHengban(data);
+    renderShuban(data);
+    renderFenxi(data);
+    renderZhishi(data);
+    switchView('xipan');
+  }
 }
 
 function renderUserInfo(data){
@@ -645,7 +670,7 @@ function renderUserInfo(data){
     </div>
     <div class="solar-time-info">
       <span class="label">太阳时校正</span>
-      <span>地区${data.solarTime.region}°E ${data.solarTime.hour>=0?'+':'-'}${Math.abs(data.solarTime.hour)}时${data.solarTime.min}分</span>
+      <span>地区${data.solarTime.region}°E ${data.solarTime.sign}${data.solarTime.hour}时${data.solarTime.min}分</span>
     </div>
     <div class="jieqi-info">
       ${data.jieqi.prev?`<span class="jieqi-tag">${data.jieqi.prev.name}(${data.jieqi.prev.month}-${String(data.jieqi.prev.day).padStart(2,'0')})</span>`:''}
@@ -792,6 +817,34 @@ function renderShuban(data){
   });
   html+='</div>';
   document.getElementById('view-shuban').innerHTML=html;
+}
+
+// ========== 新手模式简要分析 ==========
+function renderSimpleAnalysis(data){
+  let html='<div class="beginner-result">';
+  html+=`<div class="beginner-card"><h3>你的八字</h3><p style="font-size:1.4rem;font-weight:700;color:#ffd700">${data.pillars.year} ${data.pillars.month} ${data.pillars.day} ${data.pillars.hour}</p><p>日主<strong>${data.dayMaster}</strong>（${data.dayMasterElement}），生于${data.xiyong.season}季</p></div>`;
+  html+=`<div class="beginner-card"><h3>五行强弱</h3>`;
+  const wxOrder=[{k:'木',c:'#4caf50'},{k:'火',c:'#f44336'},{k:'土',c:'#ff9800'},{k:'金',c:'#ffd700'},{k:'水',c:'#2196f3'}];
+  wxOrder.forEach(({k,c})=>{
+    const v=data.wuxing[k]||0;
+    html+=`<p><span style="color:${c};font-weight:600">${k}</span>：${v.toFixed(1)} ${v>=2?'偏旺':'偏弱'}</p>`;
+  });
+  html+=`</div>`;
+  html+=`<div class="beginner-card"><h3>喜用神</h3><p>喜用：<strong style="color:#ffd700">${data.xiyong.xiyong.join('、')}</strong></p><p>忌神：<strong style="color:#ff6b6b">${data.xiyong.jishen.join('、')}</strong></p></div>`;
+  html+=`<div class="beginner-card"><h3>性格特点</h3><p>${getDayunCharacter(data.dayMaster,data.dayMasterElement)}</p></div>`;
+  html+='</div>';
+  document.getElementById('view-fenxi').innerHTML=html;
+}
+
+function getDayunCharacter(gan,element){
+  const map={
+    '木':'为人仁厚，有进取心，喜欢帮助他人，但有时过于固执。适合从事教育、医疗、艺术等行业。',
+    '火':'热情开朗，行动力强，有领导才能，但有时脾气较急。适合从事管理、演艺、餐饮等行业。',
+    '土':'诚实守信，踏实稳重，有耐心，但有时较为保守。适合从事房地产、建筑、农业等行业。',
+    '金':'果断坚毅，有决断力，讲原则，但有时过于刚强。适合从事金融、法律、机械等行业。',
+    '水':'聪明机智，善于应变，人缘好，但有时情绪多变。适合从事贸易、运输、旅游等行业。'
+  };
+  return map[element]||'性格温和，为人正直。';
 }
 
 function renderFenxi(data){

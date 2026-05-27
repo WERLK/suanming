@@ -1,40 +1,12 @@
+短信验证码扩展加载失败: No module named 'api'
  * Serving Flask app 'app'
  * Debug mode: on
 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
- * Running on http://172.24.0.9:5000
+ * Running on http://172.24.0.14:5000
 [33mPress CTRL+C to quit[0m
  * Restarting with watchdog (inotify)
  * Debugger is active!
- * Debugger PIN: 104-705-839
-127.0.0.1 - - [23/May/2026 11:28:48] "[35m[1mPOST /api/register HTTP/1.1[0m" 201 -
-127.0.0.1 - - [23/May/2026 11:28:48] "[31m[1mPOST /api/register HTTP/1.1[0m" 400 -
-127.0.0.1 - - [23/May/2026 11:28:48] "[31m[1mPOST /api/register HTTP/1.1[0m" 400 -
-/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 30 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
-  return self._jws.encode(
-127.0.0.1 - - [23/May/2026 11:28:48] "POST /api/login HTTP/1.1" 200 -
-/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages/jwt/api_jwt.py:368: InsecureKeyLengthWarning: The HMAC key is 30 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
-  decoded = self.decode_complete(
-127.0.0.1 - - [23/May/2026 11:28:48] "GET /api/profile HTTP/1.1" 200 -
-127.0.0.1 - - [23/May/2026 11:28:48] "[31m[1mGET /api/profile HTTP/1.1[0m" 401 -
-127.0.0.1 - - [23/May/2026 11:28:48] "PUT /api/profile HTTP/1.1" 200 -
-127.0.0.1 - - [23/May/2026 11:28:48] "POST /api/forgot-password HTTP/1.1" 200 -
-127.0.0.1 - - [23/May/2026 11:28:48] "POST /api/reset-password HTTP/1.1" 200 -
- * Detected change in '/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages/captcha/__init__.py', reloading
- * Detected change in '/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages/captcha/__init__.py', reloading
- * Restarting with watchdog (inotify)
- * Debugger is active!
- * Debugger PIN: 104-705-839
- * Detected change in '/workspace/api/app.py', reloading
- * Restarting with watchdog (inotify)
- * Debugger is active!
- * Debugger PIN: 104-705-839
- * Detected change in '/workspace/api/app.py', reloading
- * Restarting with watchdog (inotify)
- * Debugger is active!
- * Debugger PIN: 104-705-839
- * Detected change in '/workspace/api/app.py', reloading
- * Restarting with watchdog (inotify)
- * Debugger is active!
- * Debugger PIN: 104-705-839
+ * Debugger PIN: 193-771-598
+127.0.0.1 - - [27/May/2026 09:52:25] "[33mGET /api/health HTTP/1.1[0m" 404 -

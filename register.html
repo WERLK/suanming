@@ -632,10 +632,9 @@
                 
                 if (data.success) {
                     document.getElementById('sliderId').value = data.slider_id;
-                    const target = document.getElementById('sliderTarget');
                     // 设置目标位置（用 target_x 百分比）
-                    const target = document.getElementById('sliderTarget');
-                    target.style.left = data.target_x + '%';
+                    const sliderTarget = document.getElementById('sliderTarget');
+                    sliderTarget.style.left = data.target_x + '%';
                 }
             } catch (error) {
                 console.error('加载滑块验证码失败:', error);

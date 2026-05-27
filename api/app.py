@@ -653,13 +653,18 @@ def image_analyze():
 def auto_update():
     import subprocess
     try:
-        cwd = '/root/suanming/suanming'
+        cwd = '/home/suanming-fix'  # 阿里云项目目录
+        # 拉取最新代码
         r1 = subprocess.run(['git', 'fetch', 'origin'], cwd=cwd, capture_output=True, text=True, timeout=30)
-        r2 = subprocess.run(['git', 'reset', '--hard', 'origin/master'], cwd=cwd, capture_output=True, text=True, timeout=30)
-        r3 = subprocess.run(['pkill', '-f', 'gunicorn'], capture_output=True, text=True, timeout=10)
+        # 重置到最新 main 分支
+        r2 = subprocess.run(['git', 'reset', '--hard', 'origin/main'], cwd=cwd, capture_output=True, text=True, timeout=30)
+        # 安装依赖（如果有变化）
+        r3 = subprocess.run(['pip3', 'install', '-r', 'requirements.txt'], cwd=cwd, capture_output=True, text=True, timeout=60)
+        # 重启 Gunicorn
+        subprocess.run(['pkill', '-f', 'gunicorn'], capture_output=True, text=True, timeout=10)
         import time
         time.sleep(2)
-        subprocess.Popen(['python3', '-m', 'gunicorn', '-c', 'gunicorn_config.py', 'api.app:app'],
+        subprocess.Popen(['gunicorn', '-c', 'gunicorn_config.py', 'api.app:app'],
                         cwd=cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return f'更新成功！{r2.stdout}', 200
     except Exception as e:

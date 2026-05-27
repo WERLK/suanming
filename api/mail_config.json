@@ -1,0 +1,29 @@
+{
+    "_说明": "邮件服务配置文件。填写后自动启用真实邮件发送。",
+    "_说明2": "不填写则默认使用演示模式（重置链接直接返回给前端显示）。",
+    "_说明3": "推荐使用QQ邮箱SMTP，需先在QQ邮箱设置中开启SMTP服务获取授权码。",
+
+    "smtp_server": "",
+    "smtp_port": 587,
+    "sender_email": "",
+    "sender_password": "",
+
+    "_gmail_example": {
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "sender_email": "your@gmail.com",
+        "sender_password": "应用专用密码"
+    },
+    "_qq_example": {
+        "smtp_server": "smtp.qq.com",
+        "smtp_port": 587,
+        "sender_email": "your@qq.com",
+        "sender_password": "QQ邮箱授权码"
+    },
+    "_163_example": {
+        "smtp_server": "smtp.163.com",
+        "smtp_port": 465,
+        "sender_email": "your@163.com",
+        "sender_password": "163邮箱授权码"
+    }
+}

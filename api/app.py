@@ -79,22 +79,56 @@ def save_users(users):
         json.dump(users, f, ensure_ascii=False, indent=2)
 
 # 发送邮件（用于密码重置）
+# SMTP 配置优先级：环境变量 > mail_config.json > 演示模式
+
+def _get_mail_config():
+    """获取邮件配置，优先从环境变量读取"""
+    config = {
+        'smtp_server': os.environ.get('SMTP_SERVER', ''),
+        'smtp_port': int(os.environ.get('SMTP_PORT', '0') or '0'),
+        'sender_email': os.environ.get('SMTP_EMAIL', ''),
+        'sender_password': os.environ.get('SMTP_PASSWORD', ''),
+    }
+    if config['smtp_server'] and config['sender_email'] and config['sender_password']:
+        if not config['smtp_port']:
+            config['smtp_port'] = 587
+        return config
+
+    # 尝试从配置文件读取
+    mail_config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mail_config.json')
+    if os.path.exists(mail_config_file):
+        try:
+            with open(mail_config_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            server = data.get('smtp_server', '')
+            email = data.get('sender_email', '')
+            pwd = data.get('sender_password', '')
+            port = int(data.get('smtp_port', '587'))
+            if server and email and pwd and 'YOUR_' not in pwd:
+                return {'smtp_server': server, 'smtp_port': port, 'sender_email': email, 'sender_password': pwd}
+        except Exception:
+            pass
+    return None
+
 def send_email(to_email, subject, body):
-    smtp_server = 'smtp.example.com'
-    smtp_port = 587
-    sender_email = 'your_email@example.com'
-    sender_password = 'your_password'
+    """发送邮件（自动根据配置选择真实发送或演示模式）"""
+    mail_config = _get_mail_config()
+    if mail_config is None:
+        print(f"【演示模式】未配置SMTP，邮件内容:\n  收件人: {to_email}\n  主题: {subject}")
+        return False
+
     try:
         msg = MIMEMultipart()
-        msg['From'] = sender_email
+        msg['From'] = mail_config['sender_email']
         msg['To'] = to_email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'html', 'utf-8'))
-        server = smtplib.SMTP(smtp_server, smtp_port)
+        server = smtplib.SMTP(mail_config['smtp_server'], mail_config['smtp_port'])
         server.starttls()
-        server.login(sender_email, sender_password)
+        server.login(mail_config['sender_email'], mail_config['sender_password'])
         server.send_message(msg)
         server.quit()
+        print(f"邮件发送成功: {to_email}")
         return True
     except Exception as e:
         print(f"邮件发送失败: {e}")
@@ -442,11 +476,21 @@ def forgot_password():
         <a href="{reset_link}">{reset_link}</a>
         <p>如果您没有请求重置密码，请忽略此邮件。</p>
         """
-        return jsonify({
-            'success': True,
-            'message': '重置链接已发送到您的邮箱（实际项目中会发送邮件，当前为演示模式）',
-            'reset_link': reset_link
-        }), 200
+
+        # 尝试发送真实邮件
+        email_sent = send_email(email, '密码重置 - 玄机算命网', email_body)
+
+        if email_sent:
+            return jsonify({
+                'success': True,
+                'message': '重置链接已发送到您的邮箱，请注意查收',
+            }), 200
+        else:
+            return jsonify({
+                'success': True,
+                'message': '重置链接已生成（邮件服务未配置，请使用以下链接）',
+                'reset_link': reset_link
+            }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'发送重置邮件失败: {str(e)}'}), 500
 

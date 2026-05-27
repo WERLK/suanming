@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, session, make_response, send_from_directory
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import json
 import hashlib
 import os
@@ -17,6 +19,15 @@ import base64
 app = Flask(__name__, static_folder='../', static_url_path='')
 app.secret_key = 'xuanji_fortune_secret_key_2026!!'  # 32+ chars for HS256
 CORS(app)
+
+# API 请求限流（防止暴力破解和 API 滥用）
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["100 per minute"],  # 默认：每个 IP 每分钟 100 次请求
+    storage_uri="memory://",  # 使用内存存储（生产环境建议使用 Redis）
+)
+
 
 # 验证码存储（实际项目中应使用Redis或数据库）
 captcha_store = {}
@@ -268,6 +279,7 @@ def verify_slider():
     except Exception as e:
         return jsonify({'success': False, 'message': f'验证滑块验证码失败: {str(e)}'}), 500
 
+@limiter.limit("5 per minute")  # 注册限制：每分钟 5 次
 @app.route('/api/register', methods=['POST'])
 def register():
     """用户注册"""
@@ -322,6 +334,7 @@ def register():
     except Exception as e:
         return jsonify({'success': False, 'message': f'注册失败: {str(e)}'}), 500
 
+@limiter.limit("5 per minute")  # 登录限制：每分钟 5 次
 @app.route('/api/login', methods=['POST'])
 def login():
     """用户登录"""
@@ -451,6 +464,7 @@ def update_profile():
     except Exception as e:
         return jsonify({'success': False, 'message': f'更新用户信息失败: {str(e)}'}), 500
 
+@limiter.limit("3 per minute")  # 忘记密码限制：每分钟 3 次
 @app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
     """忘记密码 - 发送重置邮件"""

@@ -1,0 +1,98 @@
+玄机算命网 - 项目结构（整理后）
+=====================================
+时间：2026年5月27日
+版本：v2.1.1
+提交：3642585
+
+📁 根目录（19个文件）
+----------------------
+✅ index.html             - 首页（16K）
+✅ login.html             - 登录页面（39K）
+✅ register.html          - 注册页面（40K）
+✅ profile.html           - 个人中心（38K）
+✅ login_with_sms.html   - 短信登录（37K）
+✅ README.md             - 项目说明文档（9.1K）
+✅ .gitignore            - Git忽略配置
+✅ gunicorn_config.py    - Gunicorn配置（1.2K）
+✅ wsgi.py              - WSGI入口（292字节）
+✅ start.sh              - 启动脚本（1.7K）
+✅ start_prod.sh         - 生产环境启动（2.7K）
+✅ install.sh            - 安装脚本（60K）
+✅ deploy_aliyun.sh      - 阿里云部署（5.0K）
+✅ deploy.sh             - 通用部署（6.0K）
+✅ update.sh             - 更新脚本（299字节）
+✅ auto_update_runner.sh - 自动更新（2.0K）
+✅ remote_update.sh      - 远程更新（4.0K）
+✅ find_server_info.sh   - 服务器信息（3.1K）
+✅ status.sh             - 状态检查（2.7K）
+✅ fix.sh                - 修复脚本（5.0K）
+
+📁 api/ 目录（4个文件，共143K）
+----------------------
+✅ app.py               - Flask应用入口（35K）
+✅ fortune_service.py   - 核心算命服务（90K）
+✅ fortune_routes.py    - API路由（18K）
+✅ __init__.py          - 包初始化（19字节）
+
+📁 js/ 目录（2个文件，共28K）
+----------------------
+✅ fortune-api.js       - 统一API封装（11K）
+✅ main.js             - 主逻辑（17K）
+
+📁 modules/ 目录（222个HTML文件）
+----------------------
+✅ 八字算命系列（10个）
+✅ 紫微斗数系列（10个）
+✅ 塔罗牌系列（10个）
+✅ 星座运势系列（16个）
+✅ 生肖运势系列（12个）
+✅ 面相学系列（20个）
+✅ 风水学系列（10个）
+✅ 姓名学系列（10个）
+✅ 血型性格系列（8个）
+✅ 解梦学系列（10个）
+✅ 数字能量系列（8个）
+✅ 奇门遁甲系列（10个）
+✅ 太乙神数系列（10个）
+✅ 铁板神数系列（10个）
+✅ 梅花易数系列（10个）
+✅ 黄历吉日系列（10个）
+✅ 其他功能（32个）
+
+📁 docs/ 目录（6个MD文档）
+----------------------
+✅ deploy-render.md                  - Render.com部署指南（12K）
+✅ deploy-pythonanywhere.md          - PythonAnywhere部署（1.5K）
+✅ deploy-alicloud.md               - 阿里云部署指南（9.0K）
+✅ deploy-backend.md                 - 后端托管部署（6.8K）
+✅ GitHub_Pages_部署指南.md         - GitHub Pages部署（3.8K）
+✅ 最终完成报告-大数据联网实时分析功能升级.md - 完整报告（18K）
+
+📊 统计数据
+----------------------
+• 总文件数：253个（根目录19 + api/4 + js/2 + modules/222 + docs/6）
+• 删除文件：30+个（临时报告、测试文件、备份文件）
+• 代码行数：
+  - fortune_service.py：1886行
+  - fortune_routes.py：517行
+  - fortune-api.js：270行
+• Git提交：8次
+• 项目大小：约25MB
+
+🎯 整理成果
+----------------------
+1. ✅ 删除所有临时文件和备份文件
+2. ✅ 合并重复的报告文档到 README.md
+3. ✅ 将所有部署文档移动到 docs/ 目录
+4. ✅ 创建 .gitignore 排除临时文件
+5. ✅ 清理 Python 缓存文件
+6. ✅ 统一项目结构，提高可维护性
+
+🚀 下一步
+----------------------
+1. 部署到阿里云ECS（或Render.com）
+2. 配置GitHub Webhook实现实时更新
+3. 修改 js/fortune-api.js 中的API地址
+4. 测试所有221个模块功能
+5. 配置域名和SSL证书（可选）
+

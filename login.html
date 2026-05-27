@@ -591,10 +591,10 @@
                 </div>
                 
                 <div class="social-login">
-                    <button class="social-btn" onclick="showToast('微信登录功能开发中...')">
+                    <button class="social-btn" onclick="showLoginError('微信登录功能开发中...')">
                         📱 微信
                     </button>
-                    <button class="social-btn" onclick="showToast('QQ登录功能开发中...')">
+                    <button class="social-btn" onclick="showLoginError('QQ登录功能开发中...')">
                         🐧 QQ
                     </button>
                 </div>
@@ -608,10 +608,10 @@
     
     <script src="/js/main.js"></script>
     <script>
-        // 创建星空背景
+        // 星空背景
         document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-            checkLogin();
+            if (typeof createStars === 'function') createStars();
+            checkLoginStatus();
             loadCaptcha();
             initSlider();
         });
@@ -736,19 +736,19 @@
             }
         }
         
-        // 发送短信验证码
+            // 发送短信验证码
         async function sendSMSCaptcha() {
             const phone = document.getElementById('smsPhone').value.trim();
             const sendBtn = document.getElementById('smsSendBtn');
             
             // 验证手机号
             if (!phone) {
-                showError('请输入手机号');
+                showLoginError('请输入手机号');
                 return;
             }
             
             if (!/^1[3-9]\d{9}$/.test(phone)) {
-                showError('请输入正确的手机号');
+                showLoginError('请输入正确的手机号');
                 return;
             }
             
@@ -772,14 +772,14 @@
                 
                 if (data.success) {
                     // 发送成功
-                    showSuccess('验证码已发送！');
+                    showLoginSuccess('验证码已发送！');
                     
                     // 存储手机号
                     document.getElementById('smsPhoneStored').value = phone;
                     
                     // 演示模式：显示验证码
                     if (data.code) {
-                        showSuccess(`【演示模式】验证码：${data.code}`);
+                        showLoginSuccess('【演示模式】验证码：' + data.code);
                         document.getElementById('smsCode').value = data.code;
                     }
                     
@@ -787,7 +787,7 @@
                     let countdown = 60;
                     const timer = setInterval(() => {
                         countdown--;
-                        sendBtn.textContent = `${countdown}秒后重发`;
+                        sendBtn.textContent = countdown + '秒后重发';
                         
                         if (countdown <= 0) {
                             clearInterval(timer);
@@ -797,19 +797,19 @@
                     }, 1000);
                 } else {
                     // 发送失败
-                    showError(data.message || '发送失败，请重试');
+                    showLoginError(data.message || '发送失败，请重试');
                     sendBtn.disabled = false;
                     sendBtn.textContent = '发送验证码';
                 }
             } catch (error) {
-                showError('网络错误，请稍后重试');
+                showLoginError('网络错误，请稍后重试');
                 sendBtn.disabled = false;
                 sendBtn.textContent = '发送验证码';
             }
         }
         
-        // 显示错误信息
-        function showError(message) {
+        // 显示错误信息（登录页专用，不依赖 main.js）
+        function showLoginError(message) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
             errorDiv.classList.add('show');
@@ -820,8 +820,8 @@
             }, 3000);
         }
         
-        // 显示成功信息
-        function showSuccess(message) {
+        // 显示成功信息（登录页专用）
+        function showLoginSuccess(message) {
             const successDiv = document.getElementById('successMessage');
             successDiv.textContent = message;
             successDiv.classList.add('show');
@@ -833,7 +833,7 @@
         }
         
         // 检查是否已登录
-        async function checkLogin() {
+        async function checkLoginStatus() {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             
             if (!token) {
@@ -844,7 +844,7 @@
                 // 验证token
                 const response = await fetch('/api/profile', {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': 'Bearer ' + token
                     }
                 });
                 
@@ -881,14 +881,14 @@
             
             // 验证输入
             if (!username) {
-                showError('请输入用户名、手机号或邮箱');
+                showLoginError('请输入用户名、手机号或邮箱');
                 loginBtn.disabled = false;
                 loginBtn.textContent = '登录';
                 return;
             }
             
             if (!password) {
-                showError('请输入密码');
+                showLoginError('请输入密码');
                 loginBtn.disabled = false;
                 loginBtn.textContent = '登录';
                 return;
@@ -900,7 +900,7 @@
                 const captchaText = document.getElementById('captchaText').value.trim();
                 
                 if (!captchaText) {
-                    showError('请输入验证码');
+                    showLoginError('请输入验证码');
                     loginBtn.disabled = false;
                     loginBtn.textContent = '登录';
                     return;
@@ -922,14 +922,14 @@
                     const verifyData = await verifyResponse.json();
                     
                     if (!verifyData.success) {
-                        showError(verifyData.message || '验证码错误');
+                        showLoginError(verifyData.message || '验证码错误');
                         refreshCaptcha();
                         loginBtn.disabled = false;
                         loginBtn.textContent = '登录';
                         return;
                     }
                 } catch (error) {
-                    showError('验证码验证失败，请重试');
+                    showLoginError('验证码验证失败，请重试');
                     loginBtn.disabled = false;
                     loginBtn.textContent = '登录';
                     return;
@@ -939,7 +939,7 @@
                 const sliderX = document.getElementById('sliderX').value;
                 
                 if (!sliderX) {
-                    showError('请完成滑块验证');
+                    showLoginError('请完成滑块验证');
                     loginBtn.disabled = false;
                     loginBtn.textContent = '登录';
                     return;
@@ -961,14 +961,14 @@
                     const verifyData = await verifyResponse.json();
                     
                     if (!verifyData.success) {
-                        showError(verifyData.message || '滑块验证失败');
+                        showLoginError(verifyData.message || '滑块验证失败');
                         loadSlider();
                         loginBtn.disabled = false;
                         loginBtn.textContent = '登录';
                         return;
                     }
                 } catch (error) {
-                    showError('滑块验证失败，请重试');
+                    showLoginError('滑块验证失败，请重试');
                     loginBtn.disabled = false;
                     loginBtn.textContent = '登录';
                     return;
@@ -978,7 +978,7 @@
                 const smsCode = document.getElementById('smsCode').value.trim();
                 
                 if (!smsPhone || !smsCode) {
-                    showError('请完成短信验证码');
+                    showLoginError('请完成短信验证码');
                     loginBtn.disabled = false;
                     loginBtn.textContent = '登录';
                     return;
@@ -1000,13 +1000,13 @@
                     const verifyData = await verifyResponse.json();
                     
                     if (!verifyData.success) {
-                        showError(verifyData.message || '验证码错误');
+                        showLoginError(verifyData.message || '验证码错误');
                         loginBtn.disabled = false;
                         loginBtn.textContent = '登录';
                         return;
                     }
                 } catch (error) {
-                    showError('验证码验证失败，请重试');
+                    showLoginError('验证码验证失败，请重试');
                     loginBtn.disabled = false;
                     loginBtn.textContent = '登录';
                     return;
@@ -1031,7 +1031,7 @@
                 
                 if (data.success) {
                     // 登录成功
-                    showSuccess('登录成功！正在跳转...');
+                    showLoginSuccess('登录成功！正在跳转...');
                     
                     // 保存token和用户信息
                     localStorage.setItem('token', data.token);
@@ -1050,7 +1050,7 @@
                     }, 1500);
                 } else {
                     // 登录失败
-                    showError(data.message || '登录失败，请重试');
+                    showLoginError(data.message || '登录失败，请重试');
                     loginBtn.disabled = false;
                     loginBtn.textContent = '登录';
                     
@@ -1062,7 +1062,7 @@
                     }
                 }
             } catch (error) {
-                showError('网络错误，请稍后重试');
+                showLoginError('网络错误，请稍后重试');
                 loginBtn.disabled = false;
                 loginBtn.textContent = '登录';
             }

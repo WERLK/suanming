@@ -83,6 +83,7 @@
             font-size: 0.8rem;
             color: rgba(255,255,255,0.5);
             margin-top: 0.3rem;
+            line-height: 1.6;
         }
         
         .password-strength {
@@ -164,6 +165,12 @@
             transform: translateY(0);
         }
         
+        .btn-register:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .login-link {
             text-align: center;
             color: rgba(255,255,255,0.7);
@@ -199,6 +206,8 @@
             padding: 0.5rem;
             text-align: center;
             cursor: pointer;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
         }
         
         .captcha-image img {
@@ -333,6 +342,24 @@
         
         .success-message.show {
             display: block;
+        }
+        
+        .reset-link {
+            background: rgba(255,215,0,0.05);
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            word-break: break-all;
+        }
+        
+        .reset-link a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+        
+        .reset-link a:hover {
+            text-decoration: underline;
         }
     </style>
 <style>
@@ -502,25 +529,21 @@
             initSlider();
         });
         
-        // 显示错误信息
-        function showError(message) {
+        // 显示错误信息（注册页专用）
+        function showRegError(message) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
             errorDiv.classList.add('show');
-            
-            // 3秒后自动隐藏
             setTimeout(() => {
                 errorDiv.classList.remove('show');
             }, 3000);
         }
         
-        // 显示成功信息
-        function showSuccess(message) {
+        // 显示成功信息（注册页专用）
+        function showRegSuccess(message) {
             const successDiv = document.getElementById('successMessage');
             successDiv.textContent = message;
             successDiv.classList.add('show');
-            
-            // 3秒后自动隐藏
             setTimeout(() => {
                 successDiv.classList.remove('show');
             }, 3000);
@@ -552,245 +575,6 @@
                 strengthBar.classList.add('strength-medium');
             } else {
                 strengthBar.classList.add('strength-strong');
-            }
-        }
-        
-        // 处理注册
-        async function handleRegister(event) {
-            event.preventDefault();
-            
-            const registerBtn = event.target.querySelector('.btn-register') || event.target.querySelector('button[type="submit"]');
-            if (registerBtn) {
-                registerBtn.disabled = true;
-                registerBtn.textContent = '注册中...';
-            }
-            
-            const username = document.getElementById('username').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-            
-            // 验证用户名
-            if (!username) {
-                showError('请输入用户名');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            if (username.length < 3 || username.length > 20) {
-                showError('用户名长度应为3-20个字符');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-                showError('用户名只能包含字母、数字和下划线');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            // 验证手机号（如果填写）
-            if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
-                showError('请输入正确的手机号');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            // 验证邮箱（如果填写）
-            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showError('请输入正确的邮箱地址');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            // 验证密码
-            if (!password) {
-                showError('请输入密码');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            if (password.length < 6) {
-                showError('密码长度至少6个字符');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            // 验证确认密码
-            if (password !== confirmPassword) {
-                showError('两次输入的密码不一致');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            // 验证验证码
-            if (currentCaptchaType === 'image') {
-                const captchaId = document.getElementById('captchaId').value;
-                const captchaText = document.getElementById('captchaText').value.trim();
-                
-                if (!captchaText) {
-                    showError('请输入验证码');
-                    if (registerBtn) {
-                        registerBtn.disabled = false;
-                        registerBtn.textContent = '注册';
-                    }
-                    return;
-                }
-                
-                // 验证验证码
-                try {
-                    const verifyResponse = await fetch('/api/captcha/verify', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            captcha_id: captchaId,
-                            captcha_text: captchaText
-                        })
-                    });
-                    
-                    const verifyData = await verifyResponse.json();
-                    
-                    if (!verifyData.success) {
-                        showError(verifyData.message || '验证码错误');
-                        refreshCaptcha();
-                        if (registerBtn) {
-                            registerBtn.disabled = false;
-                            registerBtn.textContent = '注册';
-                        }
-                        return;
-                    }
-                } catch (error) {
-                    showError('验证码验证失败，请重试');
-                    if (registerBtn) {
-                        registerBtn.disabled = false;
-                        registerBtn.textContent = '注册';
-                    }
-                    return;
-                }
-            } else if (currentCaptchaType === 'slider') {
-                const sliderId = document.getElementById('sliderId').value;
-                const sliderX = document.getElementById('sliderX').value;
-                
-                if (!sliderX) {
-                    showError('请完成滑块验证');
-                    if (registerBtn) {
-                        registerBtn.disabled = false;
-                        registerBtn.textContent = '注册';
-                    }
-                    return;
-                }
-                
-                // 验证滑块
-                try {
-                    const verifyResponse = await fetch('/api/slider/verify', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            slider_id: sliderId,
-                            slider_x: parseInt(sliderX)
-                        })
-                    });
-                    
-                    const verifyData = await verifyResponse.json();
-                    
-                    if (!verifyData.success) {
-                        showError(verifyData.message || '滑块验证失败');
-                        loadSlider();
-                        if (registerBtn) {
-                            registerBtn.disabled = false;
-                            registerBtn.textContent = '注册';
-                        }
-                        return;
-                    }
-                } catch (error) {
-                    showError('滑块验证失败，请重试');
-                    if (registerBtn) {
-                        registerBtn.disabled = false;
-                        registerBtn.textContent = '注册';
-                    }
-                    return;
-                }
-            }
-            
-            // 验证用户协议
-            if (!agreeTerms) {
-                showError('请阅读并同意用户协议和隐私政策');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
-                return;
-            }
-            
-            try {
-                // 调用后端API
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password,
-                        email: email,
-                        phone: phone
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // 注册成功
-                    showSuccess('注册成功！正在跳转到登录页面...');
-                    
-                    // 延迟跳转
-                    setTimeout(() => {
-                        window.location.href = '/login.html';
-                    }, 1500);
-                } else {
-                    // 注册失败
-                    showError(data.message || '注册失败，请重试');
-                    if (registerBtn) {
-                        registerBtn.disabled = false;
-                        registerBtn.textContent = '注册';
-                    }
-                }
-            } catch (error) {
-                showError('网络错误，请稍后重试');
-                if (registerBtn) {
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = '注册';
-                }
             }
         }
         
@@ -848,8 +632,6 @@
                 
                 if (data.success) {
                     document.getElementById('sliderId').value = data.slider_id;
-                    
-                    // 设置目标位置
                     const target = document.getElementById('sliderTarget');
                     target.style.left = data.target_y + '%';
                 }
@@ -877,7 +659,6 @@
             
             function drag(e) {
                 if (!isDragging) return;
-                
                 e.preventDefault();
                 
                 const trackRect = sliderTrack.getBoundingClientRect();
@@ -894,7 +675,6 @@
                 
                 sliderButton.style.left = newLeft + 'px';
                 
-                // 计算百分比
                 const percent = Math.round((newLeft / (trackRect.width - 40)) * 100);
                 document.getElementById('sliderX').value = percent;
             }
@@ -908,34 +688,180 @@
             }
         }
         
-        // 检查是否已登录
-        async function checkLogin() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        // 处理注册
+        async function handleRegister(event) {
+            event.preventDefault();
             
-            if (!token) {
-                return; // 未登录，停留在注册页
+            const registerBtn = event.target.querySelector('.btn-register') || event.target.querySelector('button[type="submit"]');
+            if (registerBtn) {
+                registerBtn.disabled = true;
+                registerBtn.textContent = '注册中...';
+            }
+            
+            const username = document.getElementById('username').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            
+            // 验证用户名
+            if (!username) {
+                showRegError('请输入用户名');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            if (username.length < 3 || username.length > 20) {
+                showRegError('用户名长度应为3-20个字符');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showRegError('用户名只能包含字母、数字和下划线');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            // 验证手机号（如果填写）
+            if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+                showRegError('请输入正确的手机号');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            // 验证邮箱（如果填写）
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showRegError('请输入正确的邮箱地址');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            // 验证密码
+            if (!password) {
+                showRegError('请输入密码');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            if (password.length < 6) {
+                showRegError('密码长度至少6个字符');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            // 验证确认密码
+            if (password !== confirmPassword) {
+                showRegError('两次输入的密码不一致');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
+            }
+            
+            // 验证验证码
+            if (currentCaptchaType === 'image') {
+                const captchaId = document.getElementById('captchaId').value;
+                const captchaText = document.getElementById('captchaText').value.trim();
+                
+                if (!captchaText) {
+                    showRegError('请输入验证码');
+                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                    return;
+                }
+                
+                // 验证验证码
+                try {
+                    const verifyResponse = await fetch('/api/captcha/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            captcha_id: captchaId,
+                            captcha_text: captchaText
+                        })
+                    });
+                    const verifyData = await verifyResponse.json();
+                    if (!verifyData.success) {
+                        showRegError(verifyData.message || '验证码错误');
+                        refreshCaptcha();
+                        if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                        return;
+                    }
+                } catch (error) {
+                    showRegError('验证码验证失败，请重试');
+                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                    return;
+                }
+            } else if (currentCaptchaType === 'slider') {
+                const sliderId = document.getElementById('sliderId').value;
+                const sliderX = document.getElementById('sliderX').value;
+                
+                if (!sliderX) {
+                    showRegError('请完成滑块验证');
+                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                    return;
+                }
+                
+                // 验证滑块
+                try {
+                    const verifyResponse = await fetch('/api/slider/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            slider_id: sliderId,
+                            slider_x: parseInt(sliderX)
+                        })
+                    });
+                    const verifyData = await verifyResponse.json();
+                    if (!verifyData.success) {
+                        showRegError(verifyData.message || '滑块验证失败');
+                        loadSlider();
+                        if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                        return;
+                    }
+                } catch (error) {
+                    showRegError('滑块验证失败，请重试');
+                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                    return;
+                }
+            }
+            
+            // 验证用户协议
+            if (!agreeTerms) {
+                showRegError('请阅读并同意用户协议和隐私政策');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                return;
             }
             
             try {
-                // 验证token
-                const response = await fetch('/api/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                // 调用后端API
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        email: email,
+                        phone: phone
+                    })
                 });
                 
-                if (response.ok) {
-                    // 已登录，跳转到个人中心
-                    window.location.href = '/profile.html';
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 注册成功
+                    showRegSuccess('注册成功！正在跳转到登录页面...');
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 1500);
+                } else {
+                    // 注册失败
+                    showRegError(data.message || '注册失败，请重试');
+                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
                 }
             } catch (error) {
-                // 网络错误，忽略
+                showRegError('网络错误，请稍后重试');
+                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
             }
-        }
-        
-        // 页面加载时检查登录状态
-        if (window === window.top) {
-            checkLogin();
         }
     </script>
 </div>

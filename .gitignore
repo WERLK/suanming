@@ -46,7 +46,5 @@ SMS_REPORT.md
 PythonAnywhere_部署*报告.md
 后端托管*报告.md
 
-# Keep only:
-# - README.md (main documentation)
-# - FINAL_REPORT.md (final summary)
-# - DEPLOYMENT_GUIDE.md (consolidated deployment guide)
+# Keep these specific reports:
+!后端运行脚本配置完成报告.md

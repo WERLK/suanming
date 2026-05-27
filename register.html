@@ -361,6 +361,9 @@
         .reset-link a:hover {
             text-decoration: underline;
         }
+        
+        .sms-captcha-container{background:rgba(255,255,255,0.03);border:1px solid rgba(255,215,0,0.1);border-radius:10px;padding:1rem;margin-bottom:1.2rem}
+        .sms-send-btn:disabled{opacity:0.5;cursor:not-allowed}
     </style>
 <style>
     .back-btn {
@@ -471,6 +474,7 @@
                     <div class="captcha-type-switch">
                         <button type="button" class="captcha-type-btn active" data-type="image" onclick="switchCaptchaType('image')">图片验证码</button>
                         <button type="button" class="captcha-type-btn" data-type="slider" onclick="switchCaptchaType('slider')">滑块验证码</button>
+                        <button type="button" class="captcha-type-btn" data-type="sms" onclick="switchCaptchaType('sms')">📱 短信验证码</button>
                     </div>
                     
                     <!-- 图片验证码 -->
@@ -500,6 +504,39 @@
                         <div class="slider-hint">请拖动滑块到指定位置</div>
                         <input type="hidden" id="sliderId" name="slider_id" value="">
                         <input type="hidden" id="sliderX" name="slider_x" value="">
+                    </div>
+                    
+                    <!-- 短信验证码 -->
+                    <div class="sms-captcha-container" id="smsCaptcha" style="display: none;">
+                        <input 
+                            type="tel" 
+                            class="sms-phone-input" 
+                            id="smsPhone" 
+                            name="sms_phone" 
+                            placeholder="请输入手机号"
+                            maxlength="11"
+                            style="width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; color: #ffffff; font-size: 0.95rem; box-sizing: border-box; margin-bottom: 0.5rem;"
+                        >
+                        <div class="sms-code-display" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <input 
+                                type="text" 
+                                class="sms-code-input" 
+                                id="smsCode" 
+                                name="sms_code" 
+                                placeholder="验证码"
+                                maxlength="6"
+                                style="flex: 1; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; color: #ffffff; font-size: 0.95rem; box-sizing: border-box;"
+                            >
+                            <button 
+                                type="button" 
+                                class="sms-send-btn" 
+                                id="smsSendBtn"
+                                onclick="sendSMSCaptcha()"
+                                style="background: linear-gradient(135deg, #ffd700, #ffed4e); border: none; border-radius: 8px; color: #000; padding: 0.8rem 1rem; cursor: pointer; font-size: 0.9rem; font-weight: bold; white-space: nowrap;"
+                            >发送验证码</button>
+                        </div>
+                        <div class="sms-hint" id="smsHint" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-align: center;">验证码已发送到您的手机，5分钟内有效</div>
+                        <input type="hidden" id="smsPhoneStored" name="sms_phone_stored" value="">
                     </div>
                     
                     <div class="form-options">
@@ -595,11 +632,17 @@
             if (type === 'image') {
                 document.getElementById('imageCaptcha').style.display = 'block';
                 document.getElementById('sliderCaptcha').style.display = 'none';
+                document.getElementById('smsCaptcha').style.display = 'none';
                 loadCaptcha();
-            } else {
+            } else if (type === 'slider') {
                 document.getElementById('imageCaptcha').style.display = 'none';
                 document.getElementById('sliderCaptcha').style.display = 'block';
+                document.getElementById('smsCaptcha').style.display = 'none';
                 loadSlider();
+            } else if (type === 'sms') {
+                document.getElementById('imageCaptcha').style.display = 'none';
+                document.getElementById('sliderCaptcha').style.display = 'none';
+                document.getElementById('smsCaptcha').style.display = 'block';
             }
         }
         
@@ -621,6 +664,61 @@
         // 刷新验证码
         function refreshCaptcha() {
             loadCaptcha();
+        }
+        
+        // 发送短信验证码
+        async function sendSMSCaptcha() {
+            const phone = document.getElementById('smsPhone').value.trim();
+            const sendBtn = document.getElementById('smsSendBtn');
+            
+            if (!phone) {
+                showRegError('请输入手机号');
+                return;
+            }
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                showRegError('请输入正确的手机号');
+                return;
+            }
+            
+            sendBtn.disabled = true;
+            sendBtn.textContent = '发送中...';
+            
+            try {
+                const response = await fetch('/api/sms/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phone })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showRegSuccess(data.demo ? '【演示模式】验证码：' + data.code : '验证码已发送！');
+                    if (data.code) {
+                        document.getElementById('smsCode').value = data.code;
+                    }
+                    document.getElementById('smsPhoneStored').value = phone;
+                    
+                    let countdown = 60;
+                    const timer = setInterval(function() {
+                        countdown--;
+                        sendBtn.textContent = countdown + '秒后重发';
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            sendBtn.disabled = false;
+                            sendBtn.textContent = '重新发送';
+                        }
+                    }, 1000);
+                } else {
+                    showRegError(data.message || '发送失败');
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送验证码';
+                }
+            } catch (error) {
+                showRegError('网络错误，请稍后重试');
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送验证码';
+            }
         }
         
         // 加载滑块验证码
@@ -820,6 +918,36 @@
                     }
                 } catch (error) {
                     showRegError('滑块验证失败，请重试');
+                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                    return;
+                }
+            } else if (currentCaptchaType === 'sms') {
+                const smsPhone = document.getElementById('smsPhoneStored').value;
+                const smsCode = document.getElementById('smsCode').value.trim();
+                
+                if (!smsPhone || !smsCode) {
+                    showRegError('请先获取并输入短信验证码');
+                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                    return;
+                }
+                
+                try {
+                    const verifyResponse = await fetch('/api/sms/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            phone: smsPhone,
+                            code: smsCode
+                        })
+                    });
+                    const verifyData = await verifyResponse.json();
+                    if (!verifyData.success) {
+                        showRegError(verifyData.message || '验证码错误');
+                        if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
+                        return;
+                    }
+                } catch (error) {
+                    showRegError('验证码验证失败，请重试');
                     if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
                     return;
                 }

@@ -1,0 +1,21 @@
+{
+    "_说明": "短信验证码配置文件。填写实际值后自动启用真实短信发送。",
+    "_说明2": "如果 provider 未填写或设为 'demo'，则使用演示模式（验证码直接显示在页面）。",
+
+    "provider": "aliyun",
+    
+    "aliyun": {
+        "access_key_id": "YOUR_ALIYUN_ACCESS_KEY_ID",
+        "access_key_secret": "YOUR_ALIYUN_ACCESS_KEY_SECRET",
+        "sign_name": "玄机算命网",
+        "template_code": "SMS_123456789"
+    },
+    
+    "tencent": {
+        "secret_id": "YOUR_TENCENT_SECRET_ID",
+        "secret_key": "YOUR_TENCENT_SECRET_KEY",
+        "sms_sdk_app_id": "1400000000",
+        "sign_name": "玄机算命网",
+        "template_id": "123456"
+    }
+}

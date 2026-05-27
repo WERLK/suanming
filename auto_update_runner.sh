@@ -51,13 +51,13 @@ start_daemon() {
     fi
 }
 
-start_daemon()
+start_daemon
 
 # 主循环：每 CHECK_INTERVAL 秒检查一次守护进程
 while true; do
     if ! pgrep -f "auto_update_daemon.py" > /dev/null 2>&1; then
         log "检测到 auto_update_daemon.py 已停止，正在重启..."
-        start_daemon()
+        start_daemon
     fi
     sleep "$CHECK_INTERVAL"
 done

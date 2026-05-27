@@ -157,6 +157,131 @@
         .btn-logout:hover {
             background: rgba(255,0,0,0.2);
         }
+
+        /* ========== 会员卡片 ========== */
+        .vip-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 12px;
+            margin: 0 1rem 1.5rem;
+            overflow: hidden;
+        }
+        .vip-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 1rem;
+            background: linear-gradient(90deg, rgba(255,215,0,0.15), transparent);
+        }
+        .vip-badge {
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+        }
+        .vip-badge.free {
+            background: rgba(136,136,136,0.15);
+            color: #888;
+        }
+        .vip-badge.basic {
+            background: rgba(76,175,80,0.15);
+            color: #4caf50;
+        }
+        .vip-badge.premium {
+            background: rgba(255,215,0,0.15);
+            color: #ffd700;
+        }
+        .vip-expire {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+        .vip-card-body {
+            padding: 0.8rem 1rem;
+        }
+        .vip-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+        }
+        .vip-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+        .vip-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .vip-info-row span {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            flex: 1;
+        }
+        .vip-ad-btn {
+            padding: 0.5rem 0.8rem;
+            background: linear-gradient(135deg, #ffd700, #ffc107);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 0.78rem;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        .vip-ad-btn:hover {
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+            transform: scale(1.02);
+        }
+        .vip-ad-btn:disabled {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+        /* 广告观看弹窗 */
+        .ad-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .ad-modal.show {
+            display: flex;
+        }
+        .ad-modal-content {
+            text-align: center;
+            max-width: 320px;
+        }
+        .ad-timer {
+            font-size: 3rem;
+            color: #ffd700;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+        .ad-hint {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .ad-skip-btn {
+            padding: 0.6rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
         
         .edit-profile-modal {
             display: none;
@@ -305,6 +430,25 @@
                 <p class="profile-info" id="profileInfo">请登录</p>
             </div>
             
+            <!-- 会员卡片 -->
+            <div class="vip-card" id="vipCard" style="display:none;">
+                <div class="vip-card-header">
+                    <span class="vip-badge" id="vipBadge">免费用户</span>
+                    <span class="vip-expire" id="vipExpire"></span>
+                </div>
+                <div class="vip-card-body">
+                    <div class="vip-progress">
+                        <div class="vip-progress-bar" id="vipProgressBar" style="width:0%"></div>
+                    </div>
+                    <div class="vip-info-row">
+                        <span id="vipRemaining">未开通会员</span>
+                        <button class="vip-ad-btn" id="vipAdBtn" onclick="watchAdForVIP()">
+                            📺 看广告赚时长（<span id="adRemain">0</span>次）
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="profile-stats">
                 <div class="stat-item">
                     <div class="stat-value" id="divinationCount">0</div>
@@ -445,6 +589,18 @@
         </div>
     </div>
     
+    <!-- 广告观看弹窗 -->
+    <div class="ad-modal" id="adModal">
+        <div class="ad-modal-content">
+            <p style="color:#ffd700;font-size:1.1rem;">📺 正在观看广告</p>
+            <div class="ad-timer" id="adTimer">5</div>
+            <p class="ad-hint">广告结束后自动获得2小时会员</p>
+            <button class="ad-skip-btn" id="adSkipBtn" onclick="closeAdModal()" style="display:none;">
+                ✅ 领取奖励
+            </button>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <a href="/" class="nav-item">
             <div class="nav-icon">🏠</div>
@@ -521,6 +677,9 @@
                 
                 // 加载用户统计数据
                 loadUserStats(user);
+                
+                // 加载会员状态
+                loadVIPStatus();
                 
                 // 填充编辑表单
                 document.getElementById('editUsername').value = user.username || '';
@@ -691,6 +850,129 @@
         document.getElementById('editProfileModal').addEventListener('click', function(event) {
             if (event.target === this) {
                 closeEditProfile();
+            }
+        });
+
+        // ========== 会员VIP系统 ==========
+        let adTimerInterval = null;
+
+        async function loadVIPStatus() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) return;
+            try {
+                const resp = await fetch('/api/vip/status', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await resp.json();
+                if (!data.success) return;
+                
+                const card = document.getElementById('vipCard');
+                card.style.display = 'block';
+                
+                // 会员等级徽章
+                const badge = document.getElementById('vipBadge');
+                badge.textContent = data.vip_level_name;
+                badge.className = 'vip-badge ' + data.vip_level;
+                
+                // 到期时间
+                const expireEl = document.getElementById('vipExpire');
+                if (data.vip_expire) {
+                    const d = new Date(data.vip_expire);
+                    expireEl.textContent = '到期: ' + d.toLocaleDateString('zh-CN');
+                } else {
+                    expireEl.textContent = data.vip_level === 'free' ? '' : '永久';
+                }
+                
+                // 剩余时长
+                const remainEl = document.getElementById('vipRemaining');
+                const progressBar = document.getElementById('vipProgressBar');
+                if (data.vip_remaining) {
+                    remainEl.textContent = '剩余: ' + data.vip_remaining;
+                    // 简单进度（按天算比例）
+                    const expireDate = new Date(data.vip_expire);
+                    const now = new Date();
+                    const total = expireDate - now;
+                    const max = 7 * 24 * 3600 * 1000;  // 以7天为满
+                    const pct = Math.min(100, Math.max(0, (total / max) * 100));
+                    progressBar.style.width = pct + '%';
+                } else {
+                    remainEl.textContent = data.vip_level === 'free' ? '看广告免费升级会员' : '已过期';
+                    progressBar.style.width = '0%';
+                }
+                
+                // 广告按钮
+                const adBtn = document.getElementById('vipAdBtn');
+                const adCount = document.getElementById('adRemain');
+                const remaining = data.max_daily_ads - data.today_ads;
+                adCount.textContent = '剩' + remaining;
+                
+                if (remaining <= 0) {
+                    adBtn.disabled = true;
+                    adBtn.innerHTML = '📺 今日次数已用完';
+                } else {
+                    adBtn.disabled = false;
+                }
+            } catch (e) {
+                console.error('加载会员状态失败:', e);
+            }
+        }
+
+        function watchAdForVIP() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) { window.location.href = '/login.html'; return; }
+            
+            const modal = document.getElementById('adModal');
+            const timer = document.getElementById('adTimer');
+            const skipBtn = document.getElementById('adSkipBtn');
+            
+            modal.classList.add('show');
+            skipBtn.style.display = 'none';
+            
+            let seconds = 5;
+            timer.textContent = seconds;
+            
+            if (adTimerInterval) clearInterval(adTimerInterval);
+            
+            adTimerInterval = setInterval(() => {
+                seconds--;
+                timer.textContent = seconds;
+                if (seconds <= 0) {
+                    clearInterval(adTimerInterval);
+                    timer.textContent = '✓';
+                    skipBtn.style.display = 'inline-block';
+                }
+            }, 1000);
+        }
+
+        async function closeAdModal() {
+            clearInterval(adTimerInterval);
+            document.getElementById('adModal').classList.remove('show');
+            
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) return;
+            
+            try {
+                const resp = await fetch('/api/vip/watch-ad', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    loadVIPStatus();
+                } else {
+                    showToast('⚠️ ' + data.message);
+                }
+            } catch (e) {
+                console.error('广告奖励失败:', e);
+                showToast('网络错误，请重试');
+            }
+        }
+
+        // 点击广告弹窗空白处关闭（广告未结束时不能关闭）
+        document.getElementById('adModal').addEventListener('click', function(e) {
+            if (e.target === this && document.getElementById('adSkipBtn').style.display !== 'none') {
+                closeAdModal();
             }
         });
     </script>

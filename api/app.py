@@ -301,7 +301,11 @@ def register():
             'gender': '',
             'create_time': datetime.now().isoformat(),
             'last_login': datetime.now().isoformat(),
-            'status': 'active'
+            'status': 'active',
+            'vip_level': 'free',
+            'vip_expire': None,
+            'ad_watch_count': 0,
+            'ad_watch_date': ''
         }
         users.append(new_user)
         save_users(users)
@@ -400,7 +404,10 @@ def get_profile():
             'birthday': user.get('birthday', ''),
             'gender': user.get('gender', ''),
             'create_time': user.get('create_time', ''),
-            'last_login': user.get('last_login', '')
+            'last_login': user.get('last_login', ''),
+            'vip_level': user.get('vip_level', 'free'),
+            'vip_expire': user.get('vip_expire', None),
+            'ad_watch_count': user.get('ad_watch_count', 0)
         }
         return jsonify({'success': True, 'user': user_info}), 200
     except Exception as e:
@@ -649,6 +656,166 @@ def auto_update():
         return f'更新成功！{r2.stdout}', 200
     except Exception as e:
         return f'更新失败：{str(e)}', 500
+
+# ========== 会员VIP系统 ==========
+
+VIP_LEVELS = {
+    'free': {'name': '免费用户', 'color': '#888', 'max_daily_ads': 3},
+    'basic': {'name': '基础会员', 'color': '#4caf50', 'max_daily_ads': 5},
+    'premium': {'name': '高级会员', 'color': '#ffd700', 'max_daily_ads': 10},
+}
+
+AD_REWARD_HOURS = 2  # 每次看广告赠送2小时会员
+
+
+def _get_today():
+    return datetime.now().strftime('%Y-%m-%d')
+
+
+def _get_auth_user():
+    """获取当前登录用户"""
+    token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
+    if not token:
+        return None
+    user_id = verify_token(token)
+    if not user_id:
+        return None
+    users = load_users()
+    for u in users:
+        if u['id'] == user_id:
+            return u, users
+    return None
+
+
+def _ensure_vip_fields(user):
+    """确保用户有VIP字段"""
+    defaults = {
+        'vip_level': 'free',
+        'vip_expire': None,
+        'ad_watch_count': 0,
+        'ad_watch_date': ''
+    }
+    for k, v in defaults.items():
+        if k not in user:
+            user[k] = v
+    return user
+
+
+@app.route('/api/vip/status', methods=['GET'])
+def vip_status():
+    """获取会员状态"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+        _ensure_vip_fields(user)
+
+        vip_expire = user.get('vip_expire')
+        vip_remaining = None
+        if vip_expire:
+            expire_dt = datetime.fromisoformat(vip_expire)
+            remaining = expire_dt - datetime.now()
+            if remaining.total_seconds() <= 0:
+                user['vip_level'] = 'free'
+                user['vip_expire'] = None
+                save_users(users)
+                vip_expire = None
+            else:
+                hours = remaining.total_seconds() // 3600
+                minutes = (remaining.total_seconds() % 3600) // 60
+                vip_remaining = f'{int(hours)}小时{int(minutes)}分钟'
+
+        level_info = VIP_LEVELS.get(user.get('vip_level', 'free'), VIP_LEVELS['free'])
+        today = _get_today()
+        today_ads = user.get('ad_watch_count', 0) if user.get('ad_watch_date') == today else 0
+        max_ads = VIP_LEVELS[user.get('vip_level', 'free')]['max_daily_ads']
+
+        return jsonify({
+            'success': True,
+            'vip_level': user.get('vip_level', 'free'),
+            'vip_level_name': level_info['name'],
+            'vip_expire': vip_expire,
+            'vip_remaining': vip_remaining,
+            'ad_watch_count': user.get('ad_watch_count', 0),
+            'ad_watch_date': user.get('ad_watch_date', ''),
+            'today_ads': today_ads,
+            'max_daily_ads': max_ads,
+            'ad_reward_hours': AD_REWARD_HOURS
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/vip/watch-ad', methods=['POST'])
+def vip_watch_ad():
+    """观看广告增加会员时长"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+        _ensure_vip_fields(user)
+
+        # 找到用户在列表中的索引
+        user_index = None
+        for i, u in enumerate(users):
+            if u['id'] == user['id']:
+                user_index = i
+                break
+
+        today = _get_today()
+        ad_date = user.get('ad_watch_date', '')
+        today_ads = user.get('ad_watch_count', 0) if ad_date == today else 0
+        max_ads = VIP_LEVELS[user.get('vip_level', 'free')]['max_daily_ads']
+
+        if today_ads >= max_ads:
+            return jsonify({
+                'success': False,
+                'message': f'今日观看次数已达上限（{max_ads}次），明天再来吧'
+            }), 400
+
+        # 增加会员时长
+        now = datetime.now()
+        vip_expire = user.get('vip_expire')
+        if vip_expire:
+            expire_dt = datetime.fromisoformat(vip_expire)
+            if expire_dt < now:
+                expire_dt = now
+        else:
+            expire_dt = now
+
+        new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
+
+        users[user_index]['vip_expire'] = new_expire.isoformat()
+        users[user_index]['vip_level'] = 'basic'
+
+        # 更新广告计数
+        if ad_date == today:
+            users[user_index]['ad_watch_count'] = today_ads + 1
+        else:
+            users[user_index]['ad_watch_count'] = 1
+            users[user_index]['ad_watch_date'] = today
+
+        save_users(users)
+
+        remaining = new_expire - datetime.now()
+        hours = int(remaining.total_seconds() // 3600)
+        minutes = int((remaining.total_seconds() % 3600) // 60)
+
+        return jsonify({
+            'success': True,
+            'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时',
+            'vip_level': 'basic',
+            'vip_level_name': '基础会员',
+            'vip_remaining': f'{hours}小时{minutes}分钟',
+            'vip_expire': new_expire.isoformat(),
+            'today_ads': users[user_index]['ad_watch_count'],
+            'max_daily_ads': max_ads
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

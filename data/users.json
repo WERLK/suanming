@@ -76,5 +76,22 @@
     "create_time": "2026-05-27T08:57:43.833229",
     "last_login": "2026-05-27T08:57:43.858431",
     "status": "active"
+  },
+  {
+    "id": "user_Wz3OqlhHliSuu1HTb5vNSeRomasXAMLM",
+    "username": "vip_test_user",
+    "password": "6grzMAlFagWvaxI0Yx3m7KzkCS34p2KG$c8b9dedec7d96f33463b863053a89cad20a13a020d563b6157d7d3605da724fb",
+    "email": "vip@test.com",
+    "phone": "",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T09:33:45.327043",
+    "last_login": "2026-05-27T09:33:45.352306",
+    "status": "active",
+    "vip_level": "basic",
+    "vip_expire": "2026-05-27T17:33:45.353836",
+    "ad_watch_count": 4,
+    "ad_watch_date": "2026-05-27"
   }
 ]

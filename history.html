@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="玄机算命">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="msapplication-TileImage" content="/icon-192.png">
+    <meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>算命历史 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* 算命历史页面特定样式 */
+        .history-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .history-header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(180deg, rgba(255,215,0,0.1), transparent);
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+            margin-bottom: 1.5rem;
+        }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .history-item {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .history-item:hover {
+            background: rgba(255,215,0,0.08);
+            transform: translateX(5px);
+        }
+        
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        
+        .history-module-name {
+            color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .history-time {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+        }
+        
+        .history-input {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+        
+        .history-result {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+        
+        .history-action-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 6px;
+            color: #ffd700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .history-action-btn:hover {
+            background: rgba(255,215,0,0.2);
+        }
+        
+        .empty-history {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .empty-history-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* 桌面端布局 */
+        @media (min-width: 1024px) {
+            .history-container {
+                max-width: 900px !important;
+                padding: 0 2rem !important;
+            }
+            
+            .history-header {
+                padding: 3rem 2rem !important;
+            }
+            
+            .history-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+    
+    <!-- 桌面端侧边栏 -->
+    <aside class="desktop-sidebar" id="desktopSidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🔮</div>
+            <div>
+                <span class="logo-text">玄机算命网</span>
+                <span class="logo-sub">传承千年智慧</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <div class="sidebar-nav-title">主导航</div>
+                <a href="/" class="sidebar-nav-item">
+                    <span class="nav-icon">🏠</span> 首页
+                </a>
+                <a href="/more.html" class="sidebar-nav-item">
+                    <span class="nav-icon">🔮</span> 更多模块
+                </a>
+                <a href="/profile.html" class="sidebar-nav-item active">
+                    <span class="nav-icon">👤</span> 个人中心
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <div class="sidebar-nav-title">热门功能</div>
+                <a href="/modules/bazi.html" class="sidebar-nav-item">
+                    <span class="nav-icon">🎴</span> 八字排盘
+                </a>
+                <a href="/modules/ziwei.html" class="sidebar-nav-item">
+                    <span class="nav-icon">⭐</span> 紫微斗数
+                </a>
+                <a href="/modules/heyun.html" class="sidebar-nav-item">
+                    <span class="nav-icon">💑</span> 合婚配对
+                </a>
+                <a href="/modules/shengxiao.html" class="sidebar-nav-item">
+                    <span class="nav-icon">🐉</span> 生肖运势
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUser">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebarUserName">加载中...</div>
+                    <div class="user-status">已登录</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
+    <div class="page-header">
+        <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+        <h1>算命历史</h1>
+    </div>
+    
+    <div class="content-area">
+        <div class="stars" id="stars"></div>
+        
+        <div class="app">
+            <div class="history-container">
+                <div class="history-header">
+                    <h2 style="color: #ffd700; margin-bottom: 0.5rem;">📜 算命历史</h2>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">查看您的算命记录</p>
+                </div>
+                
+                <div class="history-list" id="historyList">
+                    <!-- 历史记录会动态加载到这里 -->
+                </div>
+                
+                <div class="empty-history" id="emptyHistory" style="display: none;">
+                    <div class="empty-history-icon">📜</div>
+                    <p>暂无算命记录</p>
+                    <p style="font-size: 0.85rem; margin-top: 0.5rem;">去首页试试算命功能吧！</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 历史详情弹窗 -->
+    <div class="edit-profile-modal" id="historyDetailModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="detailModuleName">算命详情</h3>
+                <button class="modal-close" onclick="closeHistoryDetail()">×</button>
+            </div>
+            <div style="padding: 1rem 0;">
+                <div style="margin-bottom: 1rem;">
+                    <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 0.3rem;">输入信息</div>
+                    <div style="color: rgba(255,255,255,0.9); font-size: 0.9rem; padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px;" id="detailInput"></div>
+                </div>
+                <div>
+                    <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 0.3rem;">算命结果</div>
+                    <div style="color: rgba(255,255,255,0.9); font-size: 0.9rem; line-height: 1.6; padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px; max-height: 300px; overflow-y: auto;" id="detailResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="bottom-nav">
+        <a href="/" class="nav-item">
+            <div class="nav-icon">🏠</div>
+            <span>首页</span>
+        </a>
+        <a href="/more.html" class="nav-item">
+            <div class="nav-icon">🔮</div>
+            <span>更多</span>
+        </a>
+        <a href="/profile.html" class="nav-item active">
+            <div class="nav-icon">👤</div>
+            <span>我的</span>
+        </a>
+    </nav>
+    
+    <script src="/js/main.js"></script>
+    <script>
+        // 创建星空背景
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            loadHistory();
+        });
+        
+        // 加载算命历史
+        async function loadHistory() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/divination-history', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('获取历史记录失败');
+                }
+                
+                const data = await response.json();
+                const historyList = document.getElementById('historyList');
+                const emptyHistory = document.getElementById('emptyHistory');
+                
+                if (!data.histories || data.histories.length === 0) {
+                    historyList.style.display = 'none';
+                    emptyHistory.style.display = 'block';
+                    return;
+                }
+                
+                historyList.style.display = 'block';
+                emptyHistory.style.display = 'none';
+                
+                historyList.innerHTML = data.histories.map(h => `
+                    <div class="history-item" onclick="showHistoryDetail('${h.id}')">
+                        <div class="history-item-header">
+                            <div class="history-module-name">${h.module_title}</div>
+                            <div class="history-time">${formatTime(h.create_time)}</div>
+                        </div>
+                        ${h.input_data ? `<div class="history-input">${formatInputData(h.input_data)}</div>` : ''}
+                        ${h.result_data ? `<div class="history-result">${truncateText(h.result_data, 100)}</div>` : ''}
+                        <div class="history-actions">
+                            <button class="history-action-btn" onclick="event.stopPropagation(); showHistoryDetail('${h.id}')">查看详情</button>
+                            <button class="history-action-btn" onclick="event.stopPropagation(); deleteHistory('${h.id}')">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('加载历史记录失败:', error);
+                showToast('加载历史记录失败，请重试');
+            }
+        }
+        
+        // 格式化时间
+        function formatTime(timeStr) {
+            const date = new Date(timeStr);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return '刚刚';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
+            if (diff < 604800000) return `${Math.floor(diff / 86400000)}天前`;
+            
+            return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // 格式化输入数据
+        function formatInputData(inputData) {
+            try {
+                const data = JSON.parse(inputData);
+                return Object.entries(data).map(([key, value]) => `${key}: ${value}`).join(', ');
+            } catch {
+                return inputData || '';
+            }
+        }
+        
+        // 截断文本
+        function truncateText(text, maxLen) {
+            try {
+                const data = JSON.parse(text);
+                text = data.result || data.message || text;
+            } catch {}
+            
+            if (text.length <= maxLen) return text;
+            return text.substring(0, maxLen) + '...';
+        }
+        
+        // 显示历史详情
+        async function showHistoryDetail(historyId) {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            try {
+                const response = await fetch('/api/divination-history', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                const history = data.histories.find(h => h.id == historyId);
+                
+                if (!history) {
+                    showToast('记录不存在');
+                    return;
+                }
+                
+                document.getElementById('detailModuleName').textContent = history.module_title;
+                
+                // 显示输入数据
+                try {
+                    const inputData = JSON.parse(history.input_data);
+                    document.getElementById('detailInput').innerHTML = Object.entries(inputData).map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`).join('');
+                } catch {
+                    document.getElementById('detailInput').textContent = history.input_data || '无';
+                }
+                
+                // 显示结果数据
+                try {
+                    const resultData = JSON.parse(history.result_data);
+                    document.getElementById('detailResult').innerHTML = formatResultData(resultData);
+                } catch {
+                    document.getElementById('detailResult').textContent = history.result_data || '无';
+                }
+                
+                document.getElementById('historyDetailModal').classList.add('show');
+                
+            } catch (error) {
+                console.error('加载详情失败:', error);
+                showToast('加载详情失败');
+            }
+        }
+        
+        // 格式化结果数据
+        function formatResultData(data) {
+            if (typeof data !== 'object') return data;
+            
+            let html = '';
+            for (const [key, value] of Object.entries(data)) {
+                if (key === 'success') continue;
+                html += `<div style="margin-bottom: 0.5rem;"><strong>${key}:</strong> ${value}</div>`;
+            }
+            return html || JSON.stringify(data, null, 2);
+        }
+        
+        // 关闭历史详情弹窗
+        function closeHistoryDetail() {
+            document.getElementById('historyDetailModal').classList.remove('show');
+        }
+        
+        // 删除历史记录
+        async function deleteHistory(historyId) {
+            if (!confirm('确定要删除这条记录吗？')) return;
+            
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`/api/divination-history/${historyId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('删除成功');
+                    loadHistory(); // 重新加载
+                } else {
+                    showToast(data.message || '删除失败');
+                }
+                
+            } catch (error) {
+                console.error('删除失败:', error);
+                showToast('删除失败，请重试');
+            }
+        }
+        
+        // 点击弹窗外部关闭弹窗
+        document.getElementById('historyDetailModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeHistoryDetail();
+            }
+        });
+    </script>
+</body>
+</html>

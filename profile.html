@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>个人中心 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/profile-compatible.css">
     <style>
         /* 个人中心页面特定样式 */
         .profile-container {
@@ -516,7 +517,7 @@
             
             <!-- 会员卡片 + 统计 桌面端并排 -->
             <div class="profile-vip-row">
-            <div class="vip-card" id="vipCard" style="display:none;">
+            <div class="vip-card" id="vipCard">
                 <div class="vip-card-header">
                     <span class="vip-badge" id="vipBadge">免费用户</span>
                     <span class="vip-expire" id="vipExpire"></span>
@@ -553,7 +554,7 @@
             <div class="profile-section">
                 <h3 class="section-title">📋 我的服务</h3>
                 <div class="menu-list">
-                    <div class="menu-item" onclick="showToast('历史记录功能开发中...')">
+                    <div class="menu-item" onclick="location.href='/history.html'">
                         <div class="menu-icon">📜</div>
                         <div class="menu-text">算命历史</div>
                         <div class="menu-arrow">›</div>

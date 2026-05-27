@@ -19,7 +19,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CHECK_INTERVAL = 300  # 5分钟（秒）
 LOG_FILE = os.path.join(BASE_DIR, 'logs', 'auto_update.log')
 GITHUB_API = 'https://api.github.com/repos/WERLK/suanming/commits?per_page=1'
-LAST_COMMIT_FILE = os.path.join(BASE_DIR, '.last_commit')
+# GitHub Token（可选，设置后可提高 API 限流上限）
+# 使用方法：在服务器上执行 echo 'ghp_xxxx' > /root/suanming/.github_token
+GITHUB_TOKEN_FILE = os.path.join(BASE_DIR, '.github_token')
 
 # 确保日志目录存在
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
@@ -41,8 +43,21 @@ def log(msg):
 def get_remote_commit():
     """通过 GitHub API 获取远程最新 commit hash"""
     try:
+        # 构造 curl 请求头
+        curl_cmd = [
+            'curl', '-s', '--connect-timeout', '10', '--max-time', '30',
+            GITHUB_API
+        ]
+        # 如果有 GitHub Token，加入认证头
+        if os.path.exists(GITHUB_TOKEN_FILE):
+            with open(GITHUB_TOKEN_FILE, 'r') as f:
+                token = f.read().strip()
+            if token:
+                curl_cmd += ['-H', f'Authorization: Bearer {token}']
+        curl_cmd += ['-H', 'Accept: application/vnd.github.v3+json']
+
         result = subprocess.run(
-            ['curl', '-s', '--connect-timeout', '10', '--max-time', '30', '-H', 'Accept: application/vnd.github.v3+json', GITHUB_API],
+            curl_cmd,
             capture_output=True,
             text=True,
             timeout=35

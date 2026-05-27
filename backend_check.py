@@ -10,8 +10,8 @@ import sys
 
 def check_endpoint(url, name):
     try:
-        req = urllib.request.Request(url, timeout=10)
-        with urllib.request.urlopen(req) as resp:
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8'))
             print(f"  [OK] {name}: {url}")
             print(f"       Response: {json.dumps(data, ensure_ascii=False, indent=2)[:200]}")

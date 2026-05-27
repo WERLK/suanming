@@ -824,6 +824,9 @@ def vip_watch_ad():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+# ===== WSGI 支持（PythonAnywhere 部署）=====
+# 添加 application 对象（WSGI 标准）
+application = app
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

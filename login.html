@@ -12,7 +12,7 @@
 <meta name="msapplication-TileColor" content="#ffd700">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>用户登录 - 玄机算命网</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=20260527">
     <style>
         /* 登录页面特定样式 */
         .login-container {
@@ -606,14 +606,14 @@
         </div>
     </div>
     
-    <script src="/js/main.js"></script>
+    <script src="/js/main.js?v=20260527"></script>
     <script>
         // 星空背景
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof createStars === 'function') createStars();
-            checkLoginStatus();
-            loadCaptcha();
-            initSlider();
+            try { if (typeof createStars === 'function') createStars(); } catch(e) {}
+            try { checkLoginStatus(); } catch(e) { console.error('checkLoginStatus 错误:', e); }
+            try { loadCaptcha(); } catch(e) { console.error('loadCaptcha 错误:', e); }
+            try { initSlider(); } catch(e) { console.error('initSlider 错误:', e); }
         });
         
         // 当前验证码类型

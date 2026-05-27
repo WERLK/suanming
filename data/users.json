@@ -63,5 +63,18 @@
     "create_time": "2026-05-27T04:41:08.593708",
     "last_login": "2026-05-27T04:41:08.593718",
     "status": "active"
+  },
+  {
+    "id": "user_HZ1C899lvxiI0h6iAmAFNkiTT3l85fFv",
+    "username": "test_e2e_user_2026",
+    "password": "uU1UXnYBnT2fZ3uvYNnTZciUlUnwwrEu$065373f4fa28c982ef98f21e8cfbcd6970a43ba98ee4d489abc3d6f131bb0dd7",
+    "email": "test2026@example.com",
+    "phone": "",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T08:57:43.833229",
+    "last_login": "2026-05-27T08:57:43.858431",
+    "status": "active"
   }
 ]

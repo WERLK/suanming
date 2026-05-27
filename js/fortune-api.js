@@ -4,6 +4,39 @@
  * 依赖：main.js 中的 showToast()
  */
 
+// ===== API 地址配置 =====
+
+/**
+ * 自动检测 API 基础地址
+ * - 本地开发：http://localhost:5000
+ * - Render.com 部署：https://suanming-fix.onrender.com
+ * - 其他生产环境：自动使用当前域名
+ */
+function getAPIBaseURL() {
+    // 1. 如果是本地开发环境
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        return 'http://localhost:5000';
+    }
+    
+    // 2. 如果配置了自定义后端地址（通过 meta 标签）
+    const metaURL = document.querySelector('meta[name="api-base-url"]');
+    if (metaURL) {
+        return metaURL.content;
+    }
+    
+    // 3. 如果前端在 GitHub Pages，后端在 Render.com
+    // 自动检测并使用 Render.com 地址
+    if (location.hostname.endsWith('github.io')) {
+        return 'https://suanming-fix.onrender.com';
+    }
+    
+    // 4. 同域名部署（前后端在同一个域名下）
+    return '';
+}
+
+const API_BASE = getAPIBaseURL();
+
+console.log('[Fortune API] 使用API地址:', API_BASE || '(同域名)');
 // ===== 统一 API 调用 =====
 
 /**
@@ -21,7 +54,7 @@ async function fortuneAPI(endpoint, params = {}, options = {}) {
     }
     
     try {
-        const res = await fetch('/api/fortune/' + endpoint, {
+        const res = await fetch(API_BASE + '/api/fortune/' + endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(params)
@@ -61,7 +94,7 @@ async function fortuneGetAPI(endpoint, params = {}) {
     
     try {
         const query = new URLSearchParams(params).toString();
-        const url = '/api/fortune/' + endpoint + (query ? '?' + query : '');
+        const url = API_BASE + '/api/fortune/' + endpoint + (query ? '?' + query : '');
         
         const res = await fetch(url);
         
@@ -194,7 +227,10 @@ async function uploadImageFortune(file, moduleType) {
             const result = await fortuneAPI('image-analyze', {
                 image: base64,
                 module_type: moduleType
-            }, { loadingMsg: '正在AI智能分析图片...' });
+            }, { 
+                loadingMsg: '正在AI智能分析图片...',
+                apiBase: API_BASE  // 传递 API 基础地址
+            });
             resolve(result);
         };
         reader.onerror = function() {

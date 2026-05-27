@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分享记录 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-container { max-width: 600px; margin: 0 auto; padding: 1rem; }
+        .share-item {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .share-name { color: #ffd700; font-weight: bold; margin-bottom: 0.3rem; }
+        .share-platform { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+        .share-time { color: rgba(255,255,255,0.4); font-size: 0.75rem; margin-top: 0.3rem; }
+        .empty-state { text-align: center; padding: 3rem 1rem; color: rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo"><div class="logo-icon">🔮</div><div><span class="logo-text">玄机算命网</span></div></div>
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">🏠 首页</a>
+        <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
+    </nav>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>分享记录</h1>
+</div>
+
+<div class="content-area">
+    <div class="page-container">
+        <div id="shareList"></div>
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div style="font-size:4rem;margin-bottom:1rem;">🔗</div>
+            <div>暂无分享记录</div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => loadShares());
+
+async function loadShares() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) { window.location.href = '/login.html'; return; }
+    
+    try {
+        const resp = await fetch('/api/shares', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await resp.json();
+        
+        if (data.success && data.shares.length > 0) {
+            displayShares(data.shares);
+        } else {
+            showEmptyState();
+        }
+    } catch (e) {
+        console.error('加载分享记录失败:', e);
+    }
+}
+
+function displayShares(shares) {
+    const listEl = document.getElementById('shareList');
+    const emptyEl = document.getElementById('emptyState');
+    emptyEl.style.display = 'none';
+    listEl.innerHTML = '';
+    
+    shares.forEach(share => {
+        const item = document.createElement('div');
+        item.className = 'share-item';
+        item.innerHTML = `
+            <div class="share-name">${share.module_name}</div>
+            <div class="share-platform">分享到：${share.platform}</div>
+            <div class="share-time">${new Date(share.share_time).toLocaleString('zh-CN')}</div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+function showEmptyState() {
+    document.getElementById('shareList').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帮助中心 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-container { max-width: 600px; margin: 0 auto; padding: 1rem; }
+        .help-item {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .help-item:hover {
+            background: rgba(255,215,0,0.08);
+            transform: translateX(5px);
+        }
+        .help-question { color: #ffd700; font-weight: bold; margin-bottom: 0.5rem; }
+        .help-answer {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .help-item.expanded .help-answer {
+            max-height: 500px;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,215,0,0.1);
+        }
+        .contact-box {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .contact-title { color: #ffd700; font-size: 1rem; margin-bottom: 0.5rem; }
+        .contact-email {
+            color: #4fc3f7;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .contact-email:hover { text-decoration: underline; }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+<!-- 桌面端侧边栏 -->
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div><span class="logo-text">玄机算命网</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">🏠 首页</a>
+        <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
+    </nav>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>帮助中心</h1>
+</div>
+
+<div class="content-area">
+    <div class="page-container">
+        <div class="help-list" id="helpList"></div>
+        
+        <!-- 联系我们 -->
+        <div class="contact-box">
+            <div class="contact-title">📧 没有找到答案？</div>
+            <div class="contact-email" onclick="location.href='mailto:support@xuanji.com'">
+                📮 support@xuanji.com
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+const helpTopics = [
+    {
+        id: 'register',
+        question: '如何注册账号？',
+        answer: '点击首页"注册"按钮，输入用户名、密码、邮箱或手机号，完成验证后即可注册成功。注册后您可以使用所有免费功能。'
+    },
+    {
+        id: 'login',
+        question: '如何登录账号？',
+        answer: '点击首页"登录"按钮，输入用户名/邮箱/手机号和密码即可登录。支持"记住我"功能，下次自动登录。'
+    },
+    {
+        id: 'fortune',
+        question: '算命结果准确吗？',
+        answer: '算命结果仅供参考，不可全信。命运掌握在自己手中，算命只是提供一种思路和方向。我们的算命工具基于传统命理学，结合现代算法，提供相对准确的结果。'
+    },
+    {
+        id: 'vip',
+        question: '如何获得VIP会员？',
+        answer: '您可以通过观看广告赚取VIP时长，每次观看广告可获得2小时会员时长。VIP会员可以解锁更多高级功能。'
+    },
+    {
+        id: 'avatar',
+        question: '如何上传头像？',
+        answer: '进入个人中心，点击头像区域，选择图片上传即可。系统会自动审核头像内容，审核通过后头像立即生效。支持JPG、PNG格式，图片大小需小于2MB。'
+    },
+    {
+        id: 'password',
+        question: '忘记密码怎么办？',
+        answer: '在登录页面点击"忘记密码"，输入注册时使用的邮箱，系统会发送密码重置链接到您的邮箱。点击链接后即可设置新密码。'
+    },
+    {
+        id: 'data',
+        question: '我的算命记录会保存吗？',
+        answer: '是的，您的算命记录会自动保存。登录后可以在"个人中心"-"算命历史"中查看所有历史记录。未登录状态下，记录仅保存在当前浏览器中。'
+    },
+    {
+        id: 'privacy',
+        question: '我的个人信息安全吗？',
+        answer: '我们非常重视用户隐私。您可以在"隐私设置"中控制个人资料的可见性。我们不会将您的个人信息出售或分享给第三方。详细信息请查看我们的隐私政策。'
+    },
+    {
+        id: 'contact',
+        question: '如何联系客服？',
+        answer: '发送邮件至 support@xuanji.com，我们的客服团队会在24小时内回复您。您也可以在帮助中心查找常见问题的答案。'
+    }
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadHelpTopics();
+});
+
+function loadHelpTopics() {
+    const listEl = document.getElementById('helpList');
+    listEl.innerHTML = '';
+    
+    helpTopics.forEach(topic => {
+        const item = document.createElement('div');
+        item.className = 'help-item';
+        item.onclick = () => toggleHelpItem(item);
+        item.innerHTML = `
+            <div class="help-question">❓ ${topic.question}</div>
+            <div class="help-answer">${topic.answer}</div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+function toggleHelpItem(item) {
+    item.classlist.toggle('expanded');
+}
+</script>
+</body>
+</html>

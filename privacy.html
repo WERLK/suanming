@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私设置 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-container { max-width: 600px; margin: 0 auto; padding: 1rem; }
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .setting-info { flex: 1; }
+        .setting-title { color: #ffd700; font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .setting-desc { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: rgba(255,255,255,0.5);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #ffd700; }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-color: #000;
+        }
+        .btn-save {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div><span class="logo-text">玄机算命网</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">🏠 首页</a>
+        <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
+    </nav>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>隐私设置</h1>
+</div>
+
+<div class="content-area">
+    <div class="page-container">
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">👤 个人资料公开</div>
+                <div class="setting-desc">允许其他用户查看您的个人资料</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="profilePublic" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">🔮 算命记录公开</div>
+                <div class="setting-desc">允许其他用户查看您的算命记录</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="fortunePublic" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">🔍 允许被搜索</div>
+                <div class="setting-desc">允许其他用户通过用户名搜索到您</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="allowSearch" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">🟢 显示在线状态</div>
+                <div class="setting-desc">在个人资料页显示您的在线状态</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="showOnline" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <button class="btn-save" onclick="saveManually()">💾 保存设置</button>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => loadSettings());
+
+async function loadSettings() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) { window.location.href = '/login.html'; return; }
+    
+    try {
+        const resp = await fetch('/api/privacy/settings', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await resp.json();
+        
+        if (data.success) {
+            const s = data.settings;
+            document.getElementById('profilePublic').checked = s.profile_public !== false;
+            document.getElementById('fortunePublic').checked = s.fortune_public === true;
+            document.getElementById('allowSearch').checked = s.allow_search !== false;
+            document.getElementById('showOnline').checked = s.show_online === true;
+        }
+    } catch (e) {
+        console.error('加载隐私设置失败:', e);
+    }
+}
+
+async function saveSettings() {
+    // 自动保存（每次切换开关时）
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return;
+    
+    const settings = {
+        profile_public: document.getElementById('profilePublic').checked,
+        fortune_public: document.getElementById('fortunePublic').checked,
+        allow_search: document.getElementById('allowSearch').checked,
+        show_online: document.getElementById('showOnline').checked
+    };
+    
+    try {
+        await fetch('/api/privacy/settings', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(settings)
+        });
+    } catch (e) {
+        console.error('保存隐私设置失败:', e);
+    }
+}
+
+async function saveManually() {
+    await saveSettings();
+    showToast('✅ 设置已保存');
+}
+</script>
+</body>
+</html>

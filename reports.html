@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的报告 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-container { max-width: 600px; margin: 0 auto; padding: 1rem; }
+        .report-item {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .report-item:hover {
+            background: rgba(255,215,0,0.08);
+            transform: translateX(5px);
+        }
+        .report-name { color: #ffd700; font-weight: bold; margin-bottom: 0.3rem; }
+        .report-time { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .report-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .btn-view {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 6px;
+            color: #ffd700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .btn-delete {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 6px;
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .empty-state { text-align: center; padding: 3rem 1rem; color: rgba(255,255,255,0.5); }
+        .report-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .report-detail-modal.show { display: flex; }
+        .report-detail-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+<!-- 桌面端侧边栏 -->
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div><span class="logo-text">玄机算命网</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">🏠 首页</a>
+        <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
+    </nav>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>我的报告</h1>
+</div>
+
+<div class="content-area">
+    <div class="page-container">
+        <div id="reportList"></div>
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div style="font-size:4rem;margin-bottom:1rem;">📊</div>
+            <div>暂无报告</div>
+        </div>
+    </div>
+</div>
+
+<!-- 报告详情弹窗 -->
+<div class="report-detail-modal" id="reportDetailModal">
+    <div class="report-detail-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="color:#ffd700;" id="reportDetailTitle"></h3>
+            <button style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;" onclick="closeReportDetail()">×</button>
+        </div>
+        <div id="reportDetailContent" style="color:rgba(255,255,255,0.8); line-height:1.6;"></div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => loadReports());
+
+async function loadReports() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) { window.location.href = '/login.html'; return; }
+    
+    try {
+        const resp = await fetch('/api/reports', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await resp.json();
+        
+        if (data.success && data.reports.length > 0) {
+            displayReports(data.reports);
+        } else {
+            showEmptyState();
+        }
+    } catch (e) {
+        console.error('加载报告失败:', e);
+    }
+}
+
+function displayReports(reports) {
+    const listEl = document.getElementById('reportList');
+    const emptyEl = document.getElementById('emptyState');
+    emptyEl.style.display = 'none';
+    listEl.innerHTML = '';
+    
+    reports.forEach(report => {
+        const item = document.createElement('div');
+        item.className = 'report-item';
+        item.innerHTML = `
+            <div class="report-name">${report.module_name}</div>
+            <div class="report-time">保存于 ${new Date(report.save_time).toLocaleString('zh-CN')}</div>
+            <div class="report-actions">
+                <button class="btn-view" onclick="viewReport('${report.id}')">查看</button>
+                <button class="btn-delete" onclick="deleteReport('${report.id}', '${report.module_name}')">删除</button>
+            </div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+function viewReport(reportId) {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    fetch('/api/reports', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const report = data.reports.find(r => r.id === reportId);
+            if (report) {
+                document.getElementById('reportDetailTitle').textContent = report.module_name;
+                document.getElementById('reportDetailContent').innerHTML = `
+                    <div style="margin-bottom:1rem;">
+                        <strong>输入数据：</strong>
+                        <pre style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; overflow-x:auto;">${JSON.stringify(report.input_data, null, 2)}</pre>
+                    </div>
+                    <div>
+                        <strong>算命结果：</strong>
+                        <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; margin-top:0.5rem; white-space:pre-wrap;">${report.result_data}</div>
+                    </div>
+                `;
+                document.getElementById('reportDetailModal').classlist.add('show');
+            }
+        }
+    })
+    .catch(e => console.error('查看报告失败:', e));
+}
+
+function closeReportDetail() {
+    document.getElementById('reportDetailModal').classlist.remove('show');
+}
+
+async function deleteReport(reportId, moduleName) {
+    if (!confirm(`确定删除"${moduleName}"的报告吗？`)) return;
+    
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    try {
+        const resp = await fetch(`/api/reports/${reportId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await resp.json();
+        
+        if (data.success) {
+            showToast('✅ 报告已删除');
+            loadReports(); // 重新加载
+        } else {
+            showToast('❌ ' + data.message);
+        }
+    } catch (e) {
+        console.error('删除报告失败:', e);
+        showToast('网络错误，请重试');
+    }
+}
+
+function showEmptyState() {
+    document.getElementById('reportList').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+}
+</script>
+</body>
+</html>

@@ -484,5 +484,41 @@ function openMore() { window.location.href = '/more.html'; }
 })();
 </script>
 
+<!-- 版本号显示 -->
+<div id="versionInfo" style="position:fixed; bottom:10px; right:10px; background:rgba(0,0,0,0.5); color:#888; font-size:12px; padding:5px 10px; border-radius:5px; z-index:9999; cursor:pointer;" onclick="showVersionDetail()">
+    v<span id="versionText">1.0.0</span>
+</div>
+
+<script>
+// 加载版本信息
+async function loadVersion() {
+    try {
+        const resp = await fetch('/api/version');
+        const data = await resp.json();
+        if (data.success) {
+            document.getElementById('versionText').textContent = data.version.version;
+        }
+    } catch (e) {
+        console.error('加载版本信息失败:', e);
+    }
+}
+
+// 显示版本详情
+function showVersionDetail() {
+    fetch('/api/version')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const v = data.version;
+                alert(`版本信息：\n版本号：${v.version}\n构建时间：${v.build_time}\n提交哈希：${v.git_commit || '未知'}\n作者：${v.author || '未知'}`);
+            }
+        })
+        .catch(e => console.error('获取版本详情失败:', e));
+}
+
+// 页面加载时获取版本
+loadVersion();
+</script>
+
 </body>
 </html>

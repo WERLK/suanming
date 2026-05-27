@@ -20,15 +20,15 @@ fi
 echo ""
 echo "[2/4] 停止旧后端进程..."
 pkill -f gunicorn
-sleep 2
+sleep 5
 
 # 3. 启动新进程
 echo ""
 echo "[3/4] 启动后端服务..."
 cd /root/suanming/api
-nohup gunicorn -w 4 -b 0.0.0.0:5000 app:app > /root/suanming/logs/gunicorn.log 2>&1 &
+nohup gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app > /root/suanming/logs/gunicorn.log 2>&1 &
 
-sleep 3
+sleep 5
 
 # 4. 检查状态
 echo ""

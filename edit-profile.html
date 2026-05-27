@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>编辑资料 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .form-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .avatar-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05));
+            border: 2px solid rgba(255,215,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1rem;
+            overflow: hidden;
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .btn-upload {
+            padding: 0.5rem 1rem;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 8px;
+            color: #ffd700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-upload:hover {
+            background: rgba(255,215,0,0.2);
+        }
+        
+        .btn-save {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: color 0.3s;
+        }
+        
+        .btn-back:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+<!-- 桌面端侧边栏 -->
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div>
+            <span class="logo-text">玄机算命网</span>
+            <span class="logo-sub">传承千年智慧</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">主导航</div>
+            <a href="/" class="sidebar-nav-item">🏠 首页</a>
+            <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
+        </div>
+    </nav>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>编辑资料</h1>
+</div>
+
+<div class="content-area">
+    <div class="page-container">
+        <button class="btn-back" onclick="window.location.href='/profile.html'">← 返回个人中心</button>
+        
+        <!-- 头像 section -->
+        <div class="avatar-section">
+            <div class="avatar-preview" id="avatarPreview">
+                <img id="avatarImg" src="" alt="头像" style="display:none;">
+                <span id="avatarDefault">👤</span>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar()">
+            <button class="btn-upload" onclick="document.getElementById('avatarInput').click()">📷 更换头像</button>
+        </div>
+        
+        <!-- 资料表单 -->
+        <form id="editProfileForm" onsubmit="saveProfile(event)">
+            <div class="form-card">
+                <div class="form-group">
+                    <label for="editUsername">用户名</label>
+                    <input 
+                        type="text" 
+                        id="editUsername" 
+                        name="username" 
+                        placeholder="请输入用户名"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editPhone">手机号</label>
+                    <input 
+                        type="tel" 
+                        id="editPhone" 
+                        name="phone" 
+                        placeholder="请输入手机号"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEmail">邮箱</label>
+                    <input 
+                        type="email" 
+                        id="editEmail" 
+                        name="email" 
+                        placeholder="请输入邮箱"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editBirthday">生日</label>
+                    <input 
+                        type="date" 
+                        id="editBirthday" 
+                        name="birthday"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="editGender">性别</label>
+                    <select id="editGender" name="gender">
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-save">💾 保存资料</button>
+        </form>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+});
+
+async function checkLoginStatus() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    if (!token) {
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/profile', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('currentUser');
+            window.location.href = '/login.html';
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.message);
+        }
+        
+        const user = data.user;
+        
+        // 填充表单
+        document.getElementById('editUsername').value = user.username || '';
+        document.getElementById('editPhone').value = user.phone || '';
+        document.getElementById('editEmail').value = user.email || '';
+        document.getElementById('editBirthday').value = user.birthday || '';
+        document.getElementById('editGender').value = user.gender || '';
+        
+        // 加载头像
+        if (user.avatar) {
+            const avatarImg = document.getElementById('avatarImg');
+            const avatarDefault = document.getElementById('avatarDefault');
+            
+            avatarImg.src = user.avatar + '?t=' + new Date().getTime();
+            avatarImg.style.display = 'block';
+            avatarDefault.style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('获取用户信息失败:', error);
+        showToast('获取用户信息失败，请重试');
+    }
+}
+
+async function uploadAvatar() {
+    const input = document.getElementById('avatarInput');
+    const file = input.files[0];
+    
+    if (!file) return;
+    
+    // 验证文件类型
+    if (!file.type.startsWith('image/')) {
+        showToast('❌ 请选择图片文件');
+        return;
+    }
+    
+    // 验证文件大小（2MB）
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('❌ 图片大小不能超过2MB');
+        return;
+    }
+    
+    // 显示加载状态
+    showToast('⏳ 正在上传头像...');
+    
+    try {
+        // 读取图片为 base64
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const base64Image = e.target.result;
+            
+            // 获取 token
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                showToast('❌ 请先登录');
+                return;
+            }
+            
+            // 上传头像
+            const resp = await fetch('/api/avatar/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ image: base64Image })
+            });
+            
+            const data = await resp.json();
+            
+            if (data.success) {
+                // 更新头像显示
+                const avatarImg = document.getElementById('avatarImg');
+                const avatarDefault = document.getElementById('avatarDefault');
+                
+                avatarImg.src = data.avatar_url + '?t=' + new Date().getTime();
+                avatarImg.style.display = 'block';
+                avatarDefault.style.display = 'none';
+                
+                showToast('✅ ' + data.message);
+            } else {
+                showToast('❌ ' + data.message);
+            }
+        };
+        reader.readAsDataURL(file);
+        
+    } catch (e) {
+        console.error('头像上传失败:', e);
+        showToast('❌ 上传失败，请重试');
+    }
+    
+    // 清空 input
+    input.value = '';
+}
+
+async function saveProfile(event) {
+    event.preventDefault();
+    
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    if (!token) {
+        showToast('请先登录');
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    // 获取表单数据
+    const username = document.getElementById('editUsername').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const birthday = document.getElementById('editBirthday').value;
+    const gender = document.getElementById('editGender').value;
+    
+    // 验证用户名
+    if (!username) {
+        showToast('用户名不能为空');
+        return;
+    }
+    
+    try {
+        // 调用后端API更新用户信息
+        const response = await fetch('/api/profile', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                username: username,
+                phone: phone,
+                email: email,
+                birthday: birthday,
+                gender: gender
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // 更新成功
+            const user = data.user;
+            
+            // 保存用户信息到本地
+            if (localStorage.getItem('rememberMe')) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+            } else {
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+            }
+            
+            showToast('✅ 资料保存成功！');
+            
+            // 延迟跳转
+            setTimeout(() => {
+                window.location.href = '/profile.html';
+            }, 1000);
+        } else {
+            showToast(data.message || '保存失败，请重试');
+        }
+    } catch (error) {
+        console.error('保存资料失败:', error);
+        showToast('保存失败，请检查网络');
+    }
+}
+</script>
+</body>
+</html>

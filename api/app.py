@@ -145,6 +145,59 @@ def send_email(to_email, subject, body):
         print(f"邮件发送失败: {e}")
         return False
 
+# ========== 健康检查 ==========
+@app.route('/api/health')
+def health_check():
+    """健康检查端点"""
+    try:
+        # 检查数据库连接（这里使用文件检查代替）
+        import os
+        users_file_exists = os.path.exists(USERS_FILE)
+        
+        # 读取版本信息
+        version_info = {'version': '1.0.0'}
+        version_file = os.path.join(BASE_DIR, '..', 'version.json')
+        if os.path.exists(version_file):
+            with open(version_file, 'r', encoding='utf-8') as f:
+                version_info = json.load(f)
+        
+        return jsonify({
+            'status': 'ok',
+            'timestamp': datetime.now().isoformat(),
+            'service': 'xuanji-fortune',
+            'version': version_info.get('version', '1.0.0'),
+            'build_time': version_info.get('build_time', ''),
+            'database': 'connected' if users_file_exists else 'disconnected'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+# ========== 版本信息 ==========
+@app.route('/api/version')
+def get_version():
+    """获取版本信息"""
+    try:
+        import os
+        version_file = os.path.join(BASE_DIR, '..', 'version.json')
+        
+        if os.path.exists(version_file):
+            with open(version_file, 'r', encoding='utf-8') as f:
+                version_info = json.load(f)
+            return jsonify({
+                'success': True,
+                'version': version_info
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': '版本文件不存在'
+            }), 404
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 # ========== 静态文件服务 ==========
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -322,8 +375,7 @@ def register():
         users.append(new_user)
         save_users(users)
         return jsonify({
-            'success': True,
-            'message': '注册成功',
+            'success': True, 'message': '注册成功',
             'user': {
                 'id': new_user['id'],
                 'username': new_user['username'],
@@ -370,8 +422,7 @@ def login():
             'gender': user.get('gender', '')
         }
         response = jsonify({
-            'success': True,
-            'message': '登录成功',
+            'success': True, 'message': '登录成功',
             'user': user_info,
             'token': token
         })
@@ -503,13 +554,11 @@ def forgot_password():
 
         if email_sent:
             return jsonify({
-                'success': True,
-                'message': '重置链接已发送到您的邮箱，请注意查收',
+                'success': True, 'message': '重置链接已发送到您的邮箱，请注意查收',
             }), 200
         else:
             return jsonify({
-                'success': True,
-                'message': '重置链接已生成（邮件服务未配置，请使用以下链接）',
+                'success': True, 'message': '重置链接已生成（邮件服务未配置，请使用以下链接）',
                 'reset_link': reset_link
             }), 200
     except Exception as e:
@@ -667,15 +716,15 @@ def image_analyze():
 def auto_update():
     import subprocess
     try:
-        cwd = '/home/suanming-fix'  # 阿里云项目目录
+        cwd = '/root/suanming'  # 服务器项目目录
         # 拉取最新代码
-        r1 = subprocess.run(['git', 'fetch', 'origin'], cwd=cwd, capture_output=True, text=True, timeout=30)
+        r1 = subprocess.run(['git', 'fetch', 'origin'], cwd=cwd, capture_output=True, text=True, timeout=300)
         # 重置到最新 main 分支
-        r2 = subprocess.run(['git', 'reset', '--hard', 'origin/main'], cwd=cwd, capture_output=True, text=True, timeout=30)
+        r2 = subprocess.run(['git', 'reset', '--hard', 'origin/main'], cwd=cwd, capture_output=True, text=True, timeout=300)
         # 安装依赖（如果有变化）
-        r3 = subprocess.run(['pip3', 'install', '-r', 'requirements.txt'], cwd=cwd, capture_output=True, text=True, timeout=60)
+        r3 = subprocess.run(['pip3', 'install', '-r', 'requirements.txt'], cwd=cwd, capture_output=True, text=True, timeout=300)
         # 重启 Gunicorn
-        subprocess.run(['pkill', '-f', 'gunicorn'], capture_output=True, text=True, timeout=10)
+        subprocess.run(['pkill', '-f', 'gunicorn'], capture_output=True, text=True, timeout=300)
         import time
         time.sleep(2)
         subprocess.Popen(['gunicorn', '-c', 'gunicorn_config.py', 'api.app:app'],
@@ -798,8 +847,7 @@ def vip_watch_ad():
 
         if today_ads >= max_ads:
             return jsonify({
-                'success': False,
-                'message': f'今日观看次数已达上限（{max_ads}次），明天再来吧'
+                'success': False, 'message': f'今日观看次数已达上限（{max_ads}次），明天再来吧'
             }), 400
 
         # 增加会员时长
@@ -831,14 +879,529 @@ def vip_watch_ad():
         minutes = int((remaining.total_seconds() % 3600) // 60)
 
         return jsonify({
-            'success': True,
-            'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时',
+            'success': True, 'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时',
             'vip_level': 'basic',
             'vip_level_name': '基础会员',
             'vip_remaining': f'{hours}小时{minutes}分钟',
             'vip_expire': new_expire.isoformat(),
             'today_ads': users[user_index]['ad_watch_count'],
             'max_daily_ads': max_ads
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 头像上传（带自动审核）==========
+from api.avatar_audit import AvatarAuditor
+
+AVATAR_SAVE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'static', 'avatars')
+os.makedirs(AVATAR_SAVE_DIR, exist_ok=True)
+
+@app.route('/api/avatar/upload', methods=['POST'])
+def upload_avatar():
+    """上传头像（自动审核）"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+        
+        data = request.get_json()
+        image_data = data.get('image', '')
+        
+        if not image_data:
+            return jsonify({'success': False, 'message': '请上传图片'}), 400
+        
+        # 1. 自动审核头像
+        audit_result = AvatarAuditor.audit_avatar(image_data)
+        
+        if audit_result['result'] == 'block':
+            return jsonify({
+                'success': False, 'message': f'头像审核未通过：{audit_result["reason"]}',
+                'audit_result': audit_result
+            }), 400
+        
+        # 2. 审核通过或需复审，处理图片
+        # 移除 base64 前缀
+        if 'base64,' in image_data:
+            image_data = image_data.split('base64,')[1]
+        
+        image_bytes = base64.b64decode(image_data)
+        
+        # 3. 缩放头像到标准尺寸
+        avatar_bytes = AvatarAuditor.resize_avatar(image_bytes, size=(200, 200))
+        
+        # 4. 保存头像文件
+        avatar_filename = f"{user['id']}_{int(datetime.now().timestamp())}.jpg"
+        avatar_path = os.path.join(AVATAR_SAVE_DIR, avatar_filename)
+        
+        with open(avatar_path, 'wb') as f:
+            f.write(avatar_bytes)
+        
+        # 5. 更新用户头像路径
+        avatar_url = f'/static/avatars/{avatar_filename}'
+        
+        user_index = None
+        for i, u in enumerate(users):
+            if u['id'] == user['id']:
+                user_index = i
+                break
+        
+        if user_index is not None:
+            users[user_index]['avatar'] = avatar_url
+            save_users(users)
+        
+        # 6. 返回结果
+        response_data = {
+            'success': True, 'message': '头像上传成功' if audit_result['result'] == 'pass' else '头像已上传，待人工复审',
+            'avatar_url': avatar_url,
+            'audit_result': audit_result
+        }
+        
+        return jsonify(response_data), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'头像上传失败：{str(e)}'}), 500
+
+# ========== 收藏功能 ==========
+FAVORITES_FILE = os.path.join(DATA_DIR, 'favorites.json')
+
+# 确保收藏文件存在
+if not os.path.exists(FAVORITES_FILE):
+    with open(FAVORITES_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/favorites', methods=['GET'])
+def get_favorites():
+    """获取用户收藏列表"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
+            favorites = json.load(f)
+        
+        user_favorites = favorites.get(user['id'], [])
+        
+        return jsonify({
+            'success': True,
+            'favorites': user_favorites
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/favorites', methods=['POST'])
+def add_favorite():
+    """添加收藏"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        data = request.get_json()
+        module_id = data.get('module_id', '')
+        module_name = data.get('module_name', '')
+        
+        if not module_id or not module_name:
+            return jsonify({'success': False, 'message': '参数不完整'}), 400
+        
+        with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
+            favorites = json.load(f)
+        
+        if user['id'] not in favorites:
+            favorites[user['id']] = []
+        
+        # 检查是否已收藏
+        for item in favorites[user['id']]:
+            if item['module_id'] == module_id:
+                return jsonify({'success': False, 'message': '已经收藏过了'}), 400
+        
+        # 添加收藏
+        favorites[user['id']].append({
+            'module_id': module_id,
+            'module_name': module_name,
+            'add_time': datetime.now().isoformat()
+        })
+        
+        with open(FAVORITES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(favorites, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '收藏成功'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/favorites', methods=['DELETE'])
+def remove_favorite():
+    """取消收藏"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        data = request.get_json()
+        module_id = data.get('module_id', '')
+        
+        if not module_id:
+            return jsonify({'success': False, 'message': '参数不完整'}), 400
+        
+        with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
+            favorites = json.load(f)
+        
+        if user['id'] not in favorites:
+            return jsonify({'success': False, 'message': '收藏不存在'}), 400
+        
+        # 移除收藏
+        favorites[user['id']] = [item for item in favorites[user['id']] if item['module_id'] != module_id]
+        
+        with open(FAVORITES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(favorites, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '取消收藏成功'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 分享记录 ==========
+SHARES_FILE = os.path.join(DATA_DIR, 'shares.json')
+
+# 确保分享文件存在
+if not os.path.exists(SHARES_FILE):
+    with open(SHARES_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/shares', methods=['GET'])
+def get_shares():
+    """获取分享记录"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(SHARES_FILE, 'r', encoding='utf-8') as f:
+            shares = json.load(f)
+        
+        user_shares = shares.get(user['id'], [])
+        
+        return jsonify({
+            'success': True,
+            'shares': user_shares
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/shares', methods=['POST'])
+def add_share():
+    """添加分享记录"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        data = request.get_json()
+        module_id = data.get('module_id', '')
+        module_name = data.get('module_name', '')
+        share_platform = data.get('platform', '')  # wechat/weibo/qq/other
+        
+        with open(SHARES_FILE, 'r', encoding='utf-8') as f:
+            shares = json.load(f)
+        
+        if user['id'] not in shares:
+            shares[user['id']] = []
+        
+        shares[user['id']].append({
+            'module_id': module_id,
+            'module_name': module_name,
+            'platform': share_platform,
+            'share_time': datetime.now().isoformat()
+        })
+        
+        with open(SHARES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(shares, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '分享记录已保存'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 报告功能 ==========
+REPORTS_FILE = os.path.join(DATA_DIR, 'reports.json')
+
+# 确保报告文件存在
+if not os.path.exists(REPORTS_FILE):
+    with open(REPORTS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/reports', methods=['GET'])
+def get_reports():
+    """获取用户报告列表"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(REPORTS_FILE, 'r', encoding='utf-8') as f:
+            reports = json.load(f)
+        
+        user_reports = reports.get(user['id'], [])
+        
+        return jsonify({
+            'success': True,
+            'reports': user_reports
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/reports', methods=['POST'])
+def save_report():
+    """保存算命报告"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        data = request.get_json()
+        module_id = data.get('module_id', '')
+        module_name = data.get('module_name', '')
+        input_data = data.get('input_data', {})
+        result_data = data.get('result_data', '')
+        
+        with open(REPORTS_FILE, 'r', encoding='utf-8') as f:
+            reports = json.load(f)
+        
+        if user['id'] not in reports:
+            reports[user['id']] = []
+        
+        reports[user['id']].append({
+            'id': 'report_' + ''.join(random.choices(string.ascii_letters + string.digits, k=16)),
+            'module_id': module_id,
+            'module_name': module_name,
+            'input_data': input_data,
+            'result_data': result_data,
+            'save_time': datetime.now().isoformat()
+        })
+        
+        with open(REPORTS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(reports, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '报告保存成功'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/reports/<report_id>', methods=['DELETE'])
+def delete_report(report_id):
+    """删除报告"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(REPORTS_FILE, 'r', encoding='utf-8') as f:
+            reports = json.load(f)
+        
+        if user['id'] not in reports:
+            return jsonify({'success': False, 'message': '报告不存在'}), 400
+        
+        # 删除报告
+        reports[user['id']] = [r for r in reports[user['id']] if r['id'] != report_id]
+        
+        with open(REPORTS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(reports, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '报告删除成功'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 通知设置 ==========
+NOTIFICATIONS_FILE = os.path.join(DATA_DIR, 'notifications.json')
+
+# 确保通知文件存在
+if not os.path.exists(NOTIFICATIONS_FILE):
+    with open(NOTIFICATIONS_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/notifications/settings', methods=['GET'])
+def get_notification_settings():
+    """获取通知设置"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(NOTIFICATIONS_FILE, 'r', encoding='utf-8') as f:
+            notifications = json.load(f)
+        
+        settings = notifications.get(user['id'], {
+            'push_enabled': True,
+            'email_enabled': True,
+            'sms_enabled': False,
+            'daily_fortune': True,
+            'vip_expire': True,
+            'system_notice': True
+        })
+        
+        return jsonify({
+            'success': True,
+            'settings': settings
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/notifications/settings', methods=['PUT'])
+def update_notification_settings():
+    """更新通知设置"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        data = request.get_json()
+        
+        with open(NOTIFICATIONS_FILE, 'r', encoding='utf-8') as f:
+            notifications = json.load(f)
+        
+        if user['id'] not in notifications:
+            notifications[user['id']] = {}
+        
+        # 更新设置
+        notifications[user['id']].update(data)
+        
+        with open(NOTIFICATIONS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(notifications, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '设置已保存'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 隐私设置 ==========
+PRIVACY_FILE = os.path.join(DATA_DIR, 'privacy.json')
+
+# 确保隐私文件存在
+if not os.path.exists(PRIVACY_FILE):
+    with open(PRIVACY_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/privacy/settings', methods=['GET'])
+def get_privacy_settings():
+    """获取隐私设置"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(PRIVACY_FILE, 'r', encoding='utf-8') as f:
+            privacy = json.load(f)
+        
+        settings = privacy.get(user['id'], {
+            'profile_public': True,
+            'fortune_public': False,
+            'allow_search': True,
+            'show_online': False
+        })
+        
+        return jsonify({
+            'success': True,
+            'settings': settings
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/privacy/settings', methods=['PUT'])
+def update_privacy_settings():
+    """更新隐私设置"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        data = request.get_json()
+        
+        with open(PRIVACY_FILE, 'r', encoding='utf-8') as f:
+            privacy = json.load(f)
+        
+        if user['id'] not in privacy:
+            privacy[user['id']] = {}
+        
+        # 更新设置
+        privacy[user['id']].update(data)
+        
+        with open(PRIVACY_FILE, 'w', encoding='utf-8') as f:
+            json.dump(privacy, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '隐私设置已保存'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 帮助中心 ==========
+@app.route('/api/help/<topic>', methods=['GET'])
+def get_help_topic(topic):
+    """获取帮助主题内容"""
+    try:
+        help_topics = {
+            'register': {
+                'title': '如何注册账号？',
+                'content': '点击首页"注册"按钮，输入用户名、密码、邮箱或手机号，完成验证后即可注册成功。'
+            },
+            'login': {
+                'title': '如何登录账号？',
+                'content': '点击首页"登录"按钮，输入用户名/邮箱/手机号和密码即可登录。支持记住密码功能。'
+            },
+            'fortune': {
+                'title': '算命结果准确吗？',
+                'content': '算命结果仅供参考，不可全信。命运掌握在自己手中，算命只是提供一种思路和方向。'
+            },
+            'vip': {
+                'title': '如何获得VIP会员？',
+                'content': '您可以通过观看广告赚取VIP时长，每次观看广告可获得2小时会员时长。'
+            },
+            'avatar': {
+                'title': '如何上传头像？',
+                'content': '进入个人中心，点击头像区域，选择图片上传即可。系统会自动审核头像内容。'
+            },
+            'contact': {
+                'title': '如何联系客服？',
+                'content': '发送邮件至 support@xuanji.com，我们的客服团队会在24小时内回复您。'
+            }
+        }
+        
+        if topic in help_topics:
+            return jsonify({
+                'success': True,
+                'topic': help_topics[topic]
+            }), 200
+        else:
+            return jsonify({'success': False, 'message': '帮助主题不存在'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 关于我们 ==========
+@app.route('/api/about', methods=['GET'])
+def get_about():
+    """获取关于我们信息"""
+    try:
+        about_info = {
+            'site_name': '玄机算命网',
+            'version': '1.0.0',
+            'description': '传承千年智慧，揭秘命运玄机。我们致力于为用户提供专业、准确的算命服务。',
+            'contact_email': 'support@xuanji.com',
+            'website': 'https://xuanji.com',
+            'icp': '京ICP备XXXXXXXX号-1',
+            'police_icp': '京公网安备 XXXXXXXXXXXXX号',
+            'copyright': '© 2026 玄机算命网 版权所有'
+        }
+        
+        return jsonify({
+            'success': True,
+            'about': about_info
         }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知设置 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-container { max-width: 600px; margin: 0 auto; padding: 1rem; }
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .setting-info { flex: 1; }
+        .setting-title { color: #ffd700; font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .setting-desc { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: rgba(255,255,255,0.5);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #ffd700; }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-color: #000;
+        }
+        .btn-save {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div><span class="logo-text">玄机算命网</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">🏠 首页</a>
+        <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
+    </nav>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>通知设置</h1>
+</div>
+
+<div class="content-area">
+    <div class="page-container">
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">📱 推送通知</div>
+                <div class="setting-desc">接收算命结果、会员到期提醒</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="pushEnabled" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">📧 邮件通知</div>
+                <div class="setting-desc">接收邮件提醒（需绑定邮箱）</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="emailEnabled" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">📱 短信通知</div>
+                <div class="setting-desc">接收短信提醒（需绑定手机号）</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="smsEnabled" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">🔮 每日运势提醒</div>
+                <div class="setting-desc">每天早上 8 点推送今日运势</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="dailyFortune" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">👑 VIP 到期提醒</div>
+                <div class="setting-desc">VIP 到期前 3 天提醒续费</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="vipExpire" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title">🔔 系统通知</div>
+                <div class="setting-desc">接收系统公告、活动通知</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="systemNotice" onchange="saveSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <button class="btn-save" onclick="saveManually()">💾 保存设置</button>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => loadSettings());
+
+async function loadSettings() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) { window.location.href = '/login.html'; return; }
+    
+    try {
+        const resp = await fetch('/api/notifications/settings', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await resp.json();
+        
+        if (data.success) {
+            const s = data.settings;
+            document.getElementById('pushEnabled').checked = s.push_enabled !== false;
+            document.getElementById('emailEnabled').checked = s.email_enabled !== false;
+            document.getElementById('smsEnabled').checked = s.sms_enabled === true;
+            document.getElementById('dailyFortune').checked = s.daily_fortune !== false;
+            document.getElementById('vipExpire').checked = s.vip_expire !== false;
+            document.getElementById('systemNotice').checked = s.system_notice !== false;
+        }
+    } catch (e) {
+        console.error('加载通知设置失败:', e);
+    }
+}
+
+async function saveSettings() {
+    // 自动保存（每次切换开关时）
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return;
+    
+    const settings = {
+        push_enabled: document.getElementById('pushEnabled').checked,
+        email_enabled: document.getElementById('emailEnabled').checked,
+        sms_enabled: document.getElementById('smsEnabled').checked,
+        daily_fortune: document.getElementById('dailyFortune').checked,
+        vip_expire: document.getElementById('vipExpire').checked,
+        system_notice: document.getElementById('systemNotice').checked
+    };
+    
+    try {
+        await fetch('/api/notifications/settings', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(settings)
+        });
+    } catch (e) {
+        console.error('保存通知设置失败:', e);
+    }
+}
+
+async function saveManually() {
+    await saveSettings();
+    showToast('✅ 设置已保存');
+}
+</script>
+</body>
+</html>

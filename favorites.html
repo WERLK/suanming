@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>我的收藏 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .favorite-item {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+        
+        .favorite-item:hover {
+            background: rgba(255,215,0,0.08);
+            transform: translateX(5px);
+        }
+        
+        .favorite-info {
+            flex: 1;
+        }
+        
+        .favorite-name {
+            color: #ffd700;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        
+        .favorite-time {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+        }
+        
+        .favorite-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-enter {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 6px;
+            color: #ffd700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-enter:hover {
+            background: rgba(255,215,0,0.2);
+        }
+        
+        .btn-remove {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 6px;
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-remove:hover {
+            background: rgba(255,0,0,0.2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-text {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+<!-- 桌面端侧边栏 -->
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div>
+            <span class="logo-text">玄机算命网</span>
+            <span class="logo-sub">传承千年智慧</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">主导航</div>
+            <a href="/" class="sidebar-nav-item">🏠 首页</a>
+            <a href="/more.html" class="sidebar-nav-item">🔮 更多模块</a>
+            <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
+        </div>
+    </nav>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>我的收藏</h1>
+</div>
+
+<div class="content-area">
+    <div class="page-container">
+        <div id="favoritesList"></div>
+        
+        <!-- 空状态 -->
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="empty-icon">⭐</div>
+            <div class="empty-text">暂无收藏</div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadFavorites();
+});
+
+async function loadFavorites() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    try {
+        const resp = await fetch('/api/favorites', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await resp.json();
+        
+        if (data.success && data.favorites.length > 0) {
+            displayFavorites(data.favorites);
+        } else {
+            showEmptyState();
+        }
+    } catch (e) {
+        console.error('加载收藏失败:', e);
+        showToast('加载失败，请重试');
+    }
+}
+
+function displayFavorites(favorites) {
+    const listEl = document.getElementById('favoritesList');
+    const emptyEl = document.getElementById('emptyState');
+    
+    emptyEl.style.display = 'none';
+    listEl.innerHTML = '';
+    
+    favorites.forEach(fav => {
+        const item = document.createElement('div');
+        item.className = 'favorite-item';
+        item.innerHTML = `
+            <div class="favorite-info">
+                <div class="favorite-name">${fav.module_name}</div>
+                <div class="favorite-time">收藏于 ${new Date(fav.add_time).toLocaleDateString('zh-CN')}</div>
+            </div>
+            <div class="favorite-actions">
+                <button class="btn-enter" onclick="enterModule('${fav.module_id}')">进入</button>
+                <button class="btn-remove" onclick="removeFavorite('${fav.module_id}', '${fav.module_name}')">取消收藏</button>
+            </div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+function showEmptyState() {
+    document.getElementById('favoritesList').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+}
+
+function enterModule(moduleId) {
+    // 根据 module_id 跳转到对应模块
+    const moduleRoutes = {
+        'bazi': '/modules/bazi.html',
+        'ziwei': '/modules/ziwei.html',
+        'heyun': '/modules/heyun.html',
+        'shengxiao': '/modules/shengxiao.html',
+        'xingming': '/modules/xingming.html',
+        'tarot': '/modules/tarot.html',
+        'fengshui': '/modules/fengshui.html',
+        'caishen': '/modules/caishen.html'
+    };
+    
+    if (moduleRoutes[moduleId]) {
+        window.location.href = moduleRoutes[moduleId];
+    } else {
+        showToast('模块不存在');
+    }
+}
+
+async function removeFavorite(moduleId, moduleName) {
+    if (!confirm(`确定取消收藏"${moduleName}"吗？`)) return;
+    
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    try {
+        const resp = await fetch('/api/favorites', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ module_id: moduleId })
+        });
+        
+        const data = await resp.json();
+        
+        if (data.success) {
+            showToast('✅ 已取消收藏');
+            loadFavorites(); // 重新加载
+        } else {
+            showToast('❌ ' + data.message);
+        }
+    } catch (e) {
+        console.error('取消收藏失败:', e);
+        showToast('网络错误，请重试');
+    }
+}
+</script>
+</body>
+</html>

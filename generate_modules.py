@@ -102,6 +102,18 @@ def generate_module_content(category, module_name):
     current_year = datetime.now().year
     random_score = random.randint(70, 100)
     
+    # 生成模块类型标识（用于API调用）
+    module_type_map = {
+        "八字命理": "bazi", "紫微斗数": "ziwei", "生肖运势": "shengxiao",
+        "姓名学": "xingming", "面相学": "mianxiang", "手相学": "shouxiang",
+        "风水堪舆": "fengshui", "周公解梦": "jiemeng", "塔罗牌占卜": "tarot",
+        "黄道吉日": "huangli", "六爻占卜": "liuyao", "血型性格": "xuexing",
+        "星座运势": "xingzuo", "奇门遁甲": "qimen", "太乙神数": "taiyi",
+        "铁板神数": "tieban", "梅花易数": "meihua", "数字能量": "shuzi",
+        "符咒化解": "fuzhou", "择吉文化": "zeji"
+    }
+    api_type = module_type_map.get(category, "bazi")
+    
     content = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -114,7 +126,7 @@ def generate_module_content(category, module_name):
 <meta name="msapplication-TileImage" content="/icon-192.png">
 <meta name="msapplication-TileColor" content="#ffd700">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>{module_name} - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
 <style>
@@ -168,6 +180,15 @@ def generate_module_content(category, module_name):
     line-height: 1.8;
     color: rgba(255,255,255,0.8);
     margin-bottom: 0.5rem;
+}}
+
+/* API结果区 */
+.fortune-result-area {{
+    display: none;
+    margin-bottom: 1rem;
+}}
+.fortune-result-area.show {{
+    display: block;
 }}
 </style>
 </head>
@@ -243,28 +264,33 @@ def generate_module_content(category, module_name):
         </div>
 
         <div class="section">
-            <h2>在线分析工具</h2>
-            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
-                输入你的个人信息，我们将为你提供详细的{module_name}分析，包括基础知识、实用方法、案例分析等丰富内容。
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的{module_name}分析。
             </p>
             
             <div style="max-width: 500px; margin: 0 auto;">
                 <div style="margin-bottom: 1.2rem;">
                     <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
-                    <input type="text" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
                 </div>
                 
                 <div style="margin-bottom: 1.2rem;">
                     <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
-                    <input type="date" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
                 </div>
                 
                 <div style="margin-bottom: 1.2rem;">
                     <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
-                    <input type="time" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
                 </div>
                 
-                <button style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;">开始分析</button>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <!-- API 结果区 -->
+            <div class="fortune-result-area" id="apiResult">
+                <!-- 动态填充 -->
             </div>
         </div>
 
@@ -281,10 +307,69 @@ def generate_module_content(category, module_name):
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
 <script>
+// 模块元数据
+var MODULE_TYPE = '{api_type}';
+var MODULE_NAME = '{module_name}';
+var MODULE_CATEGORY = '{category}';
+
 document.addEventListener('DOMContentLoaded', function() {{
     createStars();
 }});
+
+async function runAnalysis() {{
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    // 调用后端大数据联网分析API
+    var result = await fortuneAPI('analyze', {{
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    }});
+    
+    if (result && result.data) {{
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {{
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {{
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }}
+            html += '</div>';
+        }}
+        
+        if (data.summary) {{
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }}
+        
+        if (data.lucky_elements) {{
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            html += '</div>';
+        }}
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({{ behavior: 'smooth' }});
+    }} else {{
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }}
+}}
 </script>
 
 </body>
@@ -295,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {{
 def generate_all_modules():
     """生成所有模块页面"""
     
-    output_dir = '/workspace/modules'
+    output_dir = '/workspace/suanming-fix/modules'
     os.makedirs(output_dir, exist_ok=True)
     
     count = 0
@@ -325,11 +410,12 @@ def generate_all_modules():
             print(f"✅ 已生成 ({count}/200+): {module_name}")
     
     # 保存模块列表到 JSON
-    with open('/workspace/module_list.json', 'w', encoding='utf-8') as f:
+    list_path = os.path.join(output_dir, 'module_list.json')
+    with open(list_path, 'w', encoding='utf-8') as f:
         json.dump(module_list, f, ensure_ascii=False, indent=2)
     
     print(f"\n🎉 完成！共生成 {count} 个算命模块页面")
-    print(f"📁 模块列表已保存到 /workspace/module_list.json")
+    print(f"📁 模块列表已保存到 {list_path}")
 
 if __name__ == '__main__':
     print("🚀 开始批量生成算命模块页面...")

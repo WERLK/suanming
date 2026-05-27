@@ -365,6 +365,7 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
 <script>
 // ===== 标签页切换 =====
 function switchTab(tabName, btnElement) {
@@ -584,9 +585,9 @@ function generateZiweiResultHTML(data, name, gender, date, time) {
     return html;
 }
 
-// ===== 开始排盘 =====
-function calculateZiwei() {
-    const name = document.getElementById('nameInput').value;
+// ===== 开始排盘（API版 + 本地降级） =====
+async function calculateZiwei() {
+    const name = document.getElementById('nameInput').value.trim();
     const gender = document.getElementById('genderInput').value;
     const date = document.getElementById('dateInput').value;
     const time = document.getElementById('timeInput').value;
@@ -596,17 +597,121 @@ function calculateZiwei() {
         return;
     }
 
-    window.showToast('正在排盘...');
+    // 尝试调用后端API
+    try {
+        const apiResult = await window.fortuneAPI('ziwei', {
+            name: name,
+            birth_date: date,
+            birth_time: time,
+            gender: gender
+        }, { loadingMsg: '正在联网排盘，请稍候...' });
 
-    setTimeout(() => {
-        const result = calcZiweiSimple(date, time, gender);
-        const resultHTML = generateZiweiResultHTML(result, name, gender, date, time);
-        document.getElementById('resultContainer').innerHTML = resultHTML;
-        switchTab('result');
+        if (apiResult && apiResult.data) {
+            renderZiweiAPIResult(apiResult.data, apiResult.meta);
+            switchTab('result');
+            return;
+        }
+    } catch (e) {
+        console.error('紫微斗数API调用异常:', e);
+    }
 
-        const toast = document.querySelector('.toast');
-        if (toast) toast.remove();
-    }, 1500);
+    // API 失败，降级到本地计算
+    console.log('API调用失败，使用本地计算');
+    showFortuneError('resultContainer', '联网获取失败，是否使用本地计算？',
+        calculateZiwei, // 重试 = 重新调用API
+        function() {    // 降级到本地计算
+            const result = calcZiweiSimple(date, time, gender);
+            const resultHTML = generateZiweiResultHTML(result, name, gender, date, time);
+            document.getElementById('resultContainer').innerHTML = resultHTML;
+            showDataBadge('local_fallback', 'resultContainer');
+        }
+    );
+    switchTab('result');
+}
+
+// ===== 渲染API返回的紫微斗数结果 =====
+function renderZiweiAPIResult(data, meta) {
+    const container = document.getElementById('resultContainer');
+    let html = '';
+
+    // 命盘总览
+    if (data.overview || data.summary) {
+        html += '<div class="result-section fade-in"><h3>⭐ 命盘总览</h3>';
+        html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">';
+        html += (data.overview || data.summary) + '</p></div>';
+    }
+
+    // 十二宫命盘（表格形式）
+    const palacesSource = (data.chart_data && data.chart_data.palaces) || data.palaces;
+    if (palacesSource && palacesSource.length > 0) {
+        html += '<div class="result-section fade-in"><h3>📊 十二宫命盘</h3>';
+        html += '<table class="chart-table"><tr>';
+        palacesSource.forEach(p => {
+            html += '<th>' + (p.name || p.palace || '') + '<br><small style="color:rgba(255,255,255,0.5);">' + (p.zhi || '') + '宫</small></th>';
+        });
+        html += '</tr><tr>';
+        palacesSource.forEach(p => {
+            let cell = '';
+            if (p.stars && p.stars.length > 0) {
+                p.stars.forEach(s => {
+                    const starName = typeof s === 'string' ? s : (s.name || s);
+                    const hua = typeof s === 'object' ? s.hua : null;
+                    let cls = 'major-star';
+                    if (hua) {
+                        const huaMap = { '禄':'hua-lu', '权':'hua-quan', '科':'hua-ke', '忌':'hua-ji' };
+                        cls = huaMap[hua] || 'major-star';
+                    }
+                    cell += '<div class="' + cls + '">' + starName + '</div>';
+                });
+            }
+            if (!cell) cell = '<span style="color:rgba(255,255,255,0.2);">空宫</span>';
+            html += '<td>' + cell + '</td>';
+        });
+        html += '</tr></table></div>';
+    }
+
+    // 命局分析
+    if (data.analysis || data.detail) {
+        html += '<div class="result-section fade-in"><h3>📖 命局分析</h3>';
+        html += '<div style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">';
+        html += (data.analysis || data.detail) + '</div></div>';
+    }
+
+    // 十二宫详细解读
+    if (data.palace_details) {
+        html += '<div class="result-section fade-in"><h3>🏛️ 十二宫详解</h3>';
+        html += '<div style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">';
+        html += (typeof data.palace_details === 'string' ? data.palace_details : JSON.stringify(data.palace_details, null, 2));
+        html += '</div></div>';
+    }
+
+    // 四化分析
+    if (data.sihua || data.four_transformations) {
+        html += '<div class="result-section fade-in"><h3>✨ 四化飞星</h3>';
+        html += '<div style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">';
+        html += (typeof data.sihua === 'string' ? data.sihua : JSON.stringify(data.sihua || data.four_transformations, null, 2));
+        html += '</div></div>';
+    }
+
+    // 综合建议
+    if (data.suggestions || data.advice) {
+        html += '<div class="result-section fade-in"><h3>💡 综合建议</h3>';
+        html += '<div style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">';
+        html += (data.suggestions || data.advice) + '</div></div>';
+    }
+
+    // 兜底：如果以上字段都不存在，展示原始数据
+    if (!html) {
+        html = '<div class="result-section fade-in"><h3>⭐ 排盘结果</h3>';
+        html += '<pre style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;font-family:inherit;">';
+        html += JSON.stringify(data, null, 2) + '</pre></div>';
+    }
+
+    container.innerHTML = html;
+    
+    // 显示数据来源标识
+    const source = (meta && meta.source) ? meta.source : 'realtime';
+    showDataBadge(source, 'resultContainer');
 }
 
 // ===== 显示知识详情 =====

@@ -238,6 +238,85 @@
         height: 200px;
     }
 }
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+.form-input:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.08);
+}
+.form-select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+}
+.form-select option {
+    background: #1a1a2e;
+    color: #fff;
+}
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: transform 0.2s;
+}
+.submit-btn:hover { transform: scale(1.02); }
+.submit-btn:active { transform: scale(0.98); }
+
+/* 结果区域 */
+.result-section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.5s ease-out;
+}
+.result-section h3 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
@@ -254,26 +333,30 @@
                 <div style="margin-bottom:1rem;">
             <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('caishen')">📷 上传图片分析</button>
         </div>
-<div class="section">
+
+        <!-- 财神方位查询 -->
+        <div class="section" style="max-width:500px;margin:0 auto 1rem;">
+            <h2>🔍 查询财神方位</h2>
+            <div class="form-group">
+                <label class="form-label">选择日期</label>
+                <input type="date" class="form-input" id="caishenDateInput">
+            </div>
+            <button type="button" class="submit-btn" onclick="queryCaishenDirection()">查询财神方位</button>
+        </div>
+
+        <!-- API结果区域 -->
+        <div id="caishenResultContainer" style="max-width:600px;margin:0 auto;">
+            <p style="text-align:center;color:rgba(255,255,255,0.4);padding:1rem;">点击"查询财神方位"获取实时数据</p>
+        </div>
+
+        <!-- 图片分析结果 -->
+        <div id="resultArea" style="display:none;margin-top:1rem;"></div>
+
+        <!-- 知识内容 -->
+        <div class="section">
             <h2>财神方位简介</h2>
             <p>财神方位是中国传统风水学中的重要概念，指每日财神所在的方位。根据天干地支和五行生克原理，每日的财神方位都不同。</p>
             <p>了解每日财神方位，可以在求财、签约、开店、投资等重要事务中选择有利方位，提升财运和成功率。</p>
-        </div>
-
-        <div class="section">
-            <h2>今日财神方位</h2>
-            <div class="compass-container">
-                <div class="compass" id="compass">
-                    <div class="compass-direction north">北</div>
-                    <div class="compass-direction east">东</div>
-                    <div class="compass-direction south">南</div>
-                    <div class="compass-direction west">西</div>
-                    <div class="wealth-direction today" id="todayDirection">财神在此</div>
-                </div>
-                <p style="margin-top: 1rem; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
-                    今日财神方位：<strong style="color: #ffd700;" id="directionText">正东</strong>
-                </p>
-            </div>
         </div>
 
         <div class="section">
@@ -453,159 +536,181 @@
     </div>
 </div>
 
-<script src="/js/main.js">
-// 触发图片上传
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+// ===== 图片上传 =====
 function triggerImageUpload(moduleType) {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.onchange = function() {
+    input.onchange = async function() {
         const file = this.files[0];
         if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
+        const result = await window.uploadImageFortune(file, moduleType);
+        if (result && result.data) {
+            window.showImageAnalysisResultV2(result.data, result.meta);
+        }
     };
     input.click();
 }
-</script>
-<script>
-// 初始化今日财神方位
+
+// ===== 查询财神方位（API版 + 本地降级） =====
+async function queryCaishenDirection() {
+    const dateInput = document.getElementById('caishenDateInput');
+    const date = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+    if (!date) {
+        window.showToast('请选择日期');
+        return;
+    }
+
+    const container = document.getElementById('caishenResultContainer');
+    
+    // 尝试调用后端API
+    try {
+        const apiResult = await window.fortuneGetAPI('caishen', { date: date });
+        if (apiResult && apiResult.data) {
+            renderCaishenAPIResult(apiResult.data, apiResult.meta);
+            return;
+        }
+    } catch (e) {
+        console.error('财神方位API调用异常:', e);
+    }
+
+    // API失败，显示错误状态含重试/降级按钮
+    showFortuneError('caishenResultContainer', '联网获取失败，是否使用本地计算？',
+        queryCaishenDirection,
+        function() {
+            const dirs = ['正北','正东','正南','正西','东北','东南','西南','西北'];
+            const d = new Date(date);
+            const idx = (d.getFullYear() * 10000 + (d.getMonth()+1)*100 + d.getDate()) % dirs.length;
+            renderLocalCaishenResult({ direction: dirs[idx] });
+        }
+    );
+    container && container.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== 渲染API返回的财神方位结果 =====
+function renderCaishenAPIResult(data, meta) {
+    const container = document.getElementById('caishenResultContainer');
+    let html = '';
+
+    // 财神方位罗盘
+    const direction = data.direction || data.wealth_direction || data.方位 || '东方';
+    html += '<div class="result-section fade-in"><h3>💰 财神方位</h3>';
+    html += '<div class="compass-container"><div class="compass">';
+    html += '<div class="compass-direction north">北</div>';
+    html += '<div class="compass-direction east">东</div>';
+    html += '<div class="compass-direction south">南</div>';
+    html += '<div class="compass-direction west">西</div>';
+    html += '<div class="wealth-direction today" id="apiDirFlag">' + direction + '</div>';
+    html += '</div>';
+    html += '<p style="margin-top:1rem;font-size:1.1rem;"><strong style="color:#ffd700;">今日财神方位：' + direction + '</strong></p>';
+    html += '</div></div>';
+
+    // 详细信息表格
+    html += '<div class="result-section fade-in"><h3>📋 详细信息</h3>';
+    html += '<table class="wealth-table"><tr><th>项目</th><th>内容</th></tr>';
+    
+    const fieldMap = [
+        ['direction', '财神方位'],
+        ['wealth_direction', '财神方位'],
+        ['方位', '财神方位'],
+        ['best_time', '最佳时段'],
+        ['时辰', '最佳时段'],
+        ['time', '最佳时段'],
+        ['yi', '宜'],
+        ['suitable', '宜'],
+        ['宜', '宜'],
+        ['ji', '忌'],
+        ['taboo', '忌'],
+        ['忌', '忌'],
+        ['supplies', '供品'],
+        ['供品', '供品'],
+        ['tips', '小贴士'],
+        ['advice', '小贴士'],
+        ['建议', '小贴士']
+    ];
+    
+    const shown = {};
+    for (const [key, label] of fieldMap) {
+        if (data[key] !== undefined && data[key] !== null && !shown[label]) {
+            shown[label] = true;
+            const val = typeof data[key] === 'object' ? JSON.stringify(data[key], null, 2) : String(data[key]);
+            html += '<tr><td style="color:#ffd700;">' + label + '</td><td style="text-align:left;padding-left:1rem;">' + val + '</td></tr>';
+        }
+    }
+    html += '</table></div>';
+
+    // 供香指南
+    const incenseGuide = data.incense_guide || data.供香指南;
+    if (incenseGuide) {
+        html += '<div class="result-section fade-in"><h3>🕯️ 供香指南</h3>';
+        html += '<div style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">' + incenseGuide + '</div></div>';
+    }
+
+    // 兜底：显示原始数据
+    if (Object.keys(shown).length === 0 && !incenseGuide) {
+        html += '<div class="result-section fade-in"><pre style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;font-family:inherit;">' + JSON.stringify(data, null, 2) + '</pre></div>';
+    }
+
+    container.innerHTML = html;
+    
+    // 更新罗盘方位标注
+    setTimeout(() => updateCompassPosition('apiDirFlag', direction), 100);
+    
+    const source = (meta && meta.source) ? meta.source : 'realtime';
+    showDataBadge(source, 'caishenResultContainer');
+}
+
+// ===== 本地计算降级渲染 =====
+function renderLocalCaishenResult(data) {
+    const container = document.getElementById('caishenResultContainer');
+    let html = '<div class="result-section fade-in"><h3>💰 财神方位（本地计算）</h3>';
+    html += '<div class="compass-container"><div class="compass">';
+    html += '<div class="compass-direction north">北</div>';
+    html += '<div class="compass-direction east">东</div>';
+    html += '<div class="compass-direction south">南</div>';
+    html += '<div class="compass-direction west">西</div>';
+    html += '<div class="wealth-direction today" id="localDirFlag">' + data.direction + '</div></div>';
+    html += '<p style="margin-top:1rem;"><strong style="color:#ffd700;">' + data.direction + '</strong></p>';
+    html += '<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;text-align:center;">结果基于本地农历推算，仅供参考</p>';
+    html += '</div></div>';
+    container.innerHTML = html;
+    setTimeout(() => updateCompassPosition('localDirFlag', data.direction), 100);
+    showDataBadge('local_fallback', 'caishenResultContainer');
+}
+
+// ===== 更新罗盘方位标注位置 =====
+function updateCompassPosition(elementId, direction) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const posMap = {
+        '正北': { t: '15%', l: '50%' }, '正东': { t: '50%', l: '82%' },
+        '正南': { t: '82%', l: '50%' }, '正西': { t: '50%', l: '15%' },
+        '东北': { t: '20%', l: '78%' }, '东南': { t: '78%', l: '78%' },
+        '西南': { t: '78%', l: '20%' }, '西北': { t: '20%', l: '20%' },
+        '东方': { t: '50%', l: '82%' }, '南方': { t: '82%', l: '50%' },
+        '西方': { t: '50%', l: '15%' }, '北方': { t: '15%', l: '50%' }
+    };
+    const pos = posMap[direction] || { t: '50%', l: '50%' };
+    el.style.top = pos.t; el.style.left = pos.l;
+    el.style.transform = 'translate(-50%, -50%)';
+    el.textContent = direction;
+}
+
+// ===== 页面初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     createStars();
-    updateWealthDirection();
-});
-
-function updateWealthDirection() {
-    // 模拟根据日期计算财神方位
-    const directions = ['正北', '正东', '正南', '正西', '东北', '东南', '西南', '西北'];
-    const randomDirection = directions[Math.floor(Math.random() * directions.length)];
-    
-    document.getElementById('directionText').textContent = randomDirection;
-    
-    // 在罗盘上标记方位（简化版）
-    const directionElement = document.getElementById('todayDirection');
-    directionElement.textContent = randomDirection;
-    
-    // 根据方位调整位置（简化版）
-    switch(randomDirection) {
-        case '正北':
-            directionElement.style.top = '20%';
-            directionElement.style.left = '50%';
-            directionElement.style.transform = 'translate(-50%, -50%)';
-            break;
-        case '正东':
-            directionElement.style.top = '50%';
-            directionElement.style.left = '80%';
-            directionElement.style.transform = 'translate(-50%, -50%)';
-            break;
-        case '正南':
-            directionElement.style.top = '80%';
-            directionElement.style.left = '50%';
-            directionElement.style.transform = 'translate(-50%, -50%)';
-            break;
-        case '正西':
-            directionElement.style.top = '50%';
-            directionElement.style.left = '20%';
-            directionElement.style.transform = 'translate(-50%, -50%)';
-            break;
-        default:
-            directionElement.style.top = '50%';
-            directionElement.style.left = '50%';
-            directionElement.style.transform = 'translate(-50%, -50%)';
+    // 设置默认日期为今天
+    var dateInput = document.getElementById('caishenDateInput');
+    if (dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
     }
-}
+    // 自动查询今日财神方位
+    queryCaishenDirection();
+});
 </script>
 
-
-        <!-- 分析表单 -->
-        <div class="tab-content active" id="formTab">
-            <div class="form-container">
-                
-            <div class="form-group">
-                <label class="form-label">查询日期</label>
-                <input type="date" class="form-input" id="dateInput">
-            </div>
-            <div class="form-group">
-                <label class="form-label">查询时段</label>
-                <select class="form-select" id="timeInput">
-                    <option value="早">早起 (05:00-09:00)</option>
-                    <option value="午">午时 (11:00-13:00)</option>
-                    <option value="晚">晚时 (17:00-21:00)</option>
-                </select>
-            </div>
-        
-                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
-            </div>
-        </div>
-        <!-- 结果展示 -->
-        <div class="tab-content" id="resultTab">
-            <div class="result-container" id="resultContainer">
-                
-        <div class="result-section"><h3>💰 财神方位分析结果</h3>
-        <div class="analysis-text">
-            <p><strong>财神方位：</strong>正< span id="directionResult"></span></p>
-            <p><strong>财神时辰：</strong><span id="timeResult"></span></p>
-            <p><strong>求财建议：</strong><span id="adviceResult"></span></p>
-        </div>
-        <table class="result-table">
-            <tr><th>方位</th><th>五行</th><th>财运指数</th></tr>
-            <tr><td>正东</td><td>木</td><td>★★★☆☆</td></tr>
-            <tr><td>正南</td><td>火</td><td>★★★☆☆</td></tr>
-            <tr><td>正西</td><td>金</td><td>★★★★☆</td></tr>
-            <tr><td>正北</td><td>水</td><td>★★☆☆☆</td></tr>
-        </table>
-        </div>
-        
-            </div>
-        </div>
-    
-    <script>
-    function calculateModule() {
-        if (window.showToast) window.showToast('正在分析中...');
-        setTimeout(function() {
-            // 这里调用真正的分析计算
-            var resultHtml = generateResultHTML();
-            document.getElementById('resultContainer').innerHTML = resultHtml;
-            if (window.switchTab) window.switchTab('result');
-            if (window.showToast) window.showToast('分析完成！');
-        }, 1200);
-    }
-    
-    function generateResultHTML() {
-        // 读取表单值并生成结果
-        var html = '<div class="result-section fade-in">';
-        html += '<h3>📊 分析结果</h3>';
-        html += '<div class="analysis-text">';
-        html += '<p>根据您提供的信息，分析结果如下：</p>';
-        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
-        html += '</div></div>';
-        return html;
-    }
-    </script>
-    </body>
+</body>
 </html>

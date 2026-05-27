@@ -203,7 +203,7 @@
 
     <div class="content-area">
                 <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('taiyang')">📷 上传图片分析</button>
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUploadV2('taiyang')">📷 上传图片分析</button>
         </div>
 <div class="section">
             <h2>太阳卦简介</h2>
@@ -272,6 +272,17 @@
                     </select>
                 </div>
                 
+                <div class="form-group">
+                    <label class="form-label">所在地经度（默认自动检测）</label>
+                    <input type="number" class="form-input" id="longitudeInput" placeholder="例如：116.40（北京）" step="0.01" min="-180" max="180">
+                    <p style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:0.3rem;" id="longitudeHint">正在获取位置...</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">占卜日期</label>
+                    <input type="date" class="form-input" id="dateInput">
+                </div>
+                
                 <button type="button" class="submit-btn" onclick="startDivination()">开始占卜</button>
             </div>
             
@@ -332,97 +343,149 @@
     </div>
 </div>
 
-<script src="/js/main.js">
-// 显示提示
-function showToast(msg) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = msg;
-    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+// 太阳卦图片快捷上传
+function triggerImageUpload(moduleType) {
+    triggerImageUploadV2(moduleType);
 }
 
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
-<script>
-function startDivination() {
+// 页面初始化：获取地理位置并设置日期
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+    
+    // 设置默认日期为今天
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateInput').value = today;
+    
+    // 尝试获取地理位置
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+            document.getElementById('longitudeInput').value = pos.coords.longitude.toFixed(2);
+            document.getElementById('longitudeHint').textContent = '已自动检测经纬度: ' + pos.coords.longitude.toFixed(2) + ', ' + pos.coords.latitude.toFixed(2);
+        }, function() {
+            document.getElementById('longitudeHint').textContent = '无法获取位置，请手动输入经度';
+        });
+    } else {
+        document.getElementById('longitudeHint').textContent = '浏览器不支持定位，请手动输入经度';
+    }
+});
+
+// 开始占卜 - 接入后端API计算真太阳时
+async function startDivination() {
     const question = document.getElementById('questionInput').value.trim();
     const type = document.getElementById('typeInput').value;
+    const longitude = document.getElementById('longitudeInput').value;
+    const date = document.getElementById('dateInput').value;
     
     if (!question) {
-        window.showToast('请输入你想问的问题');
+        showToast('请输入你想问的问题');
         return;
     }
     
-    window.showToast('正在占卜...');
+    if (!longitude) {
+        showToast('请输入经度或允许位置访问');
+        return;
+    }
     
-    // 模拟占卜过程
+    showToast('正在占卜...');
+    
+    // 调用API计算真太阳时并获取卦象
+    const result = await fortuneAPI('analyze', {
+        module_type: 'taiyang',
+        question: question,
+        question_type: type,
+        longitude: parseFloat(longitude),
+        date: date
+    });
+    
+    if (result && result.data) {
+        showResult(result.data, result.meta);
+        return;
+    }
+    
+    // API失败，使用本地降级
+    divinationLocal(question, type, longitude, date);
+}
+
+// 本地降级：实时计算真太阳时
+function divinationLocal(question, type, longitude, date) {
+    showToast('使用本地计算模式...');
+    showFortuneLoading('正在计算真太阳时...');
+    
     setTimeout(() => {
-        const isSun = Math.random() > 0.5;
+        hideFortuneLoading();
+        
+        // 计算真太阳时
+        const dateObj = date ? new Date(date + 'T12:00:00') : new Date();
+        const dayOfYear = Math.floor((dateObj - new Date(dateObj.getFullYear(), 0, 0)) / 86400000);
+        
+        // 时差方程（分钟）
+        const B = (360 / 365) * (dayOfYear - 81);
+        const B_rad = B * Math.PI / 180;
+        const eot = 9.87 * Math.sin(2 * B_rad) - 7.53 * Math.cos(B_rad) - 1.5 * Math.sin(B_rad);
+        
+        // 当地正午时间 = 12:00 - (经度 - 15*时区) / 15 - 时差/60
+        const timezone = 8; // 中国标准时间 UTC+8
+        const solarNoon = 12 - (longitude - 15 * timezone) / 15 - eot / 60;
+        const solarNoonHour = Math.floor(solarNoon);
+        const solarNoonMinute = Math.round((solarNoon - solarNoonHour) * 60);
+        
+        // 基于真太阳时确定卦象
+        const solarValue = (solarNoon * 60) % 1440; // 当天分钟数
+        const isSun = solarValue > 720; // 午时之后为太阳卦
+        
         const result = {
             question: question,
             type: type,
             isSun: isSun,
             gua: isSun ? '太阳卦（阳卦）' : '太阴卦（阴卦）',
+            solar_noon: solarNoonHour + ':' + String(solarNoonMinute).padStart(2, '0'),
+            eot: eot.toFixed(1),
             meaning: isSun ? '吉祥、顺利、可成' : '波折、延迟、需等待',
             advice: isSun ? 
                 ['积极行动', '把握机遇', '勇往直前', '果断决策'][Math.floor(Math.random() * 4)] : 
                 ['谨慎行事', '等待时机', '三思后行', '暂缓决策'][Math.floor(Math.random() * 4)]
         };
         
-        showResult(result);
-    }, 1500);
+        showResult(result, { source: 'local' });
+    }, 1000);
 }
 
-function showResult(result) {
-    const guaSymbol = result.isSun ? '☀️' : '🌙';
+// 显示占卜结果（兼容API和本地两种格式）
+function showResult(result, meta) {
+    const isAPIResult = meta && meta.source !== 'local';
+    let isSun = result.isSun;
+    let gua = result.gua;
+    let meaning = result.meaning;
+    let advice = result.advice;
+    let question = result.question;
+    let solarNoon = result.solar_noon;
+    let eot = result.eot;
+    
+    // 兼容API返回格式
+    if (isAPIResult) {
+        if (result.guaInfo) {
+            gua = result.guaInfo.name || result.gua;
+            isSun = result.guaInfo.isYang !== undefined ? result.guaInfo.isYang : (gua && gua.includes('太阳'));
+            meaning = result.guaInfo.meaning || result.meaning;
+            advice = result.guaInfo.advice || result.advice;
+        }
+        solarNoon = result.solarTime || result.solar_noon;
+        eot = result.equationOfTime || result.eot;
+        question = result.question;
+    }
+    
+    const guaSymbol = isSun ? '☀️' : '🌙';
+    const typeText = document.getElementById('typeInput').options[document.getElementById('typeInput').selectedIndex].text;
     
     let html = `
         <div class="result-card fade-in">
             <h3>${guaSymbol} 占卜结果</h3>
-            <p><strong>所问之事：</strong>${result.question}</p>
-            <p><strong>问题类型：</strong>${document.getElementById('typeInput').options[document.getElementById('typeInput').selectedIndex].text}</p>
+            <p><strong>所问之事：</strong>${question}</p>
+            <p><strong>问题类型：</strong>${typeText}</p>
+            ${solarNoon ? '<p><strong>真太阳午时：</strong>' + solarNoon + (eot ? '（时差' + eot + '分钟）' : '') + '</p>' : ''}
         </div>
         
         <div class="sun-symbol fade-in">
@@ -431,15 +494,15 @@ function showResult(result) {
         
         <div class="result-card fade-in">
             <h3>📊 卦象</h3>
-            <p style="font-size: 1.5rem; color: #ffd700; font-weight: bold; text-align: center; margin: 1rem 0;">${result.gua}</p>
-            <p><strong>含义：</strong>${result.meaning}</p>
+            <p style="font-size: 1.5rem; color: #ffd700; font-weight: bold; text-align: center; margin: 1rem 0;">${gua || (isSun ? '太阳卦（阳卦）' : '太阴卦（阴卦）')}</p>
+            <p><strong>含义：</strong>${meaning}</p>
         </div>
         
         <div class="result-card fade-in">
             <h3>💡 建议</h3>
-            <p>根据卦象，建议你：<strong>${result.advice}</strong></p>
+            <p>根据卦象，建议你：<strong>${advice}</strong></p>
             <p>具体来说：</p>
-            ${result.isSun ? 
+            ${isSun ? 
                 '<p>✅ 这是一个积极的信号，你可以放心前进。</p><p>✅ 抓住机会，积极行动，成功的可能性很大。</p><p>✅ 但也要注意细节，不要盲目乐观。</p>' : 
                 '<p>⚠️ 这不是一个理想的时机，建议谨慎行事。</p><p>⚠️ 可以等待更好的时机，或者重新评估你的计划。</p><p>⚠️ 不要气馁，太阴卦只是提醒你需要更多耐心和准备。</p>'
             }
@@ -447,8 +510,8 @@ function showResult(result) {
         
         <div class="result-card fade-in">
             <h3>📝 综合分析</h3>
-            <p>针对你的问题"${result.question}"，${result.gua}的启示是：</p>
-            <p>${result.isSun ? 
+            <p>针对你的问题"${question}"，${gua || (isSun ? '太阳卦' : '太阴卦')}的启示是：</p>
+            <p>${isSun ? 
                 '当前形势对你有利，可以积极行动，把握机遇。但也要注意不要过于冒进，要保持清醒的头脑。' : 
                 '当前形势不太明朗，建议谨慎行事，等待更好的时机。可以利用这段时间做好准备，提升自己，为未来的机会打下基础。'
             }</p>
@@ -459,9 +522,14 @@ function showResult(result) {
         </div>
     `;
     
-    document.getElementById('resultArea').innerHTML = html;
-    document.getElementById('resultArea').style.display = 'block';
+    const resultArea = document.getElementById('resultArea');
+    resultArea.innerHTML = html;
+    resultArea.style.display = 'block';
     document.querySelector('.divination-form').style.display = 'none';
+    
+    if (meta) {
+        showDataBadge(meta.source || 'local', 'resultArea');
+    }
 }
 
 function resetForm() {
@@ -469,10 +537,6 @@ function resetForm() {
     document.getElementById('resultArea').style.display = 'none';
     document.getElementById('questionInput').value = '';
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    createStars();
-});
 </script>
 
 </body>

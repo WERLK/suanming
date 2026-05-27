@@ -243,7 +243,7 @@
 
     <div class="content-area">
                 <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('shouxiang')">📷 上传图片分析</button>
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUploadV2('shouxiang')">📷 上传图片分析</button>
         </div>
 <div class="section">
             <h2>手相学简介</h2>
@@ -475,80 +475,76 @@
     </div>
 </div>
 
-<script src="/js/main.js">
-// 显示提示
-function showToast(msg) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = msg;
-    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+// 手相图片快捷上传（兼容保留）
+function triggerImageUpload(moduleType) {
+    triggerImageUploadV2(moduleType);
 }
 
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
-<script>
-function analyzePalm() {
+// 手相分析 - 接入后端API
+async function analyzePalm() {
     const leftHand = document.getElementById('leftHandInput').files[0];
     const rightHand = document.getElementById('rightHandInput').files[0];
     const gender = document.getElementById('genderInput').value;
     const age = document.getElementById('ageInput').value;
     
     if (!leftHand || !rightHand) {
-        window.showToast('请上传左右手照片');
+        showToast('请上传左右手照片');
         return;
     }
     
     if (!age || age < 1 || age > 120) {
-        window.showToast('请输入有效年龄');
+        showToast('请输入有效年龄');
         return;
     }
     
-    window.showToast('正在分析手相...');
+    showToast('正在分析手相...');
     
-    // 模拟AI分析
+    // 读取左右手图片
+    try {
+        const base64Right = await readFileAsBase64(rightHand);
+        const base64Left = await readFileAsBase64(leftHand);
+        
+        // 调用API分析
+        const result = await fortuneAPI('image-analyze', {
+            image: base64Right,
+            image_extra: base64Left,
+            module_type: 'shouxiang',
+            gender: gender,
+            age: parseInt(age)
+        });
+        
+        if (result && result.data) {
+            showResult(result.data, result.meta);
+            return;
+        }
+    } catch (err) {
+        console.error('手相API分析失败:', err);
+    }
+    
+    // API失败，使用本地降级分析
+    analyzePalmLocal(gender, age);
+}
+
+// 读取文件为base64
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// 本地降级分析（保留原有模拟逻辑）
+function analyzePalmLocal(gender, age) {
+    showToast('使用本地分析模式...');
+    showFortuneLoading('正在本地分析手相...');
+    
     setTimeout(() => {
+        hideFortuneLoading();
         const result = {
             score: Math.floor(Math.random() * 30) + 70,
             lines: {
@@ -567,52 +563,100 @@ function analyzePalm() {
                     '，建议' + ['保持良好生活习惯', '多运动增强体魄', '注重内心修养'][Math.floor(Math.random() * 3)] + 
                     '，可进一步提升健康和运势。'
         };
-        
-        showResult(result);
-    }, 2500);
+        showResult(result, { source: 'local_fallback' });
+    }, 1500);
 }
 
-function showResult(result) {
-    let html = `
-        <div class="result-card fade-in">
-            <h3>🖐️ 手相分析结果</h3>
-        </div>
+// 显示分析结果（兼容API和本地两种格式）
+function showResult(result, meta) {
+    let html = '';
+    
+    // 判断是否为API返回的格式
+    const isAPIResult = meta && meta.source !== 'local_fallback';
+    
+    if (isAPIResult) {
+        // API结果格式
+        html += '<div class="result-card fade-in"><h3>🖐️ AI手相分析结果</h3>';
+        if (result.analysis) {
+            html += '<p>' + result.analysis.replace(/\n/g, '<br>') + '</p>';
+        } else if (result.summary) {
+            html += '<p>' + result.summary.replace(/\n/g, '<br>') + '</p>';
+        } else {
+            html += '<p>' + (typeof result === 'string' ? result : JSON.stringify(result)) + '</p>';
+        }
+        html += '</div>';
         
-        <div class="result-card fade-in">
-            <h3>📊 综合评分</h3>
-            <p style="font-size: 2rem; color: #ffd700; font-weight: bold; text-align: center; margin: 1rem 0;">${result.score}分</p>
-            <p style="text-align: center; color: rgba(255,255,255,0.8);">${result.score >= 90 ? '大吉手相' : result.score >= 80 ? '吉相' : result.score >= 70 ? '中吉相' : '平相'}</p>
-        </div>
+        if (result.lines) {
+            html += '<div class="result-card fade-in"><h3>🔍 主线分析</h3>';
+            const labels = { life: '生命线', wisdom: '智慧线', emotion: '感情线', fate: '命运线' };
+            for (const [key, val] of Object.entries(result.lines)) {
+                html += '<p><strong>' + (labels[key] || key) + '：</strong>' + (typeof val === 'string' ? val : JSON.stringify(val)) + '</p>';
+            }
+            html += '</div>';
+        }
         
-        <div class="result-card fade-in">
-            <h3>🔍 主线分析</h3>
-            <p><strong>生命线：</strong>${result.lines.life} — ${result.fortune.health}</p>
-            <p><strong>智慧线：</strong>${result.lines.wisdom} — ${result.fortune.career}</p>
-            <p><strong>感情线：</strong>${result.lines.emotion} — ${result.fortune.marriage}</p>
-            <p><strong>命运线：</strong>${result.lines.fate} — ${result.fortune.wealth}</p>
-        </div>
+        if (result.fortune) {
+            html += '<div class="result-card fade-in"><h3>📊 各方面运势</h3>';
+            for (const [key, val] of Object.entries(result.fortune)) {
+                html += '<p><strong>' + key + '运：</strong>' + val + '</p>';
+            }
+            html += '</div>';
+        }
         
-        <div class="result-card fade-in">
-            <h3>📊 各方面运势</h3>
-            <p><strong>事业运：</strong>${result.fortune.career}</p>
-            <p><strong>财运：</strong>${result.fortune.wealth}</p>
-            <p><strong>婚姻运：</strong>${result.fortune.marriage}</p>
-            <p><strong>健康运：</strong>${result.fortune.health}</p>
-        </div>
-        
-        <div class="result-card fade-in">
-            <h3>💡 改善建议</h3>
-            <p>${result.advice}</p>
-        </div>
-        
+        if (result.advice) {
+            html += '<div class="result-card fade-in"><h3>💡 改善建议</h3><p>' + result.advice + '</p></div>';
+        }
+    } else {
+        // 本地降级结果格式（保持原有显示）
+        html = `
+            <div class="result-card fade-in">
+                <h3>🖐️ 手相分析结果</h3>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>📊 综合评分</h3>
+                <p style="font-size: 2rem; color: #ffd700; font-weight: bold; text-align: center; margin: 1rem 0;">${result.score}分</p>
+                <p style="text-align: center; color: rgba(255,255,255,0.8);">${result.score >= 90 ? '大吉手相' : result.score >= 80 ? '吉相' : result.score >= 70 ? '中吉相' : '平相'}</p>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>🔍 主线分析</h3>
+                <p><strong>生命线：</strong>${result.lines.life} — ${result.fortune.health}</p>
+                <p><strong>智慧线：</strong>${result.lines.wisdom} — ${result.fortune.career}</p>
+                <p><strong>感情线：</strong>${result.lines.emotion} — ${result.fortune.marriage}</p>
+                <p><strong>命运线：</strong>${result.lines.fate} — ${result.fortune.wealth}</p>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>📊 各方面运势</h3>
+                <p><strong>事业运：</strong>${result.fortune.career}</p>
+                <p><strong>财运：</strong>${result.fortune.wealth}</p>
+                <p><strong>婚姻运：</strong>${result.fortune.marriage}</p>
+                <p><strong>健康运：</strong>${result.fortune.health}</p>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>💡 改善建议</h3>
+                <p>${result.advice}</p>
+            </div>
+        `;
+    }
+    
+    html += `
         <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
             <button type="button" class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
         </div>
     `;
     
-    document.getElementById('resultArea').innerHTML = html;
-    document.getElementById('resultArea').style.display = 'block';
+    const resultArea = document.getElementById('resultArea');
+    resultArea.innerHTML = html;
+    resultArea.style.display = 'block';
     document.querySelector('.analysis-form').style.display = 'none';
+    
+    // 显示数据来源标识
+    if (meta) {
+        showDataBadge(meta.source || 'local', 'resultArea');
+    }
 }
 
 function resetForm() {

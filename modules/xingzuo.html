@@ -14,7 +14,13 @@
 <title>星座运势 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
 <style>
-/* 星座运势页面特定样式 */
+/* ===== 页面基础 ===== */
+body {
+    background: #0f0c29;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 .back-btn {
     background: none;
     border: none;
@@ -67,18 +73,19 @@
     margin-bottom: 0.5rem;
 }
 
+/* ===== 星座卡片网格 ===== */
 .zodiac-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
 }
 
 .zodiac-card {
     background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.12);
     border-radius: 12px;
-    padding: 1rem 0.5rem;
+    padding: 0.8rem 0.4rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
@@ -90,97 +97,269 @@
 }
 
 .zodiac-card.active {
-    border-color: rgba(255,215,0,0.5);
-    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1));
+    border-color: rgba(255,215,0,0.6);
+    background: linear-gradient(135deg, rgba(255,215,0,0.22), rgba(255,215,0,0.12));
+    box-shadow: 0 0 15px rgba(255,215,0,0.15);
 }
 
 .zodiac-emoji {
-    font-size: 2rem;
+    font-size: 1.8rem;
     margin-bottom: 0.3rem;
 }
 
 .zodiac-name {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: rgba(255,255,255,0.9);
     font-weight: 500;
 }
 
-.fortune-result {
-    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.1);
-    border-radius: 12px;
-    padding: 1.2rem;
-    margin-top: 1rem;
-    display: none;
+/* ===== 周期切换标签 ===== */
+.period-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,215,0,0.15);
 }
 
-.fortune-date {
-    font-size: 1.1rem;
+.period-tab {
+    flex: 1;
+    padding: 0.6rem 0;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(255,215,0,0.05);
+    color: rgba(255,255,255,0.6);
+    border: none;
+}
+
+.period-tab:hover {
+    background: rgba(255,215,0,0.1);
+    color: rgba(255,255,255,0.85);
+}
+
+.period-tab.active {
+    background: rgba(255,215,0,0.2);
     color: #ffd700;
-    margin-bottom: 0.8rem;
     font-weight: 600;
 }
 
-.fortune-rank {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
+/* ===== 运势结果卡片 ===== */
+.fortune-result {
+    display: none;
+    background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.12);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-top: 0.5rem;
+    position: relative;
 }
 
-.rank-top {
-    background: rgba(255,215,0,0.2);
-    color: #ffd700;
+.fortune-result.show {
+    display: block;
 }
 
-.rank-mid {
-    background: rgba(0,255,0,0.15);
-    color: #0f0;
-}
-
-.rank-low {
-    background: rgba(255,0,0,0.15);
-    color: #f00;
-}
-
-.fortune-section {
-    margin-bottom: 1rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(255,215,0,0.08);
-}
-
-.fortune-section:last-child {
-    border-bottom: none;
-}
-
-.fortune-section h3 {
-    font-size: 0.9rem;
-    color: #ffd700;
-    margin-bottom: 0.5rem;
-}
-
-.fortune-section p {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: rgba(255,255,255,0.8);
-}
-
-.fortune-tags {
+.fortune-header {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 0.5rem;
 }
 
-.fortune-tag {
+.fortune-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fortune-zodiac-icon {
+    font-size: 1.8rem;
+}
+
+.fortune-zodiac-name {
+    font-size: 1.1rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.fortune-period-badge {
     padding: 0.2rem 0.6rem;
     border-radius: 12px;
     font-size: 0.75rem;
-    background: rgba(255,215,0,0.1);
-    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    background: rgba(255,215,0,0.15);
+    color: #ffd700;
 }
 
+.fortune-header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.fortune-refresh-btn {
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.2);
+    color: #ffd700;
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.fortune-refresh-btn:hover {
+    background: rgba(255,215,0,0.2);
+}
+
+.fortune-content {
+    font-size: 0.9rem;
+    line-height: 2;
+    color: rgba(255,255,255,0.85);
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 0.5rem 0;
+}
+
+.fortune-updated {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    text-align: right;
+    margin-top: 0.8rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba(255,215,0,0.08);
+}
+
+/* ===== Loading 状态 ===== */
+.fortune-loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    gap: 1rem;
+}
+
+.fortune-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255,215,0,0.15);
+    border-top-color: #ffd700;
+    border-radius: 50%;
+    animation: fortune-spin 0.8s linear infinite;
+}
+
+@keyframes fortune-spin {
+    to { transform: rotate(360deg); }
+}
+
+.fortune-loading-text {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+}
+
+/* ===== Error 状态 ===== */
+.fortune-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    gap: 0.8rem;
+}
+
+.fortune-error-icon {
+    font-size: 2.5rem;
+}
+
+.fortune-error-message {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.fortune-error-actions {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.fortune-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.3s;
+}
+
+.fortune-btn-retry {
+    background: rgba(255,215,0,0.15);
+    color: #ffd700;
+    border-color: rgba(255,215,0,0.3);
+}
+
+.fortune-btn-retry:hover {
+    background: rgba(255,215,0,0.25);
+}
+
+.fortune-btn-fallback {
+    background: rgba(100,149,237,0.1);
+    color: #6495ed;
+    border-color: rgba(100,149,237,0.3);
+}
+
+.fortune-btn-fallback:hover {
+    background: rgba(100,149,237,0.2);
+}
+
+/* ===== 数据来源标识 ===== */
+.fortune-data-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-bottom: 0.8rem;
+    width: fit-content;
+}
+
+.badge-realtime {
+    background: rgba(0,255,100,0.1);
+    color: #0f0;
+    border: 1px solid rgba(0,255,100,0.2);
+}
+
+.badge-cached {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.badge-fallback {
+    background: rgba(255,100,100,0.1);
+    color: #f66;
+    border: 1px solid rgba(255,100,100,0.2);
+}
+
+/* ===== 提示文字 ===== */
+.fortune-hint {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255,215,0,0.03);
+    border-radius: 8px;
+    border: 1px dashed rgba(255,215,0,0.08);
+}
+
+/* ===== 百科区域 ===== */
 .element-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -213,13 +392,41 @@
     color: rgba(255,255,255,0.7);
 }
 
-@media (max-width: 768px) {
+/* ===== 响应式 ===== */
+@media (min-width: 600px) {
     .zodiac-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
     }
-    
+}
+
+@media (min-width: 900px) {
+    .zodiac-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .zodiac-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.4rem;
+    }
+    .zodiac-card {
+        padding: 0.6rem 0.3rem;
+    }
+    .zodiac-emoji {
+        font-size: 1.5rem;
+    }
+    .zodiac-name {
+        font-size: 0.75rem;
+    }
     .element-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 360px) {
+    .zodiac-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 </style>
@@ -230,79 +437,33 @@
 
 <div class="app">
     <div class="page-header">
-        <button type="button" type="button" class="back-btn" onclick="history.back()">←</button>
-        <h1>✨ 星座运势</h1>
+        <button type="button" class="back-btn" onclick="history.back()">←</button>
+        <h1>🔮 星座运势</h1>
     </div>
 
     <div class="content-area">
-                <div style="margin-bottom:1rem;">
+        <div style="margin-bottom:1rem;">
             <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('xingzuo')">📷 上传图片分析</button>
         </div>
-<div class="section">
+
+        <div class="section">
             <h2>选择你的星座</h2>
             <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem;">
-                查看2026年5月你的星座运势详解
+                点击星座卡片查看联网实时运势数据
             </p>
-            
+
             <div class="zodiac-grid" id="zodiacGrid">
-                <div class="zodiac-card" data-zodiac="白羊座" onclick="selectZodiac('白羊座', '♈')">
-                    <div class="zodiac-emoji">♈</div>
-                    <div class="zodiac-name">白羊座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="金牛座" onclick="selectZodiac('金牛座', '♉')">
-                    <div class="zodiac-emoji">♉</div>
-                    <div class="zodiac-name">金牛座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="双子座" onclick="selectZodiac('双子座', '♊')">
-                    <div class="zodiac-emoji">♊</div>
-                    <div class="zodiac-name">双子座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="巨蟹座" onclick="selectZodiac('巨蟹座', '♋')">
-                    <div class="zodiac-emoji">♋</div>
-                    <div class="zodiac-name">巨蟹座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="狮子座" onclick="selectZodiac('狮子座', '♌')">
-                    <div class="zodiac-emoji">♌</div>
-                    <div class="zodiac-name">狮子座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="处女座" onclick="selectZodiac('处女座', '♍')">
-                    <div class="zodiac-emoji">♍</div>
-                    <div class="zodiac-name">处女座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="天秤座" onclick="selectZodiac('天秤座', '♎')">
-                    <div class="zodiac-emoji">♎</div>
-                    <div class="zodiac-name">天秤座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="天蝎座" onclick="selectZodiac('天蝎座', '♏')">
-                    <div class="zodiac-emoji">♏</div>
-                    <div class="zodiac-name">天蝎座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="射手座" onclick="selectZodiac('射手座', '♐')">
-                    <div class="zodiac-emoji">♐</div>
-                    <div class="zodiac-name">射手座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="摩羯座" onclick="selectZodiac('摩羯座', '♑')">
-                    <div class="zodiac-emoji">♑</div>
-                    <div class="zodiac-name">摩羯座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="水瓶座" onclick="selectZodiac('水瓶座', '♒')">
-                    <div class="zodiac-emoji">♒</div>
-                    <div class="zodiac-name">水瓶座</div>
-                </div>
-                <div class="zodiac-card" data-zodiac="双鱼座" onclick="selectZodiac('双鱼座', '♓')">
-                    <div class="zodiac-emoji">♓</div>
-                    <div class="zodiac-name">双鱼座</div>
-                </div>
             </div>
-            
-            <div class="fortune-result" id="fortuneResult">
-                <!-- 运势结果将动态生成 -->
+
+            <div id="fortuneContainer">
+                <div class="fortune-hint" id="fortuneHint">👆 点击上方星座卡片，获取实时运势数据</div>
+                <div class="fortune-result" id="fortuneResult"></div>
             </div>
         </div>
 
         <div class="section">
             <h2>十二星座基础知识</h2>
-            
+
             <div class="element-grid">
                 <div class="element-card">
                     <h3>火象星座</h3>
@@ -311,7 +472,7 @@
                     <p>优点：勇敢、乐观、行动力强</p>
                     <p>缺点：冲动、自我、缺乏耐心</p>
                 </div>
-                
+
                 <div class="element-card">
                     <h3>土象星座</h3>
                     <p><strong>金牛座、处女座、摩羯座</strong></p>
@@ -319,7 +480,7 @@
                     <p>优点：可靠、负责、组织力强</p>
                     <p>缺点：固执、保守、缺乏变通</p>
                 </div>
-                
+
                 <div class="element-card">
                     <h3>风象星座</h3>
                     <p><strong>双子座、天秤座、水瓶座</strong></p>
@@ -327,7 +488,7 @@
                     <p>优点：沟通力强、思维敏捷、客观</p>
                     <p>缺点：优柔寡断、表面化、不够深入</p>
                 </div>
-                
+
                 <div class="element-card">
                     <h3>水象星座</h3>
                     <p><strong>巨蟹座、天蝎座、双鱼座</strong></p>
@@ -340,8 +501,8 @@
 
         <div class="section">
             <h2>星座与爱情配对</h2>
-            <p>星座配对是西方占星学的重要内容，通过太阳星座的元素的mode，可以判断两人的compatibility。</p>
-            
+            <p>星座配对是西方占星学的重要内容，通过太阳星座的元素属性，可以判断两人的compatibility。</p>
+
             <div class="element-grid">
                 <div class="element-card">
                     <h3>最佳配对</h3>
@@ -350,19 +511,19 @@
                     <p><strong>风象：</strong>双子-天秤、天秤-水瓶、水瓶-双子</p>
                     <p><strong>水象：</strong>巨蟹-天蝎、天蝎-双鱼、双鱼-巨蟹</p>
                 </div>
-                
+
                 <div class="element-card">
                     <h3>还不错</h3>
                     <p><strong>火+风：</strong>火的热情+风的理性=平衡</p>
                     <p><strong>土+水：</strong>土的稳重+水的情感=稳定</p>
                 </div>
-                
+
                 <div class="element-card">
                     <h3>需要努力</h3>
                     <p><strong>火+水：</strong>火的热情容易被水浇灭</p>
                     <p><strong>土+风：</strong>土的保守可能限制风的自由</p>
                 </div>
-                
+
                 <div class="element-card">
                     <h3>挑战组合</h3>
                     <p><strong>同元素：</strong>太相似，缺乏互补</p>
@@ -380,120 +541,284 @@
     </div>
 </div>
 
-<script src="/js/main.js">
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    // ===== 星座数据 =====
+    var zodiacs = [
+        { name: '白羊座', emoji: '♈', en: 'aries' },
+        { name: '金牛座', emoji: '♉', en: 'taurus' },
+        { name: '双子座', emoji: '♊', en: 'gemini' },
+        { name: '巨蟹座', emoji: '♋', en: 'cancer' },
+        { name: '狮子座', emoji: '♌', en: 'leo' },
+        { name: '处女座', emoji: '♍', en: 'virgo' },
+        { name: '天秤座', emoji: '♎', en: 'libra' },
+        { name: '天蝎座', emoji: '♏', en: 'scorpio' },
+        { name: '射手座', emoji: '♐', en: 'sagittarius' },
+        { name: '摩羯座', emoji: '♑', en: 'capricorn' },
+        { name: '水瓶座', emoji: '♒', en: 'aquarius' },
+        { name: '双鱼座', emoji: '♓', en: 'pisces' }
+    ];
+
+    // ===== 状态 =====
+    var currentSign = null;
+    var currentPeriod = 'daily';
+    var isLoading = false;
+
+    var PERIOD_MAP = {
+        daily: { label: '今日', endpoint: 'xingzuo/daily' },
+        weekly: { label: '本周', endpoint: 'xingzuo/weekly' },
+        monthly: { label: '本月', endpoint: 'xingzuo/monthly' }
+    };
+
+    // ===== DOM引用 =====
+    var zodiacGrid = document.getElementById('zodiacGrid');
+    var fortuneResult = document.getElementById('fortuneResult');
+    var fortuneHint = document.getElementById('fortuneHint');
+
+    // ===== 初始化星座网格 =====
+    function renderZodiacGrid() {
+        var html = '';
+        for (var i = 0; i < zodiacs.length; i++) {
+            var z = zodiacs[i];
+            html += '<div class="zodiac-card" data-sign="' + z.name + '" data-emoji="' + z.emoji + '" onclick="__selectZodiac(\'' + z.name + '\', \'' + z.emoji + '\')">' +
+                '<div class="zodiac-emoji">' + z.emoji + '</div>' +
+                '<div class="zodiac-name">' + z.name + '</div>' +
+                '</div>';
+        }
+        zodiacGrid.innerHTML = html;
+    }
+
+    // ===== 中文名→英文字典 =====
+    function getEnglishName(cnName) {
+        for (var i = 0; i < zodiacs.length; i++) {
+            if (zodiacs[i].name === cnName) return zodiacs[i].en;
+        }
+        return cnName;
+    }
+
+    // ===== 获取emoji =====
+    function getEmoji(cnName) {
+        for (var i = 0; i < zodiacs.length; i++) {
+            if (zodiacs[i].name === cnName) return zodiacs[i].emoji;
+        }
+        return '';
+    }
+
+    // ===== 渲染周期标签 =====
+    function renderPeriodTabs() {
+        var html = '<div class="period-tabs">';
+        var periods = ['daily', 'weekly', 'monthly'];
+        for (var i = 0; i < periods.length; i++) {
+            var p = periods[i];
+            var info = PERIOD_MAP[p];
+            var activeClass = p === currentPeriod ? ' active' : '';
+            html += '<button type="button" class="period-tab' + activeClass + '" onclick="__switchPeriod(\'' + p + '\')">' + info.label + '</button>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    // ===== Swich period =====
+    function switchPeriod(period) {
+        if (period === currentPeriod) return;
+        currentPeriod = period;
+
+        // 更新标签激活状态
+        var tabs = document.querySelectorAll('.period-tab');
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove('active');
+        }
+        var periods = ['daily', 'weekly', 'monthly'];
+        var idx = periods.indexOf(period);
+        if (idx >= 0 && tabs[idx]) {
+            tabs[idx].classList.add('active');
+        }
+
+        if (currentSign) {
+            fetchFortune(currentSign);
+        }
+    }
+
+    // ===== 选择星座 =====
+    function selectZodiac(signName, emoji) {
+        currentSign = signName;
+        currentPeriod = 'daily';
+
+        // 更新卡片激活状态
+        var cards = document.querySelectorAll('.zodiac-card');
+        for (var i = 0; i < cards.length; i++) {
+            cards[i].classList.remove('active');
+        }
+        var activeCard = document.querySelector('.zodiac-card[data-sign="' + signName + '"]');
+        if (activeCard) activeCard.classList.add('active');
+
+        fetchFortune(signName);
+    }
+
+    // ===== 获取运势 =====
+    function fetchFortune(signName) {
+        if (isLoading) return;
+        isLoading = true;
+
+        var englishName = getEnglishName(signName);
+        var endpoint = PERIOD_MAP[currentPeriod].endpoint;
+        var emoji = getEmoji(signName);
+
+        // 显示加载状态
+        showLoadingState(emoji, signName);
+
+        // 隐藏提示
+        if (fortuneHint) fortuneHint.style.display = 'none';
+
+        fortuneGetAPI(endpoint, { sign: englishName })
+            .then(function(data) {
+                isLoading = false;
+                if (data && data.success) {
+                    var source = data.meta ? data.meta.source : 'realtime';
+                    // 缓存到 localStorage
+                    cacheFortune(signName, data);
+                    showFortuneResult(signName, emoji, data, source);
                 } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
+                    // API失败，尝试fallback
+                    handleFortuneError(signName, emoji, data ? data.message : '获取数据失败');
                 }
             })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
+            .catch(function(err) {
+                isLoading = false;
+                console.error('fortuneGetAPI error:', err);
+                handleFortuneError(signName, emoji, '网络连接失败');
             });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
-<script>
-function selectZodiac(zodiac, emoji) {
-    // 移除所有active类
-    document.querySelectorAll('.zodiac-card').forEach(card => {
-        card.classList.remove('active');
+    }
+
+    // ===== 缓存管理 =====
+    function cacheFortune(signName, data) {
+        try {
+            var key = 'fortune_' + signName + '_' + currentPeriod;
+            var cache = {
+                data: data,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(key, JSON.stringify(cache));
+        } catch(e) {
+            // localStorage 不可用时静默忽略
+        }
+    }
+
+    function getCachedFortune(signName) {
+        try {
+            var key = 'fortune_' + signName + '_' + currentPeriod;
+            var raw = localStorage.getItem(key);
+            if (!raw) return null;
+            var cache = JSON.parse(raw);
+            return cache.data;
+        } catch(e) {
+            return null;
+        }
+    }
+
+    // ===== 显示加载状态 =====
+    function showLoadingState(emoji, signName) {
+        var periodLabel = PERIOD_MAP[currentPeriod].label;
+        fortuneResult.style.display = 'block';
+        fortuneResult.innerHTML = renderPeriodTabs() +
+            '<div class="fortune-loading-state">' +
+            '<div class="fortune-spinner"></div>' +
+            '<div class="fortune-loading-text">正在获取 ' + emoji + ' ' + signName + ' ' + periodLabel + '运势...</div>' +
+            '</div>';
+    }
+
+    // ===== 显示运势结果 =====
+    function showFortuneResult(signName, emoji, data, source) {
+        var periodLabel = PERIOD_MAP[currentPeriod].label;
+        var horoscope = data.data.horoscope || '';
+        var dateStr = data.data.date || '';
+        var updatedTime = new Date().toLocaleTimeString('zh-CN');
+
+        var html = renderPeriodTabs();
+
+        // 数据来源标识
+        html += '<div class="fortune-data-badge badge-' + (source === 'realtime' ? 'realtime' : source === 'cached' ? 'cached' : 'fallback') + '">' +
+            (source === 'realtime' ? '🟢 实时联网数据' : source === 'cached' ? '🟡 缓存数据' : '🔴 离线数据') +
+            '</div>';
+
+        html += '<div class="fortune-header">' +
+            '<div class="fortune-header-left">' +
+            '<span class="fortune-zodiac-icon">' + emoji + '</span>' +
+            '<span class="fortune-zodiac-name">' + signName + '</span>' +
+            '<span class="fortune-period-badge">' + periodLabel + '运势</span>' +
+            (dateStr ? '<span style="font-size:0.8rem;color:rgba(255,255,255,0.5);">' + dateStr + '</span>' : '') +
+            '</div>' +
+            '<div class="fortune-header-actions">' +
+            '<button type="button" class="fortune-refresh-btn" onclick="__refreshFortune()">🔄 刷新数据</button>' +
+            '</div>' +
+            '</div>';
+
+        html += '<div class="fortune-content">' + escapeHTML(horoscope) + '</div>' +
+            '<div class="fortune-updated">更新于 ' + updatedTime + '</div>';
+
+        fortuneResult.style.display = 'block';
+        fortuneResult.innerHTML = html;
+
+        // 滚动到结果区域
+        fortuneResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ===== 错误处理 =====
+    function handleFortuneError(signName, emoji, errorMsg) {
+        var cached = getCachedFortune(signName);
+        if (cached) {
+            // 使用缓存数据
+            showFortuneResult(signName, emoji, cached, 'cached');
+            if (window.showToast) showToast('网络不可用，已加载本地缓存数据');
+        } else {
+            // 显示错误状态
+            showErrorState(signName, emoji, errorMsg);
+        }
+    }
+
+    function showErrorState(signName, emoji, errorMsg) {
+        var periodLabel = PERIOD_MAP[currentPeriod].label;
+        fortuneResult.style.display = 'block';
+        fortuneResult.innerHTML = renderPeriodTabs() +
+            '<div class="fortune-error-state">' +
+            '<div class="fortune-error-icon">⚠️</div>' +
+            '<p class="fortune-error-message">' + escapeHTML(errorMsg || '数据获取失败') + '</p>' +
+            '<div class="fortune-error-actions">' +
+            '<button type="button" class="fortune-btn fortune-btn-retry" onclick="__refreshFortune()">🔄 重新获取</button>' +
+            '</div>' +
+            '</div>';
+    }
+
+    // ===== 刷新 =====
+    function refreshFortune() {
+        if (currentSign) {
+            fetchFortune(currentSign);
+        }
+    }
+
+    // ===== HTML转义 =====
+    function escapeHTML(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ===== 导出到全局 =====
+    window.__selectZodiac = selectZodiac;
+    window.__switchPeriod = switchPeriod;
+    window.__refreshFortune = refreshFortune;
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.createStars) createStars();
+        renderZodiacGrid();
     });
-    
-    // 给当前选择的卡片添加active类
-    const card = document.querySelector('.zodiac-card[data-zodiac="' + zodiac + '"]');
-    if (card) card.classList.add('active');
-    
-    // 显示运势结果
-    showFortune(zodiac, emoji);
-}
 
-function showFortune(zodiac, emoji) {
-    const fortunes = {
-        '白羊座': { rank: 'TOP', score: 95, love: '桃花旺盛，单身者有机会遇到心仪对象，有伴侣者感情升温。', career: '事业运佳，有新项目或升职机会，把握展示自己。', wealth: '财运不错，正财稳定，偏财有小收获，但需谨慎投资。', health: '精力充沛，但需注意用眼过度和上火问题。' },
-        '金牛座': { rank: 'MID', score: 75, love: '感情平稳，单身者需主动出击，有伴侣者需多沟通。', career: '工作稳步推进，但需注意细节，避免小错误。', wealth: '财运平稳，适合储蓄和稳健投资，不宜冒险。', health: '健康良好，但需注意饮食规律，避免肠胃问题。' },
-        '双子座': { rank: 'TOP', score: 90, love: '沟通顺畅，单身者魅力四射，有伴侣者甜蜜温馨。', career: '思路敏捷，适合创意工作和谈判，易得贵人相助。', wealth: '财运亨通，正财偏财皆旺，但需节制开支。', health: '精神状态佳，但需注意休息，避免神经衰弱。' },
-        '巨蟹座': { rank: 'MID', score: 78, love: '情感丰富，单身者易怀旧，有伴侣者需给予空间。', career: '工作需耐心，家庭事务可能影响工作，需平衡。', wealth: '财运一般，家庭开支较大，需精打细算。', health: '情绪敏感，需注意心理健康，多参加户外活动。' },
-        '狮子座': { rank: 'TOP', score: 92, love: '魅力十足，单身者易吸引异性，有伴侣者浪漫满满。', career: '领导力展现，适合担当重任，易获得认可和赞赏。', wealth: '财运旺盛，收入增加，但需注意 luxuries 消费。', health: '活力四射，但需避免骄傲导致的意外。' },
-        '处女座': { rank: 'LOW', score: 65, love: '挑剔心重，单身者标准过高，有伴侣者需包容对方。', career: '工作细致，但易陷于完美主义，需学会放手。', wealth: '财运平平，需控制强迫性购物，做好预算。', health: '易焦虑，需注意消化系统，保持规律作息。' },
-        '天秤座': { rank: 'MID', score: 80, love: '优雅迷人，单身者桃花朵朵，有伴侣者需平衡自我与关系。', career: '合作运佳，适合团队工作，但需避免优柔寡断。', wealth: '财运中等，合作生财，但需明确利益分配。', health: '需平衡工作与休息，避免腰肾问题。' },
-        '天蝎座': { rank: 'TOP', score: 88, love: '深情专一，单身者易遇深刻缘分，有伴侣者关系深入。', career: '洞察力强，适合调研和策划，秘密项目易成功。', wealth: '财运不错，偏财尤旺，但需避免赌博心态。', health: '恢复力强，但需避免极端情绪影响健康。' },
-        '射手座': { rank: 'MID', score: 82, love: '自由奔放，单身者易有异地恋，有伴侣者需给予自由。', career: '机会多多，适合拓展和旅行，但需避免三分种热度。', wealth: '财运波动，收入有望增加，但开支也不小。', health: '活力充沛，但需避免运动伤害和盲目乐观。' },
-        '摩羯座': { rank: 'LOW', score: 68, love: '保守谨慎，单身者不易开口，有伴侣者需表达情感。', career: '稳扎稳打，适合长期规划，但需注意工作狂倾向。', wealth: '财运稳定，适合长期投资，但需避免过于保守。', health: '骨骼关节需注意，避免过度疲劳和压抑。' },
-        '水瓶座': { rank: 'MID', score: 85, love: '独立特别，单身者易被与众不同吸引，有伴侣者需保持新鲜感。', career: '创意无限的，适合科技和公益，易得赏识。', wealth: '财运不错，正财为主，但需避免理想化投资。', health: '需注意循环系统，保持创新同时也要接地气。' },
-        '双鱼座': { rank: 'LOW', score: 62, love: '浪漫多感，单身者易陷入幻想，有伴侣者需面对现实。', career: '直觉敏锐，适合艺术和疗愈，但需避免逃避现实。', wealth: '财运不佳，易有意外开支，需做好财务规划。', health: '需注意足部问题，避免沉迷幻想影响健康。' }
-    };
-    
-    const fortune = fortunes[zodiac];
-    const rankClass = fortune.rank === 'TOP' ? 'rank-top' : fortune.rank === 'MID' ? 'rank-mid' : 'rank-low';
-    const rankText = fortune.rank === 'TOP' ? '大吉' : fortune.rank === 'MID' ? '中吉' : '平';
-    
-    let html = `
-        <div class="fortune-date">${emoji} ${zodiac} · 2026年5月运势</div>
-        <div class="fortune-rank ${rankClass}">${rankText}（${fortune.score}分）</div>
-        
-        <div class="fortune-section">
-            <h3>❤️ 爱情运</h3>
-            <p>${fortune.love}</p>
-        </div>
-        
-        <div class="fortune-section">
-            <h3>💼 事业运</h3>
-            <p>${fortune.career}</p>
-        </div>
-        
-        <div class="fortune-section">
-            <h3>💰 财运</h3>
-            <p>${fortune.wealth}</p>
-        </div>
-        
-        <div class="fortune-section">
-            <h3>🏥 健康运</h3>
-            <p>${fortune.health}</p>
-        </div>
-        
-        <div class="fortune-tags">
-            <span class="fortune-tag">幸运颜色：红/蓝/绿</span>
-            <span class="fortune-tag">幸运数字：3/7/9</span>
-            <span class="fortune-tag">幸运方位：东/南</span>
-            <span class="fortune-tag">提醒：把握机会，理性决策</span>
-        </div>
-    `;
-    
-    document.getElementById('fortuneResult').innerHTML = html;
-    document.getElementById('fortuneResult').style.display = 'block';
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    createStars();
-});
+})();
 </script>
 
 </body>

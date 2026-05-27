@@ -132,6 +132,114 @@
             background: rgba(255,0,0,0.15);
             color: #f00;
         }
+        .search-section {
+            margin-bottom: 1.5rem;
+        }
+        .search-section h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        .search-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-input:focus {
+            border-color: rgba(255,215,0,0.5);
+        }
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        .search-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .dream-result {
+            margin-bottom: 1.5rem;
+        }
+        .dream-result h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        .result-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+        }
+        .result-section-item {
+            margin-bottom: 1rem;
+        }
+        .result-section-item:last-child {
+            margin-bottom: 0;
+        }
+        .result-section-item h4 {
+            color: #ffd700;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+        }
+        .result-section-item p {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+        }
+        .result-elements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .element-tag {
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background: rgba(255,215,0,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+        /* 行内 loading spinner */
+        .inline-spinner {
+            text-align: center;
+            padding: 2rem;
+        }
+        .inline-spinner .spinner-icon {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(255,215,0,0.2);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 0.8rem;
+        }
+        .inline-spinner p {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -139,7 +247,7 @@
 
     <div class="app">
         <div class="page-header">
-            <button type="button" type="button" class="back-btn" onclick="history.back()">←</button>
+            <button type="button" class="back-btn" onclick="history.back()">←</button>
             <h1>😴 周公解梦</h1>
         </div>
 
@@ -150,6 +258,7 @@
                 <p>通过解读梦境中的意象，可以了解自己的潜意识、预测未来趋势、获取人生指引。</p>
             </div>
 
+            <!-- 梦境分类卡片 -->
             <div class="dream-categories">
                 <div class="dream-category" onclick="showDreamDetail('animal')">
                     <h3>🐉 动物类</h3>
@@ -169,9 +278,25 @@
                 </div>
             </div>
 
+            <!-- 搜索表单 -->
+            <div class="search-section" id="searchSection">
+                <h2>🔍 搜索梦境解析</h2>
+                <div class="search-form">
+                    <input type="text" class="search-input" id="dreamInput" placeholder="请输入梦境关键词，如：蛇、水、鱼...">
+                    <button type="button" class="search-btn" onclick="searchDream()">开始分析</button>
+                </div>
+            </div>
+
+            <!-- 搜索结果 -->
+            <div class="dream-result" id="dreamResult" style="display:none;">
+                <h2>🌙 解析结果</h2>
+                <div class="result-card" id="resultCard"></div>
+            </div>
+
+            <!-- 常见梦境解析 -->
             <div class="common-dreams">
                 <h2>🔍 常见梦境解析</h2>
-                
+
                 <div class="dream-item">
                     <h3>🐍 梦见蛇</h3>
                     <p><strong>基本寓意：</strong>蛇象征财富和智慧，通常预示有财运到来或贵人相助。</p>
@@ -237,10 +362,11 @@
                 </div>
             </div>
 
-                    <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('zhougong')">📷 上传图片分析</button>
-        </div>
-<div class="section" style="margin-top: 1.5rem;">
+            <div style="margin-bottom:1rem;">
+                <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('zhougong')">📷 上传图片分析</button>
+            </div>
+
+            <div class="section" style="margin-top: 1.5rem;">
                 <h2>💡 解梦方法论</h2>
                 <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8; margin-bottom: 0.8rem;">
                     <strong>1. 象征对应原理</strong>：梦境中的意象与现实吉凶存在象征性对应关系。
@@ -258,51 +384,182 @@
         </div>
     </div>
 
-    <script src="/js/main.js">
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
+    <script src="/js/main.js"></script>
+    <script src="/js/fortune-api.js"></script>
     <script>
-        // 显示梦境详情
+        // ===== 本地梦境库（API降级时使用） =====
+        var localDreamDB = {
+            '蛇': { keyword: '蛇', analysis: '蛇在梦中象征财富和智慧。传统解梦认为梦见蛇是大吉之兆，主财运亨通，贵人相助。若被蛇咬则需提防小人暗算，蛇缠身提示注意健康问题。', elements: '五行属火，与巳相对应，主变动与智慧。', advice: '保持开放心态迎接机遇，同时留意身边人际交往，谨防口舌是非。' },
+            '水': { keyword: '水', analysis: '水在梦中象征情感和财运。清水主吉，预示财源滚滚、心情愉悦；浑水主凶，提醒注意情感纠纷或财务风险；大水漫灌预示人生重大转变即将到来。', elements: '五行属水，流动不居，主情感与财富之象。', advice: '清水之梦宜积极行动把握财运；浑水之梦则需冷静处理情感与财务问题，避免冲动决策。' },
+            '鱼': { keyword: '鱼', analysis: '鱼在梦中象征财富与机遇。传统认为"鱼"与"余"谐音，寓意富足有余。群鱼游来主财运大旺，捕鱼得手预示事业有成，死鱼则提醒注意漏财风险。', elements: '五行属水，生生不息，主丰饶与富贵。', advice: '梦见活鱼宜积极进取、把握商机；梦见死鱼则需审视财务规划，减少不必要开支。' },
+            '龙': { keyword: '龙', analysis: '龙在梦中象征权力、尊贵与成功。梦见龙是大吉大利之兆，预示事业腾达、名声大振。骑龙预示即将身居高位，龙飞于天预示前程远大。', elements: '五行属土（辰龙），兼具木火之性，主权威与升腾。', advice: '宜大胆追求理想目标，近期可能遇到重要发展机遇，应果断把握。' },
+            '虎': { keyword: '虎', analysis: '虎在梦中象征权威和挑战。梦见虎主近期面临重大考验或竞争对手。若能降服猛虎，预示可克服困难；被虎追赶则提示需正视内心的恐惧。', elements: '五行属木（寅虎），威猛刚健，主挑战与力量。', advice: '面对困难不要退缩，积蓄力量准备迎接挑战。职场中注意与强势人物的相处方式。' },
+            '火': { keyword: '火', analysis: '火在梦中象征激情、能量与变革。大火熊熊主运势旺盛，小火微明主内心温暖。失控之火提示情绪管理或潜在危机，灭火成功预示化解困境。', elements: '五行属火，炽热向上，主激情、愤怒与毁灭重生。', advice: '善用热情推动事业，但需控制脾气。若梦火势蔓延，应及时检查生活中可能存在的隐患。' },
+            '去世亲人': { keyword: '去世亲人', analysis: '梦见逝者是对您的牵挂和庇佑，预示得到祖先福荫保护。亲人面带微笑为大吉，家运昌隆；亲人哭泣需留意家人健康。与逝者说话可能获得重要人生指引。', elements: '阴阳交汇之象，连接彼岸与此岸，主庇佑与传承。', advice: '宜怀感恩之心，关注家人健康。若梦中有所嘱托，可在现实中完成相应事项以安己心。' },
+            '房屋': { keyword: '房屋', analysis: '房屋在梦中象征家庭和内自我世界。新房预示着家运亨通、生活改善；老房子代表对过去的怀念；房屋倒塌则需关注家庭关系或身体健康问题。', elements: '五行属土，安稳踏实，主根基与归属。', advice: '注重家庭和谐与居住环境。梦见旧宅可以考虑回乡探望；梦见房屋破损应予检修或改善家居布置。' },
+            '死亡': { keyword: '死亡', analysis: '梦见死亡不代表真正的死亡，而是象征某段人生的结束和新阶段的开始。梦见自己死亡预示重大转变，梦见他人死亡暗示与对方关系的改变。', elements: '生死轮回之象，阴中有阳，主蜕变与新生。', advice: '接纳改变，放下过去。这是告别旧我、迎接新生的积极信号，宜制定新计划。' },
+            '考试': { keyword: '考试', analysis: '梦见考试反映现实中的压力和自我评估。考试顺利预示自信满满，考试不理想提示对自己要求过高或准备不足。迟到或缺考暗示焦虑情绪。', elements: '五行属土（书案之象），考验心智，主压力与成长。', advice: '适当放松自我要求，合理分配精力。若现实中确有考试，这种梦通常反映的是考前焦虑。' },
+            '狗': { keyword: '狗', analysis: '狗在梦中象征忠诚、友谊和保护。梦见友好的狗预示真诚的朋友或贵人；恶狗狂吠暗示人际冲突或被背叛的风险；与狗玩耍主家庭和睦。', elements: '五行属土（戌狗），忠诚守护，主人际与信任。', advice: '珍惜身边真诚的朋友。若梦见恶狗，需留意身边可能存在的背信弃义之人。' },
+            '飞翔': { keyword: '飞翔', analysis: '梦见自己在天空中飞翔，象征内心的自由渴望和对现实的超越。飞得越高成就越大，自由翱翔预示突破困境。飞不起来或坠落则提示烦恼未解或压力过大。', elements: '五行属风，轻盈自由，主理想与突破。', advice: '保持追求理想的热情，相信自己的能力可以跨越当前的障碍。但也要脚踏实地，避免好高骛远。' }
+        };
+
+        // ===== 图片上传分析 =====
+        function triggerImageUpload(moduleType) {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function() {
+                var file = this.files[0];
+                if (!file) return;
+                if (window.showToast) window.showToast('正在分析图片...');
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var base64 = e.target.result;
+                    fetch('/api/image-analyze', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: base64, module_type: moduleType })
+                    })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            if (window.showToast) window.showToast('分析完成！');
+                            var area = document.getElementById('imageAnalysisArea');
+                            var result = document.getElementById('imageAnalysisResult');
+                            if (area) area.style.display = 'block';
+                            if (result) result.textContent = data.analysis;
+                        } else {
+                            if (window.showToast) window.showToast('分析失败：' + (data.message || '未知错误'));
+                        }
+                    })
+                    .catch(function(err) {
+                        if (window.showToast) window.showToast('分析失败，请检查网络');
+                        console.error('图片分析错误：', err);
+                    });
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+
+        // ===== 梦境搜索（API优先 + 三态管理） =====
+        async function searchDream() {
+            var input = document.getElementById('dreamInput');
+            var keyword = (input.value || '').trim();
+            if (!keyword) {
+                if (window.showToast) window.showToast('请输入梦境关键词');
+                return;
+            }
+
+            var resultDiv = document.getElementById('dreamResult');
+            var resultCard = document.getElementById('resultCard');
+
+            // --- Loading 状态 ---
+            resultDiv.style.display = 'block';
+            resultCard.innerHTML = '<div class="inline-spinner"><div class="spinner-icon"></div><p>正在联网查询「' + keyword + '」的梦境解析...</p></div>';
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // 调用后端 API
+            var data = await fortuneAPI('jiemeng', { keyword: keyword });
+
+            // --- Error / 降级处理 ---
+            if (!data || !data.success) {
+                var localData = findLocalDream(keyword);
+                if (localData) {
+                    renderResult(localData, 'local_fallback');
+                } else {
+                    resultCard.innerHTML = '<div class="fortune-error-state"><div class="fortune-error-icon">⚠️</div><p class="fortune-error-message">未找到「' + keyword + '」的梦境解析，请尝试其他关键词</p><div class="fortune-error-actions"><button class="fortune-btn fortune-btn-retry" onclick="searchDream()">🔄 重新搜索</button></div></div>';
+                }
+                return;
+            }
+
+            // --- Result 状态 ---
+            renderResult(data.data, (data.meta && data.meta.source) || 'realtime');
+        }
+
+        // ===== 降级：本地梦境库查找 =====
+        function findLocalDream(keyword) {
+            if (localDreamDB[keyword]) return localDreamDB[keyword];
+            var lowerKeyword = keyword.toLowerCase();
+            for (var key in localDreamDB) {
+                if (localDreamDB.hasOwnProperty(key)) {
+                    if (key.toLowerCase().indexOf(lowerKeyword) !== -1 || lowerKeyword.indexOf(key.toLowerCase()) !== -1) {
+                        return localDreamDB[key];
+                    }
+                }
+            }
+            return null;
+        }
+
+        // ===== 渲染结果 =====
+        function renderResult(dreamData, source) {
+            var resultDiv = document.getElementById('dreamResult');
+            var resultCard = document.getElementById('resultCard');
+
+            var sourceLabels = {
+                'realtime': '🟢 实时联网数据',
+                'cached': '🟡 缓存数据',
+                'local': '🔵 服务器计算',
+                'local_fallback': '🔴 本地数据（离线模式）'
+            };
+            var sourceLabel = sourceLabels[source] || '🔵 服务器计算';
+            if (source !== 'local_fallback') {
+                sourceLabel += ' · 更新于 ' + new Date().toLocaleTimeString('zh-CN');
+            }
+
+            var elementsHtml = '';
+            if (dreamData.elements) {
+                var elemList = dreamData.elements.split('，');
+                elementsHtml = '<div class="result-elements">';
+                for (var i = 0; i < elemList.length; i++) {
+                    var elem = elemList[i].trim();
+                    if (elem) {
+                        elementsHtml += '<span class="element-tag">' + elem + '</span>';
+                    }
+                }
+                elementsHtml += '</div>';
+            }
+
+            resultCard.innerHTML =
+                '<div class="fortune-data-badge ' + (source === 'local_fallback' ? 'badge-fallback' : 'badge-realtime') + '">' + sourceLabel + '</div>' +
+                '<div class="result-section-item">' +
+                '<h4>🔑 梦境关键词</h4>' +
+                '<p style="font-size:1.1rem;font-weight:600;color:#ffd700;">' + escapeHtml(dreamData.keyword || '') + '</p>' +
+                '</div>' +
+                '<div class="result-section-item">' +
+                '<h4>📖 详细解析</h4>' +
+                '<p>' + escapeHtml(dreamData.analysis || '暂无解析') + '</p>' +
+                '</div>' +
+                (dreamData.elements ? '<div class="result-section-item"><h4>☯ 五行元素解读</h4>' + elementsHtml + '</div>' : '') +
+                (dreamData.advice ? '<div class="result-section-item"><h4>💡 建议</h4><p>' + escapeHtml(dreamData.advice) + '</p></div>' : '');
+
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // ===== 支持回车搜索 =====
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.createStars) createStars();
+
+            var dreamInput = document.getElementById('dreamInput');
+            if (dreamInput) {
+                dreamInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        searchDream();
+                    }
+                });
+            }
+        });
+
+        // ===== 显示梦境详情弹窗 =====
         function showDreamDetail(category) {
-            let content = '';
-            
+            var content = '';
+
             switch(category) {
                 case 'animal':
                     content = '<div class="section"><h2>🐉 动物类梦境</h2><p>动物在梦境中通常代表本能、情感、或特定人物。</p><ul><li><strong>蛇</strong>：财富、智慧、贵人/小人</li><li><strong>鱼</strong>：财运、机遇</li><li><strong>龙</strong>：权力、成功、大贵人</li><li><strong>虎</strong>：权威、挑战、困难</li></ul></div>';
@@ -317,78 +574,20 @@ function triggerImageUpload(moduleType) {
                     content = '<div class="section"><h2>🏠 建筑类梦境</h2><p>建筑物在梦境中通常代表自我、家庭、人生状态。</p><ul><li><strong>房屋</strong>：家庭、内自我</li><li><strong>礼堂</strong>：庆典、成功、喜事</li><li><strong>厕所</strong>：净化、释放、隐私</li><li><strong>楼梯</strong>：上升/下降、进步/退步</li></ul></div>';
                     break;
             }
-            
-            // 创建弹窗显示
-            const modal = document.createElement('div');
+
+            var modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
-            modal.onclick = () => modal.remove();
-            
-            const modalContent = document.createElement('div');
+            modal.onclick = function() { modal.remove(); };
+
+            var modalContent = document.createElement('div');
             modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
-            modalContent.onclick = (e) => e.stopPropagation();
-            modalContent.innerHTML = content + '<button type="button" type="button" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
-            
+            modalContent.onclick = function(e) { e.stopPropagation(); };
+            modalContent.innerHTML = content + '<button type="button" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'div\').parentElement.remove()">关闭</button>';
+
             modal.className = 'modal';
             modal.appendChild(modalContent);
             document.body.appendChild(modal);
         }
-
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-        });
     </script>
-
-        <!-- 分析表单 -->
-        <div class="tab-content active" id="formTab">
-            <div class="form-container">
-                
-            <div class="form-group">
-                <label class="form-label">梦境描述</label>
-                <input type="text" class="form-input" id="dreamInput" placeholder="请描述您的梦境...">
-            </div>
-        
-                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
-            </div>
-        </div>
-        <!-- 结果展示 -->
-        <div class="tab-content" id="resultTab">
-            <div class="result-container" id="resultContainer">
-                
-        <div class="result-section"><h3>🌙 周公解梦结果</h3>
-        <div class="analysis-text">
-            <p><strong>梦境：</strong><span id="dreamResult"></span></p>
-            <p><strong>梦境含义：</strong><span id="meaningResult"></span></p>
-            <p><strong>吉凶预示：</strong><span id="omenResult"></span></p>
-            <p><strong>建议：</strong><span id="adviceResult"></span></p>
-        </div>
-        </div>
-        
-            </div>
-        </div>
-    
-    <script>
-    function calculateModule() {
-        if (window.showToast) window.showToast('正在分析中...');
-        setTimeout(function() {
-            // 这里调用真正的分析计算
-            var resultHtml = generateResultHTML();
-            document.getElementById('resultContainer').innerHTML = resultHtml;
-            if (window.switchTab) window.switchTab('result');
-            if (window.showToast) window.showToast('分析完成！');
-        }, 1200);
-    }
-    
-    function generateResultHTML() {
-        // 读取表单值并生成结果
-        var html = '<div class="result-section fade-in">';
-        html += '<h3>📊 分析结果</h3>';
-        html += '<div class="analysis-text">';
-        html += '<p>根据您提供的信息，分析结果如下：</p>';
-        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
-        html += '</div></div>';
-        return html;
-    }
-    </script>
-    </body>
+</body>
 </html>

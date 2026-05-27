@@ -90,6 +90,104 @@
             margin-bottom: 0.5rem;
             line-height: 1.6;
         }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+        }
+        .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+        }
+        .form-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: transform 0.2s;
+        }
+        .submit-btn:hover { transform: scale(1.02); }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* 结果区域 */
+        .result-section {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .result-section h3 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .wealth-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .wealth-table th,
+        .wealth-table td {
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .wealth-table th {
+            background: rgba(255,215,0,0.1);
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .wealth-table td {
+            color: rgba(255,255,255,0.9);
+        }
     </style>
 </head>
 <body>
@@ -103,8 +201,40 @@
 
         <div class="content-area">
                     <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('fengshui')">📷 上传图片分析</button>
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUploadV2('fengshui')">📷 上传图片分析</button>
         </div>
+
+        <!-- 风水分析表单 -->
+        <div class="section" style="max-width:500px;margin:0 auto 1rem;">
+            <h2>🔍 风水分析</h2>
+            <div class="form-group">
+                <label class="form-label">房屋类型</label>
+                <select class="form-select" id="houseType">
+                    <option value="公寓">公寓</option>
+                    <option value="别墅">别墅</option>
+                    <option value="办公室">办公室</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">关注区域</label>
+                <select class="form-select" id="areaInput">
+                    <option value="大门">大门</option>
+                    <option value="客厅">客厅</option>
+                    <option value="卧室">卧室</option>
+                    <option value="厨房">厨房</option>
+                </select>
+            </div>
+            <button type="button" class="submit-btn" onclick="analyzeFengshui()">开始分析</button>
+        </div>
+
+        <!-- API结果区域 -->
+        <div id="fengshuiResultContainer" style="max-width:600px;margin:0 auto;">
+            <p style="text-align:center;color:rgba(255,255,255,0.4);padding:1rem;">选择房屋类型和关注区域，点击"开始分析"</p>
+        </div>
+
+        <!-- 图片分析结果 -->
+        <div id="resultArea" style="display:none;margin-top:1rem;"></div>
+
 <div class="section">
                 <h2>风水布局指南</h2>
                 <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1rem;">
@@ -133,222 +263,243 @@
         </div>
     </div>
 
-    <script src="/js/main.js">
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
+    <script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+function showFengshuiDetail(type) {
+    let html = '';
+    
+    switch(type) {
+        case 'home':
+            html = `
+                <h2>🏠 家居风水布局要点</h2>
+                
+                <h3>🛋️ 客厅风水</h3>
+                <ul>
+                    <li><strong>位置</strong>：客厅应设在住宅中央位置，采光要充足</li>
+                    <li><strong>布局</strong>：沙发应靠墙摆放，形成"背后有靠"的格局</li>
+                    <li><strong>装饰</strong>：可摆放绿植（如发财树、富贵竹）催旺财运</li>
+                    <li><strong>禁忌</strong>：避免横梁压顶、尖角冲射</li>
+                </ul>
+                
+                <h3>🛏️ 卧室风水</h3>
+                <ul>
+                    <li><strong>床的朝向</strong>：头朝吉方（通常朝东、南、西），避免朝西</li>
+                    <li><strong>镜子</strong>：镜子不宜对着床，会导致睡眠不安</li>
+                    <li><strong>电器</strong>：电视、电脑等电器不宜放在卧室，辐射影响健康</li>
+                    <li><strong>颜色</strong>：卧室颜色宜柔和（浅蓝、浅绿、米色），避免过于鲜艳</li>
+                </ul>
+                
+                <h3>🍳 厨房风水</h3>
+                <ul>
+                    <li><strong>灶台位置</strong>：灶台不宜正对门或窗，也不宜与水槽太近</li>
+                    <li><strong>冰箱</strong>：冰箱代表财库，应保持整洁、食物充足</li>
+                    <li><strong>颜色</strong>：厨房属火，宜用白色、米色等淡雅颜色</li>
+                </ul>
+                
+                <h3>🚿 卫生间风水</h3>
+                <ul>
+                    <li><strong>位置</strong>：卫生间不宜在住宅中央或正对大门</li>
+                    <li><strong>通风</strong>：保持干燥通风，避免湿气积聚</li>
+                    <li><strong>化解</strong>：可摆放绿植或盐灯化解卫生间阴气</li>
+                </ul>
+            `;
+            break;
+            
+        case 'office':
+            html = `
+                <h2>🏢 办公室风水布局要点</h2>
+                
+                <h3>💺 座位朝向</h3>
+                <ul>
+                    <li><strong>背后有靠</strong>：座位后方应有实墙或高柜，象征"背后有靠"</li>
+                    <li><strong>前方开阔</strong>：座位前方应开阔，象征前途无量</li>
+                    <li><strong>避免门冲</strong>：座位不宜正对门，会被气流直冲</li>
+                    <li><strong>避免窗边</strong>：座位不宜正对窗户，会被光线和气流干扰</li>
+                </ul>
+                
+                <h3>🖥️ 办公桌布局</h3>
+                <ul>
+                    <li><strong>左高右低</strong>：左侧可放较高的文件架，右侧宜低矮整洁</li>
+                    <li><strong>保持整洁</strong>：桌面保持整洁，杂乱会阻碍财运和思路</li>
+                    <li><strong>摆放开运物</strong>：可摆放水晶、文昌塔、马到成功等开运物</li>
+                </ul>
+                
+                <h3>💰 催财布局</h3>
+                <ul>
+                    <li><strong>开门见红</strong>：办公室门旁可放红色地毯或装饰，催旺人气</li>
+                    <li><strong>财位布局</strong>：办公室对角线位置为财位，可放发财树、鱼缸等</li>
+                    <li><strong>水种植物</strong>：在财位放水生植物（如富贵竹），水生木，木生财</li>
+                </ul>
+            `;
+            break;
+            
+        case 'taboo':
+            html = `
+                <h2>⚠️ 常见风水禁忌及化解</h2>
+                
+                <h3>📏 横梁压顶</h3>
+                <ul>
+                    <li><strong>含义</strong>：横梁压在床、沙发、办公桌上方，会造成压迫感</li>
+                    <li><strong>影响</strong>：影响健康、睡眠、事业运</li>
+                    <li><strong>化解</strong>：安装天花板遮挡横梁，或在横梁两侧安装圆形灯具化解</li>
+                </ul>
+                
+                <h3>🚪 门冲</h3>
+                <ul>
+                    <li><strong>含义</strong>：门正对门、窗、或走廊</li>
+                    <li><strong>影响</strong>：气流直冲，导致气场不稳，财运流失</li>
+                    <li><strong>化解</strong>：设置屏风、门帘，或在门旁放绿植缓冲气流</li>
+                </ul>
+                
+                <h3>📐 房屋缺角</h3>
+                <ul>
+                    <li><strong>含义</strong>：房屋平面图形不规则，有缺角</li>
+                    <li><strong>影响</strong>：缺角代表对应方位的家庭成员或运势受损</li>
+                    <li><strong>化解</strong>：在缺角位置摆放对应五行的物品（如缺东角放绿色植物）</li>
+                </ul>
+                
+                <h3>🪞 镜子反射</h3>
+                <ul>
+                    <li><strong>含义</strong>：镜子正对床、门、灶台等</li>
+                    <li><strong>影响</strong>：镜子反射会扰乱气场，导致睡眠不安、财运不稳</li>
+                    <li><strong>化解</strong>：移动镜子位置，或用布帘遮挡</li>
+                </ul>
+            `;
+            break;
+    }
+    
+    document.getElementById('fengshuiDetail').innerHTML = html;
 }
-</script>
-    <script>
-        function showFengshuiDetail(type) {
-            let html = '';
-            
-            switch(type) {
-                case 'home':
-                    html = `
-                        <h2>🏠 家居风水布局要点</h2>
-                        
-                        <h3>🛋️ 客厅风水</h3>
-                        <ul>
-                            <li><strong>位置</strong>：客厅应设在住宅中央位置，采光要充足</li>
-                            <li><strong>布局</strong>：沙发应靠墙摆放，形成"背后有靠"的格局</li>
-                            <li><strong>装饰</strong>：可摆放绿植（如发财树、富贵竹）催旺财运</li>
-                            <li><strong>禁忌</strong>：避免横梁压顶、尖角冲射</li>
-                        </ul>
-                        
-                        <h3>🛏️ 卧室风水</h3>
-                        <ul>
-                            <li><strong>床的朝向</strong>：头朝吉方（通常朝东、南、西），避免朝西</li>
-                            <li><strong>镜子</strong>：镜子不宜对着床，会导致睡眠不安</li>
-                            <li><strong>电器</strong>：电视、电脑等电器不宜放在卧室，辐射影响健康</li>
-                            <li><strong>颜色</strong>：卧室颜色宜柔和（浅蓝、浅绿、米色），避免过于鲜艳</li>
-                        </ul>
-                        
-                        <h3>🍳 厨房风水</h3>
-                        <ul>
-                            <li><strong>灶台位置</strong>：灶台不宜正对门或窗，也不宜与水槽太近</li>
-                            <li><strong>冰箱</strong>：冰箱代表财库，应保持整洁、食物充足</li>
-                            <li><strong>颜色</strong>：厨房属火，宜用白色、米色等淡雅颜色</li>
-                        </ul>
-                        
-                        <h3>🚿 卫生间风水</h3>
-                        <ul>
-                            <li><strong>位置</strong>：卫生间不宜在住宅中央或正对大门</li>
-                            <li><strong>通风</strong>：保持干燥通风，避免湿气积聚</li>
-                            <li><strong>化解</strong>：可摆放绿植或盐灯化解卫生间阴气</li>
-                        </ul>
-                    `;
-                    break;
-                    
-                case 'office':
-                    html = `
-                        <h2>🏢 办公室风水布局要点</h2>
-                        
-                        <h3>💺 座位朝向</h3>
-                        <ul>
-                            <li><strong>背后有靠</strong>：座位后方应有实墙或高柜，象征"背后有靠"</li>
-                            <li><strong>前方开阔</strong>：座位前方应开阔，象征前途无量</li>
-                            <li><strong>避免门冲</strong>：座位不宜正对门，会被气流直冲</li>
-                            <li><strong>避免窗边</strong>：座位不宜正对窗户，会被光线和气流干扰</li>
-                        </ul>
-                        
-                        <h3>🖥️ 办公桌布局</h3>
-                        <ul>
-                            <li><strong>左高右低</strong>：左侧可放较高的文件架，右侧宜低矮整洁</li>
-                            <li><strong>保持整洁</strong>：桌面保持整洁，杂乱会阻碍财运和思路</li>
-                            <li><strong>摆放开运物</strong>：可摆放水晶、文昌塔、马到成功等开运物</li>
-                        </ul>
-                        
-                        <h3>💰 催财布局</h3>
-                        <ul>
-                            <li><strong>开门见红</strong>：办公室门旁可放红色地毯或装饰，催旺人气</li>
-                            <li><strong>财位布局</strong>：办公室对角线位置为财位，可放发财树、鱼缸等</li>
-                            <li><strong>水种植物</strong>：在财位放水生植物（如富贵竹），水生木，木生财</li>
-                        </ul>
-                    `;
-                    break;
-                    
-                case 'taboo':
-                    html = `
-                        <h2>⚠️ 常见风水禁忌及化解</h2>
-                        
-                        <h3>📏 横梁压顶</h3>
-                        <ul>
-                            <li><strong>含义</strong>：横梁压在床、沙发、办公桌上方，会造成压迫感</li>
-                            <li><strong>影响</strong>：影响健康、睡眠、事业运</li>
-                            <li><strong>化解</strong>：安装天花板遮挡横梁，或在横梁两侧安装圆形灯具化解</li>
-                        </ul>
-                        
-                        <h3>🚪 门冲</h3>
-                        <ul>
-                            <li><strong>含义</strong>：门正对门、窗、或走廊</li>
-                            <li><strong>影响</strong>：气流直冲，导致气场不稳，财运流失</li>
-                            <li><strong>化解</strong>：设置屏风、门帘，或在门旁放绿植缓冲气流</li>
-                        </ul>
-                        
-                        <h3>📐 房屋缺角</h3>
-                        <ul>
-                            <li><strong>含义</strong>：房屋平面图形不规则，有缺角</li>
-                            <li><strong>影响</strong>：缺角代表对应方位的家庭成员或运势受损</li>
-                            <li><strong>化解</strong>：在缺角位置摆放对应五行的物品（如缺东角放绿色植物）</li>
-                        </ul>
-                        
-                        <h3>🪞 镜子反射</h3>
-                        <ul>
-                            <li><strong>含义</strong>：镜子正对床、门、灶台等</li>
-                            <li><strong>影响</strong>：镜子反射会扰乱气场，导致睡眠不安、财运不稳</li>
-                            <li><strong>化解</strong>：移动镜子位置，或用布帘遮挡</li>
-                        </ul>
-                    `;
-                    break;
-            }
-            
-            document.getElementById('fengshuiDetail').innerHTML = html;
+
+// ===== 风水分析（API版 + 本地降级） =====
+async function analyzeFengshui() {
+    const houseType = document.getElementById('houseType').value;
+    const area = document.getElementById('areaInput').value;
+    
+    // 尝试调用后端API
+    try {
+        const apiResult = await window.fortuneAPI('fengshui', {
+            house_type: houseType,
+            area: area
+        }, { loadingMsg: '正在联网分析风水布局...' });
+
+        if (apiResult && apiResult.data) {
+            renderFengshuiAPIResult(apiResult.data, apiResult.meta);
+            return;
         }
-
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-        });
-    </script>
-
-        <!-- 分析表单 -->
-        <div class="tab-content active" id="formTab">
-            <div class="form-container">
-                
-            <div class="form-group">
-                <label class="form-label">房屋类型</label>
-                <select class="form-select" id="houseType">
-                    <option value="公寓">公寓</option>
-                    <option value="别墅">别墅</option>
-                    <option value="办公室">办公室</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">关注区域</label>
-                <select class="form-select" id="areaInput">
-                    <option value="大门">大门</option>
-                    <option value="客厅">客厅</option>
-                    <option value="卧室">卧室</option>
-                    <option value="厨房">厨房</option>
-                </select>
-            </div>
-        
-                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
-            </div>
-        </div>
-        <!-- 结果展示 -->
-        <div class="tab-content" id="resultTab">
-            <div class="result-container" id="resultContainer">
-                
-        <div class="result-section"><h3>🏠 风水布局分析结果</h3>
-        <div class="analysis-text">
-            <p><strong>房屋类型：</strong><span id="typeResult"></span></p>
-            <p><strong>关注区域：</strong><span id="areaResult"></span></p>
-            <p><strong>风水评价：</strong><span id="ratingResult"></span></p>
-            <p><strong>化解建议：</strong><span id="fixResult"></span></p>
-        </div>
-        </div>
-        
-            </div>
-        </div>
-    
-    <script>
-    function calculateModule() {
-        if (window.showToast) window.showToast('正在分析中...');
-        setTimeout(function() {
-            // 这里调用真正的分析计算
-            var resultHtml = generateResultHTML();
-            document.getElementById('resultContainer').innerHTML = resultHtml;
-            if (window.switchTab) window.switchTab('result');
-            if (window.showToast) window.showToast('分析完成！');
-        }, 1200);
+    } catch (e) {
+        console.error('风水分析API调用异常:', e);
     }
-    
-    function generateResultHTML() {
-        // 读取表单值并生成结果
-        var html = '<div class="result-section fade-in">';
-        html += '<h3>📊 分析结果</h3>';
-        html += '<div class="analysis-text">';
-        html += '<p>根据您提供的信息，分析结果如下：</p>';
-        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
-        html += '</div></div>';
-        return html;
+
+    // API失败，显示错误状态含重试/降级
+    showFortuneError('fengshuiResultContainer', '联网分析失败，是否使用本地分析？',
+        analyzeFengshui,
+        function() {
+            renderLocalFengshuiResult(houseType, area);
+        }
+    );
+    document.getElementById('fengshuiResultContainer').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== 渲染API返回的风水结果 =====
+function renderFengshuiAPIResult(data, meta) {
+    const container = document.getElementById('fengshuiResultContainer');
+    let html = '';
+
+    // 主要内容
+    if (data.overview || data.summary) {
+        html += '<div class="result-section fade-in"><h3>🏠 风水总览</h3>';
+        html += '<div style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">';
+        html += (data.overview || data.summary) + '</div></div>';
     }
-    </script>
-    </body>
+
+    // 详细分析
+    const fieldMap = [
+        ['evaluation', '风水评价'],
+        ['rating', '评分'],
+        ['score', '评分'],
+        ['analysis', '详细分析'],
+        ['detail', '详细分析'],
+        ['suggestions', '改善建议'],
+        ['advice', '改善建议'],
+        ['fix', '化解方案'],
+        ['resolution', '化解方案'],
+        ['suitable_color', '适宜颜色'],
+        ['color', '适宜颜色'],
+        ['suitable_material', '适宜材质'],
+        ['material', '适宜材质'],
+        ['forbidden', '禁忌事项'],
+        ['taboo', '禁忌事项']
+    ];
+
+    const shown = {};
+    let hasDetail = false;
+    for (const [key, label] of fieldMap) {
+        if (data[key] !== undefined && data[key] !== null && !shown[label]) {
+            shown[label] = true;
+            hasDetail = true;
+        }
+    }
+
+    if (hasDetail) {
+        html += '<div class="result-section fade-in"><h3>📋 分析详情</h3>';
+        html += '<table class="wealth-table"><tr><th>项目</th><th>内容</th></tr>';
+        const shown2 = {};
+        for (const [key, label] of fieldMap) {
+            if (data[key] !== undefined && data[key] !== null && !shown2[label]) {
+                shown2[label] = true;
+                const val = typeof data[key] === 'object' ? JSON.stringify(data[key], null, 2) : String(data[key]);
+                html += '<tr><td style="color:#ffd700;">' + label + '</td><td style="text-align:left;padding-left:1rem;">' + val + '</td></tr>';
+            }
+        }
+        html += '</table></div>';
+    }
+
+    // 兜底：显示原始数据
+    if (!html) {
+        html = '<div class="result-section fade-in"><pre style="color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;font-family:inherit;">';
+        html += JSON.stringify(data, null, 2) + '</pre></div>';
+    }
+
+    container.innerHTML = html;
+    
+    const source = (meta && meta.source) ? meta.source : 'realtime';
+    showDataBadge(source, 'fengshuiResultContainer');
+    container.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== 本地计算降级渲染 =====
+function renderLocalFengshuiResult(houseType, area) {
+    const container = document.getElementById('fengshuiResultContainer');
+    const tips = {
+        '公寓': { '大门': '公寓大门不宜正对电梯门或楼梯口，可在门口放脚垫化解。', '客厅': '公寓客厅宜方正明亮，避免堆放杂物影响气场流通。', '卧室': '小户型卧室宜简约，床不宜对门或对窗。', '厨房': '开放式厨房注意灶台不要正对水槽，水火相冲。' },
+        '别墅': { '大门': '别墅大门宜大气庄重，门外不宜有电线杆或大树遮挡。', '客厅': '别墅客厅宜宽敞，沙发背靠实墙，前有明堂。', '卧室': '主卧宜在房屋后方安静处，避免临街闹区。', '厨房': '别墅厨房可设单独空间，注意水火平衡。' },
+        '办公室': { '大门': '办公室大门不宜正对电梯或厕所门，宜保持通畅。', '客厅': '办公区域宜开阔，避免隔间过多阻碍气流。', '卧室': '休息区宜安静，避免靠近打印机等噪音源。', '厨房': '茶水间宜设在办公区侧面，不宜在正中位置。' }
+    };
+    const tip = (tips[houseType] && tips[houseType][area]) || '建议根据实际情况结合传统风水理论进行布局调整。';
+
+    let html = '<div class="result-section fade-in"><h3>🏠 风水分析结果（本地）</h3>';
+    html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;"><strong>房屋类型：</strong>' + houseType + '</p>';
+    html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;"><strong>关注区域：</strong>' + area + '</p>';
+    html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;">' + tip + '</p>';
+    html += '<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;text-align:center;">结果基于本地风水知识库，仅供参考</p>';
+    html += '</div>';
+    container.innerHTML = html;
+    showDataBadge('local_fallback', 'fengshuiResultContainer');
+    container.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== 图片上传（复用API封装层） =====
+function triggerImageUpload(moduleType) {
+    triggerImageUploadV2(moduleType);
+}
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+</script>
+
+</body>
 </html>

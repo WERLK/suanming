@@ -227,13 +227,13 @@
 
 <div class="app">
     <div class="page-header">
-        <button type="button" type="button" class="back-btn" onclick="history.back()">←</button>
+        <button type="button" class="back-btn" onclick="history.back()">←</button>
         <h1>🩸 血型分析</h1>
     </div>
 
     <div class="content-area">
                 <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('xuexing')">📷 上传图片分析</button>
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUploadV2('xuexing')">📷 上传图片分析</button>
         </div>
 <div class="section">
             <h2>血型性格学简介</h2>
@@ -377,7 +377,7 @@
                     <input type="number" class="form-input" id="ageInput" placeholder="请输入年龄" min="1" max="120">
                 </div>
                 
-                <button type="button" type="button" class="submit-btn" onclick="analyzeBlood()">开始分析</button>
+                <button type="button" class="submit-btn" onclick="analyzeBlood()">开始分析</button>
             </div>
             
             <div class="result-area" id="resultArea">
@@ -401,74 +401,52 @@
     </div>
 </div>
 
-<script src="/js/main.js">
-// 显示提示
-function showToast(msg) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = msg;
-    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+// 血型图片快捷上传
+function triggerImageUpload(moduleType) {
+    triggerImageUploadV2(moduleType);
 }
 
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
-<script>
-function analyzeBlood() {
+// 血型分析 - 接入后端API
+async function analyzeBlood() {
     const bloodType = document.getElementById('bloodTypeInput').value;
     const gender = document.getElementById('genderInput').value;
     const age = document.getElementById('ageInput').value;
     
     if (!age || age < 1 || age > 120) {
-        window.showToast('请输入有效年龄');
+        showToast('请输入有效年龄');
         return;
     }
     
-    window.showToast('正在分析血型...');
+    showToast('正在分析血型...');
     
-    // 模拟分析
+    // 调用API分析
+    const result = await fortuneAPI('analyze', {
+        module_type: 'xuexing',
+        blood_type: bloodType,
+        gender: gender,
+        age: parseInt(age)
+    });
+    
+    if (result && result.data) {
+        showResult(result.data, result.meta);
+        return;
+    }
+    
+    // API失败，使用本地降级分析
+    analyzeBloodLocal(bloodType, gender, age);
+}
+
+// 本地降级分析（保留原有血型知识内容）
+function analyzeBloodLocal(bloodType, gender, age) {
+    showToast('使用本地分析模式...');
+    showFortuneLoading('正在本地分析血型...');
+    
     setTimeout(() => {
+        hideFortuneLoading();
+        
         const result = {
             bloodType: bloodType,
             gender: gender,
@@ -499,60 +477,106 @@ function analyzeBlood() {
             }[bloodType]
         };
         
-        showResult(result);
-    }, 2000);
+        showResult(result, { source: 'local_fallback' });
+    }, 1000);
 }
 
-function showResult(result) {
+// 显示分析结果（兼容API和本地两种格式）
+function showResult(result, meta) {
+    const isAPIResult = meta && meta.source !== 'local_fallback';
     const bloodNames = { 'A': 'A型血', 'B': 'B型血', 'O': 'O型血', 'AB': 'AB型血' };
+    const bloodName = bloodNames[result.bloodType] || result.bloodType;
+    const genderText = result.gender === 'male' ? '男性' : (result.gender === 'female' ? '女性' : result.gender);
     
-    let html = `
-        <div class="result-card fade-in">
-            <h3>🩸 血型分析结果</h3>
-            <p><strong>血型：</strong>${bloodNames[result.bloodType]}</p>
-            <p><strong>性别：</strong>${result.gender === 'male' ? '男性' : '女性'}</p>
-            <p><strong>年龄：</strong>${result.age}岁</p>
-        </div>
+    let html = '';
+    
+    if (isAPIResult) {
+        // API结果格式
+        html += '<div class="result-card fade-in"><h3>🩸 AI血型分析结果</h3>';
+        html += '<p><strong>血型：</strong>' + bloodName + '</p>';
+        html += '<p><strong>性别：</strong>' + genderText + '</p>';
+        if (result.age) html += '<p><strong>年龄：</strong>' + result.age + '岁</p>';
+        html += '</div>';
         
-        <div class="result-card fade-in">
-            <h3>📊 性格分析</h3>
-            <p>${result.personality}</p>
-        </div>
+        if (result.personality) {
+            html += '<div class="result-card fade-in"><h3>📊 性格分析</h3><p>' + result.personality + '</p></div>';
+        }
+        if (result.love) {
+            html += '<div class="result-card fade-in"><h3>❤️ 恋爱模式</h3><p>' + result.love + '</p></div>';
+        }
+        if (result.career) {
+            html += '<div class="result-card fade-in"><h3>💼 职业建议</h3><p>' + result.career + '</p></div>';
+        }
+        if (result.health) {
+            html += '<div class="result-card fade-in"><h3>🏥 健康提醒</h3><p>' + result.health + '</p></div>';
+        }
+        if (result.advice) {
+            html += '<div class="result-card fade-in"><h3>💡 综合建议</h3><p>' + result.advice + '</p></div>';
+        }
         
-        <div class="result-card fade-in">
-            <h3>❤️ 恋爱模式</h3>
-            <p>${result.love}</p>
-        </div>
-        
-        <div class="result-card fade-in">
-            <h3>💼 职业建议</h3>
-            <p>${result.career}</p>
-        </div>
-        
-        <div class="result-card fade-in">
-            <h3>🏥 健康提醒</h3>
-            <p>${result.health}</p>
-        </div>
-        
-        <div class="result-card fade-in">
-            <h3>💡 综合建议</h3>
-            <p>作为${bloodNames[result.bloodType]}的${result.gender === 'male' ? '男性' : '女性'}，你的性格特点是${result.personality.split('，')[0]}。在恋爱中，你${result.love.replace('恋爱模式：', '').toLowerCase()}在职业选择上，${result.career.replace('适合职业：', '').toLowerCase()}在健康方面，${result.health.split('。')[0].toLowerCase()}。总的来说，${result.bloodType === 'A' ? '你是一个可靠而细腻的人，只需学会放松和信任他人。' : result.bloodType === 'B' ? '你是一个自由和创意的人，只需学会坚持和关注细节。' : result.bloodType === 'O' ? '你是一个自信和领导力强的人，只需学会倾听和体谅他人。' : '你是一个理性而客观的人，只需学会表达情感和亲近他人。'}</p>
-            <div class="tags">
-                <span class="tag">性格： ${result.personality.split('，')[0]}</span>
-                <span class="tag">恋爱： ${result.love.replace('恋爱模式：', '').split('，')[0]}</span>
-                <span class="tag">职业： ${result.career.replace('适合职业：', '').split('、')[0]}</span>
-                <span class="tag">健康： 注意${result.health.split('：')[1].split('、')[0]}</span>
+        // 标签
+        if (result.tags) {
+            html += '<div class="tags">';
+            result.tags.forEach(function(t) { html += '<span class="tag">' + t + '</span>'; });
+            html += '</div>';
+        }
+    } else {
+        // 本地降级结果格式（保持原有显示）
+        html = `
+            <div class="result-card fade-in">
+                <h3>🩸 血型分析结果</h3>
+                <p><strong>血型：</strong>${bloodName}</p>
+                <p><strong>性别：</strong>${genderText}</p>
+                <p><strong>年龄：</strong>${result.age}岁</p>
             </div>
-        </div>
-        
+            
+            <div class="result-card fade-in">
+                <h3>📊 性格分析</h3>
+                <p>${result.personality}</p>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>❤️ 恋爱模式</h3>
+                <p>${result.love}</p>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>💼 职业建议</h3>
+                <p>${result.career}</p>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>🏥 健康提醒</h3>
+                <p>${result.health}</p>
+            </div>
+            
+            <div class="result-card fade-in">
+                <h3>💡 综合建议</h3>
+                <p>作为${bloodName}的${genderText}，你的性格特点是${(result.personality || '').split('，')[0]}。在恋爱中，你${(result.love || '').replace('恋爱模式：', '').toLowerCase()}在职业选择上，${(result.career || '').replace('适合职业：', '').toLowerCase()}在健康方面，${(result.health || '').split('。')[0].toLowerCase()}。总的来说，${result.bloodType === 'A' ? '你是一个可靠而细腻的人，只需学会放松和信任他人。' : result.bloodType === 'B' ? '你是一个自由和创意的人，只需学会坚持和关注细节。' : result.bloodType === 'O' ? '你是一个自信和领导力强的人，只需学会倾听和体谅他人。' : '你是一个理性而客观的人，只需学会表达情感和亲近他人。'}</p>
+                <div class="tags">
+                    <span class="tag">性格： ${(result.personality || '').split('，')[0]}</span>
+                    <span class="tag">恋爱： ${(result.love || '').replace('恋爱模式：', '').split('，')[0]}</span>
+                    <span class="tag">职业： ${(result.career || '').replace('适合职业：', '').split('、')[0]}</span>
+                    <span class="tag">健康： 注意${(result.health || '').split('：')[1].split('、')[0]}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `
         <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
-            <button type="button" type="button" class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
+            <button type="button" class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新分析</button>
         </div>
     `;
     
-    document.getElementById('resultArea').innerHTML = html;
-    document.getElementById('resultArea').style.display = 'block';
+    const resultArea = document.getElementById('resultArea');
+    resultArea.innerHTML = html;
+    resultArea.style.display = 'block';
     document.querySelector('.analysis-form').style.display = 'none';
+    
+    if (meta) {
+        showDataBadge(meta.source || 'local', 'resultArea');
+    }
 }
 
 function resetForm() {

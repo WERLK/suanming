@@ -244,7 +244,7 @@
 
     <div class="content-area">
                 <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('mianxiang')">📷 上传图片分析</button>
+            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUploadV2('mianxiang')">📷 上传图片分析</button>
         </div>
 <div class="section">
             <h2>面相学简介</h2>
@@ -432,8 +432,9 @@ function triggerImageUpload(moduleType) {
     input.click();
 }
 </script>
+<script src="/js/fortune-api.js"></script>
 <script>
-function analyzeFace() {
+async function analyzeFace() {
     const photo = document.getElementById('photoInput').files[0];
     const gender = document.getElementById('genderInput').value;
     const age = document.getElementById('ageInput').value;
@@ -448,63 +449,110 @@ function analyzeFace() {
         return;
     }
     
-    window.showToast('正在分析面相...');
+    // 隐藏表单，显示结果区域（三态：Loading）
+    document.querySelector('.analysis-form').style.display = 'none';
+    document.getElementById('resultArea').style.display = 'block';
+    document.getElementById('resultArea').innerHTML = `
+        <div class="result-card fade-in" style="text-align:center;padding:3rem 1rem;">
+            <div class="fortune-spinner" style="margin:0 auto 1rem;"></div>
+            <p style="color:#ffd700;font-size:1rem;">👤 AI智能分析面相中...</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;">大数据实时分析中，请稍候</p>
+        </div>
+    `;
     
-    // 模拟AI分析
-    setTimeout(() => {
-        const result = {
-            score: Math.floor(Math.random() * 30) + 70,
-            features: {
-                eyes: ['大而有神', '细长澄清', '双目有神'][Math.floor(Math.random() * 3)],
-                nose: ['鼻梁高挺', '鼻头丰满', '山根饱满'][Math.floor(Math.random() * 3)],
-                mouth: ['唇红齿白', '嘴角上扬', '口方唇厚'][Math.floor(Math.random() * 3)],
-                ears: ['耳垂肥厚', '耳轮分明', '双耳贴脑'][Math.floor(Math.random() * 3)]
-            },
-            fortune: {
-                career: ['事业有成', '步步高升', '中年后发'][Math.floor(Math.random() * 3)],
-                wealth: ['财运亨通', '积蓄丰厚', '晚年财旺'][Math.floor(Math.random() * 3)],
-                marriage: ['婚姻美满', '夫妻和睦', '晚婚可得'][Math.floor(Math.random() * 3)],
-                health: ['身体强健', '少病少灾', '注意养生'][Math.floor(Math.random() * 3)]
-            },
-            advice: '整体面相' + ['吉祥', '中上', '不错'][Math.floor(Math.random() * 3)] + 
-                    '，建议' + ['保持善良心态', '多行善事', '注重修养'][Math.floor(Math.random() * 3)] + 
-                    '，可进一步提升运势。'
+    // 读取图片为 base64
+    const result = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const base64 = e.target.result;
+            const data = await fortuneAPI('image-analyze', {
+                image: base64,
+                module_type: 'mianxiang',
+                gender: gender,
+                age: age
+            });
+            resolve(data);
         };
-        
-        showResult(result);
-    }, 2000);
+        reader.onerror = function() {
+            resolve(null);
+        };
+        reader.readAsDataURL(photo);
+    });
+    
+    if (result && result.data) {
+        showResult(result.data, result.meta);
+    } else {
+        // 三态：Error
+        document.getElementById('resultArea').innerHTML = `
+            <div class="result-card fade-in" style="text-align:center;padding:3rem 1rem;">
+                <p style="color:#ff6b6b;font-size:1.2rem;">⚠️ 分析失败</p>
+                <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;">网络连接失败，请检查网络后重试</p>
+                <button type="button" class="submit-btn" style="display:inline-block;width:auto;padding:0.6rem 1.5rem;margin-top:1rem;" onclick="resetForm()">返回重试</button>
+            </div>
+        `;
+    }
 }
 
-function showResult(result) {
+function showResult(data, meta) {
+    const score = data.score || 0;
+    const scoreLabel = score >= 90 ? '大吉相' : score >= 80 ? '吉相' : score >= 70 ? '中吉相' : '平相';
+    
     let html = `
         <div class="result-card fade-in">
             <h3>👤 面相分析结果</h3>
+    `;
+    
+    // 数据来源标识
+    if (meta) {
+        const sourceMap = {
+            'realtime': '🟢 实时联网数据',
+            'cached': '🟡 缓存数据',
+            'local': '🔵 服务器计算',
+            'local_fallback': '🔴 离线数据'
+        };
+        const sourceText = sourceMap[meta.source] || '🔵 服务器计算';
+        html += `<div class="fortune-data-badge" style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:0.8rem;">${sourceText} · ${new Date().toLocaleTimeString('zh-CN')}</div>`;
+    }
+    
+    html += `
         </div>
         
         <div class="score-display fade-in">
-            <div class="score-number">${result.score}分</div>
-            <div class="score-text">${result.score >= 90 ? '大吉相' : result.score >= 80 ? '吉相' : result.score >= 70 ? '中吉相' : '平相'}</div>
+            <div class="score-number">${score}分</div>
+            <div class="score-text">${scoreLabel}</div>
         </div>
-        
+    `;
+    
+    // 面部特征分析
+    if (data.features) {
+        html += `
         <div class="result-card fade-in">
             <h3>🔍 面部特征分析</h3>
-            <p><strong>眼睛：</strong>${result.features.eyes} — ${result.fortune.career}</p>
-            <p><strong>鼻子：</strong>${result.features.nose} — ${result.fortune.wealth}</p>
-            <p><strong>嘴巴：</strong>${result.features.mouth} — ${result.fortune.marriage}</p>
-            <p><strong>耳朵：</strong>${result.features.ears} — ${result.fortune.health}</p>
+            ${data.features.eyes ? '<p><strong>眼睛：</strong>' + data.features.eyes + '</p>' : ''}
+            ${data.features.nose ? '<p><strong>鼻子：</strong>' + data.features.nose + '</p>' : ''}
+            ${data.features.mouth ? '<p><strong>嘴巴：</strong>' + data.features.mouth + '</p>' : ''}
+            ${data.features.ears ? '<p><strong>耳朵：</strong>' + data.features.ears + '</p>' : ''}
         </div>
-        
+        `;
+    }
+    
+    // 各方面运势
+    if (data.fortune) {
+        html += `
         <div class="result-card fade-in">
             <h3>📊 各方面运势</h3>
-            <p><strong>事业运：</strong>${result.fortune.career}</p>
-            <p><strong>财运：</strong>${result.fortune.wealth}</p>
-            <p><strong>婚姻运：</strong>${result.fortune.marriage}</p>
-            <p><strong>健康运：</strong>${result.fortune.health}</p>
+            ${data.fortune.career ? '<p><strong>事业运：</strong>' + data.fortune.career + '</p>' : ''}
+            ${data.fortune.wealth ? '<p><strong>财运：</strong>' + data.fortune.wealth + '</p>' : ''}
+            ${data.fortune.marriage ? '<p><strong>婚姻运：</strong>' + data.fortune.marriage + '</p>' : ''}
+            ${data.fortune.health ? '<p><strong>健康运：</strong>' + data.fortune.health + '</p>' : ''}
         </div>
-        
+        `;
+    }
+    
+    html += `
         <div class="result-card fade-in">
             <h3>💡 改善建议</h3>
-            <p>${result.advice}</p>
+            <p>${data.advice || '暂无建议'}</p>
             <div class="tags">
                 <span class="tag">修心养性</span>
                 <span class="tag">修饰仪容</span>
@@ -520,7 +568,6 @@ function showResult(result) {
     
     document.getElementById('resultArea').innerHTML = html;
     document.getElementById('resultArea').style.display = 'block';
-    document.querySelector('.analysis-form').style.display = 'none';
 }
 
 function resetForm() {

@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>八字排盘 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+<script src="/js/fortune-api.js"></script>
 <style>
 /* ========== 页面基础 ========== */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -659,24 +660,135 @@ function parseIdCard(){
   hint.style.color='#51cf66';
 }
 
+// ========== 数据格式适配 ==========
+function normalizeBaziData(apiData){
+  const d=apiData;
+
+  // 解析出生日期
+  let birthYear=0,birthMonth=0,birthDay=0;
+  if(d.birth_date){
+    const parts=d.birth_date.split('-');
+    birthYear=parseInt(parts[0])||0;
+    birthMonth=parseInt(parts[1])||0;
+    birthDay=parseInt(parts[2])||0;
+  }
+
+  // 解析 pillars
+  let pillars={},gans={},zhis={};
+  if(d.pillars){
+    if(Array.isArray(d.pillars)){
+      const labelMap={'年柱':'year','月柱':'month','日柱':'day','时柱':'hour'};
+      d.pillars.forEach(p=>{
+        const key=labelMap[p.label]||p.label;
+        pillars[key]=p.ganzhi;
+        gans[key]=p.tg;
+        zhis[key]=p.dz;
+      });
+    }else if(typeof d.pillars==='object'){
+      pillars=d.pillars;
+      for(const[key,val]of Object.entries(pillars)){
+        if(val&&val.length>=2){
+          gans[key]=val.charAt(0);
+          zhis[key]=val.charAt(1);
+        }
+      }
+    }
+  }
+
+  // 解析五行统计
+  let wuxing={'金':0,'木':0,'水':0,'火':0,'土':0};
+  if(d.wuxing_stats){
+    if(Array.isArray(d.wuxing_stats)){
+      d.wuxing_stats.forEach(w=>{wuxing[w.element||w.name]=w.count;});
+    }else{Object.assign(wuxing,d.wuxing_stats);}
+  }
+
+  // 解析大运
+  const dayun=(d.dayun||[]).map(dy=>({
+    year:dy.year,age:dy.age,ganzhi:dy.ganzhi,shishen:dy.shishen
+  }));
+
+  // 解析流年
+  const liunian=(d.liunian||[]).map(ln=>({
+    year:ln.year,ganzhi:ln.ganzhi,shishen:ln.shishen
+  }));
+
+  // 解析十神
+  let shishenMap={};
+  if(d.shishen){
+    if(Array.isArray(d.shishen)){
+      d.shishen.forEach(s=>{shishenMap[s.stem||s.gan]=s.shishen||s.name;});
+    }else{shishenMap=d.shishen;}
+  }
+
+  return{
+    name:d.name||'未知',
+    gender:d.gender||'unknown',
+    pillars,gans,zhis,
+    dayMaster:d.day_master,
+    dayMasterElement:d.day_master_element,
+    shishenMap,
+    wuxing,
+    taiyuan:d.taiyuan,
+    minggong:d.minggong,
+    shengong:d.shengong,
+    nayin:d.nayin||{},
+    changsheng:d.changsheng||{},
+    xunkong:d.xunkong||[],
+    xiyong:d.xiyong||{xiyong:[],jishen:[],season:''},
+    zodiac:d.zodiac,
+    constellation:d.constellation,
+    jieqi:d.jieqi||{prev:null,next:null},
+    lunar:d.lunar_date||{year:birthYear,month:'',day:''},
+    dayun,liunian,
+    shensha:d.shensha||[],
+    solarTime:d.solar_time||{region:120,sign:'+',hour:0,min:0},
+    birthInfo:{year:birthYear,month:birthMonth,day:birthDay,time:d.birth_time||''}
+  };
+}
+
 // ========== 显示函数 ==========
-function calculateBazi(){
+async function calculateBazi(){
   const name=document.getElementById('baziName').value;
   const gender=document.querySelector('.gender-btn.active')?.dataset.value||'male';
   const birthDate=document.getElementById('baziDate').value;
   const birthTime=document.getElementById('baziTime').value;
-  const region=document.getElementById('baziRegion').value;
+  const region=parseFloat(document.getElementById('baziRegion').value)||120;
   const mode=document.getElementById('baziMode').value;
   if(!birthDate||!birthTime){alert('请选择出生日期和时辰');return;}
 
-  const data=calcBaziFull(name,gender,birthDate,birthTime,region);
+  // 显示loading
+  showFortuneLoading('正在联网排盘...');
+
+  // 先尝试API调用
+  const apiResult=await fortuneAPI('bazi',{
+    name,gender,birth_date:birthDate,birth_time:birthTime,region_lon:region
+  },{showLoading:false});
+
+  let data,apiSource;
+
+  if(apiResult&&apiResult.success&&apiResult.data){
+    // API成功，使用API数据
+    data=normalizeBaziData(apiResult.data);
+    apiSource=apiResult.meta?apiResult.meta.source:'realtime';
+    hideFortuneLoading();
+  }else{
+    // API失败，降级到本地算法
+    hideFortuneLoading();
+    showToast('联网分析失败，已自动切换到本地计算');
+    data=calcBaziFull(name,gender,birthDate,birthTime,region);
+    apiSource='local_fallback';
+  }
+
   window.baziData=data;
   document.getElementById('formSection').classList.add('hidden');
   document.getElementById('resultArea').classList.remove('hidden');
 
+  // 显示数据来源标识
+  showDataBadge(apiSource,'resultArea');
+
   // 根据模式渲染
   if(mode==='simple'){
-    // 新手模式：只显示用户信息和简要分析，隐藏细盘/横版/竖版/知识 tab
     document.getElementById('tab-xipan').style.display='none';
     document.getElementById('tab-hengban').style.display='none';
     document.getElementById('tab-shuban').style.display='none';
@@ -685,11 +797,9 @@ function calculateBazi(){
     renderUserInfo(data);
     renderWuxingStats(data);
     renderSimpleAnalysis(data);
-    // 默认显示分析 tab
     switchView('fenxi');
     document.getElementById('tab-fenxi').style.display='';
   }else{
-    // 专业模式：显示所有 tab
     ['tab-xipan','tab-hengban','tab-shuban','tab-fenxi','tab-zhishi'].forEach(id=>{
       document.getElementById(id).style.display='';
     });

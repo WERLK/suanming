@@ -556,6 +556,14 @@ try:
 except Exception as e:
     print(f"短信验证码扩展加载失败: {e}")
 
+# 注册算命API蓝图（大数据联网实时分析）
+try:
+    from api.fortune_routes import fortune_bp
+    app.register_blueprint(fortune_bp, url_prefix='/api/fortune')
+    print("算命API蓝图已加载（/api/fortune/*）")
+except Exception as e:
+    print(f"算命API蓝图加载失败: {e}")
+
 @app.route('/api/image-analyze', methods=['POST'])
 def image_analyze():
     """图片智能分析（玄学方向）"""

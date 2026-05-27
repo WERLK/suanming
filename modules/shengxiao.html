@@ -333,6 +333,7 @@
     </div>
 
     <script src="/js/main.js"></script>
+    <script src="/js/fortune-api.js"></script>
     <script>
         // ===== 天干地支数据 =====
         const tiangan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
@@ -558,9 +559,15 @@
             showFortune(zodiac);
         }
         
-        function showFortune(zodiac) {
+        // API降级回退函数
+        function showFortuneFallback(zodiac) {
             const data = generateDynamicFortune(zodiac, currentYear, currentMonth, currentDay);
-            
+            renderLocalFortune(data, zodiac);
+            showDataBadge('local_fallback', 'fortuneResult');
+        }
+
+        // 渲染本地算法生成的数据（原有渲染逻辑）
+        function renderLocalFortune(data, zodiac) {
             let html = '<div class="fortune-year">📅 ' + data.yearName + '（' + data.yearZodiac + '年）' + zodiac + '运势</div>';
             html += '<div class="fortune-rank ' + data.rankClass + '">排名：第' + data.rank + '名 | ' + data.rankText + ' | ' + data.relationType + '</div>';
             
@@ -583,8 +590,104 @@
             document.getElementById('fortuneResult').innerHTML = html;
             document.getElementById('fortuneResult').style.display = 'block';
             
-            // 滚动到结果区
             document.getElementById('fortuneResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // 渲染API返回的数据
+        function renderFortuneAPI(apiData, zodiac) {
+            const d = apiData;
+            const yearName = d.year_ganzhi || (d.year + '年');
+            const scores = d.scores || {};
+            const relation = d.relation || {};
+            
+            let html = '';
+            
+            // 年份和生肖标题
+            html += '<div class="fortune-year">📅 ' + yearName + ' ' + zodiac + '运势</div>';
+            
+            // 关系标识
+            if (relation.type) {
+                const relLevel = relation.level || 'mid';
+                const relCls = relLevel === 'top' ? 'rank-top' : relLevel === 'low' ? 'rank-low' : 'rank-mid';
+                html += '<div class="fortune-rank ' + relCls + '">' + relation.type + ' | ' + (relation.desc || '') + '</div>';
+            }
+            
+            // 各维度评分
+            if (Object.keys(scores).length > 0) {
+                html += '<div class="fortune-section"><h3>📊 维度评分</h3>';
+                html += '<div class="fortune-tags">';
+                const scoreLabels = { career: '事业', wealth: '财运', love: '感情', health: '健康', overall: '综合' };
+                for (const key in scores) {
+                    const label = scoreLabels[key] || key;
+                    const score = scores[key];
+                    const stars = '★'.repeat(Math.round(score / 20)) + '☆'.repeat(5 - Math.round(score / 20));
+                    html += '<span class="fortune-tag">' + label + ' ' + stars + ' (' + score + '分)</span>';
+                }
+                html += '</div></div>';
+            }
+            
+            // 综合描述
+            if (d.description) {
+                html += '<div class="fortune-section"><h3>📊 综合运势</h3><p>' + d.description + '</p></div>';
+            }
+            
+            // 月度运势
+            if (d.monthly_fortune) {
+                html += '<div class="fortune-section"><h3>📌 ' + currentMonth + '月运势</h3><p>' + d.monthly_fortune + '</p></div>';
+            }
+            
+            // 幸运元素
+            const hasLuckyItems = d.lucky_numbers || d.lucky_colors || d.lucky_directions;
+            if (hasLuckyItems) {
+                html += '<div class="fortune-section"><h3>🍀 幸运元素</h3>';
+                html += '<div class="fortune-tags">';
+                if (d.lucky_numbers && d.lucky_numbers.length) {
+                    html += '<span class="fortune-tag">🔢 幸运数字：' + d.lucky_numbers.join('、') + '</span>';
+                }
+                if (d.lucky_colors && d.lucky_colors.length) {
+                    html += '<span class="fortune-tag">🎨 幸运颜色：' + d.lucky_colors.join('、') + '</span>';
+                }
+                if (d.lucky_directions && d.lucky_directions.length) {
+                    html += '<span class="fortune-tag">🧭 幸运方位：' + d.lucky_directions.join('、') + '</span>';
+                }
+                html += '</div></div>';
+            }
+            
+            document.getElementById('fortuneResult').innerHTML = html;
+            document.getElementById('fortuneResult').style.display = 'block';
+            
+            document.getElementById('fortuneResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function showFortune(zodiac) {
+            // 显示 Loading
+            showFortuneLoading('正在联网分析生肖运势...');
+            
+            // 创建降级回退闭包
+            const fallbackFn = function() { showFortuneFallback(zodiac); };
+            
+            const result = await fortuneAPI('shengxiao', {
+                zodiac: zodiac,
+                year: currentYear,
+                month: currentMonth,
+                day: currentDay
+            }, { showLoading: false });
+            
+            if (result && result.success) {
+                // 渲染API数据
+                renderFortuneAPI(result.data, zodiac);
+                // 显示数据来源标识
+                const source = (result.meta && result.meta.source) ? result.meta.source : 'realtime';
+                showDataBadge(source, 'fortuneResult');
+            } else {
+                // API失败，显示错误和降级选项
+                const errMsg = result ? '分析失败，请重试' : '网络连接失败，请检查网络后重试';
+                showFortuneError('fortuneResult', errMsg, 
+                    function() { showFortune(zodiac); },
+                    fallbackFn
+                );
+                document.getElementById('fortuneResult').style.display = 'block';
+            }
         }
         
         // 页面加载时初始化

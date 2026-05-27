@@ -511,8 +511,9 @@ function triggerImageUpload(moduleType) {
     input.click();
 }
 </script>
+<script src="/js/fortune-api.js"></script>
 <script>
-function analyzeNian() {
+async function analyzeNian() {
     const birth = document.getElementById('birthInput').value;
     const time = document.getElementById('timeInput').value;
     const gender = document.getElementById('genderInput').value;
@@ -522,69 +523,100 @@ function analyzeNian() {
         return;
     }
     
-    window.showToast('正在分析流年...');
+    // 提取出生年份
+    const birthYear = birth.split('-')[0];
     
-    // 模拟分析
-    setTimeout(() => {
-        const result = {
-            birth: birth,
-            gender: gender,
-            year: '2026年（丙午年）',
-            dayGan: ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'][Math.floor(Math.random() * 10)],
-            luckyStars: ['岁德星、天德星', '龙德星、福德星', '红鸾星、天喜星', '岁德星、龙德星'][Math.floor(Math.random() * 4)],
-            unluckyStars: ['岁破星', '寡宿星', '吊客星', '病符星', '耗财星'][Math.floor(Math.random() * 5)],
-            fortune: {
-                career: ['事业顺利', '步步高升', '中年后发', '稳扎稳打'][Math.floor(Math.random() * 4)],
-                wealth: ['财运亨通', '积蓄丰厚', '晚年财旺', '收支平衡'][Math.floor(Math.random() * 4)],
-                marriage: ['婚姻美满', '夫妻和睦', '晚婚可得', '桃花旺盛'][Math.floor(Math.random() * 4)],
-                health: ['身体强健', '少病少灾', '注意养生', '需防小病'][Math.floor(Math.random() * 4)]
-            },
-            advice: '2026年丙午年，对于' + ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'][Math.floor(Math.random() * 10)] + 
-                    '日干的人来说，是' + ['吉凶参半', '贵人相助', '桃花旺盛', '需谨慎行事'][Math.floor(Math.random() * 4)] + 
-                    '的一年。建议' + ['稳重行事', '把握机遇', '多行善事', '注意健康'][Math.floor(Math.random() * 4)] + 
-                    '，可化解凶星、增强吉星。'
-        };
-        
-        showResult(result);
-    }, 2500);
+    // 隐藏表单，显示结果区域（三态：Loading）
+    document.querySelector('.analysis-form').style.display = 'none';
+    document.getElementById('resultArea').style.display = 'block';
+    document.getElementById('resultArea').innerHTML = `
+        <div class="result-card fade-in" style="text-align:center;padding:3rem 1rem;">
+            <div class="fortune-spinner" style="margin:0 auto 1rem;"></div>
+            <p style="color:#ffd700;font-size:1rem;">🔯 正在联网推算流年运势...</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;">大数据实时分析中，请稍候</p>
+        </div>
+    `;
+    
+    const result = await fortuneAPI('analyze', {
+        module_type: 'jiexing',
+        birth_year: birthYear,
+        birth_date: birth,
+        birth_time: time,
+        gender: gender
+    });
+    
+    if (result && result.data) {
+        showResult(result.data, result.meta);
+    } else {
+        // 三态：Error
+        document.getElementById('resultArea').innerHTML = `
+            <div class="result-card fade-in" style="text-align:center;padding:3rem 1rem;">
+                <p style="color:#ff6b6b;font-size:1.2rem;">⚠️ 分析失败</p>
+                <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;">网络连接失败，请检查网络后重试</p>
+                <button type="button" class="submit-btn" style="display:inline-block;width:auto;padding:0.6rem 1.5rem;margin-top:1rem;" onclick="resetForm()">返回重试</button>
+            </div>
+        `;
+    }
 }
 
-function showResult(result) {
+function showResult(data, meta) {
     let html = `
         <div class="result-card fade-in">
             <h3>🔯 流年分析结果</h3>
-            <p><strong>出生日期：</strong>${result.birth}</p>
-            <p><strong>性别：</strong>${result.gender === 'male' ? '男性' : '女性'}</p>
-            <p><strong>分析年份：</strong>${result.year}</p>
-            <p><strong>日干：</strong>${result.dayGan}日</p>
+    `;
+    
+    // 数据来源标识
+    if (meta) {
+        const sourceMap = {
+            'realtime': '🟢 实时联网数据',
+            'cached': '🟡 缓存数据',
+            'local': '🔵 服务器计算',
+            'local_fallback': '🔴 离线数据'
+        };
+        const sourceText = sourceMap[meta.source] || '🔵 服务器计算';
+        html += `<div class="fortune-data-badge" style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:0.8rem;">${sourceText} · ${new Date().toLocaleTimeString('zh-CN')}</div>`;
+    }
+    
+    html += `
+            ${data.birth ? '<p><strong>出生日期：</strong>' + data.birth + '</p>' : ''}
+            ${data.gender ? '<p><strong>性别：</strong>' + (data.gender === 'male' ? '男性' : '女性') + '</p>' : ''}
+            ${data.year ? '<p><strong>分析年份：</strong>' + data.year + '</p>' : ''}
+            ${data.dayGan ? '<p><strong>日干：</strong>' + data.dayGan + '日</p>' : ''}
         </div>
         
         <div class="result-card fade-in">
             <h3>⭐ 吉星高照</h3>
-            <p>${result.luckyStars}</p>
+            <p>${data.luckyStars || '暂无数据'}</p>
             <p>这些吉星将为你带来好运和贵人相助，把握机会，积极进取。</p>
         </div>
         
         <div class="result-card fade-in">
             <h3>⚠️ 凶星临门</h3>
-            <p>${result.unluckyStars}</p>
+            <p>${data.unluckyStars || '暂无数据'}</p>
             <p>这些凶星可能带来挑战和波折，需谨慎行事，提前化解。</p>
         </div>
-        
+    `;
+    
+    // 各方面运势
+    if (data.fortune) {
+        html += `
         <div class="result-card fade-in">
             <h3>📊 各方面运势</h3>
-            <p><strong>事业运：</strong>${result.fortune.career}</p>
-            <p><strong>财运：</strong>${result.fortune.wealth}</p>
-            <p><strong>婚姻运：</strong>${result.fortune.marriage}</p>
-            <p><strong>健康运：</strong>${result.fortune.health}</p>
+            ${data.fortune.career ? '<p><strong>事业运：</strong>' + data.fortune.career + '</p>' : ''}
+            ${data.fortune.wealth ? '<p><strong>财运：</strong>' + data.fortune.wealth + '</p>' : ''}
+            ${data.fortune.marriage ? '<p><strong>婚姻运：</strong>' + data.fortune.marriage + '</p>' : ''}
+            ${data.fortune.health ? '<p><strong>健康运：</strong>' + data.fortune.health + '</p>' : ''}
         </div>
-        
+        `;
+    }
+    
+    html += `
         <div class="result-card fade-in">
             <h3>💡 综合建议</h3>
-            <p>${result.advice}</p>
+            <p>${data.advice || '暂无建议'}</p>
             <div class="tags">
-                <span class="tag">吉星：${result.luckyStars}</span>
-                <span class="tag">凶星：${result.unluckyStars}</span>
+                <span class="tag">吉星：${data.luckyStars || 'N/A'}</span>
+                <span class="tag">凶星：${data.unluckyStars || 'N/A'}</span>
                 <span class="tag">建议：谨慎行事</span>
                 <span class="tag">化解：祭拜太岁</span>
             </div>
@@ -597,7 +629,6 @@ function showResult(result) {
     
     document.getElementById('resultArea').innerHTML = html;
     document.getElementById('resultArea').style.display = 'block';
-    document.querySelector('.analysis-form').style.display = 'none';
 }
 
 function resetForm() {

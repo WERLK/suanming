@@ -2,484 +2,624 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffd700">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="玄机算命">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="msapplication-TileImage" content="/icon-192.png">
-<meta name="msapplication-TileColor" content="#ffd700">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="玄机算命">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="msapplication-TileImage" content="/icon-192.png">
+    <meta name="msapplication-TileColor" content="#ffd700">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>黄道吉日 - 玄机算命网</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>黄历吉日 - 玄机算命网</title>
     <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #0f0c29;
+            color: rgba(255,255,255,0.85);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ===== Stars Background (from main.js) ===== */
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            from { opacity: 0.2; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: #ffd700;
+            padding: 0.6rem 1.5rem; border-radius: 8px; font-size: 0.85rem;
+            z-index: 9999; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none; white-space: nowrap;
+        }
+        .toast.show { opacity: 1; }
+
+        /* ===== Loading Overlay ===== */
+        .fortune-loading-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15,12,41,0.85); z-index: 9998;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .fortune-loading-content { text-align: center; }
+        .fortune-spinner {
+            width: 44px; height: 44px; margin: 0 auto 1rem;
+            border: 3px solid rgba(255,215,0,0.15);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fortune-loading-text { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+        .fortune-loading-sub { font-size: 0.8rem; color: rgba(255,215,0,0.6); margin-top: 0.4rem; }
+        .fortune-loading-hide { opacity: 0; transition: opacity 0.3s; }
+
+        /* ===== page-header ===== */
         .page-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
-            border-bottom: 1px solid rgba(255,215,0,0.15);
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1rem 1.2rem;
+            background: rgba(15,12,41,0.96);
+            border-bottom: 1px solid rgba(255,215,0,0.12);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(10px);
         }
+        .page-header .back-btn {
+            background: none; border: none; color: #ffd700;
+            font-size: 1.3rem; cursor: pointer;
+            padding: 0.3rem 0.6rem; border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .page-header .back-btn:hover { background: rgba(255,215,0,0.1); }
         .page-header h1 {
-            font-size: 1.2rem;
-            color: #ffd700;
-            font-weight: 600;
+            font-size: 1.15rem; color: #ffd700;
+            font-weight: 600; letter-spacing: 0.5px;
         }
-        .back-btn {
-            background: none;
-            border: none;
-            color: #ffd700;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
+
+        /* ===== content-area ===== */
         .content-area {
+            position: relative; z-index: 1;
             padding: 1rem;
             padding-bottom: 80px;
         }
-        .huangdao-intro {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
+
+        /* ===== Date Controls ===== */
+        .date-controls {
+            display: flex; align-items: center; gap: 0.7rem;
+            margin-bottom: 1.2rem; flex-wrap: wrap;
         }
-        .huangdao-intro h2 {
-            color: #ffd700;
-            font-size: 1rem;
-            margin-bottom: 0.8rem;
+        .date-controls input[type="date"] {
+            flex: 1; min-width: 150px;
+            padding: 0.65rem 0.9rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.25);
+            background: rgba(15,12,41,0.7);
+            color: #ffd700; font-size: 0.9rem; outline: none;
+            transition: border-color 0.3s;
         }
-        .huangdao-intro p {
-            font-size: 0.85rem;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.8);
+        .date-controls input[type="date"]:focus {
+            border-color: #ffd700;
         }
-        .event-types {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .event-card {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
-            padding: 1rem;
+        .date-controls input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.8) sepia(1) saturate(5) hue-rotate(10deg);
             cursor: pointer;
-            transition: all 0.3s;
         }
-        .event-card:hover {
-            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
-            transform: translateY(-2px);
+        .btn-today {
+            padding: 0.65rem 1.2rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.35);
+            background: rgba(255,215,0,0.08);
+            color: #ffd700; font-size: 0.85rem;
+            cursor: pointer; white-space: nowrap;
+            transition: background 0.3s;
         }
-        .event-card h3 {
-            color: #ffd700;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+        .btn-today:hover { background: rgba(255,215,0,0.18); }
+
+        /* ===== Card ===== */
+        .huangli-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px; padding: 1.4rem; margin-bottom: 1rem;
         }
-        .event-card p {
-            font-size: 0.8rem;
-            line-height: 1.6;
-            color: rgba(255,255,255,0.7);
+
+        /* ===== Card Header ===== */
+        .card-header { text-align: center; padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,215,0,0.08); }
+        .date-big { font-size: 1.8rem; color: #ffd700; font-weight: 700; }
+        .weekday { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-left: 0.4rem; }
+        .lunar { font-size: 1rem; color: rgba(255,255,255,0.85); margin-top: 0.35rem; }
+        .ganzhi { font-size: 0.85rem; color: rgba(255,215,0,0.75); margin-top: 0.2rem; }
+
+        /* ===== Yi / Ji ===== */
+        .yiji-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem; }
+        .yi-box, .ji-box { padding: 0.7rem; border-radius: 8px; background: rgba(0,0,0,0.2); }
+        .yi-box h4, .ji-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 600; }
+        .yi-box h4 { color: #4ade80; }
+        .ji-box h4 { color: #f87171; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .tag-yi {
+            display: inline-block; padding: 0.2rem 0.55rem;
+            border-radius: 4px; font-size: 0.78rem;
+            background: rgba(74,222,128,0.12); color: #4ade80;
+            border: 1px solid rgba(74,222,128,0.2);
         }
-        .jiansheng-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
+        .tag-ji {
+            display: inline-block; padding: 0.2rem 0.55rem;
+            border-radius: 4px; font-size: 0.78rem;
+            background: rgba(248,113,113,0.12); color: #f87171;
+            border: 1px solid rgba(248,113,113,0.2);
         }
-        .jiansheng-table th,
-        .jiansheng-table td {
-            padding: 0.6rem;
-            text-align: left;
-            font-size: 0.8rem;
-            border-bottom: 1px solid rgba(255,215,0,0.1);
+
+        /* ===== Chongsha ===== */
+        .chongsha-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;
+            padding: 0.7rem; border-radius: 8px;
+            background: rgba(0,0,0,0.2); margin-bottom: 0.8rem;
         }
-        .jiansheng-table th {
-            color: #ffd700;
-            font-weight: 600;
-            background: rgba(255,215,0,0.05);
+        .chongsha-item { text-align: center; }
+        .chongsha-item .label { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-bottom: 0.15rem; }
+        .chongsha-item .value { font-size: 0.9rem; color: #ffd700; font-weight: 600; }
+
+        /* ===== Shen (吉神/凶神) ===== */
+        .shen-section { margin-bottom: 0.6rem; }
+        .shen-section .shen-title { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 0.35rem; }
+        .shen-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+        .shen-tag {
+            font-size: 0.76rem; padding: 0.18rem 0.5rem; border-radius: 4px;
+            background: rgba(255,215,0,0.08); color: rgba(255,255,255,0.7);
         }
-        .jiansheng-table td {
-            color: rgba(255,255,255,0.8);
+        .shen-tag.ji { color: #4ade80; background: rgba(74,222,128,0.1); }
+        .shen-tag.xiong { color: #f87171; background: rgba(248,113,113,0.1); }
+
+        /* ===== 十二值日 ===== */
+        .zhi-ri-bar {
+            display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.8rem;
         }
-        .lucky {
-            color: #0f0;
+        .zr-item {
+            font-size: 0.73rem; padding: 0.2rem 0.5rem; border-radius: 4px;
+            background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.45);
+            text-align: center; min-width: 36px; transition: all 0.2s;
         }
-        .unlucky {
-            color: #f00;
+        .zr-item.active {
+            background: rgba(255,215,0,0.18); color: #ffd700;
+            font-weight: 600; border: 1px solid rgba(255,215,0,0.25);
+        }
+        .zr-item.zr-ji { color: rgba(74,222,128,0.55); }
+        .zr-item.zr-ji.active { color: #4ade80; border-color: rgba(74,222,128,0.25); background: rgba(74,222,128,0.12); }
+        .zr-item.zr-xiong { color: rgba(248,113,113,0.55); }
+        .zr-item.zr-xiong.active { color: #f87171; border-color: rgba(248,113,113,0.25); background: rgba(248,113,113,0.12); }
+
+        /* ===== Recommend ===== */
+        .recommend-box {
+            background: linear-gradient(135deg, rgba(255,215,0,0.04), rgba(255,215,0,0.01));
+            border: 1px solid rgba(255,215,0,0.08);
+            border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem;
+        }
+        .recommend-box h3 { font-size: 0.95rem; color: #ffd700; margin-bottom: 0.6rem; }
+        .rec-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .rec-tag {
+            padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem;
+            background: rgba(74,222,128,0.1); color: #4ade80;
+            border: 1px solid rgba(74,222,128,0.18);
+        }
+
+        /* ===== Knowledge ===== */
+        .knowledge-section {
+            background: linear-gradient(135deg, rgba(255,215,0,0.04), rgba(255,215,0,0.01));
+            border: 1px solid rgba(255,215,0,0.07);
+            border-radius: 12px; padding: 1.1rem;
+        }
+        .knowledge-section h3 { font-size: 0.95rem; color: #ffd700; margin-bottom: 0.5rem; }
+        .knowledge-section p {
+            font-size: 0.8rem; line-height: 1.8; color: rgba(255,255,255,0.65);
+        }
+        .knowledge-tip {
+            margin-top: 0.5rem; padding: 0.5rem 0.7rem; border-radius: 6px;
+            background: rgba(255,215,0,0.06); color: rgba(255,215,0,0.75);
+            font-size: 0.76rem;
+        }
+
+        /* ===== Three-state Management ===== */
+        .loading-state {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 2.5rem 1rem;
+        }
+        .loading-spinner {
+            width: 38px; height: 38px;
+            border: 3px solid rgba(255,215,0,0.12);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loading-text { margin-top: 0.8rem; font-size: 0.85rem; color: rgba(255,255,255,0.55); }
+
+        .error-state { text-align: center; padding: 2rem 1rem; }
+        .error-icon { font-size: 2.2rem; margin-bottom: 0.6rem; }
+        .error-msg { color: rgba(255,255,255,0.65); font-size: 0.85rem; margin-bottom: 1rem; }
+        .error-actions { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
+        .btn-retry {
+            padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.82rem;
+            background: rgba(255,215,0,0.18); color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.25); cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-retry:hover { background: rgba(255,215,0,0.28); }
+        .btn-fallback {
+            padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.82rem;
+            background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.65);
+            border: 1px solid rgba(255,255,255,0.12); cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-fallback:hover { background: rgba(255,255,255,0.15); }
+
+        /* ===== Source Badge ===== */
+        .source-badge {
+            display: inline-block; font-size: 0.7rem; padding: 0.2rem 0.55rem;
+            border-radius: 4px; margin-bottom: 0.8rem;
+        }
+        .source-badge.realtime { background: rgba(74,222,128,0.1); color: #4ade80; }
+        .source-badge.cached { background: rgba(250,204,21,0.1); color: #facc15; }
+        .source-badge.local { background: rgba(59,130,246,0.1); color: #3b82f6; }
+        .source-badge.fallback,
+        .source-badge.local_fallback { background: rgba(248,113,113,0.1); color: #f87171; }
+
+        /* ===== Responsive ===== */
+        @media (min-width: 768px) {
+            .content-area { max-width: 720px; margin: 0 auto; padding: 1.5rem; padding-bottom: 80px; }
+            .chongsha-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+            .page-header { padding: 1rem 2rem; }
         }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
 
-    <div class="app">
-        <div class="page-header">
-            <button type="button" class="back-btn" onclick="history.back()">←</button>
-            <h1>📅 黄道吉日</h1>
+    <!-- page-header: sticky -->
+    <div class="page-header">
+        <button type="button" class="back-btn" onclick="history.back()">&#8592;</button>
+        <h1>&#x1F4C5; 黄历吉日</h1>
+    </div>
+
+    <!-- content-area -->
+    <div class="content-area" id="contentArea">
+        <!-- 日期选择区域 -->
+        <div class="date-controls">
+            <input type="date" id="datePicker" title="选择日期查询黄历" />
+            <button type="button" class="btn-today" id="btnToday">回到今天</button>
         </div>
 
-        <div class="content-area">
-            <div class="huangdao-intro">
-                <h2>黄道吉日简介</h2>
-                <p>黄道吉日是中国传统择日学的重要内容，通过十二建星、二十八星宿、每日宜忌等来判断日子的吉凶。</p>
-                <p>选择吉日办事，可以趋吉避凶，提升成功率。</p>
-            </div>
+        <!-- 动态结果区域 -->
+        <div id="resultContainer"></div>
 
-            <div class="event-types">
-                <div class="event-card" onclick="showEventDetail('marriage')">
-                    <h3>💒 结婚嫁娶</h3>
-                    <p>选择结婚吉日的方法和注意事项...</p>
-                </div>
-                <div class="event-card" onclick="showEventDetail('move')">
-                    <h3>🏠 搬家入宅</h3>
-                    <p>选择搬家吉日的方法和注意事项...</p>
-                </div>
-                <div class="event-card" onclick="showEventDetail('business')">
-                    <h3>🏪 开业开市</h3>
-                    <p>选择开业吉日的方法和注意事项...</p>
-                </div>
-                <div class="event-card" onclick="showEventDetail('construction')">
-                    <h3>🏗 动土修造</h3>
-                    <p>选择动土吉日的方法和注意事项...</p>
-                </div>
-            </div>
-
-                    <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('huangdao')">📷 上传图片分析</button>
-        </div>
-<div class="section">
-                <h2>📅 十二建星吉凶表</h2>
-                <table class="jiansheng-table">
-                    <tr>
-                        <th>建星</th>
-                        <th>吉凶</th>
-                        <th>宜</th>
-                        <th>忌</th>
-                    </tr>
-                    <tr>
-                        <td>建日</td>
-                        <td class="unlucky">平</td>
-                        <td>立基创业、上任</td>
-                        <td>动土、出行</td>
-                    </tr>
-                    <tr>
-                        <td>除日</td>
-                        <td class="lucky">吉</td>
-                        <td>除旧布新、祈福、就医</td>
-                        <td>一</td>
-                    </tr>
-                    <tr>
-                        <td>满日</td>
-                        <td class="lucky">吉</td>
-                        <td>祭祀、纳财</td>
-                        <td>栽种</td>
-                    </tr>
-                    <tr>
-                        <td>平日</td>
-                        <td class="unlucky">平</td>
-                        <td>修造、涂泥</td>
-                        <td>一</td>
-                    </tr>
-                    <tr>
-                        <td>定日</td>
-                        <td class="lucky">吉</td>
-                        <td>签约、纳畜、冠筋</td>
-                        <td>一</td>
-                    </tr>
-                    <tr>
-                        <td>执日</td>
-                        <td class="unlucky">平</td>
-                        <td>守成、捕猎</td>
-                        <td>迁居、出行</td>
-                    </tr>
-                    <tr>
-                        <td>破日</td>
-                        <td class="unlucky">凶</td>
-                        <td>破屋坏垣</td>
-                        <td>诸事不宜</td>
-                    </tr>
-                    <tr>
-                        <td>危日</td>
-                        <td class="unlucky">凶</td>
-                        <td>安床</td>
-                        <td>登高、出行</td>
-                    </tr>
-                    <tr>
-                        <td>成日</td>
-                        <td class="lucky">吉</td>
-                        <td>开业、结婚、入学</td>
-                        <td>一</td>
-                    </tr>
-                    <tr>
-                        <td>收日</td>
-                        <td class="unlucky">平</td>
-                        <td>纳财、收债</td>
-                        <td>开工、出行</td>
-                    </tr>
-                    <tr>
-                        <td>开日</td>
-                        <td class="lucky">吉</td>
-                        <td>开业、出行、结婚</td>
-                        <td>一</td>
-                    </tr>
-                    <tr>
-                        <td>闭日</td>
-                        <td class="unlucky">凶</td>
-                        <td>埋葬</td>
-                        <td>开市、出行</td>
-                    </tr>
-                </table>
-                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.8rem;">
-                    💡 口诀：建满平收黑，除危定执黄，成开皆可用，闭破不相当。
-                </p>
-            </div>
-
-            <div class="section" style="margin-top: 1.5rem;">
-                <h2>💡 如何使用黄道吉日</h2>
-                <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8); margin-bottom: 0.8rem;">
-                    1. <strong>确定事件类型</strong>：先确定你要办什么事（结婚、搬家、开业等）。<br>
-                    2. <strong>选择吉日</strong>：根据事件类型，选择对应的吉日（如结婚选成日、开日）。<br>
-                    3. <strong>避开冲煞</strong>：查看日子是否冲你的生肖，冲则不吉。<br>
-                    4. <strong>结合个人八字</strong>：更精准的择日应结合个人八字喜用神。<br>
-                    5. <strong>参考吉时</strong>：不但要选吉日，还要选吉时（一天中的吉时）。
-                </p>
+        <!-- 黄历知识简介区 -->
+        <div class="knowledge-section">
+            <h3>&#x1F4D6; 关于黄历</h3>
+            <p>
+                黄历，又称皇历、通书，是中国传统历法的重要组成部分。它基于天干地支、阴阳五行理论，
+                结合星宿运行和节令变化，推断每日的吉凶宜忌，为农业活动、民俗仪式和日常生活提供择日参考。吉日选得宜，趋吉避凶顺天时。
+            </p>
+            <div class="knowledge-tip">
+                &#x1F4A1; 口诀：建满平收黑，除危定执黄，成开皆可用，闭破不相当。
             </div>
         </div>
     </div>
 
-    <script src="/js/main.js">
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
+    <script src="/js/main.js"></script>
+    <script src="/js/fortune-api.js"></script>
     <script>
-        // 显示事件详情
-        function showEventDetail(eventType) {
-            let content = '';
-            
-            switch(eventType) {
-                case 'marriage':
-                    content = `<div class="section">
-                        <h2>💒 结婚嫁娶择日详解</h2>
-                        <h3>✅ 首选吉日（按优先级排序）</</h3>
-                        <table class="result-table">
-                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
-                            <tr><td>天德/月德日</td><td>天德、月德、天德合、月德合</td><td class="lucky">大吉（百无禁忌）</td></tr>
-                            <tr><td>三合/六合日</td><td>与新郎新娘生肖三合或六合之日</td><td class="lucky">吉（婚姻和谐长久）</td></tr>
-                            <tr><td>成日/开日</td><td>建星中的成日、开日</td><td class="lucky">吉（事成开放）</td></tr>
-                            <tr><td>天喜/天赦日</td><td>天喜（主喜事）、天赦（主化解）</td><td class="lucky">大吉</td></tr>
-                        </table>
-                        <h3>⚔️ 严格避忌</h3>
-                        <table class="result-table">
-                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
-                            <tr><td>破日/闭日</td><td>建星中的破日、闭日</td><td class="unlucky">凶（破散闭塞）</td></tr>
-                            <tr><td>四离/四绝日</td><td>春分、秋分、夏至、冬至前一日</td><td class="unlucky">凶（气场分离）</td></tr>
-                            <tr><td>三娘煞/杨公忌</td><td>每月初三、初七、十三、十八、廿二、廿七</td><td class="unlucky">凶（传说月老不牵线）</td></tr>
-                            <tr><td>冲生肖</td><td>日子地支冲新郎或新娘生肖</td><td class="unlucky">凶（主婚后不和）</td></tr>
-                        </table>
-                        <h3>📋 其他要点</h3>
-                        <ul>
-                            <li><strong>选女方大利月：</strong>首先看女方生肖所属的大利月（如鼠/马年妇利正/七月）</li>
-                            <li><strong>避开三娘煞：</strong>每月初三、初七、十三、十八、廿二、廿七不宜嫁娶</li>
-                            <li><strong>择吉时：</strong>不但要择吉日，还要择吉时（通常选上午9-11点）</li>
-                        </ul>
-                    </div>`;
-                    break;
-                case 'move':
-                    content = `<div class="section">
-                        <h2>🏠 搬家入宅择日详解</h2>
-                        <h3>✅ 首选吉日</h3>
-                        <table class="result-table">
-                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
-                            <tr><td>天马/成日</td><td>天马（主快运）、建星成日</td><td class="lucky">吉（搬家顺利快速安顿）</td></tr>
-                            <tr><td>开日/天德合</td><td>建星开日、天德合、月德合</td><td class="lucky">大吉（开放纳福）</td></tr>
-                            <tr><td>天财/天仓</td><td>天财（主财运）、天仓（主粮仓富足）</td><td class="lucky">吉（搬家后财运亨通）</td></tr>
-                        </table>
-                        <h3>⚔️ 严格避忌</h3>
-                        <table class="result-table">
-                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
-                            <tr><td>月破/平日</td><td>建星中的月破、平日、收日、闭日</td><td class="unlucky">凶（破散平滞收纳闭塞）</td></tr>
-                            <tr><td>冲家主生肖</td><td>日子地支冲家中经济支柱生肖</td><td class="unlucky">凶（主家运不宁）</td></tr>
-                            <tr><td>五墓/重丧日</td><td>特定方位对应的凶日</td><td class="unlucky">凶（主伤病死丧）</td></tr>
-                        </table>
-                        <h3>📋 其他要点</h3>
-                        <ul>
-                            <li><strong>与宅主命卦相合：</strong>选日子宜配合宅主八字喜用神</li>
-                            <li><strong>入住仪式：</strong>入住时宜全屋开灯3天、烧开水（滚财）、放绿植（生气）</li>
-                            <li><strong>入宅时间：</strong>宜在白天（上午9-15点前）完成入住</li>
-                        </ul>
-                    </div>`;
-                    break;
-                case 'business':
-                    content = `<div class="section">
-                        <h2>🏪 开业开市择日详解</h2>
-                        <h3>✅ 首选吉日</h3>
-                        <table class="result-table">
-                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
-                            <tr><td>满日/成日</td><td>建星满日（主圆满）、成日（主事成）</td><td class="lucky">大吉（开业圆满成功）</td></tr>
-                            <tr><td>开日/天愿</td><td>建星开日（主开放）、天愿日（主天意顺遂）</td><td class="lucky">吉（客源广开）</td></tr>
-                            <tr><td>天财/天仓</td><td>天财（主财运）、天仓（主货仓富足）</td><td class="lucky">吉（开业财源滚滚）</td></tr>
-                        </table>
-                        <h3>⚔️ 严格避忌</h3>
-                        <table class="result-table">
-                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
-                            <tr><td>破日/闭日</td><td>建星破日（主破败）、闭日（主闭塞）</td><td class="unlucky">凶（开业破财闭门塞运）</td></tr>
-                            <tr><td>四废日</td><td>春庚申辛酉、夏壬辰癸巳、秋甲寅乙卯、冬丙戌丁亥</td><td class="unlucky">凶（主四季废歇无成）</td></tr>
-                            <tr><td>冲店主生肖</td><td>日子地支冲店主生肖</td><td class="unlucky">凶（主开业后经营不顺）</td></tr>
-                        </table>
-                        <h3>📋 其他要点</h3>
-                        <ul>
-                            <li><strong>开业时间：</strong>宜在上午（9-11点阳气最足时）举行开业仪式</li>
-                            <li><strong>请舞狮队：</strong>如条件允许，请舞狮队助兴（狮为瑞兽，主挡煞招财）</li>
-                            <li><strong>择吉时：</strong>开业不但要择吉日，还要择吉时（通常选上午9-11点）</li>
-                        </ul>
-                    </div>`;
-                    break;
-                case 'construction':
-                    content = `<div class="section">
-                        <h2>🏗 动土修造择日详解</h2>
-                        <h3>✅ 首选吉日</h3>
-                        <table class="result-table">
-                            <tr><th>吉日类型</th><th>具体名称</th><th>寓意</th></tr>
-                            <tr><td>成日/开日</td><td>建星成日（主事成）、开日（主开放）</td><td class="lucky">吉（动土顺利建成圆满）</td></tr>
-                            <tr><td>天德/月德</td><td>天德（主天庇佑）、月德（主月华庇佑）</td><td class="lucky">大吉（百无禁忌动土平安）</td></tr>
-                            <tr><td>天德合/月德合</td><td>天德合、月德合（与主德合）</td><td class="lucky">吉（主贵人相助顺利应通过）</td></tr>
-                        </table>
-                        <h3>⚔️ 严格避忌</h3>
-                        <table class="result-table">
-                            <tr><th>凶日类型</th><th>具体名称</th><th>后果</th></tr>
-                            <tr><td>月建/土府</td><td>建星月建（主月令当权）、土府（主土神发怒）</td><td class="unlucky">凶（动土犯煞主伤亡）</td></tr>
-                            <tr><td>地囊/土符</td><td>地囊（地主凶煞）、土符（土神符令）</td><td class="unlucky">凶（主动土后家人生病）</td></tr>
-                            <tr><td>冲宅主/坐山</td><td>日子地支冲宅主生肖或房屋坐山方向</td><td class="unlucky">凶（主房主健康受损）</td></tr>
-                        </table>
-                        <h3>📋 其他要点</h3>
-                        <ul>
-                            <li><strong>动土前祭拜：</strong>宜祭拜土地公（用三牲、水果、香烛）</li>
-                            <li><strong>坐向符合风水：</strong>房屋的坐向要符合风水原则（如坐北向南为坎宅，宜选水/火日动土）</li>
-                            <li><strong>动土时间：</strong>宜在上午（阳气足时）动第一铲土，并由宅主先动</li>
-                        </ul>
-                    </div>`;
-                    break;
-            }
-            
-            // 创建弹窗显示
-            const modal = document.createElement('div');
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
-            modal.onclick = () => modal.remove();
-            
-            const modalContent = document.createElement('div');
-            modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
-            modalContent.onclick = (e) => e.stopPropagation();
-            modalContent.innerHTML = content + '<button type="button" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
-            
-            modal.className = 'modal';
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
+    (function() {
+        'use strict';
+
+        // ===== 十二建星 =====
+        var JIANS = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
+        var JIANS_JIXIONG = {
+            '建':'平','除':'吉','满':'吉','平':'平',
+            '定':'吉','执':'平','破':'凶','危':'凶',
+            '成':'吉','收':'平','开':'吉','闭':'凶'
+        };
+
+        // ===== State =====
+        var cachedData = null;
+        var cachedDate = null;
+        var currentDate = getTodayStr();
+
+        // ===== DOM =====
+        var datePicker, btnToday, resultContainer;
+
+        // ===== Helpers =====
+        function getTodayStr() {
+            var d = new Date();
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
         }
 
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-        });
-    </script>
+        function formatWeekday(wd) {
+            var m = {'星期一':'周一','星期二':'周二','星期三':'周三','星期四':'周四','星期五':'周五','星期六':'周六','星期日':'周日'};
+            return m[wd] || wd || '';
+        }
 
-        <!-- 分析表单 -->
-        <div class="tab-content active" id="formTab">
-            <div class="form-container">
-                
-            <div class="form-group">
-                <label class="form-label">事件类型</label>
-                <select class="form-select" id="eventInput">
-                    <option value="嫁娶">嫁娶</option>
-                    <option value="搬家">搬家</option>
-                    <option value="开业">开业</option>
-                    <option value="动土">动土</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">查询月份</label>
-                <input type="month" class="form-input" id="monthInput">
-            </div>
-        
-                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
-            </div>
-        </div>
-        <!-- 结果展示 -->
-        <div class="tab-content" id="resultTab">
-            <div class="result-container" id="resultContainer">
-                
-        <div class="result-section"><h3>📅 黄道吉日查询结果</h3>
-        <div class="analysis-text">
-            <p><strong>事件类型：</strong><span id="eventResult"></span></p>
-            <p><strong>推荐吉日：</strong><span id="dateResult"></span></p>
-            <p><strong>宜：</strong><span id="yiResult"></span></p>
-            <p><strong>忌：</strong><span id="jiResult"></span></p>
-        </div>
-        </div>
-        
-            </div>
-        </div>
-    
-    <script>
-    function calculateModule() {
-        if (window.showToast) window.showToast('正在分析中...');
-        setTimeout(function() {
-            // 这里调用真正的分析计算
-            var resultHtml = generateResultHTML();
-            document.getElementById('resultContainer').innerHTML = resultHtml;
-            if (window.switchTab) window.switchTab('result');
-            if (window.showToast) window.showToast('分析完成！');
-        }, 1200);
-    }
-    
-    function generateResultHTML() {
-        // 读取表单值并生成结果
-        var html = '<div class="result-section fade-in">';
-        html += '<h3>📊 分析结果</h3>';
-        html += '<div class="analysis-text">';
-        html += '<p>根据您提供的信息，分析结果如下：</p>';
-        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
-        html += '</div></div>';
-        return html;
-    }
+        function esc(s) {
+            if (!s) return '';
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        // ===== Compute jian star from date =====
+        function computeJianStar(dateStr) {
+            var base = new Date(Date.UTC(1900, 0, 1));
+            var t = new Date(dateStr + 'T00:00:00+08:00');
+            var diff = Math.floor((t.getTime() - base.getTime()) / 86400000);
+            return JIANS[((diff % 12) + 12) % 12];
+        }
+
+        // ===== Render: Loading =====
+        function showLoading() {
+            resultContainer.innerHTML =
+                '<div class="loading-state">' +
+                '<div class="loading-spinner"></div>' +
+                '<p class="loading-text">正在获取实时黄历数据&#x2026;</p>' +
+                '</div>';
+        }
+
+        // ===== Render: Error =====
+        function showError(msg) {
+            resultContainer.innerHTML =
+                '<div class="error-state">' +
+                '<div class="error-icon">&#x26A0;&#xFE0F;</div>' +
+                '<p class="error-msg">' + esc(msg || '数据获取失败，请检查网络') + '</p>' +
+                '<div class="error-actions">' +
+                '<button class="btn-retry" id="btnRetry">&#x1F504; 重新获取</button>' +
+                '<button class="btn-fallback" id="btnFallback">&#x1F4E1; 使用本地计算</button>' +
+                '</div></div>';
+            document.getElementById('btnRetry').addEventListener('click', function() { load(currentDate); });
+            document.getElementById('btnFallback').addEventListener('click', function() { renderLocal(currentDate); });
+        }
+
+        // ===== Render: Result =====
+        function showResult(data, meta) {
+            if (!data) { showError('返回数据为空'); return; }
+
+            var yi = data.yi || [];
+            var ji = data.ji || [];
+            var jishen = data.jishen || [];
+            var xiongshen = data.xiongshen || [];
+            var activeJian = data.jian_star || '';
+            var source = (meta && meta.source) || 'local';
+
+            var sourceMap = {
+                'realtime': '&#x1F7E2; 实时联网数据',
+                'cached': '&#x1F7E1; 缓存数据',
+                'local': '&#x1F535; 服务器计算',
+                'local_fallback': '&#x1F534; 离线数据'
+            };
+            var badgeLabel = sourceMap[source] || sourceMap['local'];
+            var now = new Date().toLocaleTimeString('zh-CN');
+
+            var h = '';
+
+            // Source badge
+            h += '<div class="source-badge ' + esc(source) + '">' + badgeLabel + ' &#xB7; 更新于 ' + esc(now) + '</div>';
+
+            // Main card
+            h += '<div class="huangli-card">';
+
+            // Card header
+            h += '<div class="card-header">';
+            h += '<span class="date-big">' + esc(data.date || currentDate) + '</span>';
+            if (data.weekday) h += '<span class="weekday">' + esc(formatWeekday(data.weekday)) + '</span>';
+            h += '<div class="lunar">' + esc(data.lunar_date || '') + '</div>';
+            var gz = [];
+            if (data.year_ganzhi) gz.push(esc(data.year_ganzhi) + '年' + (data.shengxiao ? '(' + esc(data.shengxiao) + ')' : ''));
+            if (data.month_ganzhi) gz.push(esc(data.month_ganzhi) + '月');
+            if (data.day_ganzhi) gz.push(esc(data.day_ganzhi) + '日');
+            h += '<div class="ganzhi">' + gz.join(' ') + '</div>';
+            h += '</div>';
+
+            // Yi / Ji grid
+            h += '<div class="yiji-grid">';
+            h += '<div class="yi-box"><h4>&#x2705; 宜</h4><div class="tag-list">';
+            if (yi.length === 0) h += '<span class="tag-yi">&mdash;</span>';
+            for (var i = 0; i < yi.length; i++) h += '<span class="tag-yi">' + esc(yi[i]) + '</span>';
+            h += '</div></div>';
+            h += '<div class="ji-box"><h4>&#x274C; 忌</h4><div class="tag-list">';
+            if (ji.length === 0) h += '<span class="tag-ji">&mdash;</span>';
+            for (var j = 0; j < ji.length; j++) h += '<span class="tag-ji">' + esc(ji[j]) + '</span>';
+            h += '</div></div></div>';
+
+            // Chongsha
+            h += '<div class="chongsha-grid">';
+            h += '<div class="chongsha-item"><div class="label">冲生肖</div><div class="value">' + esc(data.chong_shengxiao || '&mdash;') + '</div></div>';
+            h += '<div class="chongsha-item"><div class="label">煞方</div><div class="value">' + esc(data.sha_direction || '&mdash;') + '</div></div>';
+            h += '<div class="chongsha-item"><div class="label">胎神</div><div class="value">' + esc(data.taishen || '&mdash;') + '</div></div>';
+            h += '<div class="chongsha-item"><div class="label">彭祖</div><div class="value">' + esc(data.pengzu || '&mdash;') + '</div></div>';
+            h += '</div>';
+
+            // Jishen / Xiongshen
+            h += '<div class="shen-section"><div class="shen-title">&#x1F31F; 吉神</div><div class="shen-tags">';
+            if (jishen.length === 0) h += '<span class="shen-tag ji">&mdash;</span>';
+            for (var k = 0; k < jishen.length; k++) h += '<span class="shen-tag ji">' + esc(jishen[k]) + '</span>';
+            h += '</div></div>';
+
+            h += '<div class="shen-section"><div class="shen-title">&#x2620; 凶神</div><div class="shen-tags">';
+            if (xiongshen.length === 0) h += '<span class="shen-tag xiong">&mdash;</span>';
+            for (var m = 0; m < xiongshen.length; m++) h += '<span class="shen-tag xiong">' + esc(xiongshen[m]) + '</span>';
+            h += '</div></div>';
+
+            // Twelve zhi ri
+            h += renderJianStars(activeJian);
+
+            // Recommend
+            var recs = buildRecommend(data);
+            if (recs.length) {
+                h += '<div class="recommend-box"><h3>&#x1F31F; 今日宜办事</h3><div class="rec-tags">';
+                for (var n = 0; n < recs.length; n++) h += '<span class="rec-tag">' + esc(recs[n]) + '</span>';
+                h += '</div></div>';
+            }
+
+            h += '</div>'; // end card
+
+            resultContainer.innerHTML = h;
+        }
+
+        function renderJianStars(active) {
+            var h = '<div class="zhi-ri-bar">';
+            for (var i = 0; i < JIANS.length; i++) {
+                var s = JIANS[i];
+                var jx = JIANS_JIXIONG[s] || '平';
+                var cls = 'zr-item';
+                if (s === active) cls += ' active';
+                if (jx === '吉') cls += ' zr-ji';
+                else if (jx === '凶') cls += ' zr-xiong';
+                h += '<span class="' + cls + '" title="' + s + '：' + jx + '">' + s + '</span>';
+            }
+            h += '</div>';
+            return h;
+        }
+
+        function buildRecommend(data) {
+            var items = [];
+            var yi = data.yi || [];
+            var jian = data.jian_star || '';
+            if (['成','开','除','定'].indexOf(jian) !== -1) {
+                items.push('今日' + jian + '日，百事皆宜');
+            }
+            var priority = ['嫁娶','纳采','订盟','开业','开市','交易','立券','纳财',
+                            '出行','移徙','入宅','安床','动土','修造','上梁','祈福',
+                            '入学','栽种','牧养','会亲友'];
+            var emojiMap = {
+                '嫁娶':'&#x1F492;','纳采':'&#x1F48D;','订盟':'&#x1F91D;','开业':'&#x1F3EA;','开市':'&#x1F3EA;',
+                '交易':'&#x1F4B0;','出行':'&#x1F9F3;','移徙':'&#x1F3E0;','入宅':'&#x1F3E1;','安床':'&#x1F6CF;',
+                '动土':'&#x1F3D7;','修造':'&#x1F528;','祈福':'&#x1F64F;','入学':'&#x1F393;','纳财':'&#x1F4B8;'
+            };
+            for (var p = 0; p < priority.length && items.length < 5; p++) {
+                var a = priority[p];
+                if (yi.indexOf(a) !== -1) {
+                    items.push((emojiMap[a] || '&#x2728;') + ' 适合' + a);
+                }
+            }
+            return items;
+        }
+
+        // ===== Local fallback =====
+        function renderLocal(dateStr) {
+            var date = new Date(dateStr + 'T00:00:00+08:00');
+            var weekdays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+            var tg = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+            var dz = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+            var sx = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+            var lunarMonths = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','冬月','腊月'];
+            var lunarDays = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
+                             '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
+                             '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+
+            var y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
+            var yearGi = (y - 4) % 10, yearZi = (y - 4) % 12;
+            var yearGz = tg[((yearGi % 10) + 10) % 10] + dz[((yearZi % 12) + 12) % 12];
+            var wx = weekdays[date.getDay()];
+            var lunarStr = lunarMonths[m] + lunarDays[(d - 1) % 30];
+            var sxStr = sx[((yearZi % 12) + 12) % 12];
+
+            var jian = computeJianStar(dateStr);
+            var jx = JIANS_JIXIONG[jian];
+            var yiAll = [], jiAll = [];
+            if (jx === '吉') {
+                yiAll = ['嫁娶','出行','开业','交易','修造','祈福','入学','纳财','安床','纳畜'];
+            } else if (jx === '凶') {
+                jiAll = ['嫁娶','出行','开业','动土','安葬','开市'];
+            } else {
+                yiAll = ['祭祀','会亲友','入学','裁衣','安床'];
+                jiAll = ['出行','动土','修造'];
+            }
+
+            var chongIdx = ((yearZi + 6) % 12 + 12) % 12;
+            var shaDirs = ['北','东北','东北','东','东南','南','西南','西','西北','北','东北','西南'];
+
+            var localData = {
+                date: dateStr,
+                weekday: wx,
+                lunar_date: '农历' + lunarStr,
+                lunar_year: y + '年',
+                year_ganzhi: yearGz,
+                month_ganzhi: tg[((y * 2 + m) % 10 + 10) % 10] + dz[((m + 2) % 12 + 12) % 12],
+                day_ganzhi: tg[((y * 5 + m * 3 + d) % 10 + 10) % 10] + dz[((y * 3 + m * 2 + d) % 12 + 12) % 12],
+                yi: yiAll, ji: jiAll,
+                chong_shengxiao: sx[chongIdx],
+                sha_direction: shaDirs[chongIdx],
+                jishen: jx === '吉' ? ['天德','月德','天喜','驿马'] : (jx === '平' ? ['天恩','月恩'] : []),
+                xiongshen: jx === '凶' ? ['天罡','地煞'] : (jx === '平' ? ['小耗'] : []),
+                jian_star: jian,
+                shengxiao: sxStr,
+                taishen: '厨灶',
+                pengzu: '不远行'
+            };
+
+            showResult(localData, { source: 'local_fallback' });
+        }
+
+        // ===== Load =====
+        async function load(dateStr) {
+            showLoading();
+            currentDate = dateStr;
+
+            if (cachedDate === dateStr && cachedData && cachedData.success) {
+                showResult(cachedData.data, cachedData.meta);
+                return;
+            }
+
+            try {
+                var result = await fortuneGetAPI('huangli', { date: dateStr });
+                if (result && result.success) {
+                    cachedData = result;
+                    cachedDate = dateStr;
+                    showResult(result.data, result.meta);
+                } else {
+                    renderLocal(dateStr);
+                }
+            } catch (e) {
+                console.error('黄历API error:', e);
+                showError('网络连接失败，请检查网络后重试');
+            }
+        }
+
+        // ===== Init =====
+        function init() {
+            datePicker = document.getElementById('datePicker');
+            btnToday = document.getElementById('btnToday');
+            resultContainer = document.getElementById('resultContainer');
+
+            datePicker.value = currentDate;
+
+            datePicker.addEventListener('change', function() {
+                var v = this.value;
+                if (!v) return;
+                load(v);
+            });
+
+            btnToday.addEventListener('click', function() {
+                var today = getTodayStr();
+                datePicker.value = today;
+                load(today);
+            });
+
+            load(currentDate);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
     </script>
-    </body>
+</body>
 </html>

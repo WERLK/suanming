@@ -215,8 +215,46 @@ function triggerImageUpload(moduleType) {
     input.click();
 }
 </script>
+    <script src="/js/fortune-api.js"></script>
     <script>
-        function analyzeName() {
+        // ===== 本地降级算法 =====
+        function localAnalyzeName(name) {
+            const strokes = [];
+            for (let i = 0; i < name.length; i++) {
+                strokes.push((name.charCodeAt(i) % 30) + 1);
+            }
+            
+            const tiange = strokes.length > 0 ? strokes[0] + 1 : 1;
+            const renge = strokes.length > 1 ? strokes[0] + strokes[1] : strokes[0] || 1;
+            const dige = strokes.length > 1 ? strokes[1] + 1 : strokes[0] || 1;
+            const waige = strokes.length > 1 ? strokes[strokes.length - 1] + 1 : strokes[0] || 1;
+            const zongge = strokes.reduce((a, b) => a + b, 0);
+            
+            const total = tiange + renge + dige + waige + zongge;
+            const score = Math.min(95, Math.max(50, Math.floor((total / 5) * 2)));
+            const label = score >= 90 ? '大吉' : score >= 80 ? '吉' : score >= 70 ? '中吉' : '一般';
+            
+            return {
+                data: {
+                    name: name,
+                    strokes: strokes,
+                    grids: { tiange, renge, dige, waige, zongge },
+                    score: score,
+                    summary: '三才配置' + label + '（本地简化计算）',
+                    analysis: '此结果为本地简化算法通过五格剖象法计算，仅供参考。如需精确分析，请检查网络后重试联网版本。'
+                },
+                meta: { source: 'local_fallback' }
+            };
+        }
+
+        // ===== 吉凶判断辅助 =====
+        function getJixiong(val) {
+            if (!val && val !== 0) return '—';
+            const lucky = [1,3,5,6,7,8,11,13,15,16,17,18,21,23,24,25,29,31,32,33,35,37,39,41,45,47,48,52,57,61,63,65,67,68,81];
+            return lucky.includes(val) ? '吉' : '凶';
+        }
+
+        async function analyzeName() {
             const name = document.getElementById('nameInput').value.trim();
             
             if (!name) {
@@ -224,42 +262,46 @@ function triggerImageUpload(moduleType) {
                 return;
             }
 
-            window.showToast('正在分析姓名...');
+            // 调用后端 API
+            const response = await fortuneAPI('xingming', {name: name}, {
+                showLoading: true,
+                loadingMsg: '正在联网分析姓名数据...'
+            });
 
-            setTimeout(() => {
-                // 模拟API调用
-                const result = {
-                    name: name,
-                    wuge: {
-                        tiange: Math.floor(Math.random() * 81) + 1,
-                        renge: Math.floor(Math.random() * 81) + 1,
-                        dige: Math.floor(Math.random() * 81) + 1,
-                        waige: Math.floor(Math.random() * 81) + 1,
-                        zongge: Math.floor(Math.random() * 81) + 1
-                    },
-                    sancai: ['木', '火', '土'][Math.floor(Math.random() * 3)] + '、' + 
-                             ['火', '土', '金'][Math.floor(Math.random() * 3)] + '、' + 
-                             ['土', '金', '水'][Math.floor(Math.random() * 3)],
-                    score: Math.floor(Math.random() * 26) + 70,
-                    analysis: '姓名三才配置' + ['吉祥', '大吉', '中吉'][Math.floor(Math.random() * 3)] + 
-                              '，五行相' + ['生', '克'][Math.floor(Math.random() * 2)] + 
-                              '，寓意' + ['美好', '深刻', '独特'][Math.floor(Math.random() * 3)] + 
-                              '，是一个' + ['好名字', '不错的名字', '有潜力的名字'][Math.floor(Math.random() * 3)] + '。'
+            if (response && response.success) {
+                showResult(response.data, response.meta);
+            } else {
+                // API 失败，显示错误状态并提供降级
+                document.getElementById('formArea').style.display = 'none';
+                document.getElementById('resultArea').style.display = 'block';
+
+                const retryFn = function() {
+                    document.getElementById('formArea').style.display = 'block';
+                    document.getElementById('resultArea').style.display = 'none';
+                    analyzeName();
+                };
+                const fallbackFn = function() {
+                    const fallbackResult = localAnalyzeName(name);
+                    showResult(fallbackResult.data, fallbackResult.meta);
                 };
 
-                showResult(result);
-            }, 1500);
+                showFortuneError('resultArea', '大数据分析服务暂时不可用，请重试或使用本地计算', retryFn, fallbackFn);
+            }
         }
 
-        function showResult(result) {
+        function showResult(data, meta) {
+            const score = data.score || 0;
+            const scoreLabel = score >= 90 ? '大吉' : score >= 80 ? '吉' : score >= 70 ? '中吉' : '一般';
+            const grids = data.grids || {};
+            
             let html = `
                 <div class="section fade-in">
-                    <h3>📝 姓名：${result.name}</h3>
+                    <h3>📝 姓名：${data.name}</h3>
                 </div>
 
                 <div class="score-display fade-in">
-                    <div class="score-number">${result.score}分</div>
-                    <div class="score-text">${result.score >= 90 ? '大吉' : result.score >= 80 ? '吉' : result.score >= 70 ? '中吉' : '一般'}</div>
+                    <div class="score-number">${score}分</div>
+                    <div class="score-text">${scoreLabel}</div>
                 </div>
 
                 <div class="section fade-in">
@@ -272,28 +314,28 @@ function triggerImageUpload(moduleType) {
                         </tr>
                         <tr>
                             <td>天格</td>
-                            <td>${result.wuge.tiange}</td>
-                            <td>${result.wuge.tiange <= 21 || result.wuge.tiange === 23 || result.wuge.tiange === 24 || result.wuge.tiange === 31 || result.wuge.tiange === 32 ? '吉' : '凶'}</td>
+                            <td>${grids.tiange || '—'}</td>
+                            <td>${getJixiong(grids.tiange)}</td>
                         </tr>
                         <tr>
                             <td>人格</td>
-                            <td>${result.wuge.renge}</td>
-                            <td>${result.wuge.renge <= 21 || result.wuge.renge === 23 || result.wuge.renge === 24 || result.wuge.renge === 31 || result.wuge.renge === 32 ? '吉' : '凶'}</td>
+                            <td>${grids.renge || '—'}</td>
+                            <td>${getJixiong(grids.renge)}</td>
                         </tr>
                         <tr>
                             <td>地格</td>
-                            <td>${result.wuge.dige}</td>
-                            <td>${result.wuge.dige <= 21 || result.wuge.dige === 23 || result.wuge.dige === 24 || result.wuge.dige === 31 || result.wuge.dige === 32 ? '吉' : '凶'}</td>
+                            <td>${grids.dige || '—'}</td>
+                            <td>${getJixiong(grids.dige)}</td>
                         </tr>
                         <tr>
                             <td>外格</td>
-                            <td>${result.wuge.waige}</td>
-                            <td>${result.wuge.waige <= 21 || result.wuge.waige === 23 || result.wuge.waige === 24 || result.wuge.waige === 31 || result.wuge.waige === 32 ? '吉' : '凶'}</td>
+                            <td>${grids.waige || '—'}</td>
+                            <td>${getJixiong(grids.waige)}</td>
                         </tr>
                         <tr>
                             <td>总格</td>
-                            <td>${result.wuge.zongge}</td>
-                            <td>${result.wuge.zongge <= 21 || result.wuge.zongge === 23 || result.wuge.zongge === 24 || result.wuge.zongge === 31 || result.wuge.zongge === 32 ? '吉' : '凶'}</td>
+                            <td>${grids.zongge || '—'}</td>
+                            <td>${getJixiong(grids.zongge)}</td>
                         </tr>
                     </table>
                 </div>
@@ -301,19 +343,14 @@ function triggerImageUpload(moduleType) {
                 <div class="section fade-in">
                     <h3>⚖️ 三才配置</h3>
                     <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
-                        三才（天格、人格、地格）五行配置：<strong>${result.sancai}</strong>
-                    </p>
-                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6; margin-top: 0.5rem;">
-                        ${result.sancai.includes('木') && result.sancai.includes('火') ? '三才配置吉祥，木火相生，主事业顺利、财运亨通。' : 
-                          result.sancai.includes('火') && result.sancai.includes('土') ? '三才配置大吉，火土相生，主名声远扬、地位提升。' : 
-                          '三才配置中等，需注意五行平衡，可通过改名或调整来改善。'}
+                        ${data.summary || '暂无三才配置信息'}
                     </p>
                 </div>
 
                 <div class="section fade-in">
                     <h3>💡 综合分析</h3>
                     <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
-                        ${result.analysis}
+                        ${data.analysis || '暂无分析结果'}
                     </p>
                 </div>
 
@@ -325,6 +362,11 @@ function triggerImageUpload(moduleType) {
             document.getElementById('formArea').style.display = 'none';
             document.getElementById('resultArea').innerHTML = html;
             document.getElementById('resultArea').style.display = 'block';
+
+            // 显示数据来源标识
+            if (meta && meta.source) {
+                showDataBadge(meta.source, 'resultArea');
+            }
         }
 
         function resetForm() {

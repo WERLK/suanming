@@ -1053,3 +1053,193 @@ body {
         display: none;
     }
 }
+
+/* ============================================================
+   大数据联网实时分析 - UI 组件样式
+   ============================================================ */
+
+/* -------- Loading 全屏遮罩 -------- */
+.fortune-loading-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(15, 12, 41, 0.92);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    animation: fortuneFadeIn 0.3s ease;
+}
+.fortune-loading-hide {
+    animation: fortuneFadeOut 0.3s ease forwards;
+}
+@keyframes fortuneFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes fortuneFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+.fortune-loading-content {
+    text-align: center;
+}
+.fortune-spinner {
+    width: 50px; height: 50px;
+    border: 3px solid rgba(255,215,0,0.15);
+    border-top-color: #ffd700;
+    border-radius: 50%;
+    animation: fortuneSpin 0.8s linear infinite;
+    margin: 0 auto 1.5rem;
+}
+@keyframes fortuneSpin {
+    to { transform: rotate(360deg); }
+}
+.fortune-loading-text {
+    color: #ffd700;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.fortune-loading-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+}
+
+/* -------- 数据来源标识 -------- */
+.fortune-data-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+.badge-realtime {
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    color: #4caf50;
+}
+.badge-cached {
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+}
+.badge-local {
+    background: rgba(33, 150, 243, 0.15);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    color: #2196f3;
+}
+.badge-fallback {
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    color: #f44336;
+}
+
+/* -------- 错误状态 -------- */
+.fortune-error-state {
+    background: linear-gradient(135deg, rgba(244,67,54,0.08), rgba(244,67,54,0.02));
+    border: 1px solid rgba(244,67,54,0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin: 1rem 0;
+}
+.fortune-error-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+}
+.fortune-error-message {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+}
+.fortune-error-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.fortune-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.fortune-btn-retry {
+    background: linear-gradient(135deg, #d4a017, #ffd700);
+    color: #1a1a2e;
+}
+.fortune-btn-retry:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+}
+.fortune-btn-fallback {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,215,0,0.2);
+    color: rgba(255,255,255,0.8);
+}
+.fortune-btn-fallback:hover {
+    background: rgba(255,215,0,0.1);
+}
+
+/* -------- 图片分析结果（升级版） -------- */
+.image-analysis-result {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+.image-analysis-result h3 {
+    color: #ffd700;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+.analysis-text {
+    white-space: pre-wrap;
+    font-family: inherit;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.8;
+    font-size: 0.9rem;
+    background: rgba(0,0,0,0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.8rem 0;
+}
+.image-analysis-result .close-btn {
+    background: rgba(255,215,0,0.2);
+    color: #ffd700;
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* -------- API状态指示器（页面顶部） -------- */
+.fortune-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.5);
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,215,0,0.05);
+}
+.fortune-status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4caf50;
+}
+.fortune-status-dot.offline {
+    background: #f44336;
+}

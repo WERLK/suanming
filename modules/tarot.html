@@ -2,404 +2,859 @@
 <html lang="zh-CN">
 <head>
     <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffd700">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="玄机算命">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="msapplication-TileImage" content="/icon-192.png">
-<meta charset="UTF-8">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="玄机算命">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="msapplication-TileImage" content="/icon-192.png">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>塔罗牌 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a);
+            color: #fff;
+            min-height: 100vh;
+        }
+
         .page-header {
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem;
-            background: linear-gradient(180deg, rgba(15,12,41,0.8), rgba(26,26,46,0.5));
+            padding: 1rem 1.2rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.95), rgba(26,26,46,0.85));
             border-bottom: 1px solid rgba(255,215,0,0.15);
-        }
-        .page-header h1 {
-            font-size: 1.2rem;
-            color: #ffd700;
-            font-weight: 600;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         .back-btn {
             background: none;
             border: none;
             color: #ffd700;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
-            padding: 0.5rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+            transition: background 0.2s;
         }
+        .back-btn:hover { background: rgba(255,215,0,0.1); }
+        .page-header h1 {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
         .content-area {
-            padding: 1rem;
-            padding-bottom: 80px;
-        }
-        .tarot-intro {
-            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
+            max-width: 900px;
+            margin: 0 auto;
             padding: 1.2rem;
+            padding-bottom: 100px;
+        }
+
+        /* ===== 引导区 ===== */
+        .guidance-area {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(138,43,226,0.06));
+            border: 1px solid rgba(255,215,0,0.1);
+        }
+        .guidance-area .icon-mystic {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+        .guidance-area p {
+            font-size: 0.92rem;
+            color: rgba(255,255,255,0.82);
+            line-height: 1.8;
+            margin-bottom: 0.3rem;
+        }
+        .guidance-area .sub-hint {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== 抽牌按钮区 ===== */
+        .draw-section {
+            text-align: center;
             margin-bottom: 1.5rem;
         }
-        .tarot-intro h2 {
+        .btn-draw {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1040;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(255,215,0,0.35);
+            transition: all 0.3s ease;
+            letter-spacing: 0.06em;
+        }
+        .btn-draw:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 32px rgba(255,215,0,0.5);
+        }
+        .btn-draw:active {
+            transform: scale(0.96);
+        }
+        .btn-draw:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ===== 牌面展示区 ===== */
+        .cards-stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            min-height: 280px;
+            margin-bottom: 1.5rem;
+        }
+
+        .tarot-card-container {
+            perspective: 800px;
+            width: 150px;
+            aspect-ratio: 3/4;
+            cursor: pointer;
+        }
+
+        .tarot-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .tarot-card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .tarot-card-front,
+        .tarot-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+        }
+
+        .tarot-card-front {
+            background: linear-gradient(145deg, #1a1040, #0f0c29);
+            border: 2px solid rgba(255,215,0,0.4);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-front-inner {
+            width: 85%;
+            height: 85%;
+            border: 1.5px solid rgba(255,215,0,0.25);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));
+            gap: 0.4rem;
+        }
+        .card-front-inner .mystic-symbol {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+        .card-front-inner .flip-text {
+            font-size: 0.72rem;
+            color: rgba(255,215,0,0.6);
+            letter-spacing: 0.05em;
+        }
+        .card-position-label {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.04em;
+        }
+
+        .tarot-card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(145deg, #1a1040, #0f0c29);
+            border: 2px solid rgba(255,215,0,0.5);
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.3rem;
+        }
+        .card-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #ffd700;
+            line-height: 1.3;
+        }
+        .card-type-tag {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.45);
+            padding: 0.12rem 0.5rem;
+            border: 1px solid rgba(255,215,0,0.18);
+            border-radius: 10px;
+        }
+        .card-direction {
+            font-size: 0.65rem;
+            color: rgba(255,215,0,0.7);
+        }
+
+        /* 洗牌动画 */
+        @keyframes shuffle {
+            0%   { transform: translateX(0) rotate(0deg) scale(1); opacity: 1; }
+            15%  { transform: translateX(80px) rotate(18deg) scale(0.85); opacity: 0.5; }
+            30%  { transform: translateX(-60px) rotate(-12deg) scale(0.9); opacity: 0.7; }
+            45%  { transform: translateX(40px) rotate(10deg) scale(0.85); opacity: 0.6; }
+            60%  { transform: translateX(-30px) rotate(-7deg) scale(0.95); opacity: 0.8; }
+            75%  { transform: translateX(15px) rotate(5deg) scale(0.9); opacity: 0.75; }
+            100% { transform: translateX(0) rotate(0deg) scale(1); opacity: 1; }
+        }
+        .shuffling .tarot-card-container {
+            animation: shuffle 0.8s ease-in-out;
+        }
+
+        /* ===== 操作按钮区 ===== */
+        .actions-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .btn-redraw {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.85rem;
+            color: #ffd700;
+            background: rgba(255,215,0,0.08);
+            border: 1px solid rgba(255,215,0,0.25);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-redraw:hover {
+            background: rgba(255,215,0,0.18);
+            border-color: rgba(255,215,0,0.4);
+        }
+
+        /* ===== 数据来源标识（全局 badge 样式补充） ===== */
+        .data-source-badge-container {
+            text-align: center;
+            padding: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .data-source-badge-container .badge-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 0.35rem;
+            vertical-align: middle;
+        }
+        .badge-dot.realtime { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,0.5); }
+        .badge-dot.cached   { background: #ffb300; box-shadow: 0 0 6px rgba(255,179,0,0.5); }
+        .badge-dot.local    { background: #2196f3; box-shadow: 0 0 6px rgba(33,150,243,0.5); }
+        .badge-text {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+            vertical-align: middle;
+        }
+
+        /* ===== 牌面解读区 ===== */
+        .reading-section {
+            margin-bottom: 1.5rem;
+        }
+        .reading-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .reading-card {
+            background: linear-gradient(135deg, rgba(15,12,41,0.92), rgba(26,26,46,0.85));
+            border: 1px solid rgba(255,215,0,0.18);
+            border-radius: 14px;
+            padding: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .reading-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+        }
+        .reading-card .card-header-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        .reading-card .pos-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            padding: 0.12rem 0.5rem;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .reading-card .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #ffd700;
+            flex: 1;
+        }
+        .reading-card .card-type {
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.42);
+        }
+        .reading-card .toggle-dir {
+            display: inline-flex;
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .reading-card .toggle-dir button {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.55);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reading-card .toggle-dir button.active {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1040;
+            font-weight: 600;
+        }
+        .reading-card .meaning-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: rgba(255,215,0,0.72);
+            margin-bottom: 0.35rem;
+        }
+        .reading-card .meaning-text {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.78);
+            line-height: 1.75;
+        }
+        .reading-card .desc-text {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.52);
+            line-height: 1.65;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* ===== 三态：Loading / Error / Result ===== */
+        .loading-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: rgba(255,255,255,0.5);
+        }
+        .loading-state .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,215,0,0.12);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: rgba(255,255,255,0.5);
+        }
+        .error-state .err-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+        .error-state .err-msg  { font-size: 0.88rem; margin-bottom: 1rem; color: rgba(255,255,255,0.55); }
+        .error-state button {
+            padding: 0.5rem 1.3rem;
+            background: rgba(255,215,0,0.12);
+            color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .error-state button:hover { background: rgba(255,215,0,0.2); }
+
+        /* ===== 综合解读 ===== */
+        .overall-reading {
+            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(138,43,226,0.05));
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .overall-reading h3 {
+            color: #ffd700;
+            font-size: 0.92rem;
+            margin-bottom: 0.6rem;
+        }
+        .overall-reading p {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+
+        /* ===== 塔罗基础知识区 ===== */
+        .knowledge-section {
+            margin-bottom: 1.5rem;
+        }
+        .knowledge-section h2 {
             color: #ffd700;
             font-size: 1rem;
             margin-bottom: 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid rgba(255,215,0,0.15);
         }
-        .tarot-intro p {
-            font-size: 0.85rem;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 0.5rem;
-        }
-        .tarot-types {
+        .knowledge-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.8rem;
         }
-        .tarot-type-card {
-            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2));
+        .knowledge-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(138,43,226,0.04));
             border: 1px solid rgba(255,215,0,0.1);
             border-radius: 12px;
             padding: 1rem;
         }
-        .tarot-type-card h3 {
+        .knowledge-card h3 {
             color: #ffd700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 0.5rem;
         }
-        .tarot-type-card p {
-            font-size: 0.8rem;
-            line-height: 1.6;
-            color: rgba(255,255,255,0.7);
+        .knowledge-card p {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
         }
-        .major-arcana {
-            margin-bottom: 1.5rem;
+
+        /* ===== 响应式 ===== */
+        /* 平板 */
+        @media (min-width: 768px) {
+            .tarot-card-container {
+                width: 160px;
+            }
+            .reading-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .cards-stage {
+                gap: 1.5rem;
+                min-height: 320px;
+            }
         }
-        .major-arcana h2 {
-            color: #ffd700;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255,215,0,0.2);
+        /* 桌面 */
+        @media (min-width: 1024px) {
+            .tarot-card-container {
+                width: 170px;
+            }
+            .content-area {
+                padding: 1.5rem 2rem;
+                padding-bottom: 100px;
+            }
+            .cards-stage {
+                gap: 2rem;
+                min-height: 340px;
+            }
         }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 0.8rem;
+        /* 小屏手机 */
+        @media (max-width: 480px) {
+            .tarot-card-container {
+                width: 120px;
+            }
+            .cards-stage {
+                gap: 0.6rem;
+                min-height: 220px;
+            }
+            .card-name { font-size: 0.7rem; }
         }
-        .tarot-card {
-            background: linear-gradient(135deg, rgba(255,215,0,0.8), rgba(255,215,0,0.3));
-            border: 1px solid rgba(255,215,0,0.15);
-            border-radius: 8px;
-            padding: 0.8rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
+
+        /* 淡入动画 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
         }
-        .tarot-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255,215,0,0.2);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        .card-number {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 0.3rem;
+
+        /* 星星背景 */
+        .star {
+            position: fixed;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
         }
-        .card-name {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.9);
-            font-weight: 500;
+        @keyframes twinkle {
+            from { opacity: 0.3; }
+            to   { opacity: 1; }
         }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
 
-    <div class="app">
-        <div class="page-header">
-            <button type="button" type="button" class="back-btn" onclick="history.back()">←</button>
-            <h1>🎴 塔罗牌</h1>
-        </div>
-
-        <div class="content-area">
-            <div class="tarot-intro">
-                <h2>塔罗牌简介</h2>
-                <p>塔罗牌是一种古老的占卜工具，由78张牌组成，分为大阿卡纳（22张）和小阿卡纳（56张）两部分。</p>
-                <p>通过牌面的象征意义，可以探索潜意识、预测未来趋势、获取人生指引。</p>
-            </div>
-
-            <div class="tarot-types">
-                <div class="tarot-type-card">
-                    <h3>🎴 大阿卡纳（22张）</h3>
-                    <p>代表人生重大主题和灵性课题，象征人生旅程中的重要阶段。如：愚者、魔术师、女祭司、皇后、皇帝等。</p>
-                </div>
-                <div class="tarot-type-card">
-                    <h3>🃏 小阿卡纳（56张）</h3>
-                    <p>代表日常生活中的具体情况和事件，分为四个花色：圣杯（水）、权杖（火）、宝剑（风）、星币（土）。</p>
-                </div>
-            </div>
-
-            <div class="major-arcana">
-                <h2>🎴 大阿卡纳牌意速查</h2>
-                        <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('tarot')">📷 上传图片分析</button>
-        </div>
-<div class="card-grid">
-                    <div class="tarot-card" onclick="showCardDetail('愚者')">
-                        <div class="card-number">0</div>
-                        <div class="card-name">愚者</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('魔术师')">
-                        <div class="card-number">I</div>
-                        <div class="card-name">魔术师</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('女祭司')">
-                        <div class="card-number">II</div>
-                        <div class="card-name">女祭司</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('皇后')">
-                        <div class="card-number">III</div>
-                        <div class="card-name">皇后</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('皇帝')">
-                        <div class="card-number">IV</div>
-                        <div class="card-name">皇帝</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('教皇')">
-                        <div class="card-number">V</div>
-                        <div class="card-name">教皇</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('恋人')">
-                        <div class="card-number">VI</div>
-                        <div class="card-name">恋人</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('战车')">
-                        <div class="card-number">VII</div>
-                        <div class="card-name">战车</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('力量')">
-                        <div class="card-number">VIII</div>
-                        <div class="card-name">力量</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('隐士')">
-                        <div class="card-number">IX</div>
-                        <div class="card-name">隐士</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('命运之轮')">
-                        <div class="card-number">X</div>
-                        <div class="card-name">命运之轮</div>
-                    </div>
-                    <div class="tarot-card" onclick="showCardDetail('正义')">
-                        <div class="card-number">XI</div>
-                        <div class="card-name">正义</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>💡 如何使用塔罗牌</h2>
-                <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8); margin-bottom: 0.8rem;">
-                    1. <strong>准备</strong>：选择安静的环境，放松心情，专注于你的问题。<br>
-                    2. <strong>洗牌</strong>：将牌面朝下，专心洗牌，同时心中默念你的问题。<br>
-                    3. <strong>抽牌</strong>：根据需要选择合适的牌阵（如三张牌阵、凯尔特十字阵等），然后抽牌。<br>
-                    4. <strong>解读</strong>：根据牌的正位/逆位含义，结合你的问题进行解读。<br>
-                    5. <strong>反思</strong>：塔罗牌不是绝对的预言，而是帮助你思考和决策的指引工具。
-                </p>
-            </div>
-        </div>
+    <!-- ===== Sticky Header ===== -->
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()" aria-label="返回">&#8592;</button>
+        <h1>🃏 塔罗牌占卜</h1>
     </div>
 
-    <script src="/js/main.js">
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
-    <script>
-        // 牌意数据（简化版）
-        const cardMeanings = {
-            '愚者': {
-                upright: '新的开始、纯真、自发性、信任直觉',
-                reversed: '鲁莽、缺乏计划、不切实际'
-            },
-            '魔术师': {
-                upright: '创造力、技能、显化、自信',
-                reversed: '操纵、欺骗、缺乏方向、自我怀疑'
-            },
-            '女祭司': {
-                upright: '直觉、神秘、内在智慧、潜意识',
-                reversed: '忽视直觉、秘密被揭露、缺乏内在平衡'
-            },
-            '皇后': {
-                upright: '丰饶、滋养、美丽、自然',
-                reversed: '创造力受阻、过度依赖、不安全感'
-            },
-            '皇帝': {
-                upright: '领导力、权威、结构、稳定',
-                reversed: '过于控制、缺乏纪律、权威被挑战'
-            },
-            '教皇': {
-                upright: '传统、精神指引、教育、信仰',
-                reversed: '质疑传统、寻求非传统道路、教条主义'
-            },
-            '恋人': {
-                upright: '爱情、选择、和谐、价值观',
-                reversed: '价值观冲突、关系不和谐、糟糕选择'
-            },
-            '战车': {
-                upright: '决心、意志力、胜利、前进',
-                reversed: '失去控制、缺乏方向、挫折'
-            },
-            '力量': {
-                upright: '勇气、耐心、同情、内在力量',
-                reversed: '自我怀疑、缺乏自制力、恐惧'
-            },
-            '隐士': {
-                upright: '内省、孤独、智慧、寻找',
-                reversed: '孤立、拒绝寻求指引、过度内向'
-            },
-            '命运之轮': {
-                upright: '变化、循环、命运、转折点',
-                reversed: '厄运、抗拒变化、失控感'
-            },
-            '正义': {
-                upright: '公正、真相、责任、因果',
-                reversed: '不公平对待、逃避责任、偏见'
-            }
-        };
+    <div class="content-area">
 
-        // 显示牌意详情
-        function showCardDetail(cardName) {
-            const meaning = cardMeanings[cardName];
-            if (!meaning) return;
+        <!-- ===== 占卜引导区 ===== -->
+        <div class="guidance-area fade-in">
+            <span class="icon-mystic">🔮</span>
+            <p>请集中精神，默念你的问题...</p>
+            <p class="sub-hint">心诚则灵 · 塔罗牌将为你揭示命运的线索</p>
+        </div>
 
-            let html = `
-                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,215,0,0.2); border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
-                    <h3 style="color: #ffd700; font-size: 1.1rem; margin-bottom: 1rem;">🎴 ${cardName}</h3>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <h4 style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 0.5rem;">正位含义</h4>
-                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8);">${meaning.upright}</p>
-                    </div>
-                    
-                    <div>
-                        <h4 style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 0.5rem;">逆位含义</h4>
-                        <p style="font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8);">${meaning.reversed}</p>
-                    </div>
+        <!-- ===== 抽牌按钮 ===== -->
+        <div class="draw-section" id="drawSection">
+            <button class="btn-draw" id="btnDraw" onclick="handleDraw()">🔮 开始抽牌</button>
+        </div>
+
+        <!-- ===== 三张牌翻牌展示区 ===== -->
+        <div class="cards-stage" id="cardsStage"></div>
+
+        <!-- ===== 操作按钮 ===== -->
+        <div class="actions-row" id="actionsRow" style="display:none;">
+            <button class="btn-redraw" onclick="handleRedraw()">🔄 重新抽牌</button>
+        </div>
+
+        <!-- ===== 数据来源标识 ===== -->
+        <div class="data-source-badge-container" id="dataSourceBadge" style="display:none;"></div>
+
+        <!-- ===== 牌面解读区 ===== -->
+        <div class="reading-section" id="readingSection"></div>
+
+        <!-- ===== 塔罗基础知识 ===== -->
+        <div class="knowledge-section">
+            <h2>📜 塔罗牌基础知识</h2>
+            <div class="knowledge-grid">
+                <div class="knowledge-card">
+                    <h3>🂧 大阿卡纳（Major Arcana）— 22张</h3>
+                    <p>代表人生重大主题和灵性课题，象征人生旅程中的重要阶段。从"愚者"到"世界"，描绘了一条完整的灵性成长之路，如：愚者、魔术师、女祭司、皇后、皇帝等。</p>
                 </div>
-            `;
+                <div class="knowledge-card">
+                    <h3>🂱 小阿卡纳（Minor Arcana）— 56张</h3>
+                    <p>代表日常生活中的具体情况和事件，分为四个花色：<br>🏆 <b>圣杯</b>（水元素·情感关系）<br>🔥 <b>权杖</b>（火元素·行动事业）<br>⚔️ <b>宝剑</b>（风元素·思维沟通）<br>💰 <b>星币</b>（土元素·物质财富）</p>
+                </div>
+            </div>
+        </div>
 
-            // 创建弹窗显示
-            const modal = document.createElement('div');
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem;';
-            modal.onclick = () => modal.remove();
-            
-            const modalContent = document.createElement('div');
-            modalContent.style.cssText = 'background: linear-gradient(180deg, #0f0c29, #1a1a2e 30%, #16213e 70%, #0a0a1a); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;';
-            modalContent.onclick = (e) => e.stopPropagation();
-            modalContent.innerHTML = html + '<button type="button" type="button" style="margin-top: 1rem; width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 0.9rem; font-weight: 600; cursor: pointer;" onclick="this.closest(\'.modal\').remove()">关闭</button>';
-            
-            modal.className = 'modal';
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
+    </div>
+
+    <!-- ===== Scripts ===== -->
+    <script src="/js/main.js"></script>
+    <script src="/js/fortune-api.js"></script>
+    <script>
+    'use strict';
+
+    // ===== 页面状态 =====
+    var STATE = {
+        cards: [],                          // API 返回牌数据
+        flipped: [false, false, false],     // 各牌是否已翻转
+        directions: [1, 1, 1],             // 1=正位, -1=逆位
+        metaSource: 'local',
+        loading: false
+    };
+
+    var POSITIONS = ['🕰 过去', '🌟 现在', '🔮 未来'];
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.createStars) window.createStars();
+    });
+
+    // ===== 抽牌入口 =====
+    async function handleDraw() {
+        if (STATE.loading) return;
+        STATE.loading = true;
+
+        var btn = document.getElementById('btnDraw');
+        btn.disabled = true;
+
+        // 阶段1：洗牌动画
+        btn.innerHTML = '🌀 洗牌中...';
+        showShuffleAnimation();
+
+        // 等待洗牌动画 + 调用API
+        var data = await fortuneGetAPI('tarot/draw', { n: 3 });
+
+        if (!data || !data.success || !data.data || !data.data.cards) {
+            STATE.loading = false;
+            btn.disabled = false;
+            btn.innerHTML = '🔮 重新抽牌';
+            showError('占卜未果，请静心后再试');
+            return;
         }
 
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-        });
-    </script>
+        // 阶段2：数据就绪，显示牌背
+        STATE.cards = data.data.cards;
+        STATE.flipped = [false, false, false];
+        STATE.directions = [
+            Math.random() > 0.5 ? 1 : -1,
+            Math.random() > 0.5 ? 1 : -1,
+            Math.random() > 0.5 ? 1 : -1
+        ];
+        STATE.metaSource = (data.meta && data.meta.source) ? data.meta.source : 'local';
+        STATE.loading = false;
 
-        <!-- 分析表单 -->
-        <div class="tab-content active" id="formTab">
-            <div class="form-container">
-                
-            <div class="form-group">
-                <label class="form-label">占卜问题</label>
-                <input type="text" class="form-input" id="questionInput" placeholder="在心中默念您的问题...">
-            </div>
-        
-                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
-            </div>
-        </div>
-        <!-- 结果展示 -->
-        <div class="tab-content" id="resultTab">
-            <div class="result-container" id="resultContainer">
-                
-        <div class="result-section"><h3>🔮 塔罗牌占卜结果</h3>
-        <div class="analysis-text">
-            <p><strong>牌面一（过去）：</strong><span id="card1"></span></p>
-            <p><strong>牌面二（现在）：</strong><span id="card2"></span></p>
-            <p><strong>牌面三（未来）：</strong><span id="card3"></span></p>
-            <p><strong>综合解读：</strong><span id="summaryResult"></span></p>
-        </div>
-        </div>
-        
-            </div>
-        </div>
-    
-    <script>
-    function calculateModule() {
-        if (window.showToast) window.showToast('正在分析中...');
+        // 延迟一点让用户看到洗牌效果结束
         setTimeout(function() {
-            // 这里调用真正的分析计算
-            var resultHtml = generateResultHTML();
-            document.getElementById('resultContainer').innerHTML = resultHtml;
-            if (window.switchTab) window.switchTab('result');
-            if (window.showToast) window.showToast('分析完成！');
-        }, 1200);
+            renderCardStage();
+            document.getElementById('actionsRow').style.display = 'flex';
+            showDataSourceBadge();
+            btn.innerHTML = '✨ 已抽牌 — 点击牌面翻开';
+        }, 900);
     }
-    
-    function generateResultHTML() {
-        // 读取表单值并生成结果
-        var html = '<div class="result-section fade-in">';
-        html += '<h3>📊 分析结果</h3>';
-        html += '<div class="analysis-text">';
-        html += '<p>根据您提供的信息，分析结果如下：</p>';
-        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
-        html += '</div></div>';
-        return html;
+
+    // ===== 洗牌动画 =====
+    function showShuffleAnimation() {
+        var stage = document.getElementById('cardsStage');
+        var html = '<div class="shuffling" style="display:flex;gap:1.2rem;justify-content:center;">';
+        for (var i = 0; i < 3; i++) {
+            var delay = (i * 0.18) + 's';
+            html +=
+                '<div class="tarot-card-container" style="animation-delay:' + delay + '">' +
+                '<div class="tarot-card-inner">' +
+                '<div class="tarot-card-front">' +
+                '<div class="card-front-inner">' +
+                '<span class="mystic-symbol">🂠</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+        html += '</div>';
+        stage.innerHTML = html;
     }
+
+    // ===== 渲染牌面（背面朝上，等待点击翻转） =====
+    function renderCardStage() {
+        var stage = document.getElementById('cardsStage');
+        var html = '';
+
+        for (var i = 0; i < STATE.cards.length; i++) {
+            var card = STATE.cards[i];
+            var flipped = STATE.flipped[i];
+            var dir = STATE.directions[i];
+            var dirLabel = dir === 1 ? '正位 ↑' : '逆位 ↓';
+
+            html +=
+                '<div class="tarot-card-container" id="cardContainer' + i + '" onclick="handleFlip(' + i + ')">' +
+                '<div class="tarot-card-inner' + (flipped ? ' flipped' : '') + '" id="cardInner' + i + '">' +
+                // 正面（背面朝外，用户看到的初始面）
+                '<div class="tarot-card-front">' +
+                '<div class="card-front-inner">' +
+                '<span class="mystic-symbol">⭐🌙</span>' +
+                '<span class="flip-text">点击翻开</span>' +
+                '</div>' +
+                '<span class="card-position-label">' + POSITIONS[i] + '</span>' +
+                '</div>' +
+                // 背面（翻转后的牌面信息）
+                '<div class="tarot-card-back">' +
+                '<div class="card-name">' + escHtml(card.name) + '</div>' +
+                '<span class="card-type-tag">' + escHtml(card.type || '') + '</span>' +
+                '<span class="card-direction">' + dirLabel + '</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+        stage.innerHTML = html;
+    }
+
+    // ===== 翻转单张牌 =====
+    function handleFlip(index) {
+        if (STATE.flipped[index]) return;
+
+        STATE.flipped[index] = true;
+        var inner = document.getElementById('cardInner' + index);
+        if (inner) {
+            inner.classList.add('flipped');
+        }
+
+        // 检测是否全部翻开
+        var allDone = STATE.flipped.every(function(v) { return v; });
+        if (allDone) {
+            setTimeout(function() {
+                renderReading();
+            }, 900);
+        }
+    }
+
+    // ===== 渲染解读区 =====
+    function renderReading() {
+        var section = document.getElementById('readingSection');
+        var html = '<div class="reading-cards fade-in">';
+
+        for (var i = 0; i < STATE.cards.length; i++) {
+            var card = STATE.cards[i];
+            var dir = STATE.directions[i];
+            var isUp = dir === 1;
+            var meaning = isUp ? (card.meaning_up || '暂无正位释义') : (card.meaning_rev || '暂无逆位释义');
+            var meaningLabel = isUp ? '☀ 正位含义' : '🌙 逆位含义';
+
+            html +=
+                '<div class="reading-card" id="readingCard' + i + '">' +
+                '<div class="card-header-row">' +
+                '<span class="pos-label">' + POSITIONS[i] + '</span>' +
+                '<span class="card-title">' + escHtml(card.name) + '</span>' +
+                '<span class="card-type">' + escHtml(card.type || '') + '</span>' +
+                '</div>' +
+                '<div class="toggle-dir">' +
+                '<button id="btnUp' + i + '" class="' + (isUp ? 'active' : '') + '" onclick="switchDir(' + i + ', 1)">正位</button>' +
+                '<button id="btnRev' + i + '" class="' + (isUp ? '' : 'active') + '" onclick="switchDir(' + i + ', -1)">逆位</button>' +
+                '</div>' +
+                '<div class="meaning-label" id="meaningLabel' + i + '">' + meaningLabel + '</div>' +
+                '<div class="meaning-text" id="meaningText' + i + '">' + escHtml(meaning) + '</div>' +
+                (card.desc ? '<div class="desc-text">' + escHtml(card.desc) + '</div>' : '') +
+                '</div>';
+        }
+        html += '</div>';
+
+        // 综合解读
+        html +=
+            '<div class="overall-reading fade-in">' +
+            '<h3>🔮 综合解读</h3>' +
+            '<p>三张牌分别代表你的<b>过去</b>、<b>现在</b>与<b>未来</b>。' +
+            '<br>过去的「' + escHtml(STATE.cards[0].name) + '」揭示了你经历过的课题；' +
+            '现在的「' + escHtml(STATE.cards[1].name) + '」映照你当下的状态；' +
+            '未来的「' + escHtml(STATE.cards[2].name) + '」则指引前行方向。' +
+            '<br>请结合各牌释义及正逆位，静心感悟命运传递的信息。</p>' +
+            '</div>';
+
+        section.innerHTML = html;
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ===== 正位/逆位切换 =====
+    function switchDir(index, dir) {
+        STATE.directions[index] = dir;
+        var card = STATE.cards[index];
+        var isUp = dir === 1;
+        var meaning = isUp ? (card.meaning_up || '暂无正位释义') : (card.meaning_rev || '暂无逆位释义');
+
+        // 按钮
+        var btnUp = document.getElementById('btnUp' + index);
+        var btnRev = document.getElementById('btnRev' + index);
+        if (btnUp) btnUp.className = isUp ? 'active' : '';
+        if (btnRev) btnRev.className = isUp ? '' : 'active';
+
+        // 含义标签
+        var label = document.getElementById('meaningLabel' + index);
+        if (label) label.innerHTML = isUp ? '☀ 正位含义' : '🌙 逆位含义';
+
+        // 含义文本
+        var text = document.getElementById('meaningText' + index);
+        if (text) text.textContent = meaning;
+    }
+
+    // ===== 重新抽牌 =====
+    function handleRedraw() {
+        STATE.cards = [];
+        STATE.flipped = [false, false, false];
+        STATE.directions = [1, 1, 1];
+
+        document.getElementById('cardsStage').innerHTML = '';
+        document.getElementById('readingSection').innerHTML = '';
+        document.getElementById('actionsRow').style.display = 'none';
+        document.getElementById('dataSourceBadge').style.display = 'none';
+
+        var btn = document.getElementById('btnDraw');
+        btn.disabled = false;
+        btn.innerHTML = '🔮 开始抽牌';
+
+        handleDraw();
+    }
+
+    // ===== 错误状态 =====
+    function showError(msg) {
+        document.getElementById('cardsStage').innerHTML = '';
+        document.getElementById('readingSection').innerHTML =
+            '<div class="error-state">' +
+            '<div class="err-icon">⚠️</div>' +
+            '<p class="err-msg">' + escHtml(msg || '数据获取失败') + '</p>' +
+            '<button onclick="handleDraw()">🔄 重试</button>' +
+            '</div>';
+    }
+
+    // ===== 数据来源标识 =====
+    function showDataSourceBadge() {
+        var badge = document.getElementById('dataSourceBadge');
+        var map = {
+            'realtime': { dot: 'realtime', label: '实时联网数据' },
+            'cached':   { dot: 'cached',   label: '缓存数据' },
+            'local':    { dot: 'local',    label: '服务器计算' }
+        };
+        var info = map[STATE.metaSource] || map['local'];
+        badge.innerHTML =
+            '<span class="badge-dot ' + info.dot + '"></span>' +
+            '<span class="badge-text">' + info.label + ' · ' + new Date().toLocaleTimeString('zh-CN') + '</span>';
+        badge.style.display = 'block';
+
+        // 同步使用 showDataBadge (fortune-api.js)
+        if (window.showDataBadge) {
+            window.showDataBadge(STATE.metaSource, 'dataSourceBadge');
+        }
+    }
+
+    // ===== HTML 转义 =====
+    function escHtml(str) {
+        if (!str) return '';
+        var d = document.createElement('div');
+        d.appendChild(document.createTextNode(str));
+        return d.innerHTML;
+    }
+
+    // ===== 全局导出 =====
+    window.handleDraw = handleDraw;
+    window.handleFlip = handleFlip;
+    window.switchDir = switchDir;
+    window.handleRedraw = handleRedraw;
     </script>
-    </body>
+</body>
 </html>

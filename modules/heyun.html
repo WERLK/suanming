@@ -205,6 +205,24 @@
                     <input type="date" class="form-input" id="date1Input">
                 </div>
                 <div class="form-group">
+                    <label class="form-label">您的出生时辰</label>
+                    <select class="form-select" id="birthTime1Input">
+                        <option value="">不选</option>
+                        <option value="子">子时 (23:00-01:00)</option>
+                        <option value="丑">丑时 (01:00-03:00)</option>
+                        <option value="寅">寅时 (03:00-05:00)</option>
+                        <option value="卯">卯时 (05:00-07:00)</option>
+                        <option value="辰">辰时 (07:00-09:00)</option>
+                        <option value="巳">巳时 (09:00-11:00)</option>
+                        <option value="午">午时 (11:00-13:00)</option>
+                        <option value="未">未时 (13:00-15:00)</option>
+                        <option value="申">申时 (15:00-17:00)</option>
+                        <option value="酉">酉时 (17:00-19:00)</option>
+                        <option value="戌">戌时 (19:00-21:00)</option>
+                        <option value="亥">亥时 (21:00-23:00)</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label class="form-label">对方姓名</label>
                     <input type="text" class="form-input" id="name2Input" placeholder="请输入对方姓名">
                 </div>
@@ -218,6 +236,24 @@
                 <div class="form-group">
                     <label class="form-label">对方出生日期（公历）</label>
                     <input type="date" class="form-input" id="date2Input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">对方出生时辰</label>
+                    <select class="form-select" id="birthTime2Input">
+                        <option value="">不选</option>
+                        <option value="子">子时 (23:00-01:00)</option>
+                        <option value="丑">丑时 (01:00-03:00)</option>
+                        <option value="寅">寅时 (03:00-05:00)</option>
+                        <option value="卯">卯时 (05:00-07:00)</option>
+                        <option value="辰">辰时 (07:00-09:00)</option>
+                        <option value="巳">巳时 (09:00-11:00)</option>
+                        <option value="午">午时 (11:00-13:00)</option>
+                        <option value="未">未时 (13:00-15:00)</option>
+                        <option value="申">申时 (15:00-17:00)</option>
+                        <option value="酉">酉时 (17:00-19:00)</option>
+                        <option value="戌">戌时 (19:00-21:00)</option>
+                        <option value="亥">亥时 (21:00-23:00)</option>
+                    </select>
                 </div>
                 <button type="button" class="submit-btn" onclick="calculateHeyun()">💕 开始配对</button>
             </div>
@@ -255,6 +291,7 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
 <script>
 // ===== 标签页切换 =====
 function switchTab(tabName, btnElement) {
@@ -267,26 +304,59 @@ function switchTab(tabName, btnElement) {
     if (target) target.classList.add('active');
 }
 
-// ===== 合婚计算 =====
+// ===== 合婚计算（API优先 + 本地降级） =====
 function calculateHeyun() {
-    var n1 = document.getElementById('name1Input').value.trim();
-    var n2 = document.getElementById('name2Input').value.trim();
-    var d1 = document.getElementById('date1Input').value;
-    var d2 = document.getElementById('date2Input').value;
-    if (!n1 || !n2 || !d1 || !d2) {
+    var name1 = document.getElementById('name1Input').value.trim();
+    var name2 = document.getElementById('name2Input').value.trim();
+    var date1 = document.getElementById('date1Input').value;
+    var date2 = document.getElementById('date2Input').value;
+    var gender1 = document.getElementById('gender1Input').value;
+    var gender2 = document.getElementById('gender2Input').value;
+    var birthTime1 = document.getElementById('birthTime1Input').value;
+    var birthTime2 = document.getElementById('birthTime2Input').value;
+
+    if (!name1 || !name2 || !date1 || !date2) {
         if (window.showToast) window.showToast('请填写完整信息');
         else alert('请填写完整信息');
         return;
     }
-    if (window.showToast) window.showToast('正在配对分析中...');
-    setTimeout(function() {
-        var result = calcHeyunCore(n1, document.getElementById('gender1Input').value, d1,
-                                  n2, document.getElementById('gender2Input').value, d2);
+
+    // 调用后端 API
+    fortuneAPI('heyun', {
+        name1: name1,
+        birth_date1: date1,
+        birth_time1: birthTime1,
+        gender1: gender1,
+        name2: name2,
+        birth_date2: date2,
+        birth_time2: birthTime2,
+        gender2: gender2
+    }, { loadingMsg: '正在联网进行合婚配对分析...' }).then(function(apiResult) {
+        if (apiResult && apiResult.success) {
+            // API 成功 - 渲染联网数据
+            var html = generateHeyunResultFromApi(apiResult.data);
+            document.getElementById('resultContainer').innerHTML = html;
+            switchTab('result', document.querySelector('[data-tab="result"]'));
+            showDataBadge(apiResult.meta ? apiResult.meta.source : 'realtime', 'resultContainer');
+            if (window.showToast) window.showToast('合婚配对分析完成！');
+        } else {
+            // API 失败 - 降级到本地算法
+            runLocalFallback(name1, gender1, date1, name2, gender2, date2);
+        }
+    }).catch(function(err) {
+        console.error('合婚 API 调用异常:', err);
+        runLocalFallback(name1, gender1, date1, name2, gender2, date2);
+    });
+
+    // 降级函数：使用本地算法计算
+    function runLocalFallback(n1, g1, d1, n2, g2, d2) {
+        if (window.showToast) window.showToast('已切换为本地离线计算');
+        var result = calcHeyunCore(n1, g1, d1, n2, g2, d2);
         var html = generateHeyunResult(result);
         document.getElementById('resultContainer').innerHTML = html;
-        switchTab('result');
-        if (window.showToast) window.showToast('配对分析完成！');
-    }, 1200);
+        switchTab('result', document.querySelector('[data-tab="result"]'));
+        showDataBadge('local_fallback', 'resultContainer');
+    }
 }
 
 // ===== 合婚核心算法 =====
@@ -414,6 +484,99 @@ function generateHeyunResult(data) {
     html += '3. 互相尊重、信任和包容，才是婚姻长久之道。<br/>';
     html += '4. 建议在选择结婚吉日时，避开双方八字的不利月份，选择有利的月份和日子。';
     html += '</div></div>';
+
+    return html;
+}
+
+// ===== 从API数据生成合婚结果视图 =====
+function generateHeyunResultFromApi(data) {
+    var html = '';
+    var score = data.score || 0;
+    var grade = data.compatibility || '';
+    var gradeColor = score >= 90 ? '#4caf50' : (score >= 75 ? '#4caf50' : (score >= 60 ? '#ffd700' : (score >= 40 ? '#ff9800' : '#f44336')));
+
+    // 配对评分 - 圆形进度条
+    html += '<div class="result-section"><h3>📊 配对评分</h3>';
+    html += '<div style="text-align:center;padding:1.2rem 0;">';
+    html += '<div style="position:relative;display:inline-block;width:140px;height:140px;">';
+    html += '<svg viewBox="0 0 140 140" style="transform:rotate(-90deg);">';
+    html += '<circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>';
+    var circumference = 2 * Math.PI * 60;
+    var offset = circumference * (1 - score / 100);
+    html += '<circle cx="70" cy="70" r="60" fill="none" stroke="' + gradeColor + '" stroke-width="8" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + offset + '" stroke-linecap="round"/>';
+    html += '</svg>';
+    html += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">';
+    html += '<div style="font-size:2.2rem;font-weight:bold;color:' + gradeColor + ';">' + score + '</div>';
+    html += '<div style="font-size:0.75rem;color:' + gradeColor + ';">分</div>';
+    html += '</div></div>';
+    html += '<div style="font-size:1.1rem;color:' + gradeColor + ';margin-top:0.8rem;font-weight:600;">' + grade + '</div>';
+    html += '</div></div>';
+
+    // 综合分析
+    if (data.analysis) {
+        html += '<div class="result-section"><h3>🔍 综合配对分析</h3>';
+        html += '<div class="analysis-text">' + data.analysis + '</div></div>';
+    }
+
+    // 五行匹配
+    if (data.element_match) {
+        html += '<div class="result-section"><h3>☯️ 五行匹配分析</h3>';
+        html += '<div class="analysis-text">';
+        if (typeof data.element_match === 'string') {
+            html += data.element_match;
+        } else if (typeof data.element_match === 'object') {
+            html += '<table class="result-table">';
+            for (var key in data.element_match) {
+                if (data.element_match.hasOwnProperty(key)) {
+                    html += '<tr><th>' + key + '</th><td>' + data.element_match[key] + '</td></tr>';
+                }
+            }
+            html += '</table>';
+        }
+        html += '</div></div>';
+    }
+
+    // 配对优势
+    if (data.strengths) {
+        html += '<div class="result-section"><h3>✅ 配对优势</h3>';
+        html += '<div class="analysis-text">';
+        if (Array.isArray(data.strengths)) {
+            html += '<ul style="padding-left:1.2rem;line-height:2;">';
+            data.strengths.forEach(function(s) { html += '<li>' + s + '</li>'; });
+            html += '</ul>';
+        } else {
+            html += data.strengths;
+        }
+        html += '</div></div>';
+    }
+
+    // 需要注意
+    if (data.challenges) {
+        html += '<div class="result-section"><h3>⚠️ 需要注意</h3>';
+        html += '<div class="analysis-text">';
+        if (Array.isArray(data.challenges)) {
+            html += '<ul style="padding-left:1.2rem;line-height:2;">';
+            data.challenges.forEach(function(c) { html += '<li>' + c + '</li>'; });
+            html += '</ul>';
+        } else {
+            html += data.challenges;
+        }
+        html += '</div></div>';
+    }
+
+    // 婚姻建议
+    if (data.advice) {
+        html += '<div class="result-section"><h3>💡 婚姻建议</h3>';
+        html += '<div class="analysis-text">';
+        if (Array.isArray(data.advice)) {
+            html += '<ol style="padding-left:1.2rem;line-height:2;">';
+            data.advice.forEach(function(a) { html += '<li>' + a + '</li>'; });
+            html += '</ol>';
+        } else {
+            html += data.advice;
+        }
+        html += '</div></div>';
+    }
 
     return html;
 }

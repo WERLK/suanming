@@ -420,75 +420,82 @@ function triggerImageUpload(moduleType) {
     input.click();
 }
 </script>
+<script src="/js/fortune-api.js"></script>
 <script>
-function startDivination() {
+async function startDivination() {
     const question = document.getElementById('questionInput').value.trim();
-    const type = document.getElementById('typeInput').value;
     
     if (!question) {
         window.showToast('请输入你想问的问题');
         return;
     }
     
-    window.showToast('正在起卦...');
+    // 隐藏表单，显示结果区域（三态：Loading）
+    document.querySelector('.divination-form').style.display = 'none';
+    document.getElementById('resultArea').style.display = 'block';
+    document.getElementById('resultArea').innerHTML = `
+        <div class="result-card fade-in" style="text-align:center;padding:3rem 1rem;">
+            <div class="fortune-spinner" style="margin:0 auto 1rem;"></div>
+            <p style="color:#ffd700;font-size:1rem;">🌿 正在联网起卦...</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;">大数据实时分析中，请稍候</p>
+        </div>
+    `;
     
-    // 模拟起卦过程
-    setTimeout(() => {
-        const result = {
-            question: question,
-            type: type,
-            gua: {
-                name: ['乾为天', '坤为地', '水雷屯', '山水蒙', '水天需', '天水讼', '地水师', '水地比'][Math.floor(Math.random() * 8)],
-                yaos: Array.from({length: 6}, () => Math.random() > 0.5 ? '阳爻' : '阴爻')
-            },
-            analysis: '此卦象显示' + ['大吉', '中吉', '小吉', '平', '小凶', '中凶', '大凶'][Math.floor(Math.random() * 7)] + 
-                      '，建议' + ['积极进取', '稳重行事', '等待时机', '谨慎决策'][Math.floor(Math.random() * 4)] + 
-                      '，' + ['可得好运', '能化险为夷', '需多加小心', '宜静不宜动'][Math.floor(Math.random() * 4)] + '。',
-            advice: '针对你的问题"' + question + '"，此卦象的启示是：' + 
-                    ['顺应天时', '把握机遇', '稳中求进', '韬光养晦'][Math.floor(Math.random() * 4)] + 
-                    '，' + ['必有好结果', '可避凶趋吉', '需付出努力', '应耐心等待'][Math.floor(Math.random() * 4)] + '。'
-        };
-        
-        showResult(result);
-    }, 2000);
+    const result = await fortuneAPI('liuyao', {
+        question: question,
+        method: 'manual'
+    });
+    
+    if (result && result.data) {
+        showResult(result.data, result.meta);
+    } else {
+        // 三态：Error
+        document.getElementById('resultArea').innerHTML = `
+            <div class="result-card fade-in" style="text-align:center;padding:3rem 1rem;">
+                <p style="color:#ff6b6b;font-size:1.2rem;">⚠️ 起卦失败</p>
+                <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;">网络连接失败，请检查网络后重试</p>
+                <button type="button" class="submit-btn" style="display:inline-block;width:auto;padding:0.6rem 1.5rem;margin-top:1rem;" onclick="resetForm()">返回重试</button>
+            </div>
+        `;
+    }
 }
 
-function showResult(result) {
-    const yaoSymbols = result.gua.yaos.map(yao => yao === '阳爻' ? '—' : '--');
-    
+function showResult(data, meta) {
     let html = `
         <div class="result-card fade-in">
             <h3>🎋 占卜结果</h3>
-            <p><strong>所问之事：</strong>${result.question}</p>
-            <p><strong>占卜类型：</strong>${document.getElementById('typeInput').options[document.getElementById('typeInput').selectedIndex].text}</p>
+    `;
+    
+    // 数据来源标识
+    if (meta) {
+        const sourceMap = {
+            'realtime': '🟢 实时联网数据',
+            'cached': '🟡 缓存数据',
+            'local': '🔵 服务器计算',
+            'local_fallback': '🔴 离线数据'
+        };
+        const sourceText = sourceMap[meta.source] || '🔵 服务器计算';
+        html += `<div class="fortune-data-badge" style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:0.8rem;">${sourceText} · ${new Date().toLocaleTimeString('zh-CN')}</div>`;
+    }
+    
+    html += `
+            <p><strong>卦名：</strong>${data.gua_name || '未知'}</p>
+            ${data.gua_symbol ? '<p><strong>卦象：</strong>' + data.gua_symbol + '</p>' : ''}
         </div>
         
         <div class="gua-container fade-in">
-            <div class="gua-name">${result.gua.name}</div>
-            <div style="margin: 1.5rem 0; font-size: 2rem; letter-spacing: 0.5rem;">
-                ${yaoSymbols.reverse().map(symbol => `<div>${symbol}</div>`).join('')}
-            </div>
-            <div class="gua-desc">
-                ${result.analysis}
-            </div>
+            <div class="gua-name">${data.gua_symbol || data.gua_name || '—'}</div>
+            ${data.yaoci ? '<div class="gua-desc" style="margin-top:1rem;">' + data.yaoci + '</div>' : ''}
         </div>
         
         <div class="result-card fade-in">
             <h3>📊 卦象分析</h3>
-            <p>${result.analysis}</p>
+            <p>${data.analysis || '暂无详细分析'}</p>
         </div>
         
         <div class="result-card fade-in">
             <h3>💡 建议与启示</h3>
-            <p>${result.advice}</p>
-        </div>
-        
-        <div class="result-card fade-in">
-            <h3>📝 断卦提要</h3>
-            <p>1. <strong>世爻分析：</strong>世爻${['旺相', '休囚', '空亡'][Math.floor(Math.random() * 3)]}，说明问卦者目前状态${['较好', '一般', '不佳'][Math.floor(Math.random() * 3)]}。</p>
-            <p>2. <strong>应爻分析：</strong>应爻${['生世', '克世', '比和'][Math.floor(Math.random() * 3)]}，说明所问之事${['有利', '不利', '平顺'][Math.floor(Math.random() * 3)]}。</p>
-            <p>3. <strong>六亲分析：</strong>${['父母爻', '兄弟爻', '妻财爻', '官鬼爻', '子孙爻'][Math.floor(Math.random() * 5)]}${['旺相', '休囚'][Math.floor(Math.random() * 2)]}，说明${['长辈助力大', '朋友关系复杂', '财运不错', '工作有阻碍', '子女缘分深'][Math.floor(Math.random() * 5)]}。</p>
-            <p>4. <strong>综合判断：</strong>${result.analysis}</p>
+            <p>${data.advice || '暂无建议'}</p>
         </div>
         
         <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
@@ -498,7 +505,6 @@ function showResult(result) {
     
     document.getElementById('resultArea').innerHTML = html;
     document.getElementById('resultArea').style.display = 'block';
-    document.querySelector('.divination-form').style.display = 'none';
 }
 
 function resetForm() {

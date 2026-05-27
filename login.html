@@ -677,9 +677,9 @@
                 if (data.success) {
                     document.getElementById('sliderId').value = data.slider_id;
                     
-                    // 设置目标位置
+                    // 设置目标位置（用 target_x 百分比）
                     const target = document.getElementById('sliderTarget');
-                    target.style.left = data.target_y + '%';
+                    target.style.left = data.target_x + '%';
                 }
             } catch (error) {
                 console.error('加载滑块验证码失败:', error);
@@ -855,7 +855,7 @@
                     // token无效，清除
                     localStorage.removeItem('token');
                     localStorage.removeItem('currentUser');
-                    sessionStorage.removeItem('token');
+                sessionStorage.removeItem('token');
                     sessionStorage.removeItem('currentUser');
                 }
             } catch (error) {

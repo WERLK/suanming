@@ -202,7 +202,7 @@ def generate_slider():
         return jsonify({
             'success': True,
             'slider_id': slider_id,
-            'target_y': target_y,
+            'target_x': target_x,
             'image_width': 300,
             'image_height': 150
         }), 200

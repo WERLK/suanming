@@ -1,15 +1,41 @@
 [
   {
-    "id": "user_wtJiPcilmbwSsSQdDEWD58OnX30kim2B",
-    "username": "testuser123_updated",
-    "password": "CvliX7FfQBPYecDcqEAUgyopwtYjJX6g$f8f3d7dadf7c0438a5fc6375e2e3bfc5c08765e0fc6d1e36e18597bad9e3e698",
-    "email": "updated@example.com",
-    "phone": "13800138000",
+    "id": "user_demo123",
+    "username": "demo",
+    "password": "SjUQRedgncr8BZ8NZV90rOMBYWDmwOyS$2697384d2ee3f69439e296942d2b3f7cd4a38c7e2e8bcd19436611e836947c07",
+    "email": "demo@example.com",
+    "phone": "13800000000",
     "avatar": "",
     "birthday": "",
-    "gender": "male",
-    "create_time": "2026-05-23T11:28:48.888545",
-    "last_login": "2026-05-23T11:28:48.936152",
+    "gender": "",
+    "create_time": "2026-05-27T01:41:58.592762",
+    "last_login": "2026-05-27T01:42:39.937119",
+    "status": "active"
+  },
+  {
+    "id": "user_PpF5MgKnfQAjQuInZSbzBrncCKijutJZ",
+    "username": "newuser99",
+    "password": "BFqtCgdZT8WDbWscQVmsuvfcBTeR9INC$9316f85c6246671b83fb50759cf49c82c8d80a420cd2d26d7634d28319b044ba",
+    "email": "new99@example.com",
+    "phone": "13900139000",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T01:42:11.352315",
+    "last_login": "2026-05-27T01:42:11.381777",
+    "status": "active"
+  },
+  {
+    "id": "user_gXdPbGp1Xn0Sa10NIIizDEomkaEQ5jIH",
+    "username": "logintest",
+    "password": "AyxEQFZXHXxXLmnRtCywyPrAnJHFRy2R$216bbb5f8ddcebf4de2c4040ada54f49be432f08b2e152d3418e9c145a29fed7",
+    "email": "login@test.com",
+    "phone": "13912345678",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T01:42:39.966886",
+    "last_login": "2026-05-27T01:42:39.996361",
     "status": "active"
   }
 ]

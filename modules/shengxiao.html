@@ -38,6 +38,83 @@
             padding: 1rem;
             padding-bottom: 80px;
         }
+        
+        /* 日期选择器 */
+        .date-selector {
+            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+        .date-selector h3 {
+            font-size: 0.95rem;
+            color: #ffd700;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .date-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .date-field {
+            flex: 1;
+            min-width: 80px;
+        }
+        .date-field label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 0.3rem;
+            padding-left: 0.2rem;
+        }
+        .date-field select,
+        .date-field input {
+            width: 100%;
+            padding: 0.7rem 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            text-align: center;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .date-field select:focus,
+        .date-field input:focus {
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,255,255,0.08);
+        }
+        .date-field select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .selected-date-info {
+            margin-top: 0.8rem;
+            padding: 0.6rem 0.8rem;
+            background: rgba(255,215,0,0.06);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .selected-date-info .date-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            background: rgba(255,215,0,0.15);
+            color: #ffd700;
+            font-size: 0.78rem;
+        }
+        
         .zodiac-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -91,36 +168,17 @@
             font-size: 0.8rem;
             margin-bottom: 1rem;
         }
-        .rank-top {
-            background: rgba(255,215,0,0.2);
-            color: #ffd700;
-        }
-        .rank-mid {
-            background: rgba(0,255,0,0.15);
-            color: #0f0;
-        }
-        .rank-low {
-            background: rgba(255,0,0,0.15);
-            color: #f00;
-        }
+        .rank-top { background: rgba(255,215,0,0.2); color: #ffd700; }
+        .rank-mid { background: rgba(0,255,0,0.15); color: #0f0; }
+        .rank-low { background: rgba(255,0,0,0.15); color: #f00; }
         .fortune-section {
             margin-bottom: 1rem;
             padding-bottom: 0.8rem;
             border-bottom: 1px solid rgba(255,215,0,0.08);
         }
-        .fortune-section:last-child {
-            border-bottom: none;
-        }
-        .fortune-section h3 {
-            font-size: 0.9rem;
-            color: #ffd700;
-            margin-bottom: 0.5rem;
-        }
-        .fortune-section p {
-            font-size: 0.85rem;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.8);
-        }
+        .fortune-section:last-child { border-bottom: none; }
+        .fortune-section h3 { font-size: 0.9rem; color: #ffd700; margin-bottom: 0.5rem; }
+        .fortune-section p { font-size: 0.85rem; line-height: 1.8; color: rgba(255,255,255,0.8); }
         .fortune-tags {
             display: flex;
             flex-wrap: wrap;
@@ -134,9 +192,42 @@
             background: rgba(255,215,0,0.1);
             color: rgba(255,255,255,0.7);
         }
+        
+        .section {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .section h2 {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 平板/桌面端适配 */
+        @media (min-width: 768px) {
+            .zodiac-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .date-row {
+                gap: 1rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .zodiac-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            .content-area {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 2rem;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="has-desktop-sidebar">
     <div class="stars" id="stars"></div>
 
     <div class="app">
@@ -146,13 +237,41 @@
         </div>
 
         <div class="content-area">
-                    <div style="margin-bottom:1rem;">
-            <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('shengxiao')">📷 上传图片分析</button>
-        </div>
-<div class="section">
+            <!-- 日期选择器 -->
+            <div class="date-selector">
+                <h3>📅 选择查询日期</h3>
+                <div class="date-row">
+                    <div class="date-field">
+                        <label>年份</label>
+                        <select id="yearSelect" onchange="onYearChange()"></select>
+                    </div>
+                    <div class="date-field">
+                        <label>月份</label>
+                        <select id="monthSelect" onchange="onMonthChange()">
+                            <option value="1">1月</option><option value="2">2月</option>
+                            <option value="3">3月</option><option value="4">4月</option>
+                            <option value="5">5月</option><option value="6">6月</option>
+                            <option value="7">7月</option><option value="8">8月</option>
+                            <option value="9">9月</option><option value="10">10月</option>
+                            <option value="11">11月</option><option value="12">12月</option>
+                        </select>
+                    </div>
+                    <div class="date-field">
+                        <label>日期</label>
+                        <select id="daySelect" onchange="onDayChange()"></select>
+                    </div>
+                </div>
+                <div class="selected-date-info" id="selectedDateInfo">
+                    <span>当前查询：</span>
+                    <span class="date-badge" id="dateBadge">2026年 丙午年(马)</span>
+                </div>
+            </div>
+
+            <!-- 生肖选择 -->
+            <div class="section">
                 <h2>选择你的生肖</h2>
-                <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem;">
-                    查看2026年（丙午年）你的生肖运势详解
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem;" id="queryHint">
+                    选择生肖后查看运势详解
                 </p>
                 
                 <div class="zodiac-grid" id="zodiacGrid">
@@ -213,338 +332,266 @@
         </div>
     </div>
 
-    <script src="/js/main.js">
-// 触发图片上传
-function triggerImageUpload(moduleType) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function() {
-        const file = this.files[0];
-        if (!file) return;
-        window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            fetch('/api/image-analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64, module_type: moduleType })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.showToast('分析完成！');
-                    const area = document.getElementById('imageAnalysisArea');
-                    const result = document.getElementById('imageAnalysisResult');
-                    if (area) area.style.display = 'block';
-                    if (result) result.textContent = data.analysis;
-                } else {
-                    window.showToast('分析失败：' + (data.message || '未知错误'));
-                }
-            })
-            .catch(err => {
-                window.showToast('分析失败，请检查网络');
-                console.error('图片分析错误：', err);
-            });
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-</script>
+    <script src="/js/main.js"></script>
     <script>
-        // 2026年生肖运势数据
-        const fortune2026 = {
-            '鼠': {
-                rank: 11,
-                rankText: '需谨慎',
-                rankClass: 'rank-low',
-                summary: '冲太岁（子午冲），动荡起伏，需沉着应对',
-                career: '事业动荡不安，有失业风险。不宜跳槽，巩固现有事业为主。',
-                wealth: '注意破财，谨防诈骗。理财保守，偏财有但易破，别冲动。',
-                love: '火桃花能量足但脾气不稳。有伴侣需包容尊重，单身下半年有机会。',
-                health: '出行注意交通安全，易受伤，肠胃问题。',
-                advice: '做风雨中的定海神针，沉着方能破局（先破后立）',
-                tags: ['冲太岁', '岁破', '大耗', '灾煞']
-            },
-            '牛': {
-                rank: 10,
-                rankText: '需谨慎',
-                rankClass: 'rank-low',
-                summary: '害太岁，运势起伏大，人际关系易出问题',
-                career: '易遇突发事件，人际关系引发误会或冲突导致合作破裂。大额资金事务反复权衡，升职加薪先缓。',
-                wealth: '起落不定，不合伙不借贷，防背信违约。轻资产投资，下半年较好。',
-                love: '桃花运上升但多烂桃花。有伴侣注意家庭关系。',
-                health: '压力大能量低，小毛病多，注意肠胃、三高、慢性病。',
-                advice: '内耗解决不了事情，平安最重要',
-                tags: ['害太岁', '官符', '五鬼']
-            },
-            '虎': {
-                rank: 2,
-                rankText: '大吉',
-                rankClass: 'rank-top',
-                summary: '寅午半合火局，天时相助，贵人运旺',
-                career: '将星高照，黄金发展阶段。获上司认可，有望贵人提携，名利双收，可创业但需谨慎规划。',
-                wealth: '金匮星入命（财库星），偏财正财都在线。不懒就有回报，适合稳健投资，避免冲动消费。',
-                love: '还不错但波动大，渴望深情又敏感。恋爱中需信任、多沟通包容。',
-                health: '关注心血管与肝胆，火气过旺+应酬多，酗酒饮食不节加重负担。',
-                advice: '大将军挂帅出征，火力全开',
-                tags: ['寅午半合', '三台', '将星', '五鬼']
-            },
-            '兔': {
-                rank: 6,
-                rankText: '中等',
-                rankClass: 'rank-mid',
-                summary: '卯午相破，人际关系问题、计划被打乱',
-                career: '有突破机会但奔波劳累，出差多、高强度工作。有贵人助力化险为夷，主动求变更易突破。',
-                wealth: '正财稳定，守稳根基，不冲动投资。',
-                love: '异性缘好，单身推进关系要慢，有伴侣注意沟通。',
-                health: '下半年易突发小意外或磕碰，出行运动谨慎。',
-                advice: '破旧立新，喜事临门',
-                tags: ['卯午相破', '太阴', '天喜']
-            },
-            '龙': {
-                rank: 7,
-                rankText: '中等',
-                rankClass: 'rank-mid',
-                summary: '印星强旺至空前高度，整体比较佛系',
-                career: '目标别定太高，抓不到重点，工作拖拉变懒，出错概率大。有事多找"领导"，多提升技能。',
-                wealth: '下半年好于上半年，保守为主，开销多，不合伙，财务要透明。',
-                love: '不利感情，有伴侣倍感寂寞（尤其女性），喜欢独处，防外人趁虚而入。单身的等时机。',
-                health: '无大毛病，出行注意安全，别三心二意。',
-                advice: '印星强旺，有事没事找"领导"',
-                tags: ['印星强旺', '天狗', '血刃', '寡宿']
-            },
-            '蛇': {
-                rank: 9,
-                rankText: '较差',
-                rankClass: 'rank-low',
-                summary: '巳午火同根同源，暗合太岁，但情绪低状态差',
-                career: '职场竞争大，易被抢单，项目推进慢。',
-                wealth: '相对低迷，上半年起伏大，下半年好一些。',
-                love: '情绪多变忽冷忽热，不利感情，期望值太高，矛盾多有分开可能。',
-                health: '注意肝肾问题。',
-                advice: '感情易生事端',
-                tags: ['暗合太岁', '文昌']
-            },
-            '马': {
-                rank: 8,
-                rankText: '中等',
-                rankClass: 'rank-mid',
-                summary: '值太岁（本命年），午午自刑，旺极转弱',
-                career: '生活繁忙，有开创事业想法但困难重重。经历波折和小人问题，保持冷静可平稳度过。领导力和价值感会被发现升级。',
-                wealth: '表现平平，有赚但破财风险更大，现金流紧张，谨慎理财。',
-                love: '多波折，自我烦恼和误解影响感情，猜忌沟通困难，有分离风险。单身再等等。',
-                health: '注意心脏和血液循环系统，可能心悸、胸闷、气短。注重休息适当运动。',
-                advice: '做个聚光灯下的积极主动有担当的汉子',
-                tags: ['值太岁', '伏吟', '将星', '岁驾']
-            },
-            '羊': {
-                rank: 3,
-                rankText: '吉',
-                rankClass: 'rank-top',
-                summary: '午未六合，整体良好，贵人助力化险为夷',
-                career: '年中关键期，新合作机会。展示磨炼自己，升职加薪可能性大。不退缩不贪图享乐。',
-                wealth: '整体一般，稳着来，避免过度消费和小恩小惠诱惑。高风险投资不碰，今年更多是名誉职位增长。',
-                love: '颇为顺遂，单身积极社交可遇志同道合伴侣，大胆追求。',
-                health: '总体良好，注意肠胃，饮食规律，别暴饮暴食，少喝酒。',
-                advice: '贵人助力多，稳中求升',
-                tags: ['午未六合', '太阳', '天空']
-            },
-            '猴': {
-                rank: 4,
-                rankText: '吉',
-                rankClass: 'rank-top',
-                summary: '驿马星+文昌星，探索新板块，扩张事业版图',
-                career: '上半年不如下半年，整体上升。边做边学新领域，空杯心态。晋升机会在下半年，上半年要卖力。',
-                wealth: '整体上升与事业挂钩，有偏财运，可考虑副业。',
-                love: '桃花旺盛，单身多社交。有伴侣保持自律，别因诱惑破坏情感，别把工作压力带回家。',
-                health: '注意呼吸道问题，咳嗽喉咙不适，少去人多的地方。',
-                advice: '重新启程，谨防小人',
-                tags: ['驿马星', '文昌']
-            },
-            '鸡': {
-                rank: 1,
-                rankText: '大吉',
-                rankClass: 'rank-top',
-                summary: '众多贵人星环抱，压力多但贵人超多',
-                career: '晋升加薪机会明显，工作量增多但问题及时处理别放任。处理事情要低调防小人嫉妒。',
-                wealth: '正财运很不错，偏财谨慎。对他人的援助注意分辨真实动机。',
-                love: '桃花运好，找伴侣结婚蛮合适。有伴侣别因事业压力忽视家庭。',
-                health: '火克金影响呼吸系统，但恢复能力不错，身心疲劳也能改善。',
-                advice: '众多贵人星环抱，主动出击跳出舒适圈',
-                tags: ['贵人星', '禄勋', '将星']
-            },
-            '狗': {
-                rank: 5,
-                rankText: '吉',
-                rankClass: 'rank-top',
-                summary: '戌午半合火局，三台星护身，但有种被盯上的感觉',
-                career: '积极迎接挑战，创意灵感强，才华可积极展现。碰灰色地带会被发现，遵纪守法不挑战权威。',
-                wealth: '不稳，有争夺之象易破财，偏财不佳。不碰高风险投资（股票、彩票、赌博），合伙生意不建议。',
-                love: '相对平淡，遇心仪对象需更多真诚努力。有伴侣注意行为举止，偷情会被曝光。',
-                health: '整体平淡，避免过度饮酒。',
-                advice: '积极迎接挑战，平步青云',
-                tags: ['戌午半合', '三台', '地解']
-            },
-            '猪': {
-                rank: 5,
-                rankText: '吉',
-                rankClass: 'rank-top',
-                summary: '午亥暗合，内部力量生发，机遇和博弈共存',
-                career: '总体理想，有晋升机会，努力获认可。保持谦虚，别夸大功劳，别自负急功近利。',
-                wealth: '收入可观但付出回报不成正比，比较累。上半年压力大，下半年改善。',
-                love: '异性缘不错多社交助脱单，前期慢慢发展给磨合时间。有伴侣温柔沟通，外面的花草短暂且有曝光风险。',
-                health: '注意慢性疾病和泌尿系统问题。',
-                advice: '机遇和博弈共存，暗合下暗藏危机',
-                tags: ['午亥暗合', '紫微', '龙德']
+        // ===== 天干地支数据 =====
+        const tiangan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+        const dizhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+        const zodiacAnimals = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+        const zodiacEmoji = ['🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑','🐵','🐔','🐶','🐷'];
+        
+        // 五行
+        const wuxingByTiangan = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+        const wuxingByDizhi = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+        
+        // 生肖关系矩阵
+        // 六合: 子丑, 寅亥, 卯戌, 辰酉, 巳申, 午未
+        const liuheMap = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+        // 三合: 申子辰, 亥卯未, 寅午戌, 巳酉丑
+        const sanheGroups = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
+        // 六冲: 子午, 丑未, 寅申, 卯酉, 辰戌, 巳亥
+        const chongMap = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+        // 六害: 子未, 丑午, 寅巳, 卯辰, 申亥, 酉戌
+        const haiMap = {'子':'未','未':'子','丑':'午','午':'丑','寅':'巳','巳':'寅','卯':'辰','辰':'卯','申':'亥','亥':'申','酉':'戌','戌':'酉'};
+        
+        function getYearGanZhi(year) {
+            const ganIdx = (year - 4) % 10;
+            const zhiIdx = (year - 4) % 12;
+            return { gan: tiangan[ganIdx], zhi: dizhi[zhiIdx], zodiac: zodiacAnimals[zhiIdx], emoji: zodiacEmoji[zhiIdx] };
+        }
+        
+        function getSanheGroup(zhi) {
+            for (const g of sanheGroups) {
+                if (g.includes(zhi)) return g;
             }
-        };
-
-        // 选择生肖
+            return [];
+        }
+        
+        function getRelation(userZodiac, yearZhi) {
+            const userZhi = dizhi[zodiacAnimals.indexOf(userZodiac)];
+            // 同生肖
+            if (userZhi === yearZhi) return {type:'值太岁',level:'low',desc:'本命年，值太岁，运势起伏较大，需谨慎行事'};
+            // 六冲
+            if (chongMap[userZhi] === yearZhi) return {type:'冲太岁',level:'low',desc:'与流年相冲，变动较多，宜静不宜动'};
+            // 六害
+            if (haiMap[userZhi] === yearZhi) return {type:'害太岁',level:'low',desc:'与流年相害，人际关系易出问题，谨防小人'};
+            // 六合
+            if (liuheMap[userZhi] === yearZhi) return {type:'六合贵人',level:'top',desc:'与流年六合，贵人运极佳，诸事顺遂'};
+            // 三合
+            const group = getSanheGroup(userZhi);
+            if (group.includes(yearZhi)) return {type:'三合贵人',level:'top',desc:'与流年三合，运势旺盛，多有助力'};
+            // 一般
+            return {type:'平稳',level:'mid',desc:'与流年关系平和，运势平稳，按部就班即可'};
+        }
+        
+        // ===== 动态生成运势 =====
+        function generateDynamicFortune(zodiac, year, month, day) {
+            const gz = getYearGanZhi(year);
+            const userZhi = dizhi[zodiacAnimals.indexOf(zodiac)];
+            const rel = getRelation(zodiac, gz.zhi);
+            const yearWx = wuxingByDizhi[gz.zhi];
+            const userWx = wuxingByDizhi[userZhi];
+            
+            // 排名：根据关系类型
+            const rankMap = {
+                '六合贵人': {rank:1, text:'大吉', cls:'rank-top'},
+                '三合贵人': {rank:2, text:'大吉', cls:'rank-top'},
+                '平稳': {rank:6, text:'中等', cls:'rank-mid'},
+                '值太岁': {rank:10, text:'需谨慎', cls:'rank-low'},
+                '冲太岁': {rank:11, text:'需谨慎', cls:'rank-low'},
+                '害太岁': {rank:9, text:'较差', cls:'rank-low'}
+            };
+            const rankInfo = rankMap[rel.type] || {rank:7, text:'中等', cls:'rank-mid'};
+            
+            // 根据五行关系生成运势文字
+            const wxInteract = yearWx + userWx;
+            let career, wealth, love, health, advice;
+            
+            if (rel.type === '六合贵人' || rel.type === '三合贵人') {
+                career = year + '年贵人星高照，事业发展顺遂。有升职加薪的机会，大胆展示自己的能力，容易获得上级赏识。合作项目进展顺利，可以积极拓展人脉。';
+                wealth = '财运亨通，正财偏财皆有收获。适合稳健投资，但也要注意节制消费。上半年财运渐入佳境，下半年收获颇丰。';
+                love = '桃花运旺盛，单身者有机会遇到心仪对象。有伴侣者感情甜蜜，适合谈婚论嫁。';
+                health = '整体健康状况良好，精力充沛。注意饮食规律，适当锻炼身体。';
+                advice = '把握机遇，乘势而上，但也要保持谦逊，不可得意忘形。';
+            } else if (rel.type === '值太岁') {
+                career = '本命年值太岁，事业上容易遇到波折和挑战。建议稳扎稳打，不宜冒进或跳槽。遇到困难多与长辈沟通，可获得指点。';
+                wealth = '财运起伏较大，有破财风险。不建议大额投资或借贷，开源节流为上策。';
+                love = '感情波动较多，容易产生误会和矛盾。多沟通、多包容，避免因小事争执。';
+                health = '注意身体健康，尤其心脏和循环系统。避免过度劳累，保持良好作息。';
+                advice = '低调行事，穿红色衣物化解太岁，多行善事积累福报。';
+            } else if (rel.type === '冲太岁') {
+                career = '冲太岁之年，事业动荡不安，可能出现岗位变动或工作环境变化。不宜做重大决策，保持现有状态为佳。';
+                wealth = '财运不稳，注意破财和意外开销。避免高风险投资，理财要保守。';
+                love = '感情方面易生变数，有伴侣者注意沟通方式，单身的耐心等待时机。';
+                health = '出行注意安全，尤其交通安全。肠胃和消化系统需多加留意。';
+                advice = '以静制动，不宜远行或搬家。可佩戴相关生肖饰品化解冲煞。';
+            } else if (rel.type === '害太岁') {
+                career = '害太岁之年，职场人际关系复杂，容易与同事产生误会。注意言行举止，避免卷入是非之争。';
+                wealth = '财运一般，谨防合作中的财务纠纷。不宜合伙经商，借贷需谨慎。';
+                love = '感情运势低迷，容易因外界因素影响感情。多花时间陪伴对方，增进信任。';
+                health = '压力较大，注意调节情绪。小毛病较多，及时就医不要拖延。';
+                advice = '谨言慎行，远离是非。适当独处反思，提升自我修养。';
+            } else {
+                // 平稳
+                career = year + '年事业运势平稳，按部就班即可。虽然没有大的突破，但也不会有大的波折。适合学习新技能，为未来发展做准备。';
+                wealth = '财运稳定，正财收入正常。偏财运一般，不建议冒险投资。日常开销需合理规划。';
+                love = '感情生活平淡但稳定。单身者需要主动社交才有机会，有伴侣的相互理解即可。';
+                health = '身体状况良好，无大碍。保持良好的生活习惯，适当运动即可。';
+                advice = '稳中求进，积微成著。今年适合沉淀和积累，为将来打好基础。';
+            }
+            
+            // 根据月份微调
+            const seasonTips = {
+                1: '新年伊始，万象更新，宜制定年度计划。',
+                2: '初春时节，运势渐起，适合开拓新领域。',
+                3: '春暖花开，运势上升，社交活动增多。',
+                4: '春末夏初，精力旺盛，适合推进重要事项。',
+                5: '盛夏将至，运势达到高峰，抓住机遇。',
+                6: '年中时节，回顾调整，为下半年蓄力。',
+                7: '盛夏炎炎，注意劳逸结合，避免过劳。',
+                8: '秋意渐浓，收获在望，前期努力见成效。',
+                9: '金秋时节，适合总结和规划，财运渐好。',
+                10: '秋末冬初，宜保守行事，关注健康。',
+                11: '冬季来临，运势趋稳，适合内省和规划。',
+                12: '岁末年终，总结过往，为新年做好准备。'
+            };
+            
+            const tags = (function() {
+                const t = [];
+                if (rel.type !== '平稳') t.push(rel.type);
+                t.push(yearWx + userWx + '相生');
+                if (year === 2026) t.push('丙午');
+                if (year === 2027) t.push('丁未');
+                if (year === 2028) t.push('戊申');
+                if (year === 2029) t.push('己酉');
+                if (year === 2030) t.push('庚戌');
+                return t.slice(0, 4);
+            })();
+            
+            return {
+                rank: rankInfo.rank,
+                rankText: rankInfo.text,
+                rankClass: rankInfo.cls,
+                summary: gz.gan + gz.zhi + '年（' + gz.zodiac + '年），' + rel.desc,
+                career: career,
+                wealth: wealth,
+                love: love,
+                health: health,
+                advice: advice,
+                tags: tags,
+                yearName: gz.gan + gz.zhi + '年',
+                yearZodiac: gz.zodiac,
+                yearEmoji: gz.emoji,
+                monthTip: seasonTips[month] || '',
+                relationType: rel.type
+            };
+        }
+        
+        // 当前选择
+        let currentYear = 2026, currentMonth = 5, currentDay = 27, currentZodiac = null;
+        
+        function initDateSelectors() {
+            const yearSelect = document.getElementById('yearSelect');
+            for (let y = 2024; y <= 2032; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y + '年 ' + getYearGanZhi(y).gan + getYearGanZhi(y).zhi + '年(' + getYearGanZhi(y).zodiac + ')';
+                if (y === currentYear) opt.selected = true;
+                yearSelect.appendChild(opt);
+            }
+            
+            document.getElementById('monthSelect').value = currentMonth;
+            updateDaySelect(currentYear, currentMonth);
+            document.getElementById('daySelect').value = currentDay;
+            updateDateBadge();
+        }
+        
+        function updateDaySelect(year, month) {
+            const daySelect = document.getElementById('daySelect');
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const oldVal = daySelect.value;
+            daySelect.innerHTML = '';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d + '日';
+                daySelect.appendChild(opt);
+            }
+            const newVal = Math.min(oldVal || currentDay, daysInMonth);
+            daySelect.value = newVal;
+            currentDay = newVal;
+        }
+        
+        function updateDateBadge() {
+            const gz = getYearGanZhi(currentYear);
+            document.getElementById('dateBadge').textContent = currentYear + '年 ' + gz.gan + gz.zhi + '年(' + gz.zodiac + ') ' + currentMonth + '月' + currentDay + '日';
+            document.getElementById('queryHint').textContent = '查看' + currentYear + '年（' + gz.gan + gz.zhi + '年）你的生肖运势详解';
+        }
+        
+        function onYearChange() {
+            currentYear = parseInt(document.getElementById('yearSelect').value);
+            updateDaySelect(currentYear, currentMonth);
+            updateDateBadge();
+            if (currentZodiac) selectZodiac(currentZodiac);
+        }
+        
+        function onMonthChange() {
+            currentMonth = parseInt(document.getElementById('monthSelect').value);
+            updateDaySelect(currentYear, currentMonth);
+            updateDateBadge();
+            if (currentZodiac) selectZodiac(currentZodiac);
+        }
+        
+        function onDayChange() {
+            currentDay = parseInt(document.getElementById('daySelect').value);
+            updateDateBadge();
+            if (currentZodiac) selectZodiac(currentZodiac);
+        }
+        
         function selectZodiac(zodiac) {
+            currentZodiac = zodiac;
             // 更新卡片状态
-            const cards = document.querySelectorAll('.zodiac-card');
-            cards.forEach(card => {
+            document.querySelectorAll('.zodiac-card').forEach(card => {
                 card.classList.remove('active');
-                if (card.dataset.zodiac === zodiac) {
-                    card.classList.add('active');
-                }
+                if (card.dataset.zodiac === zodiac) card.classList.add('active');
             });
-
-            // 显示运势结果
             showFortune(zodiac);
         }
-
-        // 显示运势结果
+        
         function showFortune(zodiac) {
-            const data = fortune2026[zodiac];
-            if (!data) return;
-
-            let html = `
-                <div class="fortune-year">📅 2026年（丙午年）${zodiac}运势</div>
-                <div class="fortune-rank ${data.rankClass}">排名：第${data.rank}名 | ${data.rankText}</div>
-                
-                <div class="fortune-section">
-                    <h3>📊 综合运势</h3>
-                    <p>${data.summary}</p>
-                </div>
-
-                <div class="fortune-section">
-                    <h3>💼 事业运</h3>
-                    <p>${data.career}</p>
-                </div>
-
-                <div class="fortune-section">
-                    <h3>💰 财运</h3>
-                    <p>${data.wealth}</p>
-                </div>
-
-                <div class="fortune-section">
-                    <h3>💕 感情运</h3>
-                    <p>${data.love}</p>
-                </div>
-
-                <div class="fortune-section">
-                    <h3>🏥 健康运</h3>
-                    <p>${data.health}</p>
-                </div>
-
-                <div class="fortune-section">
-                    <h3>💡 建议</h3>
-                    <p><strong>${data.advice}</strong></p>
-                </div>
-
-                <div class="fortune-tags">
-            `;
-
-            data.tags.forEach(tag => {
-                html += `<span class="fortune-tag">${tag}</span>`;
-            });
-
-            html += `
-                </div>
-            `;
-
+            const data = generateDynamicFortune(zodiac, currentYear, currentMonth, currentDay);
+            
+            let html = '<div class="fortune-year">📅 ' + data.yearName + '（' + data.yearZodiac + '年）' + zodiac + '运势</div>';
+            html += '<div class="fortune-rank ' + data.rankClass + '">排名：第' + data.rank + '名 | ' + data.rankText + ' | ' + data.relationType + '</div>';
+            
+            html += '<div class="fortune-section"><h3>📊 综合运势</h3><p>' + data.summary + '</p></div>';
+            html += '<div class="fortune-section"><h3>💼 事业运</h3><p>' + data.career + '</p></div>';
+            html += '<div class="fortune-section"><h3>💰 财运</h3><p>' + data.wealth + '</p></div>';
+            html += '<div class="fortune-section"><h3>💕 感情运</h3><p>' + data.love + '</p></div>';
+            html += '<div class="fortune-section"><h3>🏥 健康运</h3><p>' + data.health + '</p></div>';
+            
+            if (data.monthTip) {
+                html += '<div class="fortune-section"><h3>📌 ' + currentMonth + '月运势提示</h3><p>' + data.monthTip + ' 当前' + data.yearZodiac + '年' + currentMonth + '月，流月运势' + (data.rank <= 3 ? '良好' : data.rank <= 7 ? '平稳' : '需留意') + '。</p></div>';
+            }
+            
+            html += '<div class="fortune-section"><h3>💡 建议</h3><p><strong>' + data.advice + '</strong></p></div>';
+            
+            html += '<div class="fortune-tags">';
+            data.tags.forEach(tag => { html += '<span class="fortune-tag">' + tag + '</span>'; });
+            html += '</div>';
+            
             document.getElementById('fortuneResult').innerHTML = html;
             document.getElementById('fortuneResult').style.display = 'block';
+            
+            // 滚动到结果区
+            document.getElementById('fortuneResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-
+        
         // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
+            initDateSelectors();
         });
     </script>
-
-        <!-- 分析表单 -->
-        <div class="tab-content active" id="formTab">
-            <div class="form-container">
-                
-            <div class="form-group">
-                <label class="form-label">选择生肖</label>
-                <select class="form-select" id="zodiacInput">
-                    <option value="鼠">鼠</option>
-                    <option value="牛">牛</option>
-                    <option value="虎">虎</option>
-                    <option value="兔">兔</option>
-                    <option value="龙">龙</option>
-                    <option value="蛇">蛇</option>
-                    <option value="马">马</option>
-                    <option value="羊">羊</option>
-                    <option value="猴">猴</option>
-                    <option value="鸡">鸡</option>
-                    <option value="狗">狗</option>
-                    <option value="猪">猪</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">查询年份</label>
-                <input type="number" class="form-input" id="yearInput" value="2026">
-            </div>
-        
-                <button type="button" class="submit-btn" onclick="calculateModule()">开始分析</button>
-            </div>
-        </div>
-        <!-- 结果展示 -->
-        <div class="tab-content" id="resultTab">
-            <div class="result-container" id="resultContainer">
-                
-        <div class="result-section"><h3>🐲 生肖运势分析结果</h3>
-        <div class="analysis-text">
-            <p><strong>生肖：</strong><span id="zodiacResult"></span></p>
-            <p><strong>年份：</strong><span id="yearResult"></span></p>
-            <p><strong>整体运势：</strong><span id="overallResult"></span></p>
-            <p><strong>事业运：</strong><span id="careerResult"></span></p>
-            <p><strong>财运：</strong><span id="wealthResult"></span></p>
-        </div>
-        </div>
-        
-            </div>
-        </div>
-    
-    <script>
-    function calculateModule() {
-        if (window.showToast) window.showToast('正在分析中...');
-        setTimeout(function() {
-            // 这里调用真正的分析计算
-            var resultHtml = generateResultHTML();
-            document.getElementById('resultContainer').innerHTML = resultHtml;
-            if (window.switchTab) window.switchTab('result');
-            if (window.showToast) window.showToast('分析完成！');
-        }, 1200);
-    }
-    
-    function generateResultHTML() {
-        // 读取表单值并生成结果
-        var html = '<div class="result-section fade-in">';
-        html += '<h3>📊 分析结果</h3>';
-        html += '<div class="analysis-text">';
-        html += '<p>根据您提供的信息，分析结果如下：</p>';
-        html += '<p>本分析基于传统玄学理论，仅供参考。</p>';
-        html += '</div></div>';
-        return html;
-    }
-    </script>
-    </body>
+</body>
 </html>

@@ -1,15 +1,52 @@
+# Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
 
-# 敏感配置文件（含AccessKey、密码等）
-api/.env.sms
-api/smtp_config.json
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# 日志
-logs/
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
 *.log
 
-# 数据文件
-data/users.json
-data/tokens.json
+# Test files (temporary)
+test_*.py
+test_*.html
+*_backup*.html
+*_patch*.html
+*_test_report.md
+
+# Temporary docs (keep only final reports)
+*完成报告.md
+*部署指南.md
+*配置指南.md
+*报告.md
+方案*执行*报告.md
+优化*报告.md
+升级*报告.md
+REPORT.md
+CAPTCHA_REPORT.md
+LOGIN_*_REPORT.md
+SMS_REPORT.md
+PythonAnywhere_部署*报告.md
+后端托管*报告.md
+
+# Keep only:
+# - README.md (main documentation)
+# - FINAL_REPORT.md (final summary)
+# - DEPLOYMENT_GUIDE.md (consolidated deployment guide)

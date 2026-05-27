@@ -486,7 +486,6 @@
                             id="captchaText" 
                             name="captcha_text" 
                             placeholder="请输入验证码"
-                            required
                             style="width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; color: #ffffff; font-size: 0.95rem; box-sizing: border-box;"
                         >
                         <input type="hidden" id="captchaId" name="captcha_id" value="">
@@ -693,7 +692,7 @@
         async function handleRegister(event) {
             event.preventDefault();
             
-            const registerBtn = event.target.querySelector('.btn-register') || event.target.querySelector('button[type="submit"]');
+            const registerBtn = document.getElementById('registerBtn');
             if (registerBtn) {
                 registerBtn.disabled = true;
                 registerBtn.textContent = '注册中...';

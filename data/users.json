@@ -37,5 +37,31 @@
     "create_time": "2026-05-27T01:42:39.966886",
     "last_login": "2026-05-27T01:42:39.996361",
     "status": "active"
+  },
+  {
+    "id": "user_YwFkPxFqVDfbP2LFOJ7xEmvhoG8EIIaW",
+    "username": "zztest111",
+    "password": "QcIJlnnxcU2zWTpSiH8afdQ1SL8Hn9ba$7b90b6f92c9be9596570a4338755a04b4dd85037a043e575fc843bbfef0df8c2",
+    "email": "zztest@example.com",
+    "phone": "13600136000",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T04:33:42.191340",
+    "last_login": "2026-05-27T04:33:42.229722",
+    "status": "active"
+  },
+  {
+    "id": "user_B8nKhGB4OqVXcKnOmEB7MUng4dN3ZsAe",
+    "username": "smstest1",
+    "password": "2AcyK11F2wteRKhac0Z3C5UUKbxiYlxV$b76cb7905d4261948d7bf815815dc6c524395576926b8678b3fac843a68dc6b2",
+    "email": "",
+    "phone": "",
+    "avatar": "",
+    "birthday": "",
+    "gender": "",
+    "create_time": "2026-05-27T04:41:08.593708",
+    "last_login": "2026-05-27T04:41:08.593718",
+    "status": "active"
   }
 ]

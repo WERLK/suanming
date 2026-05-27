@@ -443,12 +443,20 @@
     </style>
 <style>
     .back-btn {
-        background: none;
-        border: none;
+        background: rgba(255,215,0,0.1);
+        border: 1px solid rgba(255,215,0,0.3);
+        border-radius: 8px;
         color: #ffd700;
-        font-size: 1.2rem;
+        font-size: 1rem;
         cursor: pointer;
-        padding: 0.5rem;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        transition: all 0.3s;
+    }
+    .back-btn:hover {
+        background: rgba(255,215,0,0.2);
     }
     .page-header {
         display: flex;
@@ -467,7 +475,7 @@
 </head>
 <body>
 <div class="page-header">
-        <button class="back-btn" onclick="window.location.href='/'">←</button>
+        <button class="back-btn" onclick="window.location.href='/'">← 返回首页</button>
         <h1>用户登录</h1>
     </div>
     <div class="content-area">

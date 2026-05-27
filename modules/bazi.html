@@ -202,6 +202,11 @@ body{margin:0;padding:0;background:#0f0c29;color:#fff;font-family:-apple-system,
 <!-- 输入表单 -->
 <div class="form-section" id="formSection">
 <div class="form-group">
+<div class="form-label">身份证号（可选，用于自动推算出生时间）</div>
+<input type="text" class="form-input" id="idCard" placeholder="请输入18位身份证号" maxlength="18" oninput="parseIdCard()">
+<div class="hint" id="idCardHint" style="font-size:0.75rem;color:rgba(255,215,0,0.7);margin-top:0.3rem;"></div>
+</div>
+<div class="form-group">
 <div class="form-label">姓名</div>
 <input type="text" class="form-input" id="baziName" placeholder="请输入姓名（可选）">
 </div>
@@ -607,6 +612,50 @@ function calcXiyong(dayGan,wuxing,monthZhi){
   else if(dayWuxing==='金'){xiyong=['土','金'];jishen=['火','木'];}
   else{xiyong=['金','水'];jishen=['土','火'];}
   return{xiyong,jishen,season};
+}
+
+// ========== 身份证解析 ==========
+function parseIdCard(){
+  const idCard=document.getElementById('idCard').value.trim();
+  const hint=document.getElementById('idCardHint');
+  if(idCard.length<18&&idCard.length<15){
+    hint.textContent='';
+    return;
+  }
+  // 校验格式
+  const idRegex=/^\d{17}[\dXx]$/;
+  const idRegex15=/^\d{15}$/;
+  if(!idRegex.test(idCard)&&!idRegex15.test(idCard)){
+    hint.textContent='⚠️ 身份证号格式不正确';
+    hint.style.color='#ff6b6b';
+    return;
+  }
+  let year,month,day,genderCode;
+  if(idCard.length===18){
+    year=parseInt(idCard.substring(6,10));
+    month=parseInt(idCard.substring(10,12));
+    day=parseInt(idCard.substring(12,14));
+    genderCode=parseInt(idCard.charAt(16));
+  }else{
+    // 15位身份证：年份前两位补19
+    year=parseInt('19'+idCard.substring(6,8));
+    month=parseInt(idCard.substring(8,10));
+    day=parseInt(idCard.substring(10,12));
+    genderCode=parseInt(idCard.charAt(14));
+  }
+  // 填充出生日期
+  const dateStr=year+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+  document.getElementById('baziDate').value=dateStr;
+  // 自动推算时辰（默认午时，并提示用户）
+  if(!document.getElementById('baziTime').value){
+    document.getElementById('baziTime').value='午时';
+  }
+  // 自动设置性别
+  const gender=genderCode%2===1?'male':'female';
+  document.querySelectorAll('.gender-btn').forEach(btn=>btn.classList.remove('active'));
+  document.querySelector('.gender-btn[data-value="'+gender+'"]')?.classList.add('active');
+  hint.innerHTML='✅ 已从身份证解析：'+year+'年'+month+'月'+day+'日，'+ (gender==='male'?'男':'女')+'<br><span style="color:rgba(255,255,255,0.5);font-size:0.7rem;">注：时辰无法从身份证获取，请手动选择或保持默认"午时"</span>';
+  hint.style.color='#51cf66';
 }
 
 // ========== 显示函数 ==========

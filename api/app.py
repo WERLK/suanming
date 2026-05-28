@@ -1334,6 +1334,74 @@ def delete_report(report_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+# ========== 占卜历史 ==========
+DIVINATION_FILE = os.path.join(DATA_DIR, 'divination_history.json')
+
+if not os.path.exists(DIVINATION_FILE):
+    with open(DIVINATION_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/divination-history', methods=['GET'])
+def get_divination_history():
+    """获取用户占卜历史"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(DIVINATION_FILE, 'r', encoding='utf-8') as f:
+            histories = json.load(f)
+        
+        user_histories = histories.get(user['id'], [])
+        user_histories.sort(key=lambda x: x.get('create_time', ''), reverse=True)
+        
+        return jsonify({'success': True, 'histories': user_histories}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/divination-history/<history_id>', methods=['GET'])
+def get_divination_detail(history_id):
+    """获取单个占卜历史详情"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(DIVINATION_FILE, 'r', encoding='utf-8') as f:
+            histories = json.load(f)
+        
+        user_histories = histories.get(user['id'], [])
+        for h in user_histories:
+            if h['id'] == history_id:
+                return jsonify({'success': True, 'history': h}), 200
+        
+        return jsonify({'success': False, 'message': '记录不存在'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/divination-history/<history_id>', methods=['DELETE'])
+def delete_divination_history(history_id):
+    """删除占卜历史"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, _ = result
+        
+        with open(DIVINATION_FILE, 'r', encoding='utf-8') as f:
+            histories = json.load(f)
+        
+        if user['id'] in histories:
+            histories[user['id']] = [h for h in histories[user['id']] if h['id'] != history_id]
+            with open(DIVINATION_FILE, 'w', encoding='utf-8') as f:
+                json.dump(histories, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': '删除成功'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 # ========== 通知设置 ==========
 NOTIFICATIONS_FILE = os.path.join(DATA_DIR, 'notifications.json')
 

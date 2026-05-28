@@ -11,8 +11,8 @@ from datetime import datetime, timedelta
 # 阿里云短信配置（从环境变量读取）
 ALIYUN_ACCESS_KEY_ID = os.environ.get('ALIYUN_ACCESS_KEY_ID', '')
 ALIYUN_ACCESS_KEY_SECRET = os.environ.get('ALIYUN_ACCESS_KEY_SECRET', '')
-ALIYUN_SIGN_NAME = os.environ.get('ALIYUN_SIGN_NAME', '')
-ALIYUN_TEMPLATE_CODE = os.environ.get('ALIYUN_TEMPLATE_CODE', '')
+ALIYUN_SIGN_NAME = os.environ.get('ALIYUN_SIGN_NAME', '速通互联验证码')
+ALIYUN_TEMPLATE_CODE = os.environ.get('ALIYUN_TEMPLATE_CODE', '100001')
 
 
 def send_aliyun_sms(phone, code):

@@ -337,6 +337,7 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/auth.js"></script>
 <script>
 (function() {
     'use strict';
@@ -392,7 +393,7 @@
             var data = await Auth.generateCaptcha();
             if (data.success) {
                 captchaId = data.captcha_id;
-                $('captchaImage').innerHTML = '<img src="' + data.image + '" alt="验证码">';
+                $('captchaImage').innerHTML = '<img src="' + data.captcha_image + '" alt="验证码">';
             }
         } catch (e) {
             Auth.showMsg('authMsg', '验证码加载失败', true);

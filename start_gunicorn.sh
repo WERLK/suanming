@@ -1,18 +1,28 @@
 #!/bin/bash
-cd /root/suanming/api
+# One-click deploy: pull -> init data -> load env -> start gunicorn
+cd /root/suanming
 
-# Auto-detect pip site-packages and add to PYTHONPATH
-PYPATH=$(pip3 show aliyun-python-sdk-core 2>/dev/null | grep Location | awk '{print $2}')
-if [ -n "$PYPATH" ]; then
-    export PYTHONPATH="${PYPATH}:${PYTHONPATH}"
+echo "=== [1/4] Pull code ==="
+git pull origin main
+
+echo "=== [2/4] Init data files ==="
+python3 init_data.py
+
+echo "=== [3/4] Load env ==="
+if [ -f /etc/profile.d/aliyun_sms.sh ]; then
+    source /etc/profile.d/aliyun_sms.sh
 fi
 
-# Aliyun SMS env vars must be set before running this script
-# export ALIYUN_ACCESS_KEY_ID='your_key_id'
-# export ALIYUN_ACCESS_KEY_SECRET='your_key_secret'
+echo "=== [4/4] Start gunicorn ==="
+cd /root/suanming/api
+PYPATH=$(pip3 show aliyun-python-sdk-core 2>/dev/null | grep Location | awk '{print $2}')
+[ -n "$PYPATH" ] && export PYTHONPATH="${PYPATH}:${PYTHONPATH}"
 
-pkill -f gunicorn
+pkill -f gunicorn 2>/dev/null || true
 sleep 3
 nohup gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app > /root/suanming/logs/gunicorn.log 2>&1 &
 sleep 3
-echo "Gunicorn started, PID: $(pgrep -f 'gunicorn.*app:app' | head -1)"
+
+echo ""
+echo "=== Done ==="
+cd /root/suanming && python3 backend_check.py

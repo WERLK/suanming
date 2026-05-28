@@ -26,7 +26,7 @@ def main():
     endpoints = [
         (f"{base}/api/health", "Health Check"),
         (f"{base}/api/version", "Version Info"),
-        (f"{base}/api/user/profile", "User Profile"),
+        (f"{base}/api/profile", "User Profile"),
         (f"{base}/api/favorites", "Favorites"),
         (f"{base}/api/help/register", "Help Center"),
         (f"{base}/api/about", "About Us"),

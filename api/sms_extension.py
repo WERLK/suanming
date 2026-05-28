@@ -34,7 +34,7 @@ def send_aliyun_sms(phone, code):
 
     try:
         from aliyunsdkcore.client import AcsClient
-        from aliyunsdkdysmsapi.request.v20170525 import SendSmsRequest
+        from aliyunsdkdysmsapi.request.v20170525.SendSmsRequest import SendSmsRequest
 
         # 初始化客户端
         acs_client = AcsClient(

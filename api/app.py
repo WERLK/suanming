@@ -13,7 +13,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import json
 import hashlib
-import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -24,6 +23,8 @@ import jwt
 from PIL import Image, ImageDraw, ImageFont
 import io
 import base64
+import threading
+import time
 
 app = Flask(__name__, static_folder='../', static_url_path='')
 app.secret_key = 'xuanji_fortune_secret_key_2026!!'  # 32+ chars for HS256
@@ -37,16 +38,59 @@ limiter = Limiter(
     storage_uri="memory://",  # 使用内存存储（生产环境建议使用 Redis）
 )
 
-
-# 验证码存储（实际项目中应使用Redis或数据库）
-captcha_store = {}
-slider_store = {}
-
 # 用户数据存储文件（使用绝对路径）
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
 USERS_FILE = os.path.join(DATA_DIR, 'users.json')
 TOKENS_FILE = os.path.join(DATA_DIR, 'tokens.json')
+CAPTCHA_FILE = os.path.join(DATA_DIR, 'captcha_store.json')
+
+# ========== 验证码文件存储（支持多 worker 共享） ==========
+_captcha_lock = threading.Lock()
+
+def _load_captcha_store():
+    """从文件加载验证码存储（线程安全）"""
+    if os.path.exists(CAPTCHA_FILE):
+        try:
+            with open(CAPTCHA_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return {}
+    return {}
+
+def _save_captcha_store(store):
+    """保存验证码存储到文件（线程安全）"""
+    with _captcha_lock:
+        # 清理过期条目
+        now = datetime.now().isoformat()
+        store = {k: v for k, v in store.items() if v.get('expire_time', '') > now}
+        with open(CAPTCHA_FILE, 'w', encoding='utf-8') as f:
+            json.dump(store, f, ensure_ascii=False)
+
+def _get_captcha_entry(captcha_id):
+    """获取单个验证码条目"""
+    store = _load_captcha_store()
+    if captcha_id not in store:
+        return None
+    entry = store[captcha_id]
+    if datetime.now().isoformat() > entry.get('expire_time', ''):
+        del store[captcha_id]
+        _save_captcha_store(store)
+        return None
+    return entry
+
+def _set_captcha_entry(captcha_id, entry):
+    """设置验证码条目"""
+    store = _load_captcha_store()
+    store[captcha_id] = entry
+    _save_captcha_store(store)
+
+def _delete_captcha_entry(captcha_id):
+    """删除验证码条目"""
+    store = _load_captcha_store()
+    if captcha_id in store:
+        del store[captcha_id]
+        _save_captcha_store(store)
 
 # 确保数据目录存在
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -258,10 +302,11 @@ def generate_captcha():
         image.save(img_io, 'PNG')
         img_io.seek(0)
         captcha_id = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
-        captcha_store[captcha_id] = {
+        _set_captcha_entry(captcha_id, {
+            'type': 'image',
             'text': captcha_text,
             'expire_time': (datetime.now() + timedelta(minutes=5)).isoformat()
-        }
+        })
         img_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
         return jsonify({
             'success': True,
@@ -280,16 +325,12 @@ def verify_captcha():
         captcha_text = data.get('captcha_text', '').strip().upper()
         if not captcha_id or not captcha_text:
             return jsonify({'success': False, 'message': '参数不完整'}), 400
-        if captcha_id not in captcha_store:
+        entry = _get_captcha_entry(captcha_id)
+        if not entry or entry.get('type') != 'image':
             return jsonify({'success': False, 'message': '验证码已失效，请刷新'}), 400
-        captcha_data = captcha_store[captcha_id]
-        expire_time = datetime.fromisoformat(captcha_data['expire_time'])
-        if datetime.now() > expire_time:
-            del captcha_store[captcha_id]
-            return jsonify({'success': False, 'message': '验证码已过期，请刷新'}), 400
-        if captcha_data['text'] != captcha_text:
+        if entry['text'] != captcha_text:
             return jsonify({'success': False, 'message': '验证码错误'}), 400
-        del captcha_store[captcha_id]
+        _delete_captcha_entry(captcha_id)
         return jsonify({'success': True, 'message': '验证成功'}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'验证验证码失败: {str(e)}'}), 500
@@ -301,11 +342,12 @@ def generate_slider():
         target_x = random.randint(20, 80)
         target_y = random.randint(30, 70)
         slider_id = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
-        slider_store[slider_id] = {
+        _set_captcha_entry(slider_id, {
+            'type': 'slider',
             'target_x': target_x,
             'target_y': target_y,
             'expire_time': (datetime.now() + timedelta(minutes=5)).isoformat()
-        }
+        })
         return jsonify({
             'success': True,
             'slider_id': slider_id,
@@ -325,21 +367,67 @@ def verify_slider():
         slider_x = data.get('slider_x', 0)
         if not slider_id or slider_x is None:
             return jsonify({'success': False, 'message': '参数不完整'}), 400
-        if slider_id not in slider_store:
+        entry = _get_captcha_entry(slider_id)
+        if not entry or entry.get('type') != 'slider':
             return jsonify({'success': False, 'message': '滑块验证码已失效，请刷新'}), 400
-        slider_data = slider_store[slider_id]
-        expire_time = datetime.fromisoformat(slider_data['expire_time'])
-        if datetime.now() > expire_time:
-            del slider_store[slider_id]
-            return jsonify({'success': False, 'message': '滑块验证码已过期，请刷新'}), 400
-        target_x = slider_data['target_x']
+        target_x = entry['target_x']
         if abs(slider_x - target_x) <= 5:
-            del slider_store[slider_id]
+            _delete_captcha_entry(slider_id)
             return jsonify({'success': True, 'message': '验证成功'}), 200
         else:
             return jsonify({'success': False, 'message': '请再试一次'}), 400
     except Exception as e:
         return jsonify({'success': False, 'message': f'验证滑块验证码失败: {str(e)}'}), 500
+
+# ========== 短信验证码 ==========
+
+@limiter.limit("3 per minute")
+@app.route('/api/sms/send', methods=['POST'])
+def send_sms():
+    """发送短信验证码"""
+    try:
+        data = request.get_json()
+        phone = data.get('phone', '').strip()
+        if not phone or not phone.isdigit() or len(phone) != 11:
+            return jsonify({'success': False, 'message': '请输入正确的手机号'}), 400
+        # 演示模式：生成验证码并直接返回
+        sms_code = ''.join(random.choices(string.digits, k=6))
+        sms_id = 'sms_' + ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+        _set_captcha_entry(sms_id, {
+            'type': 'sms',
+            'phone': phone,
+            'code': sms_code,
+            'expire_time': (datetime.now() + timedelta(minutes=5)).isoformat()
+        })
+        print(f"【短信验证码】手机: {phone}, 验证码: {sms_code}")
+        return jsonify({
+            'success': True,
+            'message': '验证码已发送',
+            'sms_id': sms_id,
+            'code': sms_code  # 演示模式返回验证码
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'发送失败: {str(e)}'}), 500
+
+@limiter.limit("5 per minute")
+@app.route('/api/sms/verify', methods=['POST'])
+def verify_sms():
+    """验证短信验证码"""
+    try:
+        data = request.get_json()
+        sms_id = data.get('sms_id', '')
+        code = data.get('code', '').strip()
+        if not sms_id or not code:
+            return jsonify({'success': False, 'message': '参数不完整'}), 400
+        entry = _get_captcha_entry(sms_id)
+        if not entry or entry.get('type') != 'sms':
+            return jsonify({'success': False, 'message': '验证码已失效，请重新获取'}), 400
+        if entry['code'] != code:
+            return jsonify({'success': False, 'message': '验证码错误'}), 400
+        # 验证成功，保留条目以便登录时使用（不删除）
+        return jsonify({'success': True, 'message': '验证成功'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'验证失败: {str(e)}'}), 500
 
 @limiter.limit("5 per minute")  # 注册限制：每分钟 5 次
 @app.route('/api/register', methods=['POST'])

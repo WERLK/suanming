@@ -587,6 +587,7 @@
                         </div>
                         <div class="sms-hint" id="smsHint" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-align: center;">验证码已发送到您的手机，5分钟内有效</div>
                         <input type="hidden" id="smsPhoneStored" name="sms_phone_stored" value="">
+                        <input type="hidden" id="smsIdStored" name="sms_id_stored" value="">
                     </div>
                     
                     <div class="form-options">
@@ -748,6 +749,7 @@
                         document.getElementById('smsCode').value = data.code;
                     }
                     document.getElementById('smsPhoneStored').value = phone;
+                    document.getElementById('smsIdStored').value = data.sms_id || '';
                     
                     let countdown = 60;
                     const timer = setInterval(function() {
@@ -972,10 +974,10 @@
                     return;
                 }
             } else if (currentCaptchaType === 'sms') {
-                const smsPhone = document.getElementById('smsPhoneStored').value;
+                const smsId = document.getElementById('smsIdStored').value;
                 const smsCode = document.getElementById('smsCode').value.trim();
                 
-                if (!smsPhone || !smsCode) {
+                if (!smsId || !smsCode) {
                     showRegError('请先获取并输入短信验证码');
                     if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
                     return;
@@ -986,7 +988,7 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            phone: smsPhone,
+                            sms_id: smsId,
                             code: smsCode
                         })
                     });

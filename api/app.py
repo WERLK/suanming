@@ -489,8 +489,10 @@ def register():
         }
         users.append(new_user)
         save_users(users)
+        token = generate_token(new_user['id'])
         return jsonify({
             'success': True, 'message': '注册成功',
+            'token': token,
             'user': {
                 'id': new_user['id'],
                 'username': new_user['username'],

@@ -1028,10 +1028,12 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // 注册成功
-                    showRegSuccess('注册成功！正在跳转到登录页面...');
+                    // Auto-login after registration
+                    showRegSuccess('注册成功！正在跳转...');
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
                     setTimeout(() => {
-                        window.location.href = '/login.html';
+                        window.location.href = '/profile.html';
                     }, 1500);
                 } else {
                     // 注册失败

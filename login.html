@@ -1085,16 +1085,9 @@
                     // 登录成功
                     showLoginSuccess('登录成功！正在跳转...');
                     
-                    // 保存token和用户信息
+                    // Save token and user - always persist to localStorage
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    
-                    if (rememberMe) {
-                        localStorage.setItem('rememberMe', 'true');
-                    } else {
-                        sessionStorage.setItem('token', data.token);
-                        sessionStorage.setItem('currentUser', JSON.stringify(data.user));
-                    }
                     
                     // 延迟跳转
                     setTimeout(() => {

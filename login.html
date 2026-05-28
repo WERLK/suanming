@@ -1082,19 +1082,12 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // 登录成功
-                    showLoginSuccess('登录成功！正在跳转...');
-                    
-                    // Save token and user - always persist to localStorage
+                    // Save token and user
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('currentUser', JSON.stringify(data.user));
                     
-                    // 延迟跳转（使用多种方式确保兼容）
-                    setTimeout(() => {
-                        try { window.location.replace('/'); } catch(e) {}
-                        try { window.location.href = '/'; } catch(e) {}
-                        try { window.open('/', '_self'); } catch(e) {}
-                    }, 800);
+                    // 直接跳转
+                    location.assign('/');
                 } else {
                     // 登录失败
                     showLoginError(data.message || '登录失败，请重试');

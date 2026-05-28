@@ -29,7 +29,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/root/suanming/api
-Environment=PYTHONPATH=/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages
+Environment="PYTHONPATH=/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages:/usr/local/lib/python3/dist-packages:/usr/lib/python3/dist-packages"
 EnvironmentFile=$ENV_FILE
 ExecStartPre=/bin/bash -c 'cd /root/suanming && git fetch origin main && git reset --hard origin/main && python3 init_data.py'
 ExecStart=python3 -m gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app

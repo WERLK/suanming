@@ -2,6 +2,35 @@
 短信验证码扩展模块 - 阿里云短信服务
 """
 import os
+import sys
+import subprocess
+
+# Ensure aliyun SDK is available: auto-install if missing
+_sdk_ok = False
+try:
+    import aliyunsdk.core
+    _sdk_ok = True
+except ImportError:
+    pass
+
+if not _sdk_ok:
+    print("[SMS] SDK not found, auto-installing...", flush=True)
+    try:
+        subprocess.check_call(
+            [sys.executable, '-m', 'pip', 'install',
+             'aliyun-python-sdk-core', 'aliyun-python-sdk-dysmsapi',
+             '--quiet', '--user'],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        # Add user site-packages to path
+        import site
+        user_site = site.getusersitepackages()
+        if user_site and user_site not in sys.path:
+            sys.path.insert(0, user_site)
+        print("[SMS] SDK installed to", user_site, flush=True)
+    except Exception as e:
+        print("[SMS] SDK auto-install failed:", e, flush=True)
+
 import re
 import json
 import string

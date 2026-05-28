@@ -1089,10 +1089,12 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('currentUser', JSON.stringify(data.user));
                     
-                    // 延迟跳转
+                    // 延迟跳转（使用多种方式确保兼容）
                     setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1500);
+                        try { window.location.replace('/'); } catch(e) {}
+                        try { window.location.href = '/'; } catch(e) {}
+                        try { window.open('/', '_self'); } catch(e) {}
+                    }, 800);
                 } else {
                     // 登录失败
                     showLoginError(data.message || '登录失败，请重试');

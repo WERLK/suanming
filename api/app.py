@@ -384,27 +384,45 @@ def verify_slider():
 @limiter.limit("3 per minute")
 @app.route('/api/sms/send', methods=['POST'])
 def send_sms():
-    """发送短信验证码"""
+    """发送短信验证码（阿里云）"""
     try:
         data = request.get_json()
         phone = data.get('phone', '').strip()
         if not phone or not phone.isdigit() or len(phone) != 11:
             return jsonify({'success': False, 'message': '请输入正确的手机号'}), 400
-        # 演示模式：生成验证码并直接返回
+        
+        # 生成验证码
         sms_code = ''.join(random.choices(string.digits, k=6))
         sms_id = 'sms_' + ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+        
+        # 尝试通过阿里云发送短信
+        aliyun_sent = False
+        try:
+            from api.sms_extension import send_aliyun_sms
+            success, msg = send_aliyun_sms(phone, sms_code)
+            if success:
+                aliyun_sent = True
+                print(f"【阿里云短信】手机: {phone}, 验证码: {sms_code}, 发送成功")
+            else:
+                print(f"【阿里云短信】手机: {phone}, 发送失败: {msg}")
+        except ImportError:
+            print(f"【阿里云短信】SDK未安装，使用演示模式: {phone}, 验证码: {sms_code}")
+        except Exception as e:
+            print(f"【阿里云短信】异常: {e}, 使用演示模式: {phone}, 验证码: {sms_code}")
+        
+        # 存储验证码（文件存储，支持多worker）
         _set_captcha_entry(sms_id, {
             'type': 'sms',
             'phone': phone,
             'code': sms_code,
             'expire_time': (datetime.now() + timedelta(minutes=5)).isoformat()
         })
-        print(f"【短信验证码】手机: {phone}, 验证码: {sms_code}")
+        
         return jsonify({
             'success': True,
-            'message': '验证码已发送',
+            'message': '验证码已发送' if aliyun_sent else '验证码已发送（演示模式）',
             'sms_id': sms_id,
-            'code': sms_code  # 演示模式返回验证码
+            'code': sms_code if not aliyun_sent else None  # 真实发送不返回验证码
         }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'发送失败: {str(e)}'}), 500

@@ -429,9 +429,7 @@ def send_sms():
             'success': True,
             'message': '验证码已发送' if aliyun_sent else '验证码已发送（演示模式）',
             'sms_id': sms_id,
-            'code': sms_code if not aliyun_sent else None,
-            'aliyun_sent': aliyun_sent,
-            'aliyun_error': aliyun_error if aliyun_error else None
+            'code': sms_code if not aliyun_sent else None
         }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'发送失败: {str(e)}'}), 500
@@ -504,15 +502,13 @@ def register():
         save_users(users)
         token = generate_token(new_user['id'])
         return jsonify({
-            'success': True, 'message': '注册成功',
+            'success': True,
             'token': token,
             'user': {
                 'id': new_user['id'],
-                'username': new_user['username'],
-                'email': new_user['email'],
-                'phone': new_user['phone']
+                'username': new_user['username']
             }
-        }), 201
+        }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'注册失败: {str(e)}'}), 500
 
@@ -534,27 +530,18 @@ def login():
                 user = u
                 break
         if not user:
-            return jsonify({'success': False, 'message': '用户不存在'}), 404
+            return jsonify({'success': False, 'message': '用户不存在'}), 200
         if not verify_password(password, user['password']):
-            return jsonify({'success': False, 'message': '密码错误'}), 401
+            return jsonify({'success': False, 'message': '密码错误'}), 200
         if user.get('status') != 'active':
-            return jsonify({'success': False, 'message': '账户已被禁用'}), 403
+            return jsonify({'success': False, 'message': '账户已被禁用'}), 200
         user['last_login'] = datetime.now().isoformat()
         save_users(users)
         token = generate_token(user['id'])
-        user_info = {
-            'id': user['id'],
-            'username': user['username'],
-            'email': user.get('email', ''),
-            'phone': user.get('phone', ''),
-            'avatar': user.get('avatar', ''),
-            'birthday': user.get('birthday', ''),
-            'gender': user.get('gender', '')
-        }
         response = jsonify({
-            'success': True, 'message': '登录成功',
-            'user': user_info,
-            'token': token
+            'success': True,
+            'token': token,
+            'user': {'id': user['id'], 'username': user['username']}
         })
         if remember:
             response.set_cookie('token', token, max_age=7*24*3600, httponly=True)

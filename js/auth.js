@@ -32,18 +32,14 @@ window.Auth = (function() {
         var token = getToken();
         var headers = options.headers || {};
         headers['Content-Type'] = 'application/json';
-        if (token) {
-            headers['Authorization'] = 'Bearer ' + token;
-        }
+        if (token) headers['Authorization'] = 'Bearer ' + token;
         var resp = await fetch(API_BASE + url, {
             method: options.method || 'GET',
             headers: headers,
             body: options.body ? JSON.stringify(options.body) : undefined
         });
-        var data = await resp.json();
-        if (!resp.ok && data.message) {
-            throw new Error(data.message);
-        }
+        var data;
+        try { data = await resp.json(); } catch (e) { data = {}; }
         return data;
     }
 
@@ -95,7 +91,7 @@ window.Auth = (function() {
                 (remember ? localStorage : sessionStorage).setItem('currentUser', JSON.stringify(data.user));
             }
         }
-        return data;
+        return { success: data.success, message: data.message || (data.success ? '' : '登录失败') };
     }
 
     async function register(username, password, email, phone) {
@@ -109,7 +105,7 @@ window.Auth = (function() {
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
             }
         }
-        return data;
+        return { success: data.success, message: data.message || (data.success ? '' : '注册失败') };
     }
 
     async function logout() {

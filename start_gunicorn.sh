@@ -21,6 +21,7 @@ python3 -m pip install aliyun-python-sdk-core aliyun-python-sdk-dysmsapi --quiet
 
 pkill -f gunicorn 2>/dev/null || true
 sleep 3
+mkdir -p /root/suanming/logs
 nohup gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app > /root/suanming/logs/gunicorn.log 2>&1 &
 sleep 3
 

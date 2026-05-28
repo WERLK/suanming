@@ -170,7 +170,7 @@ function viewReport(reportId) {
                         <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; margin-top:0.5rem; white-space:pre-wrap;">${report.result_data}</div>
                     </div>
                 `;
-                document.getElementById('reportDetailModal').classlist.add('show');
+                document.getElementById('reportDetailModal').classList.add('show');
             }
         }
     })
@@ -178,7 +178,7 @@ function viewReport(reportId) {
 }
 
 function closeReportDetail() {
-    document.getElementById('reportDetailModal').classlist.remove('show');
+    document.getElementById('reportDetailModal').classList.remove('show');
 }
 
 async function deleteReport(reportId, moduleName) {

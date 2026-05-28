@@ -675,10 +675,10 @@
             
             // 更新按钮状态
             document.querySelectorAll('.captcha-type-btn').forEach(btn => {
-                btn.classlist.remove('active');
+                btn.classList.remove('active');
             });
             var targetBtn = document.querySelector('.captcha-type-btn[data-type="' + type + '"]');
-            if (targetBtn) targetBtn.classlist.add('active');
+            if (targetBtn) targetBtn.classList.add('active');
             
             // 显示对应的验证码
             if (type === 'image') {
@@ -862,11 +862,11 @@
         function showLoginError(message) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
-            errorDiv.classlist.add('show');
+            errorDiv.classList.add('show');
             
             // 3秒后自动隐藏
             setTimeout(() => {
-                errorDiv.classlist.remove('show');
+                errorDiv.classList.remove('show');
             }, 3000);
         }
         
@@ -874,11 +874,11 @@
         function showLoginSuccess(message) {
             const successDiv = document.getElementById('successMessage');
             successDiv.textContent = message;
-            successDiv.classlist.add('show');
+            successDiv.classList.add('show');
             
             // 3秒后自动隐藏
             setTimeout(() => {
-                successDiv.classlist.remove('show');
+                successDiv.classList.remove('show');
             }, 3000);
         }
         

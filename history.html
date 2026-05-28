@@ -387,7 +387,7 @@
                     document.getElementById('detailResult').textContent = history.result_data || '无';
                 }
                 
-                document.getElementById('historyDetailModal').classlist.add('show');
+                document.getElementById('historyDetailModal').classList.add('show');
                 
             } catch (error) {
                 console.error('加载详情失败:', error);
@@ -409,7 +409,7 @@
         
         // 关闭历史详情弹窗
         function closeHistoryDetail() {
-            document.getElementById('historyDetailModal').classlist.remove('show');
+            document.getElementById('historyDetailModal').classList.remove('show');
         }
         
         // 删除历史记录

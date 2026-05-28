@@ -818,12 +818,12 @@
         
         // 打开编辑资料弹窗
         function openEditProfile() {
-            document.getElementById('editProfileModal').classlist.add('show');
+            document.getElementById('editProfileModal').classList.add('show');
         }
         
         // 关闭编辑资料弹窗
         function closeEditProfile() {
-            document.getElementById('editProfileModal').classlist.remove('show');
+            document.getElementById('editProfileModal').classList.remove('show');
         }
         
         // 保存资料
@@ -1014,7 +1014,7 @@
             const timer = document.getElementById('adTimer');
             const skipBtn = document.getElementById('adSkipBtn');
             
-            modal.classlist.add('show');
+            modal.classList.add('show');
             skipBtn.style.display = 'none';
             
             let seconds = 5;
@@ -1035,7 +1035,7 @@
 
         async function closeAdModal() {
             clearInterval(adTimerInterval);
-            document.getElementById('adModal').classlist.remove('show');
+            document.getElementById('adModal').classList.remove('show');
             
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (!token) return;

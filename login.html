@@ -902,7 +902,7 @@
                 
                 if (response.ok) {
                     // 已登录，跳转到个人中心
-                    window.location.href = '/profile.html';
+                    window.location.href = '/';
                 } else {
                     // token无效，清除
                     localStorage.removeItem('token');
@@ -914,7 +914,7 @@
                 // 网络错误，允许用户在离线模式下使用localStorage
                 const currentUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
                 if (currentUser) {
-                    window.location.href = '/profile.html';
+                    window.location.href = '/';
                 }
             }
         }
@@ -1091,7 +1091,7 @@
                     
                     // 延迟跳转
                     setTimeout(() => {
-                        window.location.href = '/profile.html';
+                        window.location.href = '/';
                     }, 1500);
                 } else {
                     // 登录失败

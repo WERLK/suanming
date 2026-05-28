@@ -397,18 +397,24 @@ def send_sms():
         
         # 尝试通过阿里云发送短信
         aliyun_sent = False
+        aliyun_error = ''
         try:
             from api.sms_extension import send_aliyun_sms
             success, msg = send_aliyun_sms(phone, sms_code)
             if success:
                 aliyun_sent = True
-                print(f"【阿里云短信】手机: {phone}, 验证码: {sms_code}, 发送成功")
             else:
-                print(f"【阿里云短信】手机: {phone}, 发送失败: {msg}")
-        except ImportError:
-            print(f"【阿里云短信】SDK未安装，使用演示模式: {phone}, 验证码: {sms_code}")
+                aliyun_error = msg
+        except ImportError as e:
+            aliyun_error = f'SDK未安装: {e}'
         except Exception as e:
-            print(f"【阿里云短信】异常: {e}, 使用演示模式: {phone}, 验证码: {sms_code}")
+            aliyun_error = f'异常: {e}'
+        
+        # 如果阿里云发送失败，回退演示模式
+        if not aliyun_sent:
+            print(f"【短信】阿里云发送失败: {aliyun_error}, 回退演示模式: phone={phone}, code={sms_code}")
+        else:
+            print(f"【短信】阿里云发送成功: phone={phone}")
         
         # 存储验证码（文件存储，支持多worker）
         _set_captcha_entry(sms_id, {
@@ -422,7 +428,9 @@ def send_sms():
             'success': True,
             'message': '验证码已发送' if aliyun_sent else '验证码已发送（演示模式）',
             'sms_id': sms_id,
-            'code': sms_code if not aliyun_sent else None  # 真实发送不返回验证码
+            'code': sms_code,  # 始终返回验证码以便演示模式使用
+            'aliyun_sent': aliyun_sent,
+            'aliyun_error': aliyun_error if aliyun_error else None
         }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'发送失败: {str(e)}'}), 500

@@ -46,7 +46,8 @@ def send_aliyun_sms(phone, code):
         request.set_PhoneNumbers(phone)
         request.set_SignName(ALIYUN_SIGN_NAME)
         request.set_TemplateCode(ALIYUN_TEMPLATE_CODE)
-        request.set_TemplateParam(json.dumps({'code': code}))
+        # 模板有两个变量: ${code} 和 ${min}
+        request.set_TemplateParam(json.dumps({'code': code, 'min': '5'}))
         
         # 发送
         response = acs_client.do_action_with_exception(request)

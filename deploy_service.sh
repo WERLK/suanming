@@ -1,17 +1,23 @@
 #!/bin/bash
 # Install systemd service for permanent auto-start
 
-# Convert bash-style env file to systemd-compatible format
+# Source existing env file (contains AccessKey from server)
 BASH_ENV="/etc/profile.d/aliyun_sms.sh"
-SYSTEMD_ENV="/etc/suanming.env"
+ENV_FILE="/etc/suanming.env"
 
 if [ -f "$BASH_ENV" ]; then
-    # Remove 'export ', remove quotes around values
-    sed "s/^export //" "$BASH_ENV" | sed "s/'//g" > "$SYSTEMD_ENV"
-    echo "Created $SYSTEMD_ENV from $BASH_ENV"
+    source "$BASH_ENV"
+    # Convert to systemd format (KEY=value, no export, no quotes)
+    {
+        echo "ALIYUN_ACCESS_KEY_ID=${ALIYUN_ACCESS_KEY_ID}"
+        echo "ALIYUN_ACCESS_KEY_SECRET=${ALIYUN_ACCESS_KEY_SECRET}"
+        echo "ALIYUN_SIGN_NAME=速通互联验证码"
+        echo "ALIYUN_TEMPLATE_CODE=100001"
+    } > "$ENV_FILE"
+    echo "Created $ENV_FILE from $BASH_ENV"
 else
     echo "WARNING: $BASH_ENV not found, SMS will use demo mode"
-    rm -f "$SYSTEMD_ENV"
+    rm -f "$ENV_FILE"
 fi
 
 cat > /etc/systemd/system/suanming.service << SERV
@@ -24,7 +30,7 @@ Type=simple
 User=root
 WorkingDirectory=/root/suanming/api
 Environment=PYTHONPATH=/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages
-EnvironmentFile=-$SYSTEMD_ENV
+EnvironmentFile=$ENV_FILE
 ExecStartPre=/bin/bash -c 'cd /root/suanming && git fetch origin main && git reset --hard origin/main && python3 init_data.py'
 ExecStart=/usr/bin/python3 -m gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app
 ExecReload=/bin/kill -HUP \$MAINPID

@@ -27,7 +27,7 @@ import threading
 import time
 
 app = Flask(__name__, static_folder='../', static_url_path='')
-app.secret_key = 'xuanji_fortune_secret_key_2026!!'  # 32+ chars for HS256
+app.secret_key = os.environ.get('JWT_SECRET', 'xuanji_fortune_secret_key_2026!!')
 CORS(app)
 
 # API 请求限流（防止暴力破解和 API 滥用）
@@ -421,14 +421,15 @@ def send_sms():
             'type': 'sms',
             'phone': phone,
             'code': sms_code,
-            'expire_time': (datetime.now() + timedelta(minutes=5)).isoformat()
+            'expire_time': (datetime.now() + timedelta(minutes=5)).isoformat(),
+            'used': False
         })
         
         return jsonify({
             'success': True,
             'message': '验证码已发送' if aliyun_sent else '验证码已发送（演示模式）',
             'sms_id': sms_id,
-            'code': sms_code,  # 始终返回验证码以便演示模式使用
+            'code': sms_code if not aliyun_sent else None,
             'aliyun_sent': aliyun_sent,
             'aliyun_error': aliyun_error if aliyun_error else None
         }), 200
@@ -448,9 +449,13 @@ def verify_sms():
         entry = _get_captcha_entry(sms_id)
         if not entry or entry.get('type') != 'sms':
             return jsonify({'success': False, 'message': '验证码已失效，请重新获取'}), 400
+        if entry.get('used'):
+            return jsonify({'success': False, 'message': '验证码已使用，请重新获取'}), 400
         if entry['code'] != code:
             return jsonify({'success': False, 'message': '验证码错误'}), 400
-        # 验证成功，保留条目以便登录时使用（不删除）
+        # 标记已使用（一次性）
+        entry['used'] = True
+        _set_captcha_entry(sms_id, entry)
         return jsonify({'success': True, 'message': '验证成功'}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'验证失败: {str(e)}'}), 500

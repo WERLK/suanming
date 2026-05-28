@@ -2,1050 +2,144 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffd700">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="玄机算命">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="msapplication-TileImage" content="/icon-192.png">
-<meta name="msapplication-TileColor" content="#ffd700">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffd700">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>用户注册 - 玄机算命网</title>
-    <link rel="stylesheet" href="/css/style.css?v=20260527">
+    <title>注册 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/profile-compatible.css">
     <style>
-        /* 注册页面特定样式 */
-        .register-container {
-            max-width: 420px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        
-        .register-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-top: 2rem;
-        }
-        
-        .register-header h1 {
-            color: #ffd700;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .register-header p {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-        }
-        
-        .register-form {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.15);
-            border-radius: 16px;
-            padding: 2rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-        
-        .form-group label {
-            display: block;
-            color: #ffd700;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            box-sizing: border-box;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: rgba(255,215,0,0.5);
-            background: rgba(255,255,255,0.08);
-            box-shadow: 0 0 10px rgba(255,215,0,0.1);
-        }
-        
-        .form-group input::placeholder {
-            color: rgba(255,255,255,0.3);
-        }
-        
-        .form-group .hint {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.5);
-            margin-top: 0.3rem;
-            line-height: 1.6;
-        }
-        
-        .password-strength {
-            margin-top: 0.5rem;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .password-strength-bar {
-            height: 100%;
-            width: 0%;
-            transition: all 0.3s;
-            border-radius: 2px;
-        }
-        
-        .strength-weak {
-            background: #ff6b6b;
-            width: 33%;
-        }
-        
-        .strength-medium {
-            background: #ffd43b;
-            width: 66%;
-        }
-        
-        .strength-strong {
-            background: #51cf66;
-            width: 100%;
-        }
-        
-        .form-options {
-            margin-bottom: 1.5rem;
-            font-size: 0.85rem;
-        }
-        
-        .agree-terms {
-            display: flex;
-            align-items: flex-start;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.4;
-        }
-        
-        .agree-terms input {
-            margin-right: 0.5rem;
-            margin-top: 0.2rem;
-        }
-        
-        .agree-terms a {
-            color: #ffd700;
-            text-decoration: none;
-        }
-        
-        .agree-terms a:hover {
-            text-decoration: underline;
-        }
-        
-        .btn-register {
-            width: 100%;
-            padding: 0.9rem;
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            border: none;
-            border-radius: 8px;
-            color: #000;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 1rem;
-        }
-        
-        .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
-        }
-        
-        .btn-register:active {
-            transform: translateY(0);
-        }
-        
-        .btn-register:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .login-link {
-            text-align: center;
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-        }
-        
-        .login-link a {
-            color: #ffd700;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .captcha-container {
-            margin-bottom: 1.5rem;
-        }
-        
-        .captcha-display {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .captcha-image {
-            flex: 1;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 8px;
-            padding: 0.5rem;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-        }
-        
-        .captcha-image img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-        }
-        
-        .captcha-refresh {
-            background: none;
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 8px;
-            color: #ffd700;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-        
-        .captcha-refresh:hover {
-            background: rgba(255,215,0,0.1);
-        }
-        
-        .slider-container {
-            margin-bottom: 1.5rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-        
-        .slider-track {
-            width: 100%;
-            height: 40px;
-            background: linear-gradient(90deg, rgba(255,215,0,0.1), rgba(255,215,0,0.3));
-            border-radius: 20px;
-            position: relative;
-            margin: 1rem 0;
-        }
-        
-        .slider-button {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            border-radius: 50%;
-            position: absolute;
-            left: 0;
-            cursor: grab;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            user-select: none;
-            transition: left 0.1s;
-        }
-        
-        .slider-button:active {
-            cursor: grabbing;
-        }
-        
-        .slider-hint {
-            text-align: center;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-        }
-        
-        .slider-target {
-            width: 4px;
-            height: 40px;
-            background: #ff6b6b;
-            position: absolute;
-            top: 0;
-            border-radius: 2px;
-        }
-        
-        .captcha-type-switch {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .captcha-type-btn {
-            background: none;
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 8px;
-            color: rgba(255,255,255,0.7);
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.85rem;
-        }
-        
-        .captcha-type-btn.active {
-            background: rgba(255,215,0,0.1);
-            color: #ffd700;
-            border-color: rgba(255,215,0,0.5);
-        }
-        
-        .captcha-type-btn:hover {
-            background: rgba(255,215,0,0.05);
-        }
-        
-        .error-message {
-            display: none;
-            background: rgba(255,0,0,0.1);
-            border: 1px solid rgba(255,0,0,0.3);
-            border-radius: 8px;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            color: #ff6b6b;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        
-        .error-message.show {
-            display: block;
-        }
-        
-        .success-message {
-            display: none;
-            background: rgba(0,255,0,0.1);
-            border: 1px solid rgba(0,255,0,0.3);
-            border-radius: 8px;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            color: #51cf66;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        
-        .success-message.show {
-            display: block;
-        }
-        
-        .reset-link {
-            background: rgba(255,215,0,0.05);
-            border: 1px solid rgba(255,215,0,0.15);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            word-break: break-all;
-        }
-        
-        .reset-link a {
-            color: #ffd700;
-            text-decoration: none;
-        }
-        
-        .reset-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .sms-captcha-container{background:rgba(255,255,255,0.03);border:1px solid rgba(255,215,0,0.1);border-radius:10px;padding:1rem;margin-bottom:1.2rem}
-        .sms-send-btn:disabled{opacity:0.5;cursor:not-allowed}
-        
-        /* 桌面端优化 */
-        @media (min-width: 768px) {
-            .register-container {
-                max-width: 480px !important;
-            }
-            .register-header h1 {
-                font-size: 2rem !important;
-            }
-            .register-form {
-                padding: 2.5rem !important;
-            }
-        }
-        @media (min-width: 1024px) {
-            .register-container {
-                margin: 4rem auto !important;
-            }
-            .register-header {
-                padding-top: 0 !important;
-            }
-        }
+        .auth-body { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
+        .auth-card { width:100%; max-width:400px; background:linear-gradient(135deg,rgba(26,26,46,0.95),rgba(22,33,62,0.95)); border:1px solid rgba(255,215,0,0.2); border-radius:16px; padding:2rem; }
+        .auth-title { text-align:center; color:#ffd700; font-size:1.5rem; margin-bottom:0.3rem; }
+        .auth-subtitle { text-align:center; color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:1.5rem; }
+        .auth-msg { display:none; padding:0.7rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.9rem; text-align:center; }
+        .auth-msg.error { display:block; background:rgba(255,59,48,0.15); border:1px solid rgba(255,59,48,0.3); color:#ff6b6b; }
+        .auth-msg.success { display:block; background:rgba(76,217,100,0.15); border:1px solid rgba(76,217,100,0.3); color:#4cd964; }
+        .form-group { margin-bottom:1rem; }
+        .form-group label { display:block; color:rgba(255,255,255,0.7); font-size:0.85rem; margin-bottom:0.4rem; }
+        .form-input { width:100%; padding:0.75rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,215,0,0.15); border-radius:10px; color:#fff; font-size:0.95rem; box-sizing:border-box; }
+        .form-input:focus { outline:none; border-color:rgba(255,215,0,0.5); }
+        .btn { width:100%; padding:0.85rem; border:none; border-radius:10px; font-size:1rem; font-weight:bold; cursor:pointer; }
+        .btn-primary { background:linear-gradient(135deg,#ffd700,#ffc107); color:#000; }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
+        .auth-links { text-align:center; margin-top:1rem; font-size:0.9rem; }
+        .auth-links a { color:#ffd700; text-decoration:none; }
+        .strength-bar { height:4px; border-radius:2px; margin-top:0.3rem; transition:width 0.3s,background 0.3s; }
     </style>
-<style>
-    .back-btn {
-        background: rgba(255,215,0,0.1);
-        border: 1px solid rgba(255,215,0,0.3);
-        border-radius: 8px;
-        color: #ffd700;
-        font-size: 1rem;
-        cursor: pointer;
-        padding: 0.5rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        transition: all 0.3s;
-    }
-    .back-btn:hover {
-        background: rgba(255,215,0,0.2);
-    }
-    .page-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
-        border-bottom: 1px solid rgba(255,215,0,0.15);
-    }
-    .page-header h1 {
-        font-size: 1.2rem;
-        color: #ffd700;
-        font-weight: 600;
-    }
-
-    /* 桌面端优化 */
-    @media (min-width: 1024px) {
-        .register-container {
-            max-width: 480px !important;
-            margin: 3rem auto !important;
-        }
-        .register-header {
-            padding-top: 2rem !important;
-        }
-        .register-header h1 {
-            font-size: 2rem !important;
-        }
-        .register-form {
-            padding: 2.5rem !important;
-        }
-        .btn-register {
-            padding: 1rem !important;
-            font-size: 1.1rem !important;
-        }
-    }
-</style>
 </head>
 <body>
-<div class="page-header">
-        <button class="back-btn" onclick="window.location.href='/'">← 返回首页</button>
-        <h1>用户注册</h1>
-    </div>
-    <div class="content-area">
-    <div class="stars" id="stars"></div>
-    
-    <div class="app">
-        <div class="register-container">
-            <div class="register-header">
-                <h1>🔮 用户注册</h1>
-                <p>创建您的账户，开启算命之旅</p>
+<div class="stars" id="stars"></div>
+<div class="auth-body">
+    <div class="auth-card">
+        <h1 class="auth-title">🔮 注册账号</h1>
+        <p class="auth-subtitle">创建你的玄机算命网账号</p>
+        <div class="auth-msg" id="authMsg"></div>
+
+        <form id="registerForm" novalidate>
+            <div class="form-group">
+                <label>用户名 *（3-20位字母数字下划线）</label>
+                <input type="text" class="form-input" id="username" placeholder="请输入用户名" maxlength="20" required>
             </div>
-            
-            <div class="register-form">
-                <div class="error-message" id="errorMessage"></div>
-                <div class="success-message" id="successMessage"></div>
-                
-                <form id="registerForm" onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label for="username">用户名</label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            name="username" 
-                            placeholder="请输入用户名（3-20个字符）"
-                            required
-                            minlength="3"
-                            maxlength="20"
-                        >
-                        <div class="hint">用户名只能包含字母、数字和下划线</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="phone">手机号（可选）</label>
-                        <input 
-                            type="tel" 
-                            id="phone" 
-                            name="phone" 
-                            placeholder="请输入手机号"
-                        >
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">邮箱（可选）</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            placeholder="请输入邮箱"
-                        >
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">密码</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            placeholder="请输入密码（至少6个字符）"
-                            required
-                            minlength="6"
-                            oninput="checkPasswordStrength(this.value)"
-                        >
-                        <div class="password-strength">
-                            <div class="password-strength-bar" id="passwordStrength"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="confirmPassword">确认密码</label>
-                        <input 
-                            type="password" 
-                            id="confirmPassword" 
-                            name="confirmPassword" 
-                            placeholder="请再次输入密码"
-                            required
-                        >
-                    </div>
-                    
-                    <!-- 验证码类型切换 -->
-                    <div class="captcha-type-switch">
-                        <button type="button" class="captcha-type-btn active" data-type="image" onclick="switchCaptchaType('image')">图片验证码</button>
-                        <button type="button" class="captcha-type-btn" data-type="slider" onclick="switchCaptchaType('slider')">滑块验证码</button>
-                        <button type="button" class="captcha-type-btn" data-type="sms" onclick="switchCaptchaType('sms')">📱 短信验证码</button>
-                    </div>
-                    
-                    <!-- 图片验证码 -->
-                    <div class="captcha-container" id="imageCaptcha">
-                        <div class="captcha-display">
-                            <div class="captcha-image" onclick="refreshCaptcha()">
-                                <img id="captchaImage" src="" alt="验证码">
-                            </div>
-                            <button type="button" class="captcha-refresh" onclick="refreshCaptcha()">刷新</button>
-                        </div>
-                        <input 
-                            type="text" 
-                            id="captchaText" 
-                            name="captcha_text" 
-                            placeholder="请输入验证码"
-                            style="width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; color: #ffffff; font-size: 0.95rem; box-sizing: border-box;"
-                        >
-                        <input type="hidden" id="captchaId" name="captcha_id" value="">
-                    </div>
-                    
-                    <!-- 滑块验证码 -->
-                    <div class="slider-container" id="sliderCaptcha" style="display: none;">
-                        <div class="slider-track" id="sliderTrack">
-                            <div class="slider-button" id="sliderButton">→</div>
-                            <div class="slider-target" id="sliderTarget"></div>
-                        </div>
-                        <div class="slider-hint">请拖动滑块到指定位置</div>
-                        <input type="hidden" id="sliderId" name="slider_id" value="">
-                        <input type="hidden" id="sliderX" name="slider_x" value="">
-                    </div>
-                    
-                    <!-- 短信验证码 -->
-                    <div class="sms-captcha-container" id="smsCaptcha" style="display: none;">
-                        <input 
-                            type="tel" 
-                            class="sms-phone-input" 
-                            id="smsPhone" 
-                            name="sms_phone" 
-                            placeholder="请输入手机号"
-                            maxlength="11"
-                            style="width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; color: #ffffff; font-size: 0.95rem; box-sizing: border-box; margin-bottom: 0.5rem;"
-                        >
-                        <div class="sms-code-display" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                            <input 
-                                type="text" 
-                                class="sms-code-input" 
-                                id="smsCode" 
-                                name="sms_code" 
-                                placeholder="验证码"
-                                maxlength="6"
-                                style="flex: 1; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; color: #ffffff; font-size: 0.95rem; box-sizing: border-box;"
-                            >
-                            <button 
-                                type="button" 
-                                class="sms-send-btn" 
-                                id="smsSendBtn"
-                                onclick="sendSMSCaptcha()"
-                                style="background: linear-gradient(135deg, #ffd700, #ffed4e); border: none; border-radius: 8px; color: #000; padding: 0.8rem 1rem; cursor: pointer; font-size: 0.9rem; font-weight: bold; white-space: nowrap;"
-                            >发送验证码</button>
-                        </div>
-                        <div class="sms-hint" id="smsHint" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-align: center;">验证码已发送到您的手机，5分钟内有效</div>
-                        <input type="hidden" id="smsPhoneStored" name="sms_phone_stored" value="">
-                        <input type="hidden" id="smsIdStored" name="sms_id_stored" value="">
-                    </div>
-                    
-                    <div class="form-options">
-                        <label class="agree-terms">
-                            <input type="checkbox" id="agreeTerms" required>
-                            <span>我已阅读并同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a></span>
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="btn-register" id="registerBtn">注册</button>
-                </form>
-                
-                <div class="login-link">
-                    已有账户？<a href="/login.html">立即登录</a>
-                </div>
+
+            <div class="form-group">
+                <label>手机号（可选）</label>
+                <input type="tel" class="form-input" id="phone" placeholder="选填，用于找回密码" maxlength="11">
             </div>
+
+            <div class="form-group">
+                <label>邮箱（可选）</label>
+                <input type="email" class="form-input" id="email" placeholder="选填，用于找回密码">
+            </div>
+
+            <div class="form-group">
+                <label>密码 *（最少6位）</label>
+                <input type="password" class="form-input" id="password" placeholder="请输入密码" minlength="6" required>
+                <div class="strength-bar" id="strengthBar" style="width:0;background:rgba(255,255,255,0.15);"></div>
+            </div>
+
+            <div class="form-group">
+                <label>确认密码 *</label>
+                <input type="password" class="form-input" id="confirmPassword" placeholder="请再次输入密码" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="registerBtn">注册</button>
+        </form>
+
+        <div class="auth-links">
+            已有账号？<a href="/login.html">立即登录</a> | <a href="/">返回首页</a>
         </div>
     </div>
-    
-    <script src="/js/main.js"></script>
-    <script>
-        // 创建星空背景 & 初始化验证码
-        document.addEventListener('DOMContentLoaded', function() {
-            try { if (typeof createStars === 'function') createStars(); } catch(e) {}
-            try { loadCaptcha(); } catch(e) { console.error('loadCaptcha 错误:', e); }
-            try { initSlider(); } catch(e) { console.error('initSlider 错误:', e); }
-        });
-        
-        // 显示错误信息（注册页专用）
-        function showRegError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.classList.add('show');
-            setTimeout(() => {
-                errorDiv.classList.remove('show');
-            }, 3000);
-        }
-        
-        // 显示成功信息（注册页专用）
-        function showRegSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = message;
-            successDiv.classList.add('show');
-            setTimeout(() => {
-                successDiv.classList.remove('show');
-            }, 3000);
-        }
-        
-        // 检查密码强度
-        function checkPasswordStrength(password) {
-            const strengthBar = document.getElementById('passwordStrength');
-            strengthBar.className = 'password-strength-bar';
-            
-            if (password.length === 0) {
-                return;
-            }
-            
-            let strength = 0;
-            
-            // 长度检查
-            if (password.length >= 6) strength++;
-            if (password.length >= 10) strength++;
-            
-            // 复杂度检查
-            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-            if (/\d/.test(password)) strength++;
-            if (/[^a-zA-Z0-9]/.test(password)) strength++;
-            
-            if (strength <= 2) {
-                strengthBar.classList.add('strength-weak');
-            } else if (strength <= 4) {
-                strengthBar.classList.add('strength-medium');
-            } else {
-                strengthBar.classList.add('strength-strong');
-            }
-        }
-        
-        // 当前验证码类型
-        let currentCaptchaType = 'image';
-        
-        // 切换验证码类型
-        function switchCaptchaType(type) {
-            currentCaptchaType = type;
-            
-            // 更新按钮状态
-            document.querySelectorAll('.captcha-type-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            var targetBtn = document.querySelector('.captcha-type-btn[data-type="' + type + '"]');
-            if (targetBtn) targetBtn.classList.add('active');
-            
-            // 显示对应的验证码
-            if (type === 'image') {
-                document.getElementById('imageCaptcha').style.display = 'block';
-                document.getElementById('sliderCaptcha').style.display = 'none';
-                document.getElementById('smsCaptcha').style.display = 'none';
-                loadCaptcha();
-            } else if (type === 'slider') {
-                document.getElementById('imageCaptcha').style.display = 'none';
-                document.getElementById('sliderCaptcha').style.display = 'block';
-                document.getElementById('smsCaptcha').style.display = 'none';
-                loadSlider();
-            } else if (type === 'sms') {
-                document.getElementById('imageCaptcha').style.display = 'none';
-                document.getElementById('sliderCaptcha').style.display = 'none';
-                document.getElementById('smsCaptcha').style.display = 'block';
-            }
-        }
-        
-        // 加载图片验证码
-        async function loadCaptcha() {
-            try {
-                const response = await fetch('/api/captcha/generate');
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('captchaImage').src = data.captcha_image;
-                    document.getElementById('captchaId').value = data.captcha_id;
-                }
-            } catch (error) {
-                console.error('加载验证码失败:', error);
-            }
-        }
-        
-        // 刷新验证码
-        function refreshCaptcha() {
-            loadCaptcha();
-        }
-        
-        // 发送短信验证码
-        async function sendSMSCaptcha() {
-            const phone = document.getElementById('smsPhone').value.trim();
-            const sendBtn = document.getElementById('smsSendBtn');
-            
-            if (!phone) {
-                showRegError('请输入手机号');
-                return;
-            }
-            if (!/^1[3-9]\d{9}$/.test(phone)) {
-                showRegError('请输入正确的手机号');
-                return;
-            }
-            
-            sendBtn.disabled = true;
-            sendBtn.textContent = '发送中...';
-            
-            try {
-                const response = await fetch('/api/sms/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: phone })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showRegSuccess(data.demo ? '【演示模式】验证码：' + data.code : '验证码已发送！');
-                    if (data.code) {
-                        document.getElementById('smsCode').value = data.code;
-                    }
-                    document.getElementById('smsPhoneStored').value = phone;
-                    document.getElementById('smsIdStored').value = data.sms_id || '';
-                    
-                    let countdown = 60;
-                    const timer = setInterval(function() {
-                        countdown--;
-                        sendBtn.textContent = countdown + '秒后重发';
-                        if (countdown <= 0) {
-                            clearInterval(timer);
-                            sendBtn.disabled = false;
-                            sendBtn.textContent = '重新发送';
-                        }
-                    }, 1000);
-                } else {
-                    showRegError(data.message || '发送失败');
-                    sendBtn.disabled = false;
-                    sendBtn.textContent = '发送验证码';
-                }
-            } catch (error) {
-                showRegError('网络错误，请稍后重试');
-                sendBtn.disabled = false;
-                sendBtn.textContent = '发送验证码';
-            }
-        }
-        
-        // 加载滑块验证码
-        async function loadSlider() {
-            try {
-                const response = await fetch('/api/slider/generate');
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('sliderId').value = data.slider_id;
-                    // 设置目标位置（用 target_x 百分比）
-                    const sliderTarget = document.getElementById('sliderTarget');
-                    sliderTarget.style.left = data.target_x + '%';
-                }
-            } catch (error) {
-                console.error('加载滑块验证码失败:', error);
-            }
-        }
-        
-        // 初始化滑块
-        function initSlider() {
-            const sliderButton = document.getElementById('sliderButton');
-            const sliderTrack = document.getElementById('sliderTrack');
-            let isDragging = false;
-            
-            sliderButton.addEventListener('mousedown', startDrag);
-            sliderButton.addEventListener('touchstart', startDrag);
-            
-            function startDrag(e) {
-                isDragging = true;
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('touchmove', drag);
-                document.addEventListener('mouseup', stopDrag);
-                document.addEventListener('touchend', stopDrag);
-            }
-            
-            function drag(e) {
-                if (!isDragging) return;
-                e.preventDefault();
-                
-                const trackRect = sliderTrack.getBoundingClientRect();
-                let clientX;
-                
-                if (e.type === 'touchmove') {
-                    clientX = e.touches[0].clientX;
-                } else {
-                    clientX = e.clientX;
-                }
-                
-                let newLeft = clientX - trackRect.left - 20;
-                newLeft = Math.max(0, Math.min(newLeft, trackRect.width - 40));
-                
-                sliderButton.style.left = newLeft + 'px';
-                
-                const percent = Math.round((newLeft / (trackRect.width - 40)) * 100);
-                document.getElementById('sliderX').value = percent;
-            }
-            
-            function stopDrag() {
-                isDragging = false;
-                document.removeEventListener('mousemove', drag);
-                document.removeEventListener('touchmove', drag);
-                document.removeEventListener('mouseup', stopDrag);
-                document.removeEventListener('touchend', stopDrag);
-            }
-        }
-        
-        // 处理注册
-        async function handleRegister(event) {
-            event.preventDefault();
-            
-            const registerBtn = document.getElementById('registerBtn');
-            if (registerBtn) {
-                registerBtn.disabled = true;
-                registerBtn.textContent = '注册中...';
-            }
-            
-            const username = document.getElementById('username').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-            
-            // 验证用户名
-            if (!username) {
-                showRegError('请输入用户名');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            if (username.length < 3 || username.length > 20) {
-                showRegError('用户名长度应为3-20个字符');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-                showRegError('用户名只能包含字母、数字和下划线');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            // 验证手机号（如果填写）
-            if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
-                showRegError('请输入正确的手机号');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            // 验证邮箱（如果填写）
-            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showRegError('请输入正确的邮箱地址');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            // 验证密码
-            if (!password) {
-                showRegError('请输入密码');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            if (password.length < 6) {
-                showRegError('密码长度至少6个字符');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            // 验证确认密码
-            if (password !== confirmPassword) {
-                showRegError('两次输入的密码不一致');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            // 验证验证码
-            if (currentCaptchaType === 'image') {
-                const captchaId = document.getElementById('captchaId').value;
-                const captchaText = document.getElementById('captchaText').value.trim();
-                
-                if (!captchaText) {
-                    showRegError('请输入验证码');
-                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                    return;
-                }
-                
-                // 验证验证码
-                try {
-                    const verifyResponse = await fetch('/api/captcha/verify', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            captcha_id: captchaId,
-                            captcha_text: captchaText
-                        })
-                    });
-                    const verifyData = await verifyResponse.json();
-                    if (!verifyData.success) {
-                        showRegError(verifyData.message || '验证码错误');
-                        refreshCaptcha();
-                        if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                        return;
-                    }
-                } catch (error) {
-                    showRegError('验证码验证失败，请重试');
-                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                    return;
-                }
-            } else if (currentCaptchaType === 'slider') {
-                const sliderId = document.getElementById('sliderId').value;
-                const sliderX = document.getElementById('sliderX').value;
-                
-                if (!sliderX) {
-                    showRegError('请完成滑块验证');
-                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                    return;
-                }
-                
-                // 验证滑块
-                try {
-                    const verifyResponse = await fetch('/api/slider/verify', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            slider_id: sliderId,
-                            slider_x: parseInt(sliderX)
-                        })
-                    });
-                    const verifyData = await verifyResponse.json();
-                    if (!verifyData.success) {
-                        showRegError(verifyData.message || '滑块验证失败');
-                        loadSlider();
-                        if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                        return;
-                    }
-                } catch (error) {
-                    showRegError('滑块验证失败，请重试');
-                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                    return;
-                }
-            } else if (currentCaptchaType === 'sms') {
-                const smsId = document.getElementById('smsIdStored').value;
-                const smsCode = document.getElementById('smsCode').value.trim();
-                
-                if (!smsId || !smsCode) {
-                    showRegError('请先获取并输入短信验证码');
-                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                    return;
-                }
-                
-                try {
-                    const verifyResponse = await fetch('/api/sms/verify', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sms_id: smsId,
-                            code: smsCode
-                        })
-                    });
-                    const verifyData = await verifyResponse.json();
-                    if (!verifyData.success) {
-                        showRegError(verifyData.message || '验证码错误');
-                        if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                        return;
-                    }
-                } catch (error) {
-                    showRegError('验证码验证失败，请重试');
-                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                    return;
-                }
-            }
-            
-            // 验证用户协议
-            if (!agreeTerms || !document.getElementById('agreeTerms').checked) {
-                showRegError('请阅读并同意用户协议和隐私政策');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                return;
-            }
-            
-            try {
-                // 调用后端API
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password,
-                        email: email,
-                        phone: phone
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Auto-login after registration
-                    showRegSuccess('注册成功！正在跳转...');
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    setTimeout(() => {
-                        window.location.href = '/profile.html';
-                    }, 1500);
-                } else {
-                    // 注册失败
-                    showRegError(data.message || '注册失败，请重试');
-                    if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-                }
-            } catch (error) {
-                showRegError('网络错误，请稍后重试');
-                if (registerBtn) { registerBtn.disabled = false; registerBtn.textContent = '注册'; }
-            }
-        }
-    </script>
 </div>
-    </body>
+
+<script src="/js/main.js"></script>
+<script>
+(function() {
+    var $ = function(id) { return document.getElementById(id); };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.createStars) createStars();
+        // 密码强度检测
+        $('password').addEventListener('input', function() {
+            var v = this.value, l = v.length, bar = $('strengthBar');
+            if (l === 0) bar.style.cssText = 'width:0';
+            else if (l < 4) bar.style.cssText = 'width:25%;background:#ff3b30';
+            else if (l < 6) bar.style.cssText = 'width:50%;background:#ff9500';
+            else if (l < 8) bar.style.cssText = 'width:75%;background:#ffd700';
+            else bar.style.cssText = 'width:100%;background:#4cd964';
+        });
+    });
+
+    $('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = $('registerBtn');
+
+        var username = $('username').value.trim();
+        var password = $('password').value;
+        var confirmPassword = $('confirmPassword').value;
+        var phone = $('phone').value.trim();
+        var email = $('email').value.trim();
+
+        // 校验
+        if (!username || username.length < 3) {
+            Auth.showMsg('authMsg', '用户名至少3个字符', true); return;
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            Auth.showMsg('authMsg', '用户名只能包含字母、数字和下划线', true); return;
+        }
+        if (!password || password.length < 6) {
+            Auth.showMsg('authMsg', '密码至少6个字符', true); return;
+        }
+        if (password !== confirmPassword) {
+            Auth.showMsg('authMsg', '两次密码输入不一致', true); return;
+        }
+        if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+            Auth.showMsg('authMsg', '手机号格式不正确', true); return;
+        }
+        if (email && !/@/.test(email)) {
+            Auth.showMsg('authMsg', '邮箱格式不正确', true); return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '注册中...';
+
+        try {
+            var result = await Auth.register(username, password, email, phone);
+            if (result.success) {
+                Auth.showMsg('authMsg', '注册成功！正在跳转...', false);
+                setTimeout(function() { window.location.replace('/'); }, 800);
+            } else {
+                Auth.showMsg('authMsg', result.message || '注册失败', true);
+                btn.disabled = false;
+                btn.textContent = '注册';
+            }
+        } catch (e) {
+            Auth.showMsg('authMsg', '网络错误，请重试', true);
+            btn.disabled = false;
+            btn.textContent = '注册';
+        }
+    });
+})();
+</script>
+</body>
 </html>

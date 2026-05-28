@@ -1,35 +1,14 @@
 """
 短信验证码扩展模块 - 阿里云短信服务
+SDK 已内置于 api/sdk/ 目录，无需 pip 安装
 """
 import os
 import sys
-import subprocess
 
-# Ensure aliyun SDK is available: auto-install if missing
-_sdk_ok = False
-try:
-    import aliyunsdk.core
-    _sdk_ok = True
-except ImportError:
-    pass
-
-if not _sdk_ok:
-    print("[SMS] SDK not found, auto-installing...", flush=True)
-    try:
-        subprocess.check_call(
-            [sys.executable, '-m', 'pip', 'install',
-             'aliyun-python-sdk-core', 'aliyun-python-sdk-dysmsapi',
-             '--quiet', '--user'],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        )
-        # Add user site-packages to path
-        import site
-        user_site = site.getusersitepackages()
-        if user_site and user_site not in sys.path:
-            sys.path.insert(0, user_site)
-        print("[SMS] SDK installed to", user_site, flush=True)
-    except Exception as e:
-        print("[SMS] SDK auto-install failed:", e, flush=True)
+# Add local SDK to path
+_sdk_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sdk')
+if _sdk_dir not in sys.path:
+    sys.path.insert(0, _sdk_dir)
 
 import re
 import json
@@ -37,7 +16,7 @@ import string
 import random
 from datetime import datetime, timedelta
 
-# 阿里云短信配置（从环境变量读取）
+# 阿里云短信配置
 ALIYUN_ACCESS_KEY_ID = os.environ.get('ALIYUN_ACCESS_KEY_ID', '')
 ALIYUN_ACCESS_KEY_SECRET = os.environ.get('ALIYUN_ACCESS_KEY_SECRET', '')
 ALIYUN_SIGN_NAME = os.environ.get('ALIYUN_SIGN_NAME', '速通互联验证码')
@@ -45,52 +24,43 @@ ALIYUN_TEMPLATE_CODE = os.environ.get('ALIYUN_TEMPLATE_CODE', '100001')
 
 
 def send_aliyun_sms(phone, code):
-    """发送阿里云短信 - 真实发送，失败时返回详细错误信息"""
-    # 验证配置
+    """发送阿里云短信 - 真实发送"""
     if not ALIYUN_ACCESS_KEY_ID or not ALIYUN_ACCESS_KEY_SECRET:
-        return False, 'AccessKey 未配置，请在环境变量中设置 ALIYUN_ACCESS_KEY_ID 和 ALIYUN_ACCESS_KEY_SECRET'
+        return False, 'AccessKey 未配置'
     if not ALIYUN_SIGN_NAME:
-        return False, '短信签名未配置，请在环境变量中设置 ALIYUN_SIGN_NAME'
+        return False, '短信签名未配置'
     if not ALIYUN_TEMPLATE_CODE:
-        return False, '短信模板未配置，请在环境变量中设置 ALIYUN_TEMPLATE_CODE'
-    
-    # 尝试导入阿里云 SDK
+        return False, '短信模板未配置'
+
     try:
-        from aliyunsdk.core.client import AcsClient
-        from aliyunsdk.dysmsapi.request.v20170525 import SendSmsRequest
-    except ImportError as e:
-        return False, f'阿里云SDK未安装: {e}。请运行: pip3 install aliyun-python-sdk-core aliyun-python-sdk-dysmsapi'
-    
-    try:
-        # 初始化客户端（使用 cn-hangzhou region）
+        from aliyunsdkcore.client import AcsClient
+        from aliyunsdkdysmsapi.request.v20170525 import SendSmsRequest
+
+        # 初始化客户端
         acs_client = AcsClient(
             ALIYUN_ACCESS_KEY_ID,
             ALIYUN_ACCESS_KEY_SECRET,
             'cn-hangzhou'
         )
-        
-        # 构建请求
-        request = SendSmsRequest()
-        request.set_accept_format('json')
-        request.set_PhoneNumbers(phone)
-        request.set_SignName(ALIYUN_SIGN_NAME)
-        request.set_TemplateCode(ALIYUN_TEMPLATE_CODE)
-        # 模板有两个变量: ${code} 和 ${min}
-        request.set_TemplateParam(json.dumps({'code': code, 'min': '5'}))
-        
+
+        # 构建请求（模板有两个变量: ${code} 和 ${min}）
+        req = SendSmsRequest()
+        req.set_PhoneNumbers(phone)
+        req.set_SignName(ALIYUN_SIGN_NAME)
+        req.set_TemplateCode(ALIYUN_TEMPLATE_CODE)
+        req.set_TemplateParam(json.dumps({'code': code, 'min': '5'}))
+
         # 发送
-        response = acs_client.do_action_with_exception(request)
-        result = json.loads(response.decode('utf-8') if isinstance(response, bytes) else response)
-        
+        resp = acs_client.do_action_with_exception(req)
+        result = json.loads(resp.decode('utf-8') if isinstance(resp, bytes) else resp)
+
         if result.get('Code') == 'OK':
             return True, '发送成功'
         else:
-            error_msg = result.get('Message', '发送失败')
-            error_code = result.get('Code', 'Unknown')
-            return False, f'阿里云返回错误 [{error_code}]: {error_msg}'
-            
+            return False, f"阿里云返回错误 [{result.get('Code')}]: {result.get('Message', '未知错误')}"
+
     except Exception as e:
-        return False, f'发送异常: {str(e)}'
+        return False, f'{e}'
 
 
 def generate_sms_code():

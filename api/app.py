@@ -7,6 +7,19 @@ project_dir = os.path.dirname(api_dir)
 if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
+# Auto-install missing dependencies on startup
+import subprocess
+def _ensure_package(module_name, pip_name):
+    try:
+        __import__(module_name)
+    except ImportError:
+        print(f"[AutoInstall] Installing {pip_name}...")
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', pip_name, '--quiet'])
+        print(f"[AutoInstall] {pip_name} installed successfully")
+
+_ensure_package('aliyunsdk.core', 'aliyun-python-sdk-core')
+_ensure_package('aliyunsdk.dysmsapi', 'aliyun-python-sdk-dysmsapi')
+
 from flask import Flask, request, jsonify, session, make_response, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter

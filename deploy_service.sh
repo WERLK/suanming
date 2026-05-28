@@ -31,8 +31,8 @@ User=root
 WorkingDirectory=/root/suanming/api
 Environment=PYTHONPATH=/root/.pyenv/versions/3.11.1/lib/python3.11/site-packages
 EnvironmentFile=$ENV_FILE
-ExecStartPre=/bin/bash -c '/usr/bin/python3 -m pip install aliyun-python-sdk-core aliyun-python-sdk-dysmsapi; cd /root/suanming && git fetch origin main && git reset --hard origin/main && /usr/bin/python3 init_data.py'
-ExecStart=/usr/bin/python3 -m gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app
+ExecStartPre=/bin/bash -c 'cd /root/suanming && git fetch origin main && git reset --hard origin/main && python3 init_data.py'
+ExecStart=python3 -m gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app
 ExecReload=/bin/kill -HUP \$MAINPID
 Restart=always
 RestartSec=5

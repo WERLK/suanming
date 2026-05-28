@@ -1,88 +1,97 @@
 #!/bin/bash
-# Unified auto-update daemon for suanming project
+# Auto-update daemon: watches git repo, redeploys on new commits
 # Usage: bash auto_update.sh start|stop|status|restart
 
 PROJECT_DIR="/root/suanming"
-LOG_FILE="$PROJECT_DIR/logs/auto_update.log"
-PID_FILE="$PROJECT_DIR/logs/auto_update.pid"
-CHECK_INTERVAL=300  # 5 minutes
+LOG_DIR="$PROJECT_DIR/logs"
+PID_FILE="$LOG_DIR/auto_update.pid"
+CHECK_INTERVAL=300  # check every 5 minutes
+
+mkdir -p "$LOG_DIR"
 
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_DIR/auto_update.log"
+}
+
+get_pid() {
+    if [ -f "$PID_FILE" ]; then
+        cat "$PID_FILE"
+    fi
+}
+
+is_running() {
+    local pid
+    pid=$(get_pid)
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+        return 0
+    fi
+    return 1
 }
 
 start_daemon() {
-    if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
-        echo "Auto-update daemon already running (PID: $(cat "$PID_FILE"))"
+    if is_running; then
+        echo "Auto-update daemon already running (PID: $(get_pid))"
         return 1
     fi
-    
+
     echo "Starting auto-update daemon..."
-    nohup bash -c '
-        PROJECT_DIR="/root/suanming"
-        LOG_FILE="$PROJECT_DIR/logs/auto_update.log"
-        CHECK_INTERVAL=300
-        
-        log() {
-            echo "[$(date +%Y-%m-%d\ %H:%M:%S)] $1" >> "$LOG_FILE"
-        }
-        
-        log "Daemon started (interval: ${CHECK_INTERVAL}s)"
-        
+
+    # Run the loop in background
+    (
+        log "Daemon started, check interval: ${CHECK_INTERVAL}s"
+
         while true; do
-            cd "$PROJECT_DIR" || exit 1
-            
-            LOCAL_HASH=$(git rev-parse HEAD 2>/dev/null)
+            cd "$PROJECT_DIR" 2>/dev/null || { log "ERROR: $PROJECT_DIR not found"; sleep "$CHECK_INTERVAL"; continue; }
+
+            # Check for updates
             git fetch origin main 2>/dev/null
-            REMOTE_HASH=$(git rev-parse origin/main 2>/dev/null)
-            
-            if [ "$LOCAL_HASH" != "$REMOTE_HASH" ] && [ -n "$REMOTE_HASH" ]; then
-                log "New commits: $LOCAL_HASH -> $REMOTE_HASH"
-                if git reset --hard origin/main 2>/dev/null; then
-                    log "Code updated"
-                    log "Restarting gunicorn..."
-                    pkill -f gunicorn
-                    sleep 5
-                    cd "$PROJECT_DIR/api"
-                    nohup gunicorn -w 4 -t 300 -b 0.0.0.0:5000 app:app \
-                        > "$PROJECT_DIR/logs/gunicorn.log" 2>&1 &
-                    sleep 3
-                    log "Gunicorn restarted"
+            LOCAL=$(git rev-parse HEAD 2>/dev/null)
+            REMOTE=$(git rev-parse origin/main 2>/dev/null)
+
+            if [ -n "$LOCAL" ] && [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
+                log "New commits detected: ${LOCAL:0:7} -> ${REMOTE:0:7}"
+                
+                # Also check if gunicorn is running; if not, force redeploy
+                if pgrep -f gunicorn > /dev/null 2>&1; then
+                    log "Gunicorn is running, redeploying..."
                 else
-                    log "ERROR: Pull failed"
+                    log "Gunicorn is DOWN, starting recovery deploy..."
                 fi
+                
+                bash "$PROJECT_DIR/start_gunicorn.sh" >> "$LOG_DIR/auto_update.log" 2>&1
+                log "Redeploy finished"
+            elif ! pgrep -f gunicorn > /dev/null 2>&1; then
+                log "Gunicorn not running, attempting recovery..."
+                bash "$PROJECT_DIR/start_gunicorn.sh" >> "$LOG_DIR/auto_update.log" 2>&1
+                log "Recovery deploy finished"
             fi
-            
+
             sleep "$CHECK_INTERVAL"
         done
-    ' > /dev/null 2>&1 &
-    
+    ) &
+
     echo $! > "$PID_FILE"
     echo "Daemon started (PID: $(cat "$PID_FILE"))"
 }
 
 stop_daemon() {
-    if [ -f "$PID_FILE" ]; then
-        PID=$(cat "$PID_FILE")
-        if kill -0 "$PID" 2>/dev/null; then
-            kill -9 "$PID" 2>/dev/null
-            echo "Daemon stopped (PID: $PID)"
-        else
-            echo "Daemon not running"
-        fi
+    local pid
+    pid=$(get_pid)
+    if [ -n "$pid" ]; then
+        kill -9 "$pid" 2>/dev/null || true
         rm -f "$PID_FILE"
+        echo "Daemon stopped (PID: $pid)"
     else
-        # Fallback: kill all auto_update processes
-        pkill -9 -f "auto_update" 2>/dev/null
+        pkill -9 -f "auto_update.*start" 2>/dev/null || true
         echo "Daemon stopped (fallback)"
     fi
 }
 
 status_daemon() {
-    if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
-        echo "Running (PID: $(cat "$PID_FILE"))"
-        echo "Last log:"
-        tail -5 "$LOG_FILE" 2>/dev/null || echo "No log yet"
+    if is_running; then
+        echo "Running (PID: $(get_pid))"
+        echo "--- Last 5 log lines ---"
+        tail -5 "$LOG_DIR/auto_update.log" 2>/dev/null || echo "(no log yet)"
     else
         echo "Not running"
     fi

@@ -384,7 +384,7 @@
         document.querySelectorAll('.captcha-panel').forEach(function(p) { p.classList.remove('active'); });
         $('panel' + type.charAt(0).toUpperCase() + type.slice(1).toLowerCase().replace('ms', 'MS').replace('ms','MS')).classList.add('active');
         if (type === 'image') loadImageCaptcha();
-        if (type === 'slider') initSlider();
+        if (type === 'slider') refreshSlider();
     };
 
     // 图片验证码
@@ -400,26 +400,14 @@
         }
     }
 
-    // 滑块验证码
+    // 滑块验证码（仅绑定事件一次）
     function initSlider() {
         var track = $('sliderTrack');
         var thumb = $('sliderThumb');
         var target = $('sliderTarget');
         var hint = $('sliderHint');
 
-        Auth.generateSlider().then(function(data) {
-            if (!data.success) return;
-            sliderId = data.slider_id;
-            sliderTargetX = data.target_x;
-            target.style.left = sliderTargetX + '%';
-            hint.textContent = '请拖动滑块到目标位置';
-            thumb.style.left = '0px';
-        }).catch(function() {});
-
         var dragging = false, startX = 0, startLeft = 0;
-
-        thumb.addEventListener('mousedown', onStart);
-        thumb.addEventListener('touchstart', onStart, { passive: false });
 
         function onStart(e) {
             e.preventDefault();
@@ -458,6 +446,24 @@
                 thumb.style.left = '0px';
             }
         }
+
+        thumb.addEventListener('mousedown', onStart);
+        thumb.addEventListener('touchstart', onStart, { passive: false });
+
+        // 初始加载
+        refreshSlider();
+    }
+
+    function refreshSlider() {
+        Auth.generateSlider().then(function(data) {
+            if (!data.success) return;
+            sliderId = data.slider_id;
+            sliderTargetX = data.target_x;
+            $('sliderTarget').style.left = sliderTargetX + '%';
+            $('sliderHint').textContent = '请拖动滑块到目标位置';
+            $('sliderHint').style.color = '';
+            $('sliderThumb').style.left = '0px';
+        }).catch(function() {});
     }
 
     // 短信验证码
@@ -476,7 +482,9 @@
             var data = await Auth.sendSMS(phone);
             if (data.success) {
                 smsId = data.sms_id;
-                Auth.showMsg('authMsg', '验证码已发送（演示模式）', false);
+                // 演示模式下显示验证码给用户
+                var msg = data.code ? '验证码：' + data.code + '（演示模式）' : '验证码已发送';
+                Auth.showMsg('authMsg', msg, false);
 
                 // 倒计时
                 var sec = 60;
@@ -524,7 +532,7 @@
             } else if (captchaType === 'slider') {
                 var pct = (($('sliderThumb').offsetLeft / ($('sliderTrack').offsetWidth - $('sliderThumb').offsetWidth)) * 100);
                 var v = await Auth.verifySlider(sliderId, pct);
-                if (!v.success) { Auth.showMsg('authMsg', v.message || '滑块验证失败', true); initSlider(); return; }
+                if (!v.success) { Auth.showMsg('authMsg', v.message || '滑块验证失败', true); refreshSlider(); return; }
             } else if (captchaType === 'sms') {
                 var smsCodeVal = $('smsCode').value.trim();
                 if (!smsId) { Auth.showMsg('authMsg', '请先发送验证码', true); return; }
@@ -551,7 +559,7 @@
                 btn.disabled = false;
                 btn.textContent = '登录';
                 if (captchaType === 'image') loadImageCaptcha();
-                if (captchaType === 'slider') initSlider();
+                if (captchaType === 'slider') refreshSlider();
             }
         } catch (e) {
             Auth.showMsg('authMsg', '网络错误，请重试', true);

@@ -13,6 +13,15 @@ from flask import jsonify, request
 # 短信验证码存储（实际项目中应使用Redis或数据库）
 sms_captcha_store = {}
 
+# 检测阿里云SDK是否可用
+_ALIYUN_SDK_AVAILABLE = False
+try:
+    from aliyunsdk.core import client
+    from aliyunsdk.request.v20170525 import SendSmsRequest
+    _ALIYUN_SDK_AVAILABLE = True
+except ImportError:
+    pass
+
 # 阿里云短信配置（从环境变量读取，不在代码中硬编码以保证安全）
 ALIYUN_ACCESS_KEY_ID = os.environ.get('ALIYUN_ACCESS_KEY_ID', '')
 ALIYUN_ACCESS_KEY_SECRET = os.environ.get('ALIYUN_ACCESS_KEY_SECRET', '')
@@ -29,6 +38,8 @@ TENCENT_TEMPLATE_ID = '123456'                        # 短信模板ID
 
 def send_aliyun_sms(phone, code):
     """发送阿里云短信"""
+    if not _ALIYUN_SDK_AVAILABLE:
+        return False, 'Aliyun SDK not installed'
     try:
         from aliyunsdk.core import client
         from aliyunsdk.request.v20170525 import SendSmsRequest

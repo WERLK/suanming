@@ -13,10 +13,11 @@ if [ -f /etc/profile.d/aliyun_sms.sh ]; then
     source /etc/profile.d/aliyun_sms.sh
 fi
 
-echo "=== [4/4] Start gunicorn ==="
+echo "=== [4/4] Install SDK + start gunicorn ==="
 cd /root/suanming/api
-PYPATH=$(pip3 show aliyun-python-sdk-core 2>/dev/null | grep Location | awk '{print $2}')
-[ -n "$PYPATH" ] && export PYTHONPATH="${PYPATH}:${PYTHONPATH}"
+
+# Ensure aliyun SDK is installed for the correct python3
+python3 -m pip install aliyun-python-sdk-core aliyun-python-sdk-dysmsapi --quiet 2>/dev/null
 
 pkill -f gunicorn 2>/dev/null || true
 sleep 3

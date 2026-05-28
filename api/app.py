@@ -1,3 +1,12 @@
+import os
+import sys
+
+# Fix Python path for gunicorn compatibility (can start from any directory)
+api_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.dirname(api_dir)
+if project_dir not in sys.path:
+    sys.path.insert(0, project_dir)
+
 from flask import Flask, request, jsonify, session, make_response, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter

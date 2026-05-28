@@ -16,20 +16,25 @@ log() {
 
 log "========== Deploy started =========="
 
-# [1/5] Pull latest code
-log "[1/5] Pulling code..."
+# [1/6] Pull latest code
+log "[1/6] Pulling code..."
 cd "$PROJECT_DIR"
 git fetch origin main
 git reset --hard origin/main
 log "Code updated to $(git rev-parse --short HEAD)"
 
-# [2/5] Init data files
-log "[2/5] Initializing data files..."
+# [2/6] Init data files
+log "[2/6] Initializing data files..."
 python3 init_data.py
 log "Data files OK"
 
-# [3/5] Load Aliyun SMS env
-log "[3/5] Loading environment..."
+# [3/6] Run post-deploy fixes (auth.js injection, etc.)
+log "[3/6] Running post-deploy fixes..."
+bash "$PROJECT_DIR/post_deploy.sh" >> "$LOG_DIR/deploy.log" 2>&1
+log "Post-deploy fixes OK"
+
+# [4/6] Load Aliyun SMS env
+log "[4/6] Loading environment..."
 if [ -f "$ENV_FILE" ]; then
     source "$ENV_FILE"
     log "Aliyun SMS env loaded"
@@ -37,13 +42,13 @@ else
     log "WARNING: $ENV_FILE not found, SMS will use demo mode"
 fi
 
-# [4/5] Install Python deps
-log "[4/5] Installing Python dependencies..."
+# [5/6] Install Python deps
+log "[5/6] Installing Python dependencies..."
 python3 -m pip install aliyun-python-sdk-core aliyun-python-sdk-dysmsapi --quiet 2>/dev/null || true
 log "Dependencies OK"
 
-# [5/5] Start gunicorn
-log "[5/5] Starting gunicorn..."
+# [6/6] Start gunicorn
+log "[6/6] Starting gunicorn..."
 
 # Kill old instances
 pkill -f gunicorn 2>/dev/null || true

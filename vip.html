@@ -14,6 +14,7 @@
     <title>会员中心 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/profile-compatible.css">
+    <script src="/js/ads.js"></script>
     <style>
         .vip-container {
             max-width: 600px;
@@ -182,17 +183,66 @@
             justify-content: center;
         }
         .ad-modal.show { display: flex; }
-        .ad-modal-content { text-align: center; max-width: 320px; }
-        .ad-timer { font-size: 3rem; color: #ffd700; margin: 1rem 0; font-weight: bold; }
+        .ad-modal-content { text-align: center; max-width: 360px; width: 90%; }
+        .ad-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.8rem 0;
+            overflow: hidden;
+        }
+        .ad-container .ad-loading {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.85rem;
+            padding: 2rem;
+        }
+        .ad-container .ad-fallback {
+            text-align: center;
+            padding: 1.5rem;
+            color: rgba(255,255,255,0.5);
+        }
+        .ad-container .ad-fallback .ad-fallback-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .ad-timer { font-size: 1.8rem; color: #ffd700; margin: 0.4rem 0; font-weight: bold; }
         .ad-hint { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 1rem; }
         .ad-skip-btn {
             padding: 0.6rem 1.5rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: #fff;
+            background: linear-gradient(135deg,#ffd700,#ffc107);
+            border: none;
+            border-radius: 10px;
+            color: #000;
             cursor: pointer;
             font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .ad-skip-btn:hover { transform: scale(1.03); }
+        .ad-skip-btn:disabled {
+            opacity: 0.4; cursor: not-allowed; transform: none;
+            background: rgba(255,255,255,0.1);
+        }
+        .ad-skip-btn.ready {
+            animation: adPulse 1.5s infinite;
+        }
+        @keyframes adPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255,215,0,0); }
+        }
+        .ad-close-btn {
+            position: absolute;
+            top: 10px; right: 16px;
+            background: none; border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 1.5rem; cursor: pointer;
+            z-index: 10;
         }
 
         /* 签到与积分 */
@@ -460,11 +510,18 @@
 
 <!-- 广告观看弹窗 -->
 <div class="ad-modal" id="adModal">
+    <button class="ad-close-btn" onclick="closeAdModal()">✕</button>
     <div class="ad-modal-content">
-        <div style="color:#fff;font-size:1.1rem;margin-bottom:0.5rem;">📺 正在观看广告...</div>
-        <div class="ad-timer" id="adTimer">15</div>
-        <div class="ad-hint">秒后自动完成，感谢支持！</div>
-        <button class="ad-skip-btn" onclick="completeAdWatch()">完成观看 →</button>
+        <div style="color:#ffd700;font-size:1.1rem;">📺 看广告获取 VIP 时长</div>
+        <!-- 广告展示区域 -->
+        <div class="ad-container" id="adContainer">
+            <div class="ad-loading">正在加载广告...</div>
+        </div>
+        <!-- 观看进度 -->
+        <div class="ad-timer" id="adTimer">观看广告即可领取奖励</div>
+        <button class="ad-skip-btn" id="adClaimBtn" onclick="claimAdReward()" disabled>
+            请先观看广告 (0/5秒)
+        </button>
     </div>
 </div>
 
@@ -537,7 +594,6 @@ async function loadUserInfo() {
 }
 
 // ========== 会员VIP系统 ==========
-var adTimerInterval = null;
 
 async function loadVIPStatus() {
     var token = Auth.getToken();
@@ -711,30 +767,71 @@ async function loadVIPStatus() {
     }
 }
 
-// ========== 看广告 ==========
+// ========== 广告观看系统 ==========
+var adTimerInterval = null;
+var adSecondsWatched = 0;
+var adRewardSeconds = 5;
+
 function watchAdForVIP() {
-    var adModal = document.getElementById('adModal');
-    adModal.classList.add('show');
-    var timerEl = document.getElementById('adTimer');
-    var seconds = 15;
-    timerEl.textContent = seconds;
+    adRewardSeconds = BaiduAd.getRewardSeconds();
+    adSecondsWatched = 0;
+
+    var modal = document.getElementById('adModal');
+    var timer = document.getElementById('adTimer');
+    var claimBtn = document.getElementById('adClaimBtn');
+    var container = document.getElementById('adContainer');
 
     if (adTimerInterval) clearInterval(adTimerInterval);
+    claimBtn.disabled = true;
+    claimBtn.classList.remove('ready');
+    claimBtn.textContent = '请先观看广告 (0/' + adRewardSeconds + '秒)';
+    timer.textContent = '观看广告即可领取奖励';
+    container.innerHTML = '<div class="ad-loading">正在加载广告...</div>';
+
+    modal.classList.add('show');
+
+    if (BaiduAd.isReady()) {
+        BaiduAd.show('adContainer', function() {
+            startAdCountdown();
+        });
+    } else {
+        setTimeout(function() {
+            container.innerHTML = '<div class="ad-fallback">'
+                + '<span class="ad-fallback-icon">📺</span>'
+                + '<p style="margin:0.3rem 0;">百度广告加载中...</p>'
+                + '<p style="font-size:0.7rem;color:rgba(255,255,255,0.3);">接入百度联盟后将展示真实广告</p>'
+                + '</div>';
+            startAdCountdown();
+        }, 400);
+    }
+}
+
+function startAdCountdown() {
+    var timer = document.getElementById('adTimer');
+    var claimBtn = document.getElementById('adClaimBtn');
+
     adTimerInterval = setInterval(function() {
-        seconds--;
-        timerEl.textContent = seconds;
-        if (seconds <= 0) {
+        adSecondsWatched++;
+        timer.textContent = '⏱ 已观看 ' + adSecondsWatched + ' / ' + adRewardSeconds + ' 秒';
+
+        if (adSecondsWatched >= adRewardSeconds) {
             clearInterval(adTimerInterval);
-            adTimerInterval = null;
-            completeAdWatch();
+            timer.textContent = '✅ 观看完成！';
+            claimBtn.disabled = false;
+            claimBtn.classList.add('ready');
+            claimBtn.textContent = '🎁 领取奖励';
+        } else {
+            claimBtn.textContent = '请先观看广告 (' + adSecondsWatched + '/' + adRewardSeconds + '秒)';
         }
     }, 1000);
 }
 
-async function completeAdWatch() {
-    var adModal = document.getElementById('adModal');
-    adModal.classList.remove('show');
-    if (adTimerInterval) { clearInterval(adTimerInterval); adTimerInterval = null; }
+async function claimAdReward() {
+    if (adSecondsWatched < adRewardSeconds) return;
+
+    clearInterval(adTimerInterval);
+    document.getElementById('adModal').classList.remove('show');
+    BaiduAd.destroy('adContainer');
 
     var token = Auth.getToken();
     if (!token) { showToast('请先登录'); return; }
@@ -754,6 +851,12 @@ async function completeAdWatch() {
     } catch (e) {
         showToast('网络错误，请重试');
     }
+}
+
+function closeAdModal() {
+    clearInterval(adTimerInterval);
+    document.getElementById('adModal').classList.remove('show');
+    BaiduAd.destroy('adContainer');
 }
 
 // ========== 签到 ==========

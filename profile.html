@@ -1059,6 +1059,9 @@
                 
             } catch (error) {
                 console.error('获取用户信息失败:', error);
+                // 显示加载失败提示
+                document.getElementById('profileName').textContent = '加载失败';
+                document.getElementById('profileInfo').textContent = '⚠️ 请刷新页面重试';
                 // 网络错误等，尝试从本地缓存加载
                 loadFromLocalCache();
             }
@@ -1351,6 +1354,11 @@
                 }
             } catch (e) {
                 console.error('加载会员状态失败:', e);
+                // 显示错误状态
+                const card = document.getElementById('vipCard');
+                if (card) card.style.display = 'block';
+                const remainEl = document.getElementById('vipRemaining');
+                if (remainEl) remainEl.textContent = '⚠️ 会员信息加载失败，请刷新重试';
             }
         }
 

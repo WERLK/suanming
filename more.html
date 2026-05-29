@@ -13,46 +13,66 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/profile-compatible.css">
     <style>
-        .content-area { padding: 1rem; max-width: 1200px; margin: 0 auto; }
+        .content-area { padding: 1rem; max-width: 1400px; margin: 0 auto; }
         .section-title {
             color: #ffd700;
             font-size: 1.1rem;
-            margin: 1.5rem 0 0.8rem;
+            margin: 1.8rem 0 0.9rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid rgba(255,215,0,0.15);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .section-title .cat-icon { font-size: 1.4rem; }
+        .section-count {
+            font-size: 0.75rem; color: rgba(255,255,255,0.35);
+            margin-left: auto; font-weight: normal;
         }
         .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 0.7rem;
+            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+            gap: 0.8rem;
         }
         .mod-card {
-            background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(22,33,62,0.9));
-            border: 1px solid rgba(255,215,0,0.15);
-            border-radius: 12px;
-            padding: 0.9rem 0.6rem;
+            background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95));
+            border: 1px solid rgba(255,215,0,0.12);
+            border-radius: 14px;
+            padding: 1rem 0.7rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.25s;
             text-decoration: none;
-            display: block;
+            display: flex; flex-direction: column; align-items: center;
             color: inherit;
+            min-height: 100px; justify-content: center;
         }
         .mod-card:hover {
-            border-color: rgba(255,215,0,0.4);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(255,215,0,0.1);
+            border-color: rgba(255,215,0,0.45);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255,215,0,0.12);
         }
-        .mod-card .icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
-        .mod-card .name { color: #ffd700; font-size: 0.9rem; font-weight: 500; }
-        .mod-card .desc { color: rgba(255,255,255,0.45); font-size: 0.72rem; margin-top: 0.2rem; }
+        .mod-card .icon { font-size: 2rem; margin-bottom: 0.35rem; line-height: 1; }
+        .mod-card .name { color: #ffd700; font-size: 0.88rem; font-weight: 600; }
+        .mod-card .desc { color: rgba(255,255,255,0.45); font-size: 0.68rem; margin-top: 0.25rem; line-height: 1.35; max-width: 130px; }
+
+        /* 新功能高亮 */
+        .mod-card.new-feature {
+            border-color: rgba(0,200,255,0.3);
+            background: linear-gradient(135deg, rgba(0,200,255,0.06), rgba(22,33,62,0.95));
+        }
+        .mod-card.new-feature::after {
+            content: 'NEW'; position: absolute; top: 6px; right: 8px;
+            font-size: 0.6rem; background: #00c8ff; color: #000;
+            padding: 1px 6px; border-radius: 8px; font-weight: bold;
+        }
+        .mod-card.new-feature .name { color: #00c8ff; }
 
         @media (max-width: 480px) {
-            .module-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 0.5rem; }
-            .mod-card { padding: 0.7rem 0.4rem; }
-            .mod-card .icon { font-size: 1.4rem; }
-            .mod-card .name { font-size: 0.78rem; }
-            .mod-card .desc { font-size: 0.65rem; }
+            .module-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; }
+            .mod-card { padding: 0.7rem 0.4rem; min-height: 90px; }
+            .mod-card .icon { font-size: 1.5rem; }
+            .mod-card .name { font-size: 0.75rem; }
+            .mod-card .desc { font-size: 0.62rem; max-width: 90px; }
+            .section-title { font-size: 0.95rem; }
         }
     </style>
 </head>
@@ -64,245 +84,484 @@
 <div class="content-area">
     <div class="stars" id="stars"></div>
 
-    <div class="section-title">🔮 八字命理</div>
+    <div class="section-title"><span class="cat-icon">🔮</span>八字命理<span class="section-count" id="cntBazi"></span></div>
     <div class="module-grid" id="gridBazi"></div>
 
-    <div class="section-title">⭐ 紫微斗数</div>
+    <div class="section-title"><span class="cat-icon">⭐</span>紫微斗数<span class="section-count" id="cntZiwei"></span></div>
     <div class="module-grid" id="gridZiwei"></div>
 
-    <div class="section-title">🕊️ 生肖运势</div>
+    <div class="section-title"><span class="cat-icon">🐉</span>生肖运势<span class="section-count" id="cntShengxiao"></span></div>
     <div class="module-grid" id="gridShengxiao"></div>
 
-    <div class="section-title">📛 姓名测算</div>
+    <div class="section-title"><span class="cat-icon">📛</span>姓名测算<span class="section-count" id="cntXingming"></span></div>
     <div class="module-grid" id="gridXingming"></div>
 
-    <div class="section-title">🏠 风水布局</div>
+    <div class="section-title"><span class="cat-icon">🏠</span>风水布局<span class="section-count" id="cntFengshui"></span></div>
     <div class="module-grid" id="gridFengshui"></div>
 
-    <div class="section-title">🃏 塔罗占卜</div>
+    <div class="section-title"><span class="cat-icon">🃏</span>塔罗占卜<span class="section-count" id="cntTarot"></span></div>
     <div class="module-grid" id="gridTarot"></div>
 
-    <div class="section-title">💭 周公解梦</div>
+    <div class="section-title"><span class="cat-icon">💭</span>周公解梦<span class="section-count" id="cntZhougong"></span></div>
     <div class="module-grid" id="gridZhougong"></div>
 
-    <div class="section-title">🎯 面相手相</div>
+    <div class="section-title"><span class="cat-icon">🎯</span>面相手相<span class="section-count" id="cntMianxiang"></span></div>
     <div class="module-grid" id="gridMianxiang"></div>
 
-    <div class="section-title">📅 黄道吉日</div>
+    <div class="section-title"><span class="cat-icon">📅</span>黄道吉日<span class="section-count" id="cntJiri"></span></div>
     <div class="module-grid" id="gridJiri"></div>
 
-    <div class="section-title">🔭 占卜问事</div>
+    <div class="section-title"><span class="cat-icon">🔭</span>占卜问事<span class="section-count" id="cntZhanbu"></span></div>
     <div class="module-grid" id="gridZhanbu"></div>
 
-    <div class="section-title">♈ 星座命理</div>
+    <div class="section-title"><span class="cat-icon">🪙</span>六爻占卜<span class="section-count" id="cntLiuyao"></span></div>
+    <div class="module-grid" id="gridLiuyao"></div>
+
+    <div class="section-title"><span class="cat-icon">♈</span>星座命理<span class="section-count" id="cntXingzuo"></span></div>
     <div class="module-grid" id="gridXingzuo"></div>
 
-    <div class="section-title">🩸 血型性格</div>
+    <div class="section-title"><span class="cat-icon">🩸</span>血型性格<span class="section-count" id="cntXuexing"></span></div>
     <div class="module-grid" id="gridXuexing"></div>
 
-    <div class="section-title">🔢 数字灵数</div>
+    <div class="section-title"><span class="cat-icon">🔢</span>数字灵数<span class="section-count" id="cntShuzi"></span></div>
     <div class="module-grid" id="gridShuzi"></div>
 
-    <div class="section-title">☯️ 奇门遁甲</div>
+    <div class="section-title"><span class="cat-icon">☯️</span>奇门遁甲<span class="section-count" id="cntQimen"></span></div>
     <div class="module-grid" id="gridQimen"></div>
 
-    <div class="section-title">🌸 梅花易数</div>
+    <div class="section-title"><span class="cat-icon">🌸</span>梅花易数<span class="section-count" id="cntMeihua"></span></div>
     <div class="module-grid" id="gridMeihua"></div>
 
-    <div class="section-title">🔧 太乙神数</div>
+    <div class="section-title"><span class="cat-icon">📐</span>太乙神数<span class="section-count" id="cntTaiyi"></span></div>
     <div class="module-grid" id="gridTaiyi"></div>
 
-    <div class="section-title">🔩 铁板神数</div>
+    <div class="section-title"><span class="cat-icon">🔩</span>铁板神数<span class="section-count" id="cntTieban"></span></div>
     <div class="module-grid" id="gridTieban"></div>
 
-    <div class="section-title">🧧 符咒灵符</div>
+    <div class="section-title"><span class="cat-icon">🧧</span>符咒灵符<span class="section-count" id="cntFuzhou"></span></div>
     <div class="module-grid" id="gridFuzhou"></div>
+
+    <div class="section-title"><span class="cat-icon">📆</span>择日择时<span class="section-count" id="cntZeri"></span></div>
+    <div class="module-grid" id="gridZeri"></div>
+
+    <div class="section-title" style="border-color:rgba(0,200,255,0.3);"><span class="cat-icon">🤖</span>大数据AI分析<span class="section-count" id="cntDataAnalysis"></span></div>
+    <div class="module-grid" id="gridDataAnalysis"></div>
+
+    <div class="section-title" style="border-color:rgba(0,200,255,0.3);"><span class="cat-icon">📷</span>图片上传算<span class="section-count" id="cntImageUpload"></span></div>
+    <div class="module-grid" id="gridImageUpload"></div>
 </div>
 
 <script>
 (function() {
     var modules = [
-        { cat:"Bazi", icon:"🔮", name:"八字排盘", file:"bazi.html" },
-        { cat:"Bazi", icon:"🌿", name:"十神分析", file:"十神分析_1.html" },
-        { cat:"Bazi", icon:"🌀", name:"大运流年", file:"大运流年_2.html" },
-        { cat:"Bazi", icon:"💑", name:"八字合婚", file:"八字合婚_3.html" },
-        { cat:"Bazi", icon:"👶", name:"八字起名", file:"八字起名_4.html" },
-        { cat:"Bazi", icon:"📅", name:"八字择日", file:"八字择日_5.html" },
-        { cat:"Bazi", icon:"🏠", name:"八字风水", file:"八字风水_6.html" },
-        { cat:"Bazi", icon:"🔄", name:"八字改运", file:"八字改运_7.html" },
-        { cat:"Bazi", icon:"💊", name:"八字问病", file:"八字问病_8.html" },
-        { cat:"Bazi", icon:"💰", name:"八字求财", file:"八字求财_9.html" },
+        // ==================== 八字命理 (18) ====================
+        { cat:"Bazi", icon:"🔮", name:"八字排盘", desc:"四柱八字精准排盘，五行十神分析", file:"bazi.html" },
+        { cat:"Bazi", icon:"🌿", name:"十神分析", desc:"正印偏印食神伤官深度解读", file:"十神分析_1.html" },
+        { cat:"Bazi", icon:"🌀", name:"大运流年", desc:"十年大运走势，流年吉凶推演", file:"大运流年_2.html" },
+        { cat:"Bazi", icon:"💑", name:"八字合婚", desc:"男女八字配对，婚姻幸福指数", file:"八字合婚_3.html" },
+        { cat:"Bazi", icon:"👶", name:"八字起名", desc:"五行喜用神起名，补益命局", file:"八字起名_4.html" },
+        { cat:"Bazi", icon:"📅", name:"八字择日", desc:"选取黄道吉日，契合个人八字", file:"八字择日_5.html" },
+        { cat:"Bazi", icon:"🏠", name:"八字风水", desc:"根据八字喜忌调整住宅布局", file:"八字风水_6.html" },
+        { cat:"Bazi", icon:"🔄", name:"八字改运", desc:"五行补救方案，运势提升指南", file:"八字改运_7.html" },
+        { cat:"Bazi", icon:"💊", name:"八字问病", desc:"命理角度分析健康隐患", file:"八字问病_8.html" },
+        { cat:"Bazi", icon:"💰", name:"八字求财", desc:"财星旺衰分析，求财时机把握", file:"八字求财_9.html" },
+        { cat:"Bazi", icon:"🎓", name:"文昌学业", desc:"文昌星旺衰，学业考试运势", file:"文昌学业_201.html" },
+        { cat:"Bazi", icon:"👶", name:"子女运程", desc:"子女星分析，生育时机预测", file:"子女运程_202.html" },
+        { cat:"Bazi", icon:"❤️", name:"桃花运程", desc:"桃花星旺衰，姻缘时机判断", file:"桃花运程_203.html" },
+        { cat:"Bazi", icon:"⚖️", name:"官运仕途", desc:"官星分析，仕途升迁时机", file:"官运仕途_204.html" },
+        { cat:"Bazi", icon:"🧘", name:"用神喜忌", desc:"精准取用神，补益命局不足", file:"用神喜忌_205.html" },
+        { cat:"Bazi", icon:"🌗", name:"纳音五行", desc:"六十甲子纳音，五行属性解读", file:"纳音五行_206.html" },
+        { cat:"Bazi", icon:"🕰️", name:"时辰校正", desc:"出生时辰反推，精准校准八字", file:"时辰校正_207.html" },
+        { cat:"Bazi", icon:"📊", name:"命格评分", desc:"八字综合评分，命理质量评估", file:"命格评分_208.html" },
 
-        { cat:"Ziwei", icon:"⭐", name:"紫微斗数", file:"ziwei.html" },
-        { cat:"Ziwei", icon:"📊", name:"命盘排盘", file:"命盘排盘_10.html" },
-        { cat:"Ziwei", icon:"🌟", name:"主星分析", file:"主星分析_11.html" },
-        { cat:"Ziwei", icon:"✨", name:"四化飞星", file:"四化飞星_12.html" },
-        { cat:"Ziwei", icon:"🏰", name:"十二宫位", file:"十二宫位_13.html" },
-        { cat:"Ziwei", icon:"💍", name:"紫微合婚", file:"紫微合婚_14.html" },
-        { cat:"Ziwei", icon:"💼", name:"紫微择职", file:"紫微择职_15.html" },
-        { cat:"Ziwei", icon:"💵", name:"紫微问财", file:"紫微问财_16.html" },
-        { cat:"Ziwei", icon:"❤️", name:"紫微健康", file:"紫微健康_17.html" },
+        // ==================== 紫微斗数 (18) ====================
+        { cat:"Ziwei", icon:"⭐", name:"紫微斗数", desc:"十四主星排盘，十二宫分析", file:"ziwei.html" },
+        { cat:"Ziwei", icon:"📊", name:"命盘排盘", desc:"完整紫微命盘，宫位分布图", file:"命盘排盘_10.html" },
+        { cat:"Ziwei", icon:"🌟", name:"主星分析", desc:"十四主星性格与运势解读", file:"主星分析_11.html" },
+        { cat:"Ziwei", icon:"✨", name:"四化飞星", desc:"化禄化权化科化忌飞星", file:"四化飞星_12.html" },
+        { cat:"Ziwei", icon:"🏰", name:"十二宫位", desc:"命宫夫妻宫财帛宫详解", file:"十二宫位_13.html" },
+        { cat:"Ziwei", icon:"💍", name:"紫微合婚", desc:"双人命盘配对，婚姻质量评估", file:"紫微合婚_14.html" },
+        { cat:"Ziwei", icon:"💼", name:"紫微择职", desc:"官禄宫分析，职业方向指引", file:"紫微择职_15.html" },
+        { cat:"Ziwei", icon:"💵", name:"紫微问财", desc:"财帛宫旺衰，求财方向建议", file:"紫微问财_16.html" },
+        { cat:"Ziwei", icon:"❤️", name:"紫微健康", desc:"疾厄宫分析，健康预警提示", file:"紫微健康_17.html" },
+        { cat:"Ziwei", icon:"📈", name:"大限流年", desc:"十年大限分析，流年运势", file:"大限流年_209.html" },
+        { cat:"Ziwei", icon:"🔗", name:"辅星杂曜", desc:"六吉六煞星曜综合解读", file:"辅星杂曜_210.html" },
+        { cat:"Ziwei", icon:"🏛️", name:"田宅宫详解", desc:"房产运、居住环境命理", file:"田宅宫详解_211.html" },
+        { cat:"Ziwei", icon:"👨‍👩‍👧", name:"父母宫详解", desc:"父母关系、长辈运势分析", file:"父母宫详解_212.html" },
+        { cat:"Ziwei", icon:"🚗", name:"迁移宫详解", desc:"出行运、外出发展运势", file:"迁移宫详解_213.html" },
+        { cat:"Ziwei", icon:"🤝", name:"交友宫详解", desc:"人际关系、合作伙伴运程", file:"交友宫详解_214.html" },
+        { cat:"Ziwei", icon:"🎨", name:"福德宫详解", desc:"精神状态、享受福报运势", file:"福德宫详解_215.html" },
+        { cat:"Ziwei", icon:"⚡", name:"紫微速断", desc:"快速命盘解读，三分钟看命", file:"紫微速断_216.html" },
+        { cat:"Ziwei", icon:"🔬", name:"格局分析", desc:"紫微命盘格局，富贵贫贱", file:"格局分析_217.html" },
 
-        { cat:"Shengxiao", icon:"🕊️", name:"生肖运势", file:"shengxiao.html" },
-        { cat:"Shengxiao", icon:"🐭", name:"鼠年运势", file:"鼠年运势_20.html" },
-        { cat:"Shengxiao", icon:"🐮", name:"牛年运势", file:"牛年运势_21.html" },
-        { cat:"Shengxiao", icon:"🐯", name:"虎年运势", file:"虎年运势_22.html" },
-        { cat:"Shengxiao", icon:"🐰", name:"兔年运势", file:"兔年运势_23.html" },
-        { cat:"Shengxiao", icon:"🐲", name:"龙年运势", file:"龙年运势_24.html" },
-        { cat:"Shengxiao", icon:"🐍", name:"蛇年运势", file:"蛇年运势_25.html" },
-        { cat:"Shengxiao", icon:"🐴", name:"马年运势", file:"马年运势_26.html" },
-        { cat:"Shengxiao", icon:"🐑", name:"羊年运势", file:"羊年运势_27.html" },
-        { cat:"Shengxiao", icon:"🐵", name:"猴年运势", file:"猴年运势_28.html" },
-        { cat:"Shengxiao", icon:"🐔", name:"鸡年运势", file:"鸡年运势_29.html" },
-        { cat:"Shengxiao", icon:"🐶", name:"狗年运势", file:"狗年运势_30.html" },
-        { cat:"Shengxiao", icon:"🐷", name:"猪年运势", file:"猪年运势_31.html" },
+        // ==================== 生肖运势 (16) ====================
+        { cat:"Shengxiao", icon:"🐉", name:"生肖运势", desc:"十二生肖全年运势综合分析", file:"shengxiao.html" },
+        { cat:"Shengxiao", icon:"🐭", name:"鼠年运势", desc:"属鼠人的流年运势详解", file:"鼠年运势_20.html" },
+        { cat:"Shengxiao", icon:"🐮", name:"牛年运势", desc:"属牛人的流年运势详解", file:"牛年运势_21.html" },
+        { cat:"Shengxiao", icon:"🐯", name:"虎年运势", desc:"属虎人的流年运势详解", file:"虎年运势_22.html" },
+        { cat:"Shengxiao", icon:"🐰", name:"兔年运势", desc:"属兔人的流年运势详解", file:"兔年运势_23.html" },
+        { cat:"Shengxiao", icon:"🐲", name:"龙年运势", desc:"属龙人的流年运势详解", file:"龙年运势_24.html" },
+        { cat:"Shengxiao", icon:"🐍", name:"蛇年运势", desc:"属蛇人的流年运势详解", file:"蛇年运势_25.html" },
+        { cat:"Shengxiao", icon:"🐴", name:"马年运势", desc:"属马人的流年运势详解", file:"马年运势_26.html" },
+        { cat:"Shengxiao", icon:"🐑", name:"羊年运势", desc:"属羊人的流年运势详解", file:"羊年运势_27.html" },
+        { cat:"Shengxiao", icon:"🐵", name:"猴年运势", desc:"属猴人的流年运势详解", file:"猴年运势_28.html" },
+        { cat:"Shengxiao", icon:"🐔", name:"鸡年运势", desc:"属鸡人的流年运势详解", file:"鸡年运势_29.html" },
+        { cat:"Shengxiao", icon:"🐶", name:"狗年运势", desc:"属狗人的流年运势详解", file:"狗年运势_30.html" },
+        { cat:"Shengxiao", icon:"🐷", name:"猪年运势", desc:"属猪人的流年运势详解", file:"猪年运势_31.html" },
+        { cat:"Shengxiao", icon:"💕", name:"生肖配对", desc:"十二生肖配对指数与建议", file:"生肖配对_218.html" },
+        { cat:"Shengxiao", icon:"⚡", name:"生肖犯太岁", desc:"本命年、冲太岁化解方案", file:"生肖犯太岁_219.html" },
+        { cat:"Shengxiao", icon:"🏮", name:"本命年指南", desc:"本命年注意事项与化解法", file:"本命年指南_220.html" },
 
-        { cat:"Xingming", icon:"📛", name:"姓名测算", file:"xingming.html" },
-        { cat:"Xingming", icon:"📐", name:"五格剖象", file:"五格剖象_32.html" },
-        { cat:"Xingming", icon:"☯️", name:"三才配置", file:"三才配置_33.html" },
-        { cat:"Xingming", icon:"🎵", name:"姓名音律", file:"姓名音律_34.html" },
-        { cat:"Xingming", icon:"✍️", name:"姓名字形", file:"姓名字形_35.html" },
-        { cat:"Xingming", icon:"📖", name:"姓名义理", file:"姓名义理_36.html" },
-        { cat:"Xingming", icon:"🔄", name:"姓名改运", file:"姓名改运_37.html" },
-        { cat:"Xingming", icon:"💑", name:"姓名合婚", file:"姓名合婚_38.html" },
-        { cat:"Xingming", icon:"📊", name:"姓名评分", file:"姓名评分_41.html" },
+        // ==================== 姓名测算 (14) ====================
+        { cat:"Xingming", icon:"📛", name:"姓名测算", desc:"姓名五格剖象综合评分", file:"xingming.html" },
+        { cat:"Xingming", icon:"📐", name:"五格剖象", desc:"天格人格地格外格总格分析", file:"五格剖象_32.html" },
+        { cat:"Xingming", icon:"☯️", name:"三才配置", desc:"天人地三才五行吉凶解读", file:"三才配置_33.html" },
+        { cat:"Xingming", icon:"🎵", name:"姓名音律", desc:"姓名读音五行与韵律分析", file:"姓名音律_34.html" },
+        { cat:"Xingming", icon:"✍️", name:"姓名字形", desc:"笔画结构与字形五行分析", file:"姓名字形_35.html" },
+        { cat:"Xingming", icon:"📖", name:"姓名义理", desc:"名字寓意与文化内涵解读", file:"姓名义理_36.html" },
+        { cat:"Xingming", icon:"🔄", name:"姓名改运", desc:"改名建议与转运效果评估", file:"姓名改运_37.html" },
+        { cat:"Xingming", icon:"💑", name:"姓名合婚", desc:"姓名配对婚姻匹配度", file:"姓名合婚_38.html" },
+        { cat:"Xingming", icon:"📊", name:"姓名评分", desc:"综合评分体系，量化姓名吉凶", file:"姓名评分_41.html" },
+        { cat:"Xingming", icon:"👶", name:"宝宝起名", desc:"根据八字五行给宝宝起名", file:"宝宝起名_221.html" },
+        { cat:"Xingming", icon:"🏢", name:"公司命名", desc:"企业名称五行配置与吉凶", file:"公司命名_222.html" },
+        { cat:"Xingming", icon:"📝", name:"笔名测算", desc:"艺名笔名网名五行分析", file:"笔名测算_223.html" },
+        { cat:"Xingming", icon:"🌐", name:"英文名测", desc:"英文名五行属性与运势", file:"英文名测_224.html" },
+        { cat:"Xingming", icon:"🔤", name:"品牌命名", desc:"品牌名称五行配置建议", file:"品牌命名_225.html" },
 
-        { cat:"Fengshui", icon:"🏠", name:"风水布局", file:"fengshui.html" },
-        { cat:"Fengshui", icon:"🛋️", name:"家居风水", file:"家居风水_62.html" },
-        { cat:"Fengshui", icon:"🏢", name:"办公风水", file:"办公风水_63.html" },
-        { cat:"Fengshui", icon:"🏪", name:"商铺风水", file:"商铺风水_64.html" },
-        { cat:"Fengshui", icon:"🌅", name:"阳宅风水", file:"阳宅风水_66.html" },
-        { cat:"Fengshui", icon:"📅", name:"风水择日", file:"风水择日_67.html" },
-        { cat:"Fengshui", icon:"💰", name:"风水招财", file:"风水招财_70.html" },
+        // ==================== 风水布局 (18) ====================
+        { cat:"Fengshui", icon:"🏠", name:"风水布局", desc:"家居风水整体布局方案", file:"fengshui.html" },
+        { cat:"Fengshui", icon:"🛋️", name:"家居风水", desc:"客厅卧室厨房风水调整", file:"家居风水_62.html" },
+        { cat:"Fengshui", icon:"🏢", name:"办公风水", desc:"办公室座位财位布局", file:"办公风水_63.html" },
+        { cat:"Fengshui", icon:"🏪", name:"商铺风水", desc:"店面选址与店内风水布置", file:"商铺风水_64.html" },
+        { cat:"Fengshui", icon:"🌅", name:"阳宅风水", desc:"住宅外部环境风水分析", file:"阳宅风水_66.html" },
+        { cat:"Fengshui", icon:"📅", name:"风水择日", desc:"搬家入宅动土吉日选择", file:"风水择日_67.html" },
+        { cat:"Fengshui", icon:"💰", name:"风水招财", desc:"财位布置，招财进宝秘法", file:"风水招财_70.html" },
+        { cat:"Fengshui", icon:"🪦", name:"阴宅风水", desc:"墓地风水选址与朝向分析", file:"阴宅风水_226.html" },
+        { cat:"Fengshui", icon:"🚪", name:"大门风水", desc:"入户门朝向与气场吉凶", file:"大门风水_227.html" },
+        { cat:"Fengshui", icon:"🛏️", name:"卧室风水", desc:"床位摆放与睡眠质量提升", file:"卧室风水_228.html" },
+        { cat:"Fengshui", icon:"🍳", name:"厨房风水", desc:"灶位布局与家庭健康运", file:"厨房风水_229.html" },
+        { cat:"Fengshui", icon:"🌳", name:"庭院风水", desc:"花园庭院植物山石布局", file:"庭院风水_230.html" },
+        { cat:"Fengshui", icon:"💧", name:"水法布局", desc:"鱼缸喷泉等水元素摆放", file:"水法布局_231.html" },
+        { cat:"Fengshui", icon:"🪞", name:"镜子风水", desc:"镜面反射对气场的影响", file:"镜子风水_232.html" },
+        { cat:"Fengshui", icon:"🏗️", name:"建筑风水", desc:"房屋结构与朝向风水评估", file:"建筑风水_233.html" },
+        { cat:"Fengshui", icon:"🌈", name:"色彩风水", desc:"装修色彩五行搭配方案", file:"色彩风水_234.html" },
+        { cat:"Fengshui", icon:"🔮", name:"罗盘运用", desc:"风水罗盘实操与方位测定", file:"罗盘运用_235.html" },
+        { cat:"Fengshui", icon:"🧹", name:"化煞辟邪", desc:"各种煞气识别与化解方法", file:"化煞辟邪_236.html" },
 
-        { cat:"Tarot", icon:"🃏", name:"塔罗占卜", file:"tarot.html" },
-        { cat:"Tarot", icon:"🌌", name:"大阿卡纳", file:"大阿卡纳_82.html" },
-        { cat:"Tarot", icon:"💕", name:"爱情塔罗", file:"爱情塔罗_84.html" },
-        { cat:"Tarot", icon:"💼", name:"事业塔罗", file:"事业塔罗_85.html" },
-        { cat:"Tarot", icon:"💰", name:"财运塔罗", file:"财运塔罗_86.html" },
-        { cat:"Tarot", icon:"❤️", name:"健康塔罗", file:"健康塔罗_87.html" },
-        { cat:"Tarot", icon:"🔮", name:"预测塔罗", file:"预测塔罗_91.html" },
+        // ==================== 塔罗占卜 (16) ====================
+        { cat:"Tarot", icon:"🃏", name:"塔罗占卜", desc:"78张塔罗牌综合占卜解读", file:"tarot.html" },
+        { cat:"Tarot", icon:"🌌", name:"大阿卡纳", desc:"22张大牌深度解读", file:"大阿卡纳_82.html" },
+        { cat:"Tarot", icon:"💕", name:"爱情塔罗", desc:"感情发展、桃花运势占卜", file:"爱情塔罗_84.html" },
+        { cat:"Tarot", icon:"💼", name:"事业塔罗", desc:"职业发展、工作运势占卜", file:"事业塔罗_85.html" },
+        { cat:"Tarot", icon:"💰", name:"财运塔罗", desc:"财务状况、投资时机占卜", file:"财运塔罗_86.html" },
+        { cat:"Tarot", icon:"❤️", name:"健康塔罗", desc:"身体状况、养生建议占卜", file:"健康塔罗_87.html" },
+        { cat:"Tarot", icon:"🔮", name:"预测塔罗", desc:"未来三个月综合运势预测", file:"预测塔罗_91.html" },
+        { cat:"Tarot", icon:"✨", name:"小阿卡纳", desc:"56张小牌权杖圣杯解读", file:"小阿卡纳_237.html" },
+        { cat:"Tarot", icon:"🔄", name:"凯尔特十字", desc:"经典凯尔特十字牌阵解读", file:"凯尔特十字_238.html" },
+        { cat:"Tarot", icon:"❤️‍🔥", name:"关系牌阵", desc:"两人关系发展深层分析", file:"关系牌阵_239.html" },
+        { cat:"Tarot", icon:"📅", name:"周运占卜", desc:"未来一周每日运势预测", file:"周运占卜_240.html" },
+        { cat:"Tarot", icon:"🌙", name:"月运占卜", desc:"未来一个月整体运势", file:"月运占卜_241.html" },
+        { cat:"Tarot", icon:"🎯", name:"是否牌阵", desc:"简单直接的是否问题占卜", file:"是否牌阵_242.html" },
+        { cat:"Tarot", icon:"🧩", name:"六芒星阵", desc:"六芒星牌阵全方位解读", file:"六芒星阵_243.html" },
+        { cat:"Tarot", icon:"🗺️", name:"年度占卜", desc:"一年十二个月综合塔罗", file:"年度占卜_244.html" },
+        { cat:"Tarot", icon:"💎", name:"水晶塔罗", desc:"结合水晶能量的塔罗占卜", file:"水晶塔罗_245.html" },
 
-        { cat:"Zhougong", icon:"💭", name:"周公解梦", file:"zhougong.html" },
-        { cat:"Zhougong", icon:"🐱", name:"动物梦境", file:"动物梦境_72.html" },
-        { cat:"Zhougong", icon:"🌿", name:"植物梦境", file:"植物梦境_73.html" },
-        { cat:"Zhougong", icon:"🏔️", name:"自然梦境", file:"自然梦境_74.html" },
-        { cat:"Zhougong", icon:"🏗️", name:"建筑梦境", file:"建筑梦境_75.html" },
-        { cat:"Zhougong", icon:"🧑", name:"人物梦境", file:"人物梦境_77.html" },
-        { cat:"Zhougong", icon:"🍔", name:"食物梦境", file:"食物梦境_80.html" },
+        // ==================== 周公解梦 (14) ====================
+        { cat:"Zhougong", icon:"💭", name:"周公解梦", desc:"传统周公解梦全书查询", file:"zhougong.html" },
+        { cat:"Zhougong", icon:"🐱", name:"动物梦境", desc:"梦见各类动物的吉凶解读", file:"动物梦境_72.html" },
+        { cat:"Zhougong", icon:"🌿", name:"植物梦境", desc:"梦见花草树木的寓意", file:"植物梦境_73.html" },
+        { cat:"Zhougong", icon:"🏔️", name:"自然梦境", desc:"梦见山水日月星辰解析", file:"自然梦境_74.html" },
+        { cat:"Zhougong", icon:"🏗️", name:"建筑梦境", desc:"梦见房屋桥梁等建筑", file:"建筑梦境_75.html" },
+        { cat:"Zhougong", icon:"🧑", name:"人物梦境", desc:"梦见亲友陌生人的寓意", file:"人物梦境_77.html" },
+        { cat:"Zhougong", icon:"🍔", name:"食物梦境", desc:"梦见饮食宴席的吉凶", file:"食物梦境_80.html" },
+        { cat:"Zhougong", icon:"💀", name:"恐怖梦境", desc:"噩梦解读与心理疏导", file:"恐怖梦境_246.html" },
+        { cat:"Zhougong", icon:"✈️", name:"交通梦境", desc:"梦见车船飞机的寓意", file:"交通梦境_247.html" },
+        { cat:"Zhougong", icon:"💰", name:"财运梦境", desc:"梦见金钱财宝的征兆", file:"财运梦境_248.html" },
+        { cat:"Zhougong", icon:"💒", name:"婚恋梦境", desc:"梦见婚礼恋爱的解读", file:"婚恋梦境_249.html" },
+        { cat:"Zhougong", icon:"🎓", name:"考试梦境", desc:"梦见考试学校的寓意", file:"考试梦境_250.html" },
+        { cat:"Zhougong", icon:"🔍", name:"梦境分析", desc:"心理学视角的梦境深度解析", file:"梦境分析_251.html" },
+        { cat:"Zhougong", icon:"📔", name:"梦境日记", desc:"记录分析梦境规律模式", file:"梦境日记_252.html" },
 
-        { cat:"Mianxiang", icon:"🎯", name:"面相分析", file:"mianxiang.html" },
-        { cat:"Mianxiang", icon:"👁️", name:"五官面相", file:"五官面相_42.html" },
-        { cat:"Mianxiang", icon:"🟤", name:"痣相学", file:"痣相学_45.html" },
-        { cat:"Mianxiang", icon:"🦴", name:"骨相学", file:"骨相学_46.html" },
-        { cat:"Mianxiang", icon:"🤲", name:"手相解析", file:"shouxiang.html" },
-        { cat:"Mianxiang", icon:"📏", name:"智慧线", file:"智慧线解析_53.html" },
-        { cat:"Mianxiang", icon:"💕", name:"感情线", file:"感情线解析_54.html" },
-        { cat:"Mianxiang", icon:"🧭", name:"命运线", file:"命运线解析_55.html" },
-        { cat:"Mianxiang", icon:"💍", name:"婚姻线", file:"婚姻线解析_56.html" },
-        { cat:"Mianxiang", icon:"💵", name:"财运线", file:"财运线解析_57.html" },
+        // ==================== 面相手相 (18) ====================
+        { cat:"Mianxiang", icon:"🎯", name:"面相分析", desc:"五官面相综合运势解读", file:"mianxiang.html" },
+        { cat:"Mianxiang", icon:"👁️", name:"五官面相", desc:"眉眼耳鼻口五官详解", file:"五官面相_42.html" },
+        { cat:"Mianxiang", icon:"🟤", name:"痣相学", desc:"面部身体各部位痣的寓意", file:"痣相学_45.html" },
+        { cat:"Mianxiang", icon:"🦴", name:"骨相学", desc:"头骨面骨与命运的关系", file:"骨相学_46.html" },
+        { cat:"Mianxiang", icon:"🤲", name:"手相解析", desc:"掌纹生命线智慧线感情线", file:"shouxiang.html" },
+        { cat:"Mianxiang", icon:"📏", name:"智慧线", desc:"智慧线深度解析与运势", file:"智慧线解析_53.html" },
+        { cat:"Mianxiang", icon:"💕", name:"感情线", desc:"感情线走向与婚姻运势", file:"感情线解析_54.html" },
+        { cat:"Mianxiang", icon:"🧭", name:"命运线", desc:"事业线与命运线综合分析", file:"命运线解析_55.html" },
+        { cat:"Mianxiang", icon:"💍", name:"婚姻线", desc:"婚姻线数量形态解读", file:"婚姻线解析_56.html" },
+        { cat:"Mianxiang", icon:"💵", name:"财运线", desc:"财运线清晰度与财富运势", file:"财运线解析_57.html" },
+        { cat:"Mianxiang", icon:"🗻", name:"三庭分析", desc:"上中下三庭比例与运势", file:"三庭分析_253.html" },
+        { cat:"Mianxiang", icon:"👃", name:"鼻相分析", desc:"鼻形鼻梁与财运官运", file:"鼻相分析_254.html" },
+        { cat:"Mianxiang", icon:"👄", name:"唇齿分析", desc:"嘴唇牙齿与口才运势", file:"唇齿分析_255.html" },
+        { cat:"Mianxiang", icon:"👂", name:"耳相分析", desc:"耳形耳垂与寿命福气", file:"耳相分析_256.html" },
+        { cat:"Mianxiang", icon:"🔍", name:"指纹分析", desc:"十指指纹与性格命运", file:"指纹分析_257.html" },
+        { cat:"Mianxiang", icon:"🌡️", name:"气色分析", desc:"面色气色与近期运势", file:"气色分析_258.html" },
+        { cat:"Mianxiang", icon:"📸", name:"面相年龄", desc:"面相与实际年龄差异解读", file:"面相年龄_259.html" },
+        { cat:"Mianxiang", icon:"🧔", name:"须眉分析", desc:"胡须眉毛与男性运势", file:"须眉分析_260.html" },
 
-        { cat:"Jiri", icon:"📅", name:"黄道吉日", file:"huangdao.html" },
-        { cat:"Jiri", icon:"💒", name:"嫁娶吉日", file:"嫁娶吉日_92.html" },
-        { cat:"Jiri", icon:"🎉", name:"开业吉日", file:"开业吉日_93.html" },
-        { cat:"Jiri", icon:"🚚", name:"搬家吉日", file:"搬家吉日_94.html" },
-        { cat:"Jiri", icon:"✈️", name:"出行吉日", file:"出行吉日_95.html" },
-        { cat:"Jiri", icon:"🙏", name:"祭祀吉日", file:"祭祀吉日_96.html" },
-        { cat:"Jiri", icon:"🔨", name:"动土吉日", file:"动土吉日_97.html" },
-        { cat:"Jiri", icon:"💵", name:"纳财吉日", file:"纳财吉日_99.html" },
+        // ==================== 黄道吉日 (16) ====================
+        { cat:"Jiri", icon:"📅", name:"黄道吉日", desc:"万年历黄道吉日查询", file:"huangdao.html" },
+        { cat:"Jiri", icon:"💒", name:"嫁娶吉日", desc:"结婚领证最佳日期选择", file:"嫁娶吉日_92.html" },
+        { cat:"Jiri", icon:"🎉", name:"开业吉日", desc:"公司店铺开业良辰吉日", file:"开业吉日_93.html" },
+        { cat:"Jiri", icon:"🚚", name:"搬家吉日", desc:"乔迁新居入宅日期选择", file:"搬家吉日_94.html" },
+        { cat:"Jiri", icon:"✈️", name:"出行吉日", desc:"远行旅游出差良辰", file:"出行吉日_95.html" },
+        { cat:"Jiri", icon:"🙏", name:"祭祀吉日", desc:"祭祖拜神祈福日期", file:"祭祀吉日_96.html" },
+        { cat:"Jiri", icon:"🔨", name:"动土吉日", desc:"建房装修开工黄道日", file:"动土吉日_97.html" },
+        { cat:"Jiri", icon:"💵", name:"纳财吉日", desc:"收款签约投资吉日", file:"纳财吉日_99.html" },
+        { cat:"Jiri", icon:"🎂", name:"剖腹产择日", desc:"宝宝出生最佳时辰选择", file:"剖腹产择日_261.html" },
+        { cat:"Jiri", icon:"🏥", name:"就医吉日", desc:"看病手术日期选择", file:"就医吉日_262.html" },
+        { cat:"Jiri", icon:"✂️", name:"理发吉日", desc:"剪发理发吉日查询", file:"理发吉日_263.html" },
+        { cat:"Jiri", icon:"📝", name:"签约吉日", desc:"合同签约谈判日期", file:"签约吉日_264.html" },
+        { cat:"Jiri", icon:"🚗", name:"提车吉日", desc:"买车提车上牌日期", file:"提车吉日_265.html" },
+        { cat:"Jiri", icon:"🏠", name:"安门吉日", desc:"安装大门入户门日期", file:"安门吉日_266.html" },
+        { cat:"Jiri", icon:"⚰️", name:"安葬吉日", desc:"下葬入土日期选择", file:"安葬吉日_267.html" },
+        { cat:"Jiri", icon:"🏮", name:"每日宜忌", desc:"今日宜忌事项查询", file:"每日宜忌_268.html" },
 
-        { cat:"Zhanbu", icon:"🔭", name:"解星问事", file:"jiexing.html" },
-        { cat:"Zhanbu", icon:"💼", name:"事业占卜", file:"事业占卜_102.html" },
-        { cat:"Zhanbu", icon:"💰", name:"财运占卜", file:"财运占卜_103.html" },
-        { cat:"Zhanbu", icon:"💍", name:"婚姻占卜", file:"婚姻占卜_104.html" },
-        { cat:"Zhanbu", icon:"❤️", name:"健康占卜", file:"健康占卜_105.html" },
-        { cat:"Zhanbu", icon:"📚", name:"学业占卜", file:"学业占卜_106.html" },
+        // ==================== 占卜问事 (14) ====================
+        { cat:"Zhanbu", icon:"🔭", name:"解星问事", desc:"综合占卜解答人生疑问", file:"jiexing.html" },
+        { cat:"Zhanbu", icon:"💼", name:"事业占卜", desc:"职业发展与跳槽时机", file:"事业占卜_102.html" },
+        { cat:"Zhanbu", icon:"💰", name:"财运占卜", desc:"投资理财财运走势", file:"财运占卜_103.html" },
+        { cat:"Zhanbu", icon:"💍", name:"婚姻占卜", desc:"婚姻状况与感情走向", file:"婚姻占卜_104.html" },
+        { cat:"Zhanbu", icon:"❤️", name:"健康占卜", desc:"身体状况与疾病预兆", file:"健康占卜_105.html" },
+        { cat:"Zhanbu", icon:"📚", name:"学业占卜", desc:"考试运与学业发展", file:"学业占卜_106.html" },
+        { cat:"Zhanbu", icon:"🏠", name:"房产占卜", desc:"买房卖房时机判断", file:"房产占卜_269.html" },
+        { cat:"Zhanbu", icon:"⚖️", name:"官司占卜", desc:"诉讼纠纷结果预判", file:"官司占卜_270.html" },
+        { cat:"Zhanbu", icon:"👶", name:"生育占卜", desc:"怀孕时机与子女运势", file:"生育占卜_271.html" },
+        { cat:"Zhanbu", icon:"✈️", name:"出行占卜", desc:"旅行安全与时机占卜", file:"出行占卜_272.html" },
+        { cat:"Zhanbu", icon:"🤝", name:"合作占卜", desc:"合伙创业合作前景", file:"合作占卜_273.html" },
+        { cat:"Zhanbu", icon:"🎯", name:"目标占卜", desc:"目标能否达成的预测", file:"目标占卜_274.html" },
+        { cat:"Zhanbu", icon:"🔍", name:"失物占卜", desc:"丢失物品方位与找回", file:"失物占卜_275.html" },
+        { cat:"Zhanbu", icon:"👻", name:"灵异占卜", desc:"超自然现象与灵异事件", file:"灵异占卜_276.html" },
 
-        { cat:"Xingzuo", icon:"♈", name:"星座运势", file:"xingzuo.html" },
-        { cat:"Xingzuo", icon:"🐏", name:"白羊座", file:"白羊座运势_122.html" },
-        { cat:"Xingzuo", icon:"🐂", name:"金牛座", file:"金牛座运势_123.html" },
-        { cat:"Xingzuo", icon:"👯", name:"双子座", file:"双子座运势_124.html" },
-        { cat:"Xingzuo", icon:"🦀", name:"巨蟹座", file:"巨蟹座运势_125.html" },
-        { cat:"Xingzuo", icon:"🦁", name:"狮子座", file:"狮子座运势_126.html" },
-        { cat:"Xingzuo", icon:"👧", name:"处女座", file:"处女座运势_127.html" },
-        { cat:"Xingzuo", icon:"⚖️", name:"天秤座", file:"天秤座运势_128.html" },
-        { cat:"Xingzuo", icon:"🦂", name:"天蝎座", file:"天蝎座运势_129.html" },
-        { cat:"Xingzuo", icon:"🏹", name:"射手座", file:"射手座运势_130.html" },
-        { cat:"Xingzuo", icon:"🐐", name:"摩羯座", file:"摩羯座运势_131.html" },
-        { cat:"Xingzuo", icon:"🏺", name:"水瓶座", file:"水瓶座运势_132.html" },
-        { cat:"Xingzuo", icon:"🐟", name:"双鱼座", file:"双鱼座运势_133.html" },
+        // ==================== 六爻占卜 (14) ====================
+        { cat:"Liuyao", icon:"🪙", name:"六爻排盘", desc:"金钱卦铜钱摇卦排盘", file:"liuya.html" },
+        { cat:"Liuyao", icon:"📖", name:"六爻断卦", desc:"六爻卦象综合解读分析", file:"六爻断卦_277.html" },
+        { cat:"Liuyao", icon:"💼", name:"六爻问事业", desc:"用六爻占问职业发展", file:"六爻问事业_278.html" },
+        { cat:"Liuyao", icon:"💰", name:"六爻求财", desc:"六爻卦判断财运走势", file:"六爻求财_279.html" },
+        { cat:"Liuyao", icon:"💑", name:"六爻问姻缘", desc:"六爻占问婚姻感情", file:"六爻问姻缘_280.html" },
+        { cat:"Liuyao", icon:"❤️", name:"六爻问健康", desc:"六爻卦象疾病分析", file:"六爻问健康_281.html" },
+        { cat:"Liuyao", icon:"🏠", name:"六爻问房产", desc:"买房租房六爻卦象", file:"六爻问房产_282.html" },
+        { cat:"Liuyao", icon:"⚖️", name:"六爻问官非", desc:"官司诉讼六爻预测", file:"六爻问官非_283.html" },
+        { cat:"Liuyao", icon:"🌤️", name:"六爻问天气", desc:"用六爻预测天气变化", file:"六爻问天气_284.html" },
+        { cat:"Liuyao", icon:"🔍", name:"六爻寻物", desc:"失物方位六爻定位", file:"六爻寻物_285.html" },
+        { cat:"Liuyao", icon:"📊", name:"应期判断", desc:"六爻卦应验时间推算", file:"应期判断_286.html" },
+        { cat:"Liuyao", icon:"⚡", name:"动爻分析", desc:"六爻动爻变化深度解读", file:"动爻分析_287.html" },
+        { cat:"Liuyao", icon:"🏛️", name:"世应用神", desc:"世爻应爻用神取用方法", file:"世应用神_288.html" },
+        { cat:"Liuyao", icon:"🔄", name:"六爻变卦", desc:"本卦变卦互卦关系解读", file:"六爻变卦_289.html" },
 
-        { cat:"Xuexing", icon:"🩸", name:"血型分析", file:"xuexing.html" },
-        { cat:"Xuexing", icon:"🅰️", name:"A型血性格", file:"A型血性格_112.html" },
-        { cat:"Xuexing", icon:"🅱️", name:"B型血性格", file:"B型血性格_113.html" },
-        { cat:"Xuexing", icon:"🅾️", name:"O型血性格", file:"O型血性格_114.html" },
-        { cat:"Xuexing", icon:"🆎", name:"AB型血性格", file:"AB型血性格_115.html" },
-        { cat:"Xuexing", icon:"💕", name:"血型配对", file:"血型配对_116.html" },
+        // ==================== 星座命理 (16) ====================
+        { cat:"Xingzuo", icon:"♈", name:"星座运势", desc:"十二星座综合运势分析", file:"xingzuo.html" },
+        { cat:"Xingzuo", icon:"🐏", name:"白羊座", desc:"3.21-4.19 运势与性格", file:"白羊座运势_122.html" },
+        { cat:"Xingzuo", icon:"🐂", name:"金牛座", desc:"4.20-5.20 运势与性格", file:"金牛座运势_123.html" },
+        { cat:"Xingzuo", icon:"👯", name:"双子座", desc:"5.21-6.21 运势与性格", file:"双子座运势_124.html" },
+        { cat:"Xingzuo", icon:"🦀", name:"巨蟹座", desc:"6.22-7.22 运势与性格", file:"巨蟹座运势_125.html" },
+        { cat:"Xingzuo", icon:"🦁", name:"狮子座", desc:"7.23-8.22 运势与性格", file:"狮子座运势_126.html" },
+        { cat:"Xingzuo", icon:"👧", name:"处女座", desc:"8.23-9.22 运势与性格", file:"处女座运势_127.html" },
+        { cat:"Xingzuo", icon:"⚖️", name:"天秤座", desc:"9.23-10.23 运势与性格", file:"天秤座运势_128.html" },
+        { cat:"Xingzuo", icon:"🦂", name:"天蝎座", desc:"10.24-11.22 运势与性格", file:"天蝎座运势_129.html" },
+        { cat:"Xingzuo", icon:"🏹", name:"射手座", desc:"11.23-12.21 运势与性格", file:"射手座运势_130.html" },
+        { cat:"Xingzuo", icon:"🐐", name:"摩羯座", desc:"12.22-1.19 运势与性格", file:"摩羯座运势_131.html" },
+        { cat:"Xingzuo", icon:"🏺", name:"水瓶座", desc:"1.20-2.18 运势与性格", file:"水瓶座运势_132.html" },
+        { cat:"Xingzuo", icon:"🐟", name:"双鱼座", desc:"2.19-3.20 运势与性格", file:"双鱼座运势_133.html" },
+        { cat:"Xingzuo", icon:"💕", name:"星座配对", desc:"十二星座配对指数分析", file:"星座配对_290.html" },
+        { cat:"Xingzuo", icon:"🌙", name:"月亮星座", desc:"月亮星座与内心世界", file:"月亮星座_291.html" },
+        { cat:"Xingzuo", icon:"⬆️", name:"上升星座", desc:"上升星座与外在气质", file:"上升星座_292.html" },
 
-        { cat:"Shuzi", icon:"🔢", name:"数字灵数", file:"taiyang.html" },
-        { cat:"Shuzi", icon:"📱", name:"手机号码", file:"手机号码_174.html" },
-        { cat:"Shuzi", icon:"🚗", name:"车牌号码", file:"车牌号码_175.html" },
-        { cat:"Shuzi", icon:"🏠", name:"门牌号码", file:"门牌号码_176.html" },
-        { cat:"Shuzi", icon:"🪪", name:"身份证号", file:"身份证号码_177.html" },
-        { cat:"Shuzi", icon:"💳", name:"银行卡号", file:"银行卡号_178.html" },
-        { cat:"Shuzi", icon:"💬", name:"QQ号码", file:"QQ号码_179.html" },
-        { cat:"Shuzi", icon:"💚", name:"微信号码", file:"微信号码_180.html" },
+        // ==================== 血型性格 (12) ====================
+        { cat:"Xuexing", icon:"🩸", name:"血型分析", desc:"四大血型性格综合解读", file:"xuexing.html" },
+        { cat:"Xuexing", icon:"🅰️", name:"A型血性格", desc:"A型血优缺点与职场", file:"A型血性格_112.html" },
+        { cat:"Xuexing", icon:"🅱️", name:"B型血性格", desc:"B型血优缺点与职场", file:"B型血性格_113.html" },
+        { cat:"Xuexing", icon:"🅾️", name:"O型血性格", desc:"O型血优缺点与职场", file:"O型血性格_114.html" },
+        { cat:"Xuexing", icon:"🆎", name:"AB型血性格", desc:"AB型血优缺点与职场", file:"AB型血性格_115.html" },
+        { cat:"Xuexing", icon:"💕", name:"血型配对", desc:"血型婚恋配对指数", file:"血型配对_116.html" },
+        { cat:"Xuexing", icon:"💼", name:"血型职场", desc:"各血型适合职业方向", file:"血型职场_293.html" },
+        { cat:"Xuexing", icon:"🍽️", name:"血型饮食", desc:"根据血型的饮食建议", file:"血型饮食_294.html" },
+        { cat:"Xuexing", icon:"🧠", name:"血型心理", desc:"血型与心理特质关系", file:"血型心理_295.html" },
+        { cat:"Xuexing", icon:"⚕️", name:"血型健康", desc:"各血型易患疾病预防", file:"血型健康_296.html" },
+        { cat:"Xuexing", icon:"💑", name:"血型星座", desc:"血型+星座双重性格", file:"血型星座_297.html" },
+        { cat:"Xuexing", icon:"📊", name:"血型统计", desc:"中国各地血型分布数据", file:"血型统计_298.html" },
 
-        { cat:"Qimen", icon:"☯️", name:"奇门遁甲", file:"liuya.html" },
-        { cat:"Qimen", icon:"📐", name:"奇门排盘", file:"奇门排盘_134.html" },
-        { cat:"Qimen", icon:"🔍", name:"奇门用神", file:"奇门用神_135.html" },
-        { cat:"Qimen", icon:"📅", name:"奇门择吉", file:"奇门择吉_136.html" },
-        { cat:"Qimen", icon:"🔮", name:"奇门预测", file:"奇门预测_137.html" },
-        { cat:"Qimen", icon:"🏠", name:"奇门风水", file:"奇门风水_138.html" },
+        // ==================== 数字灵数 (14) ====================
+        { cat:"Shuzi", icon:"🔢", name:"数字灵数", desc:"生命灵数综合解读", file:"taiyang.html" },
+        { cat:"Shuzi", icon:"📱", name:"手机号码", desc:"手机号吉凶数字能量", file:"手机号码_174.html" },
+        { cat:"Shuzi", icon:"🚗", name:"车牌号码", desc:"车牌号数字吉凶测评", file:"车牌号码_175.html" },
+        { cat:"Shuzi", icon:"🏠", name:"门牌号码", desc:"住宅门牌号风水数字", file:"门牌号码_176.html" },
+        { cat:"Shuzi", icon:"🪪", name:"身份证号", desc:"身份证数字能量解读", file:"身份证号码_177.html" },
+        { cat:"Shuzi", icon:"💳", name:"银行卡号", desc:"银行卡数字财运分析", file:"银行卡号_178.html" },
+        { cat:"Shuzi", icon:"💬", name:"QQ号码", desc:"QQ号数字吉凶解读", file:"QQ号码_179.html" },
+        { cat:"Shuzi", icon:"💚", name:"微信号码", desc:"微信号数字能量分析", file:"微信号码_180.html" },
+        { cat:"Shuzi", icon:"🔑", name:"密码吉凶", desc:"各类密码数字能量测评", file:"密码吉凶_299.html" },
+        { cat:"Shuzi", icon:"📅", name:"出生日期", desc:"生日数字与命运关联", file:"出生日期灵数_300.html" },
+        { cat:"Shuzi", icon:"🎂", name:"生日灵数", desc:"生命灵数1-9性格解读", file:"生日灵数_301.html" },
+        { cat:"Shuzi", icon:"🏢", name:"楼层号码", desc:"住宅楼层数字吉凶", file:"楼层号码_302.html" },
+        { cat:"Shuzi", icon:"💼", name:"工号测算", desc:"员工编号数字运势", file:"工号测算_303.html" },
+        { cat:"Shuzi", icon:"✈️", name:"航班号测", desc:"航班号数字吉凶分析", file:"航班号测_304.html" },
 
-        { cat:"Meihua", icon:"🌸", name:"梅花易数", file:"梅花起卦_164.html" },
-        { cat:"Meihua", icon:"🔮", name:"梅花预测", file:"梅花预测_166.html" },
-        { cat:"Meihua", icon:"💑", name:"梅花合婚", file:"梅花合婚_169.html" },
-        { cat:"Meihua", icon:"💰", name:"梅花求财", file:"梅花求财_170.html" },
-        { cat:"Meihua", icon:"🏠", name:"梅花风水", file:"梅花风水_168.html" },
+        // ==================== 奇门遁甲 (14) ====================
+        { cat:"Qimen", icon:"☯️", name:"奇门遁甲", desc:"奇门遁甲盘局综合解读", file:"liuya.html" },
+        { cat:"Qimen", icon:"📐", name:"奇门排盘", desc:"时家奇门精准排盘", file:"奇门排盘_134.html" },
+        { cat:"Qimen", icon:"🔍", name:"奇门用神", desc:"用神选取与格局分析", file:"奇门用神_135.html" },
+        { cat:"Qimen", icon:"📅", name:"奇门择吉", desc:"利用奇门选择最佳时机", file:"奇门择吉_136.html" },
+        { cat:"Qimen", icon:"🔮", name:"奇门预测", desc:"奇门遁甲万事预测", file:"奇门预测_137.html" },
+        { cat:"Qimen", icon:"🏠", name:"奇门风水", desc:"奇门九宫风水布局", file:"奇门风水_138.html" },
+        { cat:"Qimen", icon:"🌐", name:"八门详解", desc:"休生伤杜景死惊开八门", file:"八门详解_305.html" },
+        { cat:"Qimen", icon:"⭐", name:"九星飞布", desc:"天蓬天芮天冲等九星", file:"九星飞布_306.html" },
+        { cat:"Qimen", icon:"🎭", name:"八神解读", desc:"值符螣蛇太阴六合等", file:"八神解读_307.html" },
+        { cat:"Qimen", icon:"🏗️", name:"三奇六仪", desc:"乙丙丁三奇配六仪", file:"三奇六仪_308.html" },
+        { cat:"Qimen", icon:"🔲", name:"奇门克应", desc:"天地盘干与八门组合", file:"奇门克应_309.html" },
+        { cat:"Qimen", icon:"💼", name:"奇门商战", desc:"商业竞争奇门策略", file:"奇门商战_310.html" },
+        { cat:"Qimen", icon:"⚔️", name:"奇门军事", desc:"古代兵法奇门运用", file:"奇门军事_311.html" },
+        { cat:"Qimen", icon:"📈", name:"奇门运筹", desc:"运筹帷幄决胜千里", file:"奇门运筹_312.html" },
 
-        { cat:"Taiyi", icon:"🔧", name:"太乙排盘", file:"太乙排盘_144.html" },
-        { cat:"Taiyi", icon:"🔮", name:"太乙预测", file:"太乙预测_146.html" },
-        { cat:"Taiyi", icon:"📅", name:"太乙择吉", file:"太乙择吉_147.html" },
-        { cat:"Taiyi", icon:"🏠", name:"太乙风水", file:"太乙风水_148.html" },
-        { cat:"Taiyi", icon:"💑", name:"太乙合婚", file:"太乙合婚_150.html" },
+        // ==================== 梅花易数 (12) ====================
+        { cat:"Meihua", icon:"🌸", name:"梅花起卦", desc:"年月日时数字起卦法", file:"梅花起卦_164.html" },
+        { cat:"Meihua", icon:"🔮", name:"梅花预测", desc:"梅花易数万事预测", file:"梅花预测_166.html" },
+        { cat:"Meihua", icon:"💑", name:"梅花合婚", desc:"用梅花易数看婚姻", file:"梅花合婚_169.html" },
+        { cat:"Meihua", icon:"💰", name:"梅花求财", desc:"梅花易数财运预测", file:"梅花求财_170.html" },
+        { cat:"Meihua", icon:"🏠", name:"梅花风水", desc:"梅花易数风水应用", file:"梅花风水_168.html" },
+        { cat:"Meihua", icon:"🔢", name:"数字起卦", desc:"随手取数快速起卦", file:"数字起卦_313.html" },
+        { cat:"Meihua", icon:"🕊️", name:"鸟雀占", desc:"观鸟雀动静起卦", file:"鸟雀占_314.html" },
+        { cat:"Meihua", icon:"🌿", name:"草木占", desc:"观草木荣枯动静起卦", file:"草木占_315.html" },
+        { cat:"Meihua", icon:"🔊", name:"声音占", desc:"闻声起卦判断吉凶", file:"声音占_316.html" },
+        { cat:"Meihua", icon:"📏", name:"丈尺占", desc:"以尺寸长度起卦", file:"丈尺占_317.html" },
+        { cat:"Meihua", icon:"✍️", name:"字画占", desc:"以字迹笔画起卦", file:"字画占_318.html" },
+        { cat:"Meihua", icon:"📖", name:"体用生克", desc:"体卦用卦生克关系", file:"体用生克_319.html" },
 
-        { cat:"Tieban", icon:"🔩", name:"铁板排盘", file:"铁板排盘_154.html" },
-        { cat:"Tieban", icon:"🔐", name:"铁板密码", file:"铁板密码_155.html" },
-        { cat:"Tieban", icon:"🔮", name:"铁板预测", file:"铁板预测_156.html" },
-        { cat:"Tieban", icon:"💑", name:"铁板合婚", file:"铁板合婚_157.html" },
-        { cat:"Tieban", icon:"💰", name:"铁板求财", file:"铁板求财_161.html" },
+        // ==================== 太乙神数 (12) ====================
+        { cat:"Taiyi", icon:"📐", name:"太乙排盘", desc:"太乙神数盘局完整排盘", file:"太乙排盘_144.html" },
+        { cat:"Taiyi", icon:"🔮", name:"太乙预测", desc:"太乙神数综合预测", file:"太乙预测_146.html" },
+        { cat:"Taiyi", icon:"📅", name:"太乙择吉", desc:"用太乙神数选择吉时", file:"太乙择吉_147.html" },
+        { cat:"Taiyi", icon:"🏠", name:"太乙风水", desc:"太乙神数风水布局", file:"太乙风水_148.html" },
+        { cat:"Taiyi", icon:"💑", name:"太乙合婚", desc:"太乙神数婚配分析", file:"太乙合婚_150.html" },
+        { cat:"Taiyi", icon:"🏛️", name:"太乙十六神", desc:"十六神将含义解读", file:"太乙十六神_320.html" },
+        { cat:"Taiyi", icon:"⭐", name:"五福太乙", desc:"五福星运行与天下大势", file:"五福太乙_321.html" },
+        { cat:"Taiyi", icon:"🌍", name:"太乙运数", desc:"太乙积年与运数推算", file:"太乙运数_322.html" },
+        { cat:"Taiyi", icon:"⚖️", name:"太乙格局", desc:"掩迫关格等格局判断", file:"太乙格局_323.html" },
+        { cat:"Taiyi", icon:"🔭", name:"君基太乙", desc:"君基星与国运分析", file:"君基太乙_324.html" },
+        { cat:"Taiyi", icon:"🏗️", name:"太乙阳遁", desc:"阳遁局排法与解读", file:"太乙阳遁_325.html" },
+        { cat:"Taiyi", icon:"🌑", name:"太乙阴遁", desc:"阴遁局排法与解读", file:"太乙阴遁_326.html" },
 
-        { cat:"Fuzhou", icon:"🧧", name:"招财符", file:"招财符_184.html" },
-        { cat:"Fuzhou", icon:"💕", name:"桃花符", file:"桃花符_185.html" },
-        { cat:"Fuzhou", icon:"🛡️", name:"平安符", file:"平安符_186.html" },
-        { cat:"Fuzhou", icon:"❤️", name:"健康符", file:"健康符_187.html" },
-        { cat:"Fuzhou", icon:"📚", name:"学业符", file:"学业符_188.html" },
-        { cat:"Fuzhou", icon:"🔄", name:"化解符", file:"化解符_190.html" },
-        { cat:"Fuzhou", icon:"🏠", name:"镇宅符", file:"镇宅符_191.html" },
-        { cat:"Fuzhou", icon:"👹", name:"驱邪符", file:"驱邪符_192.html" },
+        // ==================== 铁板神数 (12) ====================
+        { cat:"Tieban", icon:"🔩", name:"铁板排盘", desc:"铁板神数基础排盘", file:"铁板排盘_154.html" },
+        { cat:"Tieban", icon:"🔐", name:"铁板密码", desc:"铁板密码条文解读", file:"铁板密码_155.html" },
+        { cat:"Tieban", icon:"🔮", name:"铁板预测", desc:"铁板神数精准预测", file:"铁板预测_156.html" },
+        { cat:"Tieban", icon:"💑", name:"铁板合婚", desc:"铁板神数婚姻匹配", file:"铁板合婚_157.html" },
+        { cat:"Tieban", icon:"💰", name:"铁板求财", desc:"铁板神数财运分析", file:"铁板求财_161.html" },
+        { cat:"Tieban", icon:"📜", name:"考刻分", desc:"刻分考定精准推算", file:"考刻分_327.html" },
+        { cat:"Tieban", icon:"🔢", name:"铁板条文", desc:"12000条铁板条文查询", file:"铁板条文_328.html" },
+        { cat:"Tieban", icon:"📊", name:"铁板算法", desc:"铁板神数算法原理", file:"铁板算法_329.html" },
+        { cat:"Tieban", icon:"❤️", name:"铁板健康", desc:"铁板神数健康预测", file:"铁板健康_330.html" },
+        { cat:"Tieban", icon:"🎓", name:"铁板学业", desc:"铁板神数学业考试", file:"铁板学业_331.html" },
+        { cat:"Tieban", icon:"💼", name:"铁板事业", desc:"铁板神数事业发展", file:"铁板事业_332.html" },
+        { cat:"Tieban", icon:"🔮", name:"铁板终身", desc:"铁板神数一生运势", file:"铁板终身_333.html" },
+
+        // ==================== 符咒灵符 (12) ====================
+        { cat:"Fuzhou", icon:"🧧", name:"招财符", desc:"招财进宝灵符详解", file:"招财符_184.html" },
+        { cat:"Fuzhou", icon:"💕", name:"桃花符", desc:"催旺桃花姻缘灵符", file:"桃花符_185.html" },
+        { cat:"Fuzhou", icon:"🛡️", name:"平安符", desc:"保平安化解灾祸灵符", file:"平安符_186.html" },
+        { cat:"Fuzhou", icon:"❤️", name:"健康符", desc:"祛病强身健康灵符", file:"健康符_187.html" },
+        { cat:"Fuzhou", icon:"📚", name:"学业符", desc:"文昌学业考试灵符", file:"学业符_188.html" },
+        { cat:"Fuzhou", icon:"🔄", name:"化解符", desc:"化解小人官非灵符", file:"化解符_190.html" },
+        { cat:"Fuzhou", icon:"🏠", name:"镇宅符", desc:"镇宅驱邪安家灵符", file:"镇宅符_191.html" },
+        { cat:"Fuzhou", icon:"👹", name:"驱邪符", desc:"驱除邪气阴气灵符", file:"驱邪符_192.html" },
+        { cat:"Fuzhou", icon:"💼", name:"事业符", desc:"升职加薪事业灵符", file:"事业符_334.html" },
+        { cat:"Fuzhou", icon:"👶", name:"求子符", desc:"祈求子嗣生育灵符", file:"求子符_335.html" },
+        { cat:"Fuzhou", icon:"🚗", name:"行车符", desc:"行车安全护身灵符", file:"行车符_336.html" },
+        { cat:"Fuzhou", icon:"💍", name:"和合符", desc:"夫妻和合感情灵符", file:"和合符_337.html" },
+
+        // ==================== 择日择时 (12) ====================
+        { cat:"Zeri", icon:"📆", name:"综合择日", desc:"多种需求最佳日期选择", file:"综合择日_338.html" },
+        { cat:"Zeri", icon:"🏗️", name:"装修择日", desc:"装修开工日期选择", file:"装修择日_339.html" },
+        { cat:"Zeri", icon:"🎓", name:"入学择日", desc:"入学拜师日期选择", file:"入学择日_340.html" },
+        { cat:"Zeri", icon:"🌱", name:"播种择日", desc:"种植播种收割日期", file:"播种择日_341.html" },
+        { cat:"Zeri", icon:"🐟", name:"放生择日", desc:"放生祈福日期选择", file:"放生择日_342.html" },
+        { cat:"Zeri", icon:"💍", name:"订婚择日", desc:"订婚纳彩日期选择", file:"订婚择日_343.html" },
+        { cat:"Zeri", icon:"🕰️", name:"时辰吉凶", desc:"每日十二时辰吉凶", file:"时辰吉凶_344.html" },
+        { cat:"Zeri", icon:"🌙", name:"月令择日", desc:"根据月令选择日期", file:"月令择日_345.html" },
+        { cat:"Zeri", icon:"🔮", name:"二十八宿", desc:"二十八星宿值日吉凶", file:"二十八宿_346.html" },
+        { cat:"Zeri", icon:"📊", name:"建除十二神", desc:"建除满平等十二神", file:"建除十二神_347.html" },
+        { cat:"Zeri", icon:"⚡", name:"避忌日期", desc:"各类禁忌日期查询", file:"避忌日期_348.html" },
+        { cat:"Zeri", icon:"🌞", name:"节气择日", desc:"二十四节气吉日", file:"节气择日_349.html" },
+
+        // ==================== 大数据AI分析 (18) - NEW ====================
+        { cat:"DataAnalysis", icon:"🤖", name:"AI八字分析", desc:"深度学习模型八字解读", file:"AI八字分析_350.html", isNew:true },
+        { cat:"DataAnalysis", icon:"🧠", name:"神经网络算命", desc:"多层神经网络命理模型", file:"神经网络算命_351.html", isNew:true },
+        { cat:"DataAnalysis", icon:"📊", name:"命理大数据", desc:"海量命例数据统计分析", file:"命理大数据_352.html", isNew:true },
+        { cat:"DataAnalysis", icon:"📈", name:"运势趋势图", desc:"可视化运势走势曲线", file:"运势趋势图_353.html", isNew:true },
+        { cat:"DataAnalysis", icon:"📉", name:"统计命理", desc:"概率统计方法验证命理", file:"统计命理_354.html", isNew:true },
+        { cat:"DataAnalysis", icon:"🗺️", name:"命理图谱", desc:"知识图谱展示命理关系", file:"命理图谱_355.html", isNew:true },
+        { cat:"DataAnalysis", icon:"💑", name:"大数据合婚", desc:"百万婚例数据配对分析", file:"大数据合婚_356.html", isNew:true },
+        { cat:"DataAnalysis", icon:"🎯", name:"运势概率预测", desc:"贝叶斯算法运势概率", file:"运势概率预测_357.html", isNew:true },
+        { cat:"DataAnalysis", icon:"📋", name:"命理问卷分析", desc:"多维问卷智能命理匹配", file:"命理问卷分析_358.html", isNew:true },
+        { cat:"DataAnalysis", icon:"🔬", name:"五行数据建模", desc:"五行生克关系数学建模", file:"五行数据建模_359.html", isNew:true },
+        { cat:"DataAnalysis", icon:"💭", name:"AI智能解梦", desc:"NLP自然语言梦境解析", file:"AI智能解梦_360.html", isNew:true },
+        { cat:"DataAnalysis", icon:"📅", name:"智能择吉引擎", desc:"多维数据驱动择吉算法", file:"智能择吉引擎_361.html", isNew:true },
+        { cat:"DataAnalysis", icon:"🔄", name:"对比分析", desc:"同类命格横向对比报告", file:"对比分析_362.html", isNew:true },
+        { cat:"DataAnalysis", icon:"📚", name:"历史命例库", desc:"古今名人命例检索分析", file:"历史命例库_363.html", isNew:true },
+        { cat:"DataAnalysis", icon:"🌐", name:"流年数据追踪", desc:"逐年运势数据变化追踪", file:"流年数据追踪_364.html", isNew:true },
+        { cat:"DataAnalysis", icon:"⚡", name:"实时预测引擎", desc:"实时数据驱动即时预测", file:"实时预测引擎_365.html", isNew:true },
+        { cat:"DataAnalysis", icon:"🧩", name:"命理模式识别", desc:"模式识别发现命理规律", file:"命理模式识别_366.html", isNew:true },
+        { cat:"DataAnalysis", icon:"📡", name:"星象数据融合", desc:"天文星象与命理大数据", file:"星象数据融合_367.html", isNew:true },
+
+        // ==================== 图片上传算命 (18) - NEW ====================
+        { cat:"ImageUpload", icon:"📷", name:"面相拍照分析", desc:"上传照片AI智能面相解读", file:"面相拍照分析_368.html", isNew:true },
+        { cat:"ImageUpload", icon:"🤳", name:"手相拍照解析", desc:"手机拍照掌纹智能分析", file:"手相拍照解析_369.html", isNew:true },
+        { cat:"ImageUpload", icon:"🔍", name:"掌纹识别", desc:"AI深度学习掌纹特征识别", file:"掌纹识别_370.html", isNew:true },
+        { cat:"ImageUpload", icon:"🖼️", name:"照片命理", desc:"上传照片综合命理分析", file:"照片命理_371.html", isNew:true },
+        { cat:"ImageUpload", icon:"👤", name:"头像吉凶", desc:"社交头像风水吉凶分析", file:"头像吉凶_372.html", isNew:true },
+        { cat:"ImageUpload", icon:"🏠", name:"风水实拍", desc:"拍照上传房屋风水分析", file:"风水实拍_373.html", isNew:true },
+        { cat:"ImageUpload", icon:"🟤", name:"痣相识别", desc:"AI拍照识别痣相位置", file:"痣相识别_374.html", isNew:true },
+        { cat:"ImageUpload", icon:"👁️", name:"眉形分析", desc:"上传照片分析眉形运势", file:"眉形分析_375.html", isNew:true },
+        { cat:"ImageUpload", icon:"👀", name:"眼型分析", desc:"AI识别眼型桃花运势", file:"眼型分析_376.html", isNew:true },
+        { cat:"ImageUpload", icon:"👃", name:"鼻型分析", desc:"拍照分析鼻型财运官运", file:"鼻型分析_377.html", isNew:true },
+        { cat:"ImageUpload", icon:"👄", name:"唇型分析", desc:"AI唇型口才运势分析", file:"唇型分析_378.html", isNew:true },
+        { cat:"ImageUpload", icon:"👂", name:"耳型分析", desc:"拍照识别耳型寿命福气", file:"耳型分析_379.html", isNew:true },
+        { cat:"ImageUpload", icon:"🗿", name:"法令纹分析", desc:"拍照分析法令纹权威运", file:"法令纹分析_380.html", isNew:true },
+        { cat:"ImageUpload", icon:"🧠", name:"额头分析", desc:"上传照片额头运势解读", file:"额头分析_381.html", isNew:true },
+        { cat:"ImageUpload", icon:"🦴", name:"颧骨分析", desc:"颧骨拍照AI运势评估", file:"颧骨分析_382.html", isNew:true },
+        { cat:"ImageUpload", icon:"📏", name:"人中分析", desc:"人中长度形态AI解读", file:"人中分析_383.html", isNew:true },
+        { cat:"ImageUpload", icon:"🎨", name:"气色拍照", desc:"手机拍照面色气色分析", file:"气色拍照_384.html", isNew:true },
+        { cat:"ImageUpload", icon:"📸", name:"全身照看相", desc:"全身照片综合看相分析", file:"全身照看相_385.html", isNew:true }
     ];
 
     var catToGrid = {
         Bazi: "gridBazi", Ziwei: "gridZiwei", Shengxiao: "gridShengxiao",
         Xingming: "gridXingming", Fengshui: "gridFengshui", Tarot: "gridTarot",
         Zhougong: "gridZhougong", Mianxiang: "gridMianxiang", Jiri: "gridJiri",
-        Zhanbu: "gridZhanbu", Xingzuo: "gridXingzuo", Xuexing: "gridXuexing",
-        Shuzi: "gridShuzi", Qimen: "gridQimen", Meihua: "gridMeihua",
-        Taiyi: "gridTaiyi", Tieban: "gridTieban", Fuzhou: "gridFuzhou",
+        Zhanbu: "gridZhanbu", Liuyao: "gridLiuyao", Xingzuo: "gridXingzuo",
+        Xuexing: "gridXuexing", Shuzi: "gridShuzi", Qimen: "gridQimen",
+        Meihua: "gridMeihua", Taiyi: "gridTaiyi", Tieban: "gridTieban",
+        Fuzhou: "gridFuzhou", Zeri: "gridZeri",
+        DataAnalysis: "gridDataAnalysis", ImageUpload: "gridImageUpload"
     };
 
+    var catCounts = {};
     modules.forEach(function(m) {
         var grid = document.getElementById(catToGrid[m.cat]);
         if (!grid) return;
+        catCounts[m.cat] = (catCounts[m.cat] || 0) + 1;
+
         var a = document.createElement('a');
         a.className = 'mod-card';
+        if (m.isNew) a.classList.add('new-feature');
         a.href = '/modules/' + m.file;
-        a.innerHTML = '<div class="icon">' + m.icon + '</div><div class="name">' + m.name + '</div>';
+        a.style.position = 'relative';
+        a.innerHTML = '<div class="icon">' + m.icon + '</div>'
+            + '<div class="name">' + m.name + '</div>'
+            + '<div class="desc">' + m.desc + '</div>';
         grid.appendChild(a);
     });
 
-    // Remove empty section titles and grids
+    // Update counts
+    Object.keys(catToGrid).forEach(function(cat) {
+        var cnt = document.getElementById('cnt' + cat);
+        if (cnt) cnt.textContent = '(' + (catCounts[cat] || 0) + '个)';
+    });
+
+    // Remove empty sections
     Object.keys(catToGrid).forEach(function(cat) {
         var grid = document.getElementById(catToGrid[cat]);
         if (grid && grid.children.length === 0) {

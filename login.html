@@ -503,6 +503,11 @@
                 }
                 Auth.showMsg('authMsg', msg, false);
 
+                // 演示模式下自动填入验证码
+                if (data.code) {
+                    $('smsCode').value = data.code;
+                }
+
                 // 倒计时
                 var sec = 60;
                 smsTimer = setInterval(function() {

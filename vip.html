@@ -418,7 +418,7 @@
                     </button>
                     <div class="wheel-prizes">
                         <span>🎁 1hVIP</span><span>⏰ 2hVIP</span><span>⭐ 5分</span><span>💎 10分</span>
-                        <span>📺 1次广告</span><span>📺 3次广告</span><span>🏆 24hVIP</span><span>👑 50分</span>
+                        <span>🎫 免广卡x1</span><span>🎫 免广卡x3</span><span>🏆 24hVIP</span><span>👑 50分</span>
                     </div>
                 </div>
             </div>
@@ -476,7 +476,7 @@
         <div class="redeem-options">
             <div class="redeem-option" onclick="doRedeem('ad1')">
                 <span class="ro-icon">📺</span>
-                <span class="ro-label">1次广告计次</span>
+                <span class="ro-label">免广卡x1</span>
                 <span class="ro-cost">20积分</span>
             </div>
             <div class="redeem-option" onclick="doRedeem('vip3')">
@@ -813,7 +813,7 @@ async function doRedeem(type) {
 // ========== 幸运转盘 ==========
 var wheelSpinning = false;
 var wheelColors = ['#ff6b35','#ff9f43','#ffd700','#feca57','#54a0ff','#5f27cd','#00d2d3','#1dd1a1'];
-var wheelPrizes = ['1hVIP','2hVIP','5分','10分','1次广告','3次广告','24hVIP','50分'];
+var wheelPrizes = ['1hVIP','2hVIP','5分','10分','免广卡x1','免广卡x3','24hVIP','50分'];
 
 function drawWheel() {
     var canvas = document.getElementById('vipWheelCanvas');

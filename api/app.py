@@ -1199,7 +1199,7 @@ def vip_redeem():
         redeem_type = data.get('type', '')
 
         redeem_options = {
-            'ad1': {'points': 20,   'label': '1次广告计次', 'action': 'add_ad'},
+            'ad1': {'points': 20,   'label': '免广卡x1', 'action': 'add_ad'},
             'vip3': {'points': 50,  'label': '3小时会员', 'action': 'extend_vip', 'hours': 3},
             'vip24': {'points': 200, 'label': '24小时会员', 'action': 'extend_vip', 'hours': 24},
             'permanent': {'points': 500, 'label': '永久会员', 'action': 'unlock_permanent'},
@@ -1217,7 +1217,7 @@ def vip_redeem():
 
         if opt['action'] == 'add_ad':
             users[user_index]['total_ad_count'] = user.get('total_ad_count', 0) + 1
-            message = f'兑换成功！获得 1 次广告计次'
+            message = f'兑换成功！获得免广卡x1'
             # 检查是否达到永久阈值
             if users[user_index]['total_ad_count'] >= PERMANENT_AD_THRESHOLD:
                 users[user_index]['vip_level'] = 'permanent'
@@ -1289,8 +1289,8 @@ def vip_wheel():
         # 2. 2小时VIP — 20%
         # 3. 5积分 — 20%
         # 4. 10积分 — 15%
-        # 5. 1次广告计次 — 10%
-        # 6. 3次广告计次 — 5%
+        # 5. 免广卡x1 — 10%
+        # 6. 免广卡x3 — 5%
         # 7. 24小时VIP — 3%
         # 8. 50积分 — 2%
         if roll < 25:
@@ -1302,9 +1302,9 @@ def vip_wheel():
         elif roll < 80:
             prize_type, prize_value, prize_name = 'points', 10, '10积分'
         elif roll < 90:
-            prize_type, prize_value, prize_name = 'ad_credit', 1, '1次广告计次'
+            prize_type, prize_value, prize_name = 'ad_credit', 1, '免广卡x1'
         elif roll < 95:
-            prize_type, prize_value, prize_name = 'ad_credit', 3, '3次广告计次'
+            prize_type, prize_value, prize_name = 'ad_credit', 3, '免广卡x3'
         elif roll < 98:
             prize_type, prize_value, prize_name = 'vip_hours', 24, '24小时VIP会员'
         else:

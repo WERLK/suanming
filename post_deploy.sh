@@ -48,3 +48,9 @@ for page in "${PAGES[@]}"; do
 done
 
 log "Post-deploy fixes complete"
+
+# ── Ensure Nginx config is correct (idempotent) ──
+if [ -f "$PROJECT_DIR/setup_nginx.sh" ]; then
+    log "Checking Nginx config..."
+    bash "$PROJECT_DIR/setup_nginx.sh" >> "$LOG_DIR/post_deploy.log" 2>&1 || log "WARN: Nginx setup had issues, but continuing"
+fi

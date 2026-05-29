@@ -1761,6 +1761,8 @@
                     loadVIPStatus();
                 }
             } catch (e) {
+                wheelSpinning = false;
+                document.getElementById('wheelSpinBtn').disabled = false;
                 showToast('网络错误，请重试');
                 loadVIPStatus();
             }

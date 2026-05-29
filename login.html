@@ -394,9 +394,11 @@
             if (data.success) {
                 captchaId = data.captcha_id;
                 $('captchaImage').innerHTML = '<img src="' + data.captcha_image + '" alt="验证码">';
+            } else {
+                Auth.showMsg('authMsg', data.message || '验证码加载失败', true);
             }
         } catch (e) {
-            Auth.showMsg('authMsg', '验证码加载失败', true);
+            Auth.showMsg('authMsg', '验证码加载失败，请刷新页面重试', true);
         }
     }
 
@@ -455,15 +457,23 @@
     }
 
     function refreshSlider() {
+        $('sliderHint').textContent = '加载中...';
         Auth.generateSlider().then(function(data) {
-            if (!data.success) return;
+            if (!data.success) {
+                $('sliderHint').textContent = data.message || '加载失败，请刷新页面';
+                $('sliderHint').style.color = '#ff6b6b';
+                return;
+            }
             sliderId = data.slider_id;
             sliderTargetX = data.target_x;
             $('sliderTarget').style.left = sliderTargetX + '%';
             $('sliderHint').textContent = '请拖动滑块到目标位置';
             $('sliderHint').style.color = '';
             $('sliderThumb').style.left = '0px';
-        }).catch(function() {});
+        }).catch(function() {
+            $('sliderHint').textContent = '网络错误，请刷新页面';
+            $('sliderHint').style.color = '#ff6b6b';
+        });
     }
 
     // 短信验证码
@@ -482,8 +492,15 @@
             var data = await Auth.sendSMS(phone);
             if (data.success) {
                 smsId = data.sms_id;
-                // 演示模式下显示验证码给用户
-                var msg = data.code ? '验证码：' + data.code + '（演示模式）' : '验证码已发送';
+                // 演示模式下显示验证码给用户（兼容新旧后端格式）
+                var msg;
+                if (data.code && data.code !== null && data.code !== undefined) {
+                    msg = '验证码：' + data.code + '（演示模式）';
+                } else if (data.message && data.message.indexOf('演示') >= 0) {
+                    msg = data.message;
+                } else {
+                    msg = data.message || '验证码已发送';
+                }
                 Auth.showMsg('authMsg', msg, false);
 
                 // 倒计时
@@ -530,6 +547,11 @@
                 var v = await Auth.verifyCaptcha(captchaId, captchaText);
                 if (!v.success) { Auth.showMsg('authMsg', v.message || '验证码错误', true); loadImageCaptcha(); return; }
             } else if (captchaType === 'slider') {
+                if (!sliderId) {
+                    Auth.showMsg('authMsg', '滑块验证码未加载，请刷新页面', true);
+                    refreshSlider();
+                    return;
+                }
                 var pct = (($('sliderThumb').offsetLeft / ($('sliderTrack').offsetWidth - $('sliderThumb').offsetWidth)) * 100);
                 var v = await Auth.verifySlider(sliderId, pct);
                 if (!v.success) { Auth.showMsg('authMsg', v.message || '滑块验证失败', true); refreshSlider(); return; }

@@ -25,6 +25,7 @@ import io
 import base64
 import threading
 import time
+import fcntl
 
 app = Flask(__name__, static_folder='../', static_url_path='')
 app.secret_key = os.environ.get('JWT_SECRET', 'xuanji_fortune_secret_key_2026!!')
@@ -45,27 +46,37 @@ USERS_FILE = os.path.join(DATA_DIR, 'users.json')
 TOKENS_FILE = os.path.join(DATA_DIR, 'tokens.json')
 CAPTCHA_FILE = os.path.join(DATA_DIR, 'captcha_store.json')
 
-# ========== 验证码文件存储（支持多 worker 共享） ==========
+# ========== 验证码文件存储（支持多 worker / 多进程共享） ==========
 _captcha_lock = threading.Lock()
 
 def _load_captcha_store():
-    """从文件加载验证码存储（线程安全）"""
-    if os.path.exists(CAPTCHA_FILE):
-        try:
-            with open(CAPTCHA_FILE, 'r', encoding='utf-8') as f:
+    """从文件加载验证码存储（进程安全 - 使用文件锁）"""
+    if not os.path.exists(CAPTCHA_FILE):
+        return {}
+    try:
+        with open(CAPTCHA_FILE, 'r', encoding='utf-8') as f:
+            # 获取共享读锁（允许并发读取）
+            fcntl.flock(f.fileno(), fcntl.LOCK_SH)
+            try:
                 return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            return {}
-    return {}
+            finally:
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+    except (json.JSONDecodeError, IOError):
+        return {}
 
 def _save_captcha_store(store):
-    """保存验证码存储到文件（线程安全）"""
-    with _captcha_lock:
-        # 清理过期条目
-        now = datetime.now().isoformat()
-        store = {k: v for k, v in store.items() if v.get('expire_time', '') > now}
-        with open(CAPTCHA_FILE, 'w', encoding='utf-8') as f:
-            json.dump(store, f, ensure_ascii=False)
+    """保存验证码存储到文件（进程安全 - 使用文件锁）"""
+    # 先清理过期条目
+    now = datetime.now().isoformat()
+    store = {k: v for k, v in store.items() if v.get('expire_time', '') > now}
+    # 使用排他写锁（阻塞其他读写）
+    fd = os.open(CAPTCHA_FILE, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0o644)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        os.write(fd, json.dumps(store, ensure_ascii=False).encode('utf-8'))
+    finally:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
 
 def _get_captcha_entry(captcha_id):
     """获取单个验证码条目"""
@@ -324,12 +335,12 @@ def verify_captcha():
         captcha_id = data.get('captcha_id', '')
         captcha_text = data.get('captcha_text', '').strip().upper()
         if not captcha_id or not captcha_text:
-            return jsonify({'success': False, 'message': '参数不完整'}), 400
+            return jsonify({'success': False, 'message': '参数不完整'}), 200
         entry = _get_captcha_entry(captcha_id)
         if not entry or entry.get('type') != 'image':
-            return jsonify({'success': False, 'message': '验证码已失效，请刷新'}), 400
+            return jsonify({'success': False, 'message': '验证码已失效，请刷新'}), 200
         if entry['text'] != captcha_text:
-            return jsonify({'success': False, 'message': '验证码错误'}), 400
+            return jsonify({'success': False, 'message': '验证码错误'}), 200
         _delete_captcha_entry(captcha_id)
         return jsonify({'success': True, 'message': '验证成功'}), 200
     except Exception as e:
@@ -366,16 +377,16 @@ def verify_slider():
         slider_id = data.get('slider_id', '')
         slider_x = data.get('slider_x', 0)
         if not slider_id or slider_x is None:
-            return jsonify({'success': False, 'message': '参数不完整'}), 400
+            return jsonify({'success': False, 'message': '参数不完整'}), 200
         entry = _get_captcha_entry(slider_id)
         if not entry or entry.get('type') != 'slider':
-            return jsonify({'success': False, 'message': '滑块验证码已失效，请刷新'}), 400
+            return jsonify({'success': False, 'message': '滑块验证码已失效，请刷新'}), 200
         target_x = entry['target_x']
         if abs(slider_x - target_x) <= 5:
             _delete_captcha_entry(slider_id)
             return jsonify({'success': True, 'message': '验证成功'}), 200
         else:
-            return jsonify({'success': False, 'message': '请再试一次'}), 400
+            return jsonify({'success': False, 'message': '请再试一次'}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'验证滑块验证码失败: {str(e)}'}), 500
 
@@ -389,7 +400,7 @@ def send_sms():
         data = request.get_json()
         phone = data.get('phone', '').strip()
         if not phone or not phone.isdigit() or len(phone) != 11:
-            return jsonify({'success': False, 'message': '请输入正确的手机号'}), 400
+            return jsonify({'success': False, 'message': '请输入正确的手机号'}), 200
         
         # 生成验证码
         sms_code = ''.join(random.choices(string.digits, k=6))
@@ -443,14 +454,14 @@ def verify_sms():
         sms_id = data.get('sms_id', '')
         code = data.get('code', '').strip()
         if not sms_id or not code:
-            return jsonify({'success': False, 'message': '参数不完整'}), 400
+            return jsonify({'success': False, 'message': '参数不完整'}), 200
         entry = _get_captcha_entry(sms_id)
         if not entry or entry.get('type') != 'sms':
-            return jsonify({'success': False, 'message': '验证码已失效，请重新获取'}), 400
+            return jsonify({'success': False, 'message': '验证码已失效，请重新获取'}), 200
         if entry.get('used'):
-            return jsonify({'success': False, 'message': '验证码已使用，请重新获取'}), 400
+            return jsonify({'success': False, 'message': '验证码已使用，请重新获取'}), 200
         if entry['code'] != code:
-            return jsonify({'success': False, 'message': '验证码错误'}), 400
+            return jsonify({'success': False, 'message': '验证码错误'}), 200
         # 标记已使用（一次性）
         entry['used'] = True
         _set_captcha_entry(sms_id, entry)

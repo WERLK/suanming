@@ -166,7 +166,6 @@
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">主导航</div>
             <a href="/" class="sidebar-nav-item">🏠 首页</a>
-            <a href="/vip.html" class="sidebar-nav-item">👑 会员中心</a>
             <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
         </div>
     </nav>
@@ -195,13 +194,24 @@
         <form id="editProfileForm" onsubmit="saveProfile(event)">
             <div class="form-card">
                 <div class="form-group">
-                    <label for="editUsername">用户名</label>
+                    <label for="editNickname">昵称（用于页面显示，可随时修改）</label>
+                    <input 
+                        type="text" 
+                        id="editNickname" 
+                        name="nickname" 
+                        placeholder="请输入昵称"
+                        maxlength="20"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="editUsername">登录用户名（不可修改）</label>
                     <input 
                         type="text" 
                         id="editUsername" 
                         name="username" 
                         placeholder="请输入用户名"
-                        required
+                        readonly
+                        style="opacity:0.5;cursor:not-allowed;"
                     >
                 </div>
                 
@@ -285,6 +295,7 @@ async function checkLoginStatus() {
         const user = data.user;
         
         // 填充表单
+        document.getElementById('editNickname').value = user.nickname || '';
         document.getElementById('editUsername').value = user.username || '';
         document.getElementById('editPhone').value = user.phone || '';
         document.getElementById('editEmail').value = user.email || '';
@@ -292,10 +303,15 @@ async function checkLoginStatus() {
         document.getElementById('editGender').value = user.gender || '';
         
         // 加载头像
-        if (user.avatar) {
+        if (user.avatar_type === 'emoji' && user.avatar_preset) {
             const avatarImg = document.getElementById('avatarImg');
             const avatarDefault = document.getElementById('avatarDefault');
-            
+            avatarImg.style.display = 'none';
+            avatarDefault.style.display = 'block';
+            avatarDefault.textContent = user.avatar_preset;
+        } else if (user.avatar) {
+            const avatarImg = document.getElementById('avatarImg');
+            const avatarDefault = document.getElementById('avatarDefault');
             avatarImg.src = user.avatar + '?t=' + new Date().getTime();
             avatarImg.style.display = 'block';
             avatarDefault.style.display = 'none';
@@ -390,19 +406,21 @@ async function saveProfile(event) {
     }
     
     // 获取表单数据
-    const username = document.getElementById('editUsername').value.trim();
+    const nickname = document.getElementById('editNickname').value.trim();
     const phone = document.getElementById('editPhone').value.trim();
     const email = document.getElementById('editEmail').value.trim();
     const birthday = document.getElementById('editBirthday').value;
     const gender = document.getElementById('editGender').value;
     
-    // 验证用户名
-    if (!username) {
-        showToast('用户名不能为空');
-        return;
-    }
-    
     try {
+        const body = {
+            phone: phone,
+            email: email,
+            birthday: birthday,
+            gender: gender
+        };
+        if (nickname) body.nickname = nickname;
+        
         // 调用后端API更新用户信息
         const response = await fetch('/api/profile', {
             method: 'PUT',
@@ -410,13 +428,7 @@ async function saveProfile(event) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-                username: username,
-                phone: phone,
-                email: email,
-                birthday: birthday,
-                gender: gender
-            })
+            body: JSON.stringify(body)
         });
         
         const data = await response.json();

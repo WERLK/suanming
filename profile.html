@@ -658,6 +658,7 @@
                 <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar()">
                 <h2 class="profile-name" id="profileName">加载中...</h2>
                 <p class="profile-info" id="profileInfo">请登录</p>
+                <p class="profile-uid" id="profileUid" style="color:rgba(255,255,255,0.35);font-size:0.72rem;margin-top:0.15rem;"></p>
             </div>
             
             <!-- 会员卡片 + 统计 桌面端并排 -->
@@ -818,13 +819,24 @@
             
             <form id="editProfileForm" onsubmit="saveProfile(event)">
                 <div class="form-group">
-                    <label for="editUsername">用户名</label>
+                    <label for="editNickname">昵称（用于页面显示，可随时修改）</label>
+                    <input 
+                        type="text" 
+                        id="editNickname" 
+                        name="nickname" 
+                        placeholder="请输入昵称"
+                        maxlength="20"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="editUsername">登录用户名（不可修改）</label>
                     <input 
                         type="text" 
                         id="editUsername" 
                         name="username" 
                         placeholder="请输入用户名"
-                        required
+                        readonly
+                        style="opacity:0.5;cursor:not-allowed;"
                     >
                 </div>
                 
@@ -1016,12 +1028,26 @@
                 const user = data.user;
                 
                 // 更新页面显示
-                document.getElementById('profileName').textContent = user.username || '未设置用户名';
+                // 昵称作为主显示名，用户名作为辅助信息
+                var displayName = user.nickname || user.username || '未设置昵称';
+                document.getElementById('profileName').textContent = displayName;
                 
-                let infoText = '';
+                // 同步更新侧边栏用户名显示
+                var sidebarName = document.getElementById('sidebarUserName');
+                if (sidebarName) sidebarName.textContent = displayName;
+                
+                var infoText = '';
                 if (user.phone) infoText += user.phone;
                 if (user.email) infoText += (infoText ? ' · ' : '') + user.email;
                 document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
+                
+                // 显示登录用户名（仅当与昵称不同时）
+                var uidEl = document.getElementById('profileUid');
+                if (user.username && user.username !== user.nickname) {
+                    uidEl.textContent = '@' + user.username;
+                } else {
+                    uidEl.textContent = '';
+                }
                 
                 // 保存用户信息到本地（用于离线访问）
                 var storage = Auth.isRemember() ? localStorage : sessionStorage;
@@ -1035,7 +1061,11 @@
                 // 加载会员状态
                 loadVIPStatus();
                 
+                // 加载头像
+                loadAvatar();
+                
                 // 填充编辑表单
+                document.getElementById('editNickname').value = user.nickname || '';
                 document.getElementById('editUsername').value = user.username || '';
                 document.getElementById('editPhone').value = user.phone || '';
                 document.getElementById('editEmail').value = user.email || '';
@@ -1055,11 +1085,23 @@
             if (localUser) {
                 try {
                     const user = JSON.parse(localUser);
-                    document.getElementById('profileName').textContent = user.username || '未设置用户名';
+                    var displayName = user.nickname || user.username || '未设置昵称';
+                    document.getElementById('profileName').textContent = displayName;
+                    
+                    var sidebarName = document.getElementById('sidebarUserName');
+                    if (sidebarName) sidebarName.textContent = displayName;
+                    
                     let infoText = '';
                     if (user.phone) infoText += user.phone;
                     if (user.email) infoText += (infoText ? ' · ' : '') + user.email;
                     document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
+                    var uidEl = document.getElementById('profileUid');
+                    if (user.username && user.username !== user.nickname) {
+                        uidEl.textContent = '@' + user.username;
+                    } else {
+                        uidEl.textContent = '';
+                    }
+                    document.getElementById('editNickname').value = user.nickname || '';
                     document.getElementById('editUsername').value = user.username || '';
                     document.getElementById('editPhone').value = user.phone || '';
                     document.getElementById('editEmail').value = user.email || '';
@@ -1067,6 +1109,7 @@
                     document.getElementById('editGender').value = user.gender || '';
                     loadUserStats(user);
                     loadVIPStatus();
+                    loadAvatar();
                 } catch(e) {
                     showToast('加载用户数据失败');
                 }
@@ -1117,33 +1160,30 @@
             }
             
             // 获取表单数据
-            const username = document.getElementById('editUsername').value.trim();
+            const nickname = document.getElementById('editNickname').value.trim();
             const phone = document.getElementById('editPhone').value.trim();
             const email = document.getElementById('editEmail').value.trim();
             const birthday = document.getElementById('editBirthday').value;
             const gender = document.getElementById('editGender').value;
             
-            // 验证用户名
-            if (!username) {
-                showToast('用户名不能为空');
-                return;
-            }
-            
             try {
                 // 调用后端API更新用户信息
+                const body = {
+                    phone: phone,
+                    email: email,
+                    birthday: birthday,
+                    gender: gender
+                };
+                // 昵称可选，有值才发送
+                if (nickname) body.nickname = nickname;
+                
                 const response = await fetch('/api/profile', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({
-                        username: username,
-                        phone: phone,
-                        email: email,
-                        birthday: birthday,
-                        gender: gender
-                    })
+                    body: JSON.stringify(body)
                 });
                 
                 const data = await response.json();
@@ -1153,12 +1193,25 @@
                     const user = data.user;
                     
                     // 更新页面显示
-                    document.getElementById('profileName').textContent = user.username;
+                    var displayName = user.nickname || user.username || '未设置昵称';
+                    document.getElementById('profileName').textContent = displayName;
+                    
+                    // 同步侧边栏
+                    var sidebarName = document.getElementById('sidebarUserName');
+                    if (sidebarName) sidebarName.textContent = displayName;
                     
                     let infoText = '';
                     if (user.phone) infoText += user.phone;
                     if (user.email) infoText += (infoText ? ' · ' : '') + user.email;
                     document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
+                    
+                    // 更新用户名显示
+                    var uidEl = document.getElementById('profileUid');
+                    if (user.username && user.username !== user.nickname) {
+                        uidEl.textContent = '@' + user.username;
+                    } else {
+                        uidEl.textContent = '';
+                    }
                     
                     // 保存用户信息到本地
                     var storage = Auth.isRemember() ? localStorage : sessionStorage;
@@ -1536,7 +1589,9 @@
             }
         }
 
-        // 页面加载时加载头像
+        // 页面初始加载头像（与用户信息加载并行）
+        // 注意：loadAvatar 也在 checkLoginStatus / loadFromLocalCache 中调用
+        // 此处先触发，确保头像尽快显示
         loadAvatar();
     </script>
 </div>

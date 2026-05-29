@@ -53,10 +53,10 @@ _captcha_lock = threading.Lock()
 def _load_captcha_store():
     if not os.path.exists(CAPTCHA_FILE):return {}
     try:
-    with open(CAPTCHA_FILE,'r') as f:
-        fcntl.flock(f.fileno(),fcntl.LOCK_SH)
-        try:return json.load(f)
-        finally:fcntl.flock(f.fileno(),fcntl.LOCK_UN)
+        with open(CAPTCHA_FILE,'r') as f:
+            fcntl.flock(f.fileno(),fcntl.LOCK_SH)
+            try:return json.load(f)
+            finally:fcntl.flock(f.fileno(),fcntl.LOCK_UN)
     except:return {}
 def _save_captcha_store(store):
     now=datetime.now().isoformat()
@@ -104,6 +104,40 @@ if not os.path.exists(USERS_FILE):
 if not os.path.exists(TOKENS_FILE):
     with open(TOKENS_FILE, 'w', encoding='utf-8') as f:
         json.dump({}, f, ensure_ascii=False, indent=2)
+
+# ========== 随机昵称和头像生成 ==========
+
+# 随机昵称词库（玄学主题）
+_NICKNAME_FIRST = [
+    '灵', '玄', '智', '慧', '明', '静', '清', '远', '妙', '神',
+    '道', '仙', '易', '天', '紫', '碧', '丹', '鹤', '金', '玉',
+    '太', '无', '真', '素', '逸', '观', '通', '空', '微', '至',
+    '云', '风', '月', '星', '梦', '尘', '雪', '雨', '霜', '露'
+]
+_NICKNAME_SECOND = [
+    '机', '心', '镜', '光', '空', '云', '风', '月', '星', '辰',
+    '梦', '尘', '水', '山', '雪', '雾', '雨', '烟', '火', '雷',
+    '阳', '阴', '气', '数', '道', '缘', '法', '术', '门', '子',
+    '客', '人', '君', '生', '华', '音', '羽', '林', '松', '鹤'
+]
+# 预设头像池（与前端avatar picker一致）
+_PRESET_AVATARS = [
+    '🔮', '🎴', '☯️', '🐉', '⭐', '🌙', '🀄', '🧙', '🦊', '🌸',
+    '👤', '👨', '👩', '🧑', '🤵', '👸', '🧚', '🧛', '🧝', '🧞',
+    '🐱', '🐶', '🐼', '🐨', '🐰', '🐯', '🐸', '🐵', '🐤', '🦁',
+    '💎', '🎯', '🍀', '🌞', '🕊️', '🔥', '💜', '🏆', '🎭', '🌈'
+]
+
+def generate_random_nickname():
+    """生成随机玄学主题中文昵称，格式：前缀+后缀+数字"""
+    first = random.choice(_NICKNAME_FIRST)
+    second = random.choice(_NICKNAME_SECOND)
+    number = str(random.randint(10, 999))
+    return f"{first}{second}{number}"
+
+def generate_random_avatar():
+    """随机选择一个预设头像"""
+    return random.choice(_PRESET_AVATARS)
 
 # 密码加密
 def hash_password(password, salt=None):
@@ -485,10 +519,13 @@ def register():
         new_user = {
             'id': 'user_' + ''.join(random.choices(string.ascii_letters + string.digits, k=32)),
             'username': username,
+            'nickname': generate_random_nickname(),
             'password': hash_password(password),
             'email': email,
             'phone': phone,
             'avatar': '',
+            'avatar_type': 'emoji',
+            'avatar_preset': generate_random_avatar(),
             'birthday': '',
             'gender': '',
             'create_time': datetime.now().isoformat(),
@@ -507,7 +544,10 @@ def register():
             'token': token,
             'user': {
                 'id': new_user['id'],
-                'username': new_user['username']
+                'username': new_user['username'],
+                'nickname': new_user['nickname'],
+                'avatar_type': new_user['avatar_type'],
+                'avatar_preset': new_user['avatar_preset']
             }
         }), 200
     except Exception as e:
@@ -542,7 +582,13 @@ def login():
         response = jsonify({
             'success': True,
             'token': token,
-            'user': {'id': user['id'], 'username': user['username']}
+            'user': {
+                'id': user['id'],
+                'username': user['username'],
+                'nickname': user.get('nickname', user['username']),
+                'avatar_type': user.get('avatar_type', ''),
+                'avatar_preset': user.get('avatar_preset', '')
+            }
         })
         if remember:
             response.set_cookie('token', token, max_age=7*24*3600, httponly=True)
@@ -577,9 +623,25 @@ def get_profile():
                 break
         if not user:
             return jsonify({'success': False, 'message': '用户不存在'}), 404
+        # 懒初始化：已有用户未设置昵称/头像时自动分配
+        need_save = False
+        if not user.get('nickname'):
+            user['nickname'] = generate_random_nickname()
+            need_save = True
+        if not user.get('avatar_type') or not user.get('avatar_preset'):
+            user['avatar_type'] = 'emoji'
+            user['avatar_preset'] = generate_random_avatar()
+            need_save = True
+        if need_save:
+            for i, u in enumerate(users):
+                if u['id'] == user['id']:
+                    users[i] = user
+                    break
+            save_users(users)
         user_info = {
             'id': user['id'],
             'username': user['username'],
+            'nickname': user.get('nickname', user['username']),
             'email': user.get('email', ''),
             'phone': user.get('phone', ''),
             'avatar': user.get('avatar', ''),
@@ -616,7 +678,7 @@ def update_profile():
                 break
         if user_index is None:
             return jsonify({'success': False, 'message': '用户不存在'}), 404
-        allowed_fields = ['username', 'email', 'phone', 'avatar', 'birthday', 'gender']
+        allowed_fields = ['username', 'nickname', 'email', 'phone', 'avatar', 'birthday', 'gender']
         for field in allowed_fields:
             if field in data:
                 users[user_index][field] = data[field]
@@ -625,6 +687,7 @@ def update_profile():
         user_info = {
             'id': user['id'],
             'username': user['username'],
+            'nickname': user.get('nickname', user['username']),
             'email': user.get('email', ''),
             'phone': user.get('phone', ''),
             'avatar': user.get('avatar', ''),

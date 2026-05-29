@@ -17,20 +17,61 @@
         .section-title {
             color: #ffd700;
             font-size: 1.1rem;
-            margin: 1.8rem 0 0.9rem;
-            padding-bottom: 0.5rem;
+            margin: 0;
+            padding: 0.85rem 1rem;
             border-bottom: 1px solid rgba(255,215,0,0.15);
             display: flex; align-items: center; gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95));
+            border-radius: 12px;
+            border: 1px solid rgba(255,215,0,0.12);
+            transition: all 0.25s;
+            margin-bottom: 0;
+        }
+        .section-title:hover {
+            border-color: rgba(255,215,0,0.35);
+            background: linear-gradient(135deg, rgba(30,30,55,0.98), rgba(28,40,70,0.98));
+        }
+        .section-title:active {
+            transform: scale(0.995);
         }
         .section-title .cat-icon { font-size: 1.4rem; }
         .section-count {
             font-size: 0.75rem; color: rgba(255,255,255,0.35);
             margin-left: auto; font-weight: normal;
         }
+        .section-arrow {
+            font-size: 0.7rem; color: rgba(255,255,255,0.3);
+            transition: transform 0.3s ease;
+            margin-left: 0.3rem;
+        }
+        .section-title.open .section-arrow {
+            transform: rotate(90deg);
+        }
+        .cat-section {
+            margin-top: 0.6rem;
+        }
+        .cat-section:first-of-type {
+            margin-top: 0;
+        }
         .module-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
             gap: 0.8rem;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+            padding: 0 0.5rem;
+            margin: 0;
+        }
+        .module-grid.open {
+            max-height: 3000px;
+            opacity: 1;
+            padding: 0.8rem 0.5rem;
+            margin: 0.4rem 0 0.6rem 0;
         }
         .mod-card {
             background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95));
@@ -72,7 +113,7 @@
             .mod-card .icon { font-size: 1.5rem; }
             .mod-card .name { font-size: 0.75rem; }
             .mod-card .desc { font-size: 0.62rem; max-width: 90px; }
-            .section-title { font-size: 0.95rem; }
+            .section-title { font-size: 0.95rem; padding: 0.7rem 0.8rem; }
         }
     </style>
 </head>
@@ -84,71 +125,115 @@
 <div class="content-area">
     <div class="stars" id="stars"></div>
 
-    <div class="section-title"><span class="cat-icon">🔮</span>八字命理<span class="section-count" id="cntBazi"></span></div>
-    <div class="module-grid" id="gridBazi"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🔮</span>八字命理<span class="section-count" id="cntBazi"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridBazi"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">⭐</span>紫微斗数<span class="section-count" id="cntZiwei"></span></div>
-    <div class="module-grid" id="gridZiwei"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">⭐</span>紫微斗数<span class="section-count" id="cntZiwei"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridZiwei"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🐉</span>生肖运势<span class="section-count" id="cntShengxiao"></span></div>
-    <div class="module-grid" id="gridShengxiao"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🐉</span>生肖运势<span class="section-count" id="cntShengxiao"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridShengxiao"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">📛</span>姓名测算<span class="section-count" id="cntXingming"></span></div>
-    <div class="module-grid" id="gridXingming"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">📛</span>姓名测算<span class="section-count" id="cntXingming"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridXingming"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🏠</span>风水布局<span class="section-count" id="cntFengshui"></span></div>
-    <div class="module-grid" id="gridFengshui"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🏠</span>风水布局<span class="section-count" id="cntFengshui"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridFengshui"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🃏</span>塔罗占卜<span class="section-count" id="cntTarot"></span></div>
-    <div class="module-grid" id="gridTarot"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🃏</span>塔罗占卜<span class="section-count" id="cntTarot"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridTarot"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">💭</span>周公解梦<span class="section-count" id="cntZhougong"></span></div>
-    <div class="module-grid" id="gridZhougong"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">💭</span>周公解梦<span class="section-count" id="cntZhougong"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridZhougong"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🎯</span>面相手相<span class="section-count" id="cntMianxiang"></span></div>
-    <div class="module-grid" id="gridMianxiang"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🎯</span>面相手相<span class="section-count" id="cntMianxiang"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridMianxiang"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">📅</span>黄道吉日<span class="section-count" id="cntJiri"></span></div>
-    <div class="module-grid" id="gridJiri"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">📅</span>黄道吉日<span class="section-count" id="cntJiri"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridJiri"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🔭</span>占卜问事<span class="section-count" id="cntZhanbu"></span></div>
-    <div class="module-grid" id="gridZhanbu"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🔭</span>占卜问事<span class="section-count" id="cntZhanbu"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridZhanbu"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🪙</span>六爻占卜<span class="section-count" id="cntLiuyao"></span></div>
-    <div class="module-grid" id="gridLiuyao"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🪙</span>六爻占卜<span class="section-count" id="cntLiuyao"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridLiuyao"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">♈</span>星座命理<span class="section-count" id="cntXingzuo"></span></div>
-    <div class="module-grid" id="gridXingzuo"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">♈</span>星座命理<span class="section-count" id="cntXingzuo"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridXingzuo"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🩸</span>血型性格<span class="section-count" id="cntXuexing"></span></div>
-    <div class="module-grid" id="gridXuexing"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🩸</span>血型性格<span class="section-count" id="cntXuexing"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridXuexing"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🔢</span>数字灵数<span class="section-count" id="cntShuzi"></span></div>
-    <div class="module-grid" id="gridShuzi"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🔢</span>数字灵数<span class="section-count" id="cntShuzi"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridShuzi"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">☯️</span>奇门遁甲<span class="section-count" id="cntQimen"></span></div>
-    <div class="module-grid" id="gridQimen"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">☯️</span>奇门遁甲<span class="section-count" id="cntQimen"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridQimen"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🌸</span>梅花易数<span class="section-count" id="cntMeihua"></span></div>
-    <div class="module-grid" id="gridMeihua"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🌸</span>梅花易数<span class="section-count" id="cntMeihua"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridMeihua"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">📐</span>太乙神数<span class="section-count" id="cntTaiyi"></span></div>
-    <div class="module-grid" id="gridTaiyi"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">📐</span>太乙神数<span class="section-count" id="cntTaiyi"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridTaiyi"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🔩</span>铁板神数<span class="section-count" id="cntTieban"></span></div>
-    <div class="module-grid" id="gridTieban"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🔩</span>铁板神数<span class="section-count" id="cntTieban"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridTieban"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">🧧</span>符咒灵符<span class="section-count" id="cntFuzhou"></span></div>
-    <div class="module-grid" id="gridFuzhou"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">🧧</span>符咒灵符<span class="section-count" id="cntFuzhou"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridFuzhou"></div>
+    </div>
 
-    <div class="section-title"><span class="cat-icon">📆</span>择日择时<span class="section-count" id="cntZeri"></span></div>
-    <div class="module-grid" id="gridZeri"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)"><span class="cat-icon">📆</span>择日择时<span class="section-count" id="cntZeri"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridZeri"></div>
+    </div>
 
-    <div class="section-title" style="border-color:rgba(0,200,255,0.3);"><span class="cat-icon">🤖</span>大数据AI分析<span class="section-count" id="cntDataAnalysis"></span></div>
-    <div class="module-grid" id="gridDataAnalysis"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)" style="border-color:rgba(0,200,255,0.3);"><span class="cat-icon">🤖</span>大数据AI分析<span class="section-count" id="cntDataAnalysis"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridDataAnalysis"></div>
+    </div>
 
-    <div class="section-title" style="border-color:rgba(0,200,255,0.3);"><span class="cat-icon">📷</span>图片上传算<span class="section-count" id="cntImageUpload"></span></div>
-    <div class="module-grid" id="gridImageUpload"></div>
+    <div class="cat-section">
+        <div class="section-title" onclick="toggleCat(this)" style="border-color:rgba(0,200,255,0.3);"><span class="cat-icon">📷</span>图片上传算<span class="section-count" id="cntImageUpload"></span><span class="section-arrow">▶</span></div>
+        <div class="module-grid" id="gridImageUpload"></div>
+    </div>
 </div>
 
 <script>
@@ -565,12 +650,23 @@
     Object.keys(catToGrid).forEach(function(cat) {
         var grid = document.getElementById(catToGrid[cat]);
         if (grid && grid.children.length === 0) {
-            var title = grid.previousElementSibling;
-            if (title && title.classList.contains('section-title')) title.remove();
-            grid.remove();
+            var section = grid.parentElement;
+            if (section && section.classList.contains('cat-section')) section.remove();
         }
     });
 })();
+
+// 折叠/展开分类
+function toggleCat(titleEl) {
+    var grid = titleEl.nextElementSibling;
+    if (!grid) return;
+    var isOpen = titleEl.classList.toggle('open');
+    if (isOpen) {
+        grid.classList.add('open');
+    } else {
+        grid.classList.remove('open');
+    }
+}
 </script>
 <script src="/js/footer.js"></script>
 </body>

@@ -312,10 +312,10 @@
             <!-- 短信验证码 -->
             <div class="captcha-panel" id="panelSMS">
                 <div class="form-row">
-                    <input type="tel" class="form-input" id="smsPhone" placeholder="手机号" maxlength="11">
+                    <input type="tel" class="form-input" id="smsPhone" placeholder="手机号" maxlength="11" autocomplete="tel">
                     <button type="button" class="btn-sms" id="smsSendBtn" onclick="sendSMSCode()">发送验证码</button>
                 </div>
-                <input type="text" class="form-input" id="smsCode" placeholder="短信验证码" style="margin-top:0.5rem;" autocomplete="off">
+                <input type="text" class="form-input" id="smsCode" placeholder="短信验证码" style="margin-top:0.5rem;" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6">
             </div>
 
             <div class="remember-row">
@@ -358,6 +358,13 @@
         checkAutoLogin();
         loadImageCaptcha();
         initSlider();
+
+        // 支持 URL 参数自动切换验证码类型 (?captcha=sms)
+        var params = new URLSearchParams(window.location.search);
+        var captchaParam = params.get('captcha');
+        if (captchaParam && ['image', 'slider', 'sms'].indexOf(captchaParam) >= 0) {
+            switchCaptcha(captchaParam);
+        }
     });
 
     // 自动登录检查

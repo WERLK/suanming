@@ -763,11 +763,10 @@
                 document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
                 
                 // 保存用户信息到本地（用于离线访问）
-                if (localStorage.getItem('rememberMe')) {
-                    localStorage.setItem('currentUser', JSON.stringify(user));
-                } else {
-                    sessionStorage.setItem('currentUser', JSON.stringify(user));
-                }
+                var storage = Auth.isRemember() ? localStorage : sessionStorage;
+                storage.setItem('currentUser', JSON.stringify(user));
+                // 双写同步，确保多标签页一致
+                Auth.syncTokenToBoth();
                 
                 // 加载用户统计数据
                 loadUserStats(user);
@@ -814,8 +813,7 @@
                 showToast('加载用户数据失败，请刷新重试');
             }
         }
-        }
-        
+
         // 加载用户统计数据
         function loadUserStats(user) {
             // 从localStorage获取用户统计数据
@@ -902,11 +900,9 @@
                     document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
                     
                     // 保存用户信息到本地
-                    if (localStorage.getItem('rememberMe')) {
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                    } else {
-                        sessionStorage.setItem('currentUser', JSON.stringify(user));
-                    }
+                    var storage = Auth.isRemember() ? localStorage : sessionStorage;
+                    storage.setItem('currentUser', JSON.stringify(user));
+                    Auth.syncTokenToBoth();
                     
                     // 关闭弹窗
                     closeEditProfile();

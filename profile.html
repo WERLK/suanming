@@ -1246,9 +1246,13 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await resp.json();
-                if (!data.success) return;
+                if (!data.success) {
+                    console.warn('VIP status API returned failure:', data.message);
+                    return;
+                }
                 
                 const card = document.getElementById('vipCard');
+                if (!card) return;
                 card.style.display = 'block';
                 
                 // 会员等级徽章

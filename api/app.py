@@ -583,6 +583,8 @@ def get_profile():
             'email': user.get('email', ''),
             'phone': user.get('phone', ''),
             'avatar': user.get('avatar', ''),
+            'avatar_type': user.get('avatar_type', ''),
+            'avatar_preset': user.get('avatar_preset', ''),
             'birthday': user.get('birthday', ''),
             'gender': user.get('gender', ''),
             'create_time': user.get('create_time', ''),
@@ -626,6 +628,8 @@ def update_profile():
             'email': user.get('email', ''),
             'phone': user.get('phone', ''),
             'avatar': user.get('avatar', ''),
+            'avatar_type': user.get('avatar_type', ''),
+            'avatar_preset': user.get('avatar_preset', ''),
             'birthday': user.get('birthday', ''),
             'gender': user.get('gender', '')
         }
@@ -1079,6 +1083,45 @@ def upload_avatar():
         
     except Exception as e:
         return jsonify({'success': False, 'message': f'头像上传失败：{str(e)}'}), 500
+
+@app.route('/api/avatar/set-preset', methods=['POST'])
+def set_preset_avatar():
+    """设置系统预设头像"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+
+        data = request.get_json()
+        avatar_type = data.get('type', 'emoji')  # emoji | letter | color
+        avatar_value = data.get('value', '')
+
+        if not avatar_value:
+            return jsonify({'success': False, 'message': '请选择头像'}), 400
+
+        # 更新用户头像
+        user_index = None
+        for i, u in enumerate(users):
+            if u['id'] == user['id']:
+                user_index = i
+                break
+
+        if user_index is not None:
+            users[user_index]['avatar_type'] = avatar_type
+            users[user_index]['avatar_preset'] = avatar_value
+            users[user_index]['avatar'] = None  # 清除自定义头像
+            save_users(users)
+
+        return jsonify({
+            'success': True,
+            'message': '头像设置成功',
+            'avatar_type': avatar_type,
+            'avatar_value': avatar_value
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'头像设置失败：{str(e)}'}), 500
 
 # ========== 收藏功能 ==========
 FAVORITES_FILE = os.path.join(DATA_DIR, 'favorites.json')

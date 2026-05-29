@@ -343,6 +343,89 @@
             cursor: pointer;
             font-size: 0.9rem;
         }
+
+        /* 头像选择弹窗 */
+        .avatar-picker-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        .avatar-picker-modal.show { display: flex; }
+        .avatar-picker-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-width: 380px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .avatar-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .avatar-picker-title {
+            color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .avatar-picker-close {
+            background: none; border: none;
+            color: rgba(255,255,255,0.5); font-size: 1.5rem; cursor: pointer;
+        }
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .avatar-option {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.2s;
+            margin: 0 auto;
+        }
+        .avatar-option:hover, .avatar-option.selected {
+            border-color: rgba(255,215,0,0.6);
+            background: rgba(255,215,0,0.1);
+            transform: scale(1.08);
+        }
+        .avatar-section-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            margin: 0.8rem 0 0.5rem;
+        }
+        .avatar-upload-row {
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+        .avatar-upload-btn {
+            padding: 0.6rem 1.5rem;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 10px;
+            color: #ffd700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .avatar-upload-btn:hover {
+            background: rgba(255,215,0,0.2);
+        }
         
         .edit-profile-modal {
             display: none;
@@ -568,7 +651,7 @@
     <div class="app">
         <div class="profile-container">
             <div class="profile-header">
-                <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+                <div class="profile-avatar" onclick="openAvatarPicker()">
                     <img id="avatarImg" src="" alt="头像" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
                     <span id="avatarDefault">👤</span>
                 </div>
@@ -786,6 +869,73 @@
                 
                 <button type="submit" class="btn-save">保存资料</button>
             </form>
+        </div>
+    </div>
+    
+    <!-- 头像选择弹窗 -->
+    <div class="avatar-picker-modal" id="avatarPickerModal">
+        <div class="avatar-picker-content">
+            <div class="avatar-picker-header">
+                <span class="avatar-picker-title">选择头像</span>
+                <button class="avatar-picker-close" onclick="closeAvatarPicker()">×</button>
+            </div>
+            <div class="avatar-section-label">🐉 玄学主题</div>
+            <div class="avatar-grid" id="avatarGridTheme">
+                <div class="avatar-option" onclick="selectPresetAvatar('🔮')">🔮</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🎴')">🎴</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('☯️')">☯️</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐉')">🐉</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('⭐')">⭐</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🌙')">🌙</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🀄')">🀄</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🧙')">🧙</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🦊')">🦊</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🌸')">🌸</div>
+            </div>
+            <div class="avatar-section-label">👤 人物头像</div>
+            <div class="avatar-grid" id="avatarGridPeople">
+                <div class="avatar-option" onclick="selectPresetAvatar('👤')">👤</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('👨')">👨</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('👩')">👩</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🧑')">🧑</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🤵')">🤵</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('👸')">👸</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🧚')">🧚</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🧛')">🧛</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🧝')">🧝</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🧞')">🧞</div>
+            </div>
+            <div class="avatar-section-label">🐾 可爱动物</div>
+            <div class="avatar-grid" id="avatarGridAnimal">
+                <div class="avatar-option" onclick="selectPresetAvatar('🐱')">🐱</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐶')">🐶</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐼')">🐼</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐨')">🐨</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐰')">🐰</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐯')">🐯</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐸')">🐸</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐵')">🐵</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🐤')">🐤</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🦁')">🦁</div>
+            </div>
+            <div class="avatar-section-label">✨ 其他</div>
+            <div class="avatar-grid" id="avatarGridOther">
+                <div class="avatar-option" onclick="selectPresetAvatar('💎')">💎</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🎯')">🎯</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🍀')">🍀</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🌞')">🌞</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🕊️')">🕊️</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🔥')">🔥</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('💜')">💜</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🏆')">🏆</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🎭')">🎭</div>
+                <div class="avatar-option" onclick="selectPresetAvatar('🌈')">🌈</div>
+            </div>
+            <div class="avatar-upload-row">
+                <label class="avatar-upload-btn" onclick="document.getElementById('avatarInput').click()">
+                    📷 自定义上传
+                </label>
+            </div>
         </div>
     </div>
     
@@ -1202,6 +1352,75 @@
             }
         });
 
+        // ========== 头像选择功能 ==========
+        function openAvatarPicker() {
+            document.getElementById('avatarPickerModal').classList.add('show');
+            // 清除之前选中状态
+            document.querySelectorAll('.avatar-option').forEach(function(o) { o.classList.remove('selected'); });
+        }
+
+        function closeAvatarPicker() {
+            document.getElementById('avatarPickerModal').classList.remove('show');
+        }
+
+        async function selectPresetAvatar(emoji) {
+            // 高亮选中
+            document.querySelectorAll('.avatar-option').forEach(function(o) { o.classList.remove('selected'); });
+            var options = document.querySelectorAll('.avatar-option');
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].textContent.trim() === emoji) {
+                    options[i].classList.add('selected');
+                    break;
+                }
+            }
+
+            var token = Auth.getToken();
+            if (!token) return;
+
+            try {
+                var resp = await fetch('/api/avatar/set-preset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ type: 'emoji', value: emoji })
+                });
+                var data = await resp.json();
+
+                if (data.success) {
+                    // 更新显示
+                    var avatarImg = document.getElementById('avatarImg');
+                    var avatarDefault = document.getElementById('avatarDefault');
+                    avatarImg.style.display = 'none';
+                    avatarDefault.style.display = 'block';
+                    avatarDefault.textContent = emoji;
+
+                    // 更新本地缓存
+                    var storage = Auth.isRemember() ? localStorage : sessionStorage;
+                    try {
+                        var user = JSON.parse(storage.getItem('currentUser') || '{}');
+                        user.avatar_type = 'emoji';
+                        user.avatar_preset = emoji;
+                        user.avatar = '';
+                        storage.setItem('currentUser', JSON.stringify(user));
+                    } catch(e) {}
+
+                    showToast('✅ 头像设置成功');
+                    closeAvatarPicker();
+                } else {
+                    showToast('❌ ' + (data.message || '设置失败'));
+                }
+            } catch (e) {
+                showToast('网络错误，请重试');
+            }
+        }
+
+        // 弹窗点击空白处关闭
+        document.getElementById('avatarPickerModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAvatarPicker();
+        });
+
         // ========== 头像上传功能 ==========
         async function uploadAvatar() {
             const input = document.getElementById('avatarInput');
@@ -1257,8 +1476,19 @@
                         avatarImg.src = data.avatar_url + '?t=' + new Date().getTime();
                         avatarImg.style.display = 'block';
                         avatarDefault.style.display = 'none';
-                        
+
+                        // 更新本地缓存
+                        var storage = Auth.isRemember() ? localStorage : sessionStorage;
+                        try {
+                            var user = JSON.parse(storage.getItem('currentUser') || '{}');
+                            user.avatar_type = 'custom';
+                            user.avatar_preset = '';
+                            user.avatar = data.avatar_url;
+                            storage.setItem('currentUser', JSON.stringify(user));
+                        } catch(e) {}
+
                         showToast('✅ ' + data.message);
+                        closeAvatarPicker();
                     } else {
                         showToast('❌ ' + data.message);
                     }
@@ -1285,13 +1515,21 @@
                 });
                 const data = await resp.json();
                 
-                if (data.success && data.user.avatar) {
-                    const avatarImg = document.getElementById('avatarImg');
-                    const avatarDefault = document.getElementById('avatarDefault');
+                if (data.success) {
+                    var avatarImg = document.getElementById('avatarImg');
+                    var avatarDefault = document.getElementById('avatarDefault');
                     
-                    avatarImg.src = data.user.avatar + '?t=' + new Date().getTime();
-                    avatarImg.style.display = 'block';
-                    avatarDefault.style.display = 'none';
+                    // 预设头像优先
+                    if (data.user.avatar_type === 'emoji' && data.user.avatar_preset) {
+                        avatarImg.style.display = 'none';
+                        avatarDefault.style.display = 'block';
+                        avatarDefault.textContent = data.user.avatar_preset;
+                    } else if (data.user.avatar) {
+                        // 自定义上传头像
+                        avatarImg.src = data.user.avatar + '?t=' + new Date().getTime();
+                        avatarImg.style.display = 'block';
+                        avatarDefault.style.display = 'none';
+                    }
                 }
             } catch (e) {
                 console.error('加载头像失败:', e);

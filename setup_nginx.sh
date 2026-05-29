@@ -9,7 +9,11 @@ DOMAIN="xuanjisuanming.top"
 WWW_DOMAIN="www.xuanjisuanming.top"
 NGINX_SITE="/etc/nginx/sites-available/xjsm"
 NGINX_ENABLED="/etc/nginx/sites-enabled/xjsm"
-CERT_PATH="/etc/letsencrypt/live/$DOMAIN/fullchain.pem"
+
+# certbot may append -0001 suffix, auto-detect the directory
+CERT_BASE=$(ls -d /etc/letsencrypt/live/${DOMAIN}* 2>/dev/null | head -1)
+CERT_FILE="${CERT_BASE}/fullchain.pem"
+KEY_FILE="${CERT_BASE}/privkey.pem"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -35,15 +39,15 @@ ln -sf "$NGINX_SITE" "$NGINX_ENABLED"
 rm -f /etc/nginx/sites-enabled/default
 
 # Detect HTTPS capability
-if [ -f "$CERT_PATH" ]; then
-    log "${GREEN}SSL certificate found, writing HTTPS config...${NC}"
+if [ -f "$CERT_FILE" ]; then
+    log "${GREEN}SSL certificate found: ${CERT_BASE}${NC}"
 
-    cat > "$NGINX_SITE" << 'NGINX_EOF'
+    cat > "$NGINX_SITE" << NGINX_EOF
 # HTTP -> HTTPS redirect
 server {
     listen 80;
     server_name xuanjisuanming.top www.xuanjisuanming.top;
-    return 301 https://$host$request_uri;
+    return 301 https://\$host\$request_uri;
 }
 
 # HTTPS server
@@ -51,8 +55,8 @@ server {
     listen 443 ssl http2;
     server_name xuanjisuanming.top www.xuanjisuanming.top;
 
-    ssl_certificate /etc/letsencrypt/live/xuanjisuanming.top/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/xuanjisuanming.top/privkey.pem;
+    ssl_certificate ${CERT_FILE};
+    ssl_certificate_key ${KEY_FILE};
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
@@ -61,10 +65,10 @@ server {
 
     location / {
         proxy_pass http://127.0.0.1:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_read_timeout 120s;
         proxy_connect_timeout 10s;
     }
@@ -123,7 +127,7 @@ log "Testing Nginx config..."
 if nginx -t 2>&1; then
     log "${GREEN}Config OK, reloading Nginx...${NC}"
     systemctl reload nginx 2>/dev/null || systemctl restart nginx
-    if [ -f "$CERT_PATH" ]; then
+    if [ -f "$CERT_FILE" ]; then
         log "${GREEN}Site: https://$DOMAIN${NC}"
     else
         log "${GREEN}Site: http://$DOMAIN${NC}"

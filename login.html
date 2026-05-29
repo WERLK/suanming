@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/css/profile-compatible.css">
     <style>
         .auth-body {
-            min-height: 100vh;
+            min-height: calc(100vh - 56px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -261,6 +261,11 @@
     </style>
 </head>
 <body>
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/'">←</button>
+    <h1>登录</h1>
+</div>
+<div class="content-area">
 <div class="stars" id="stars"></div>
 
 <div class="auth-body">
@@ -604,5 +609,6 @@
 
 })();
 </script>
+</div>
 </body>
 </html>

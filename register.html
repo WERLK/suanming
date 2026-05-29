@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/profile-compatible.css">
     <style>
-        .auth-body { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
+        .auth-body { min-height:calc(100vh - 56px); display:flex; align-items:center; justify-content:center; padding:1rem; }
         .auth-card { width:100%; max-width:400px; background:linear-gradient(135deg,rgba(26,26,46,0.95),rgba(22,33,62,0.95)); border:1px solid rgba(255,215,0,0.2); border-radius:16px; padding:2rem; }
         .auth-title { text-align:center; color:#ffd700; font-size:1.5rem; margin-bottom:0.3rem; }
         .auth-subtitle { text-align:center; color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:1.5rem; }
@@ -29,6 +29,11 @@
     </style>
 </head>
 <body>
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/'">←</button>
+    <h1>注册</h1>
+</div>
+<div class="content-area">
 <div class="stars" id="stars"></div>
 <div class="auth-body">
     <div class="auth-card">
@@ -142,5 +147,6 @@
     });
 })();
 </script>
+</div>
 </body>
 </html>

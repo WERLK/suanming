@@ -188,7 +188,7 @@
             background: rgba(76,175,80,0.15);
             color: #4caf50;
         }
-        .vip-badge.premium {
+        .vip-badge.permanent {
             background: rgba(255,215,0,0.15);
             color: #ffd700;
         }
@@ -607,26 +607,11 @@
             <a href="/" class="sidebar-nav-item">
                 <span class="nav-icon">🏠</span> 首页
             </a>
-            <a href="/profile.html" class="sidebar-nav-item">
+            <a href="/more.html" class="sidebar-nav-item">
                 <span class="nav-icon">🔮</span> 更多模块
             </a>
             <a href="/profile.html" class="sidebar-nav-item active">
                 <span class="nav-icon">👤</span> 个人中心
-            </a>
-        </div>
-        <div class="sidebar-nav-section">
-            <div class="sidebar-nav-title">热门功能</div>
-            <a href="/modules/bazi.html" class="sidebar-nav-item">
-                <span class="nav-icon">🎴</span> 八字排盘
-            </a>
-            <a href="/modules/ziwei.html" class="sidebar-nav-item">
-                <span class="nav-icon">⭐</span> 紫微斗数
-            </a>
-            <a href="/modules/heyun.html" class="sidebar-nav-item">
-                <span class="nav-icon">💑</span> 合婚配对
-            </a>
-            <a href="/modules/shengxiao.html" class="sidebar-nav-item">
-                <span class="nav-icon">🐉</span> 生肖运势
             </a>
         </div>
     </nav>
@@ -715,12 +700,12 @@
                         <div class="plan-desc">每日10次算命<br>详细命理报告</div>
                         <span class="plan-badge plan-badge-b">可升级</span>
                     </div>
-                    <div class="vip-plan-card" id="planPremium">
+                    <div class="vip-plan-card" id="planPermanent">
                         <div class="plan-icon">👑</div>
-                        <div class="plan-name">高级会员</div>
-                        <div class="plan-price">¥99<small>/月</small></div>
-                        <div class="plan-desc">无限次数<br>AI深度分析</div>
-                        <span class="plan-badge plan-badge-p">即将上线</span>
+                        <div class="plan-name">永久会员</div>
+                        <div class="plan-price">看广告<small>/免费获取</small></div>
+                        <div class="plan-desc" id="permanentPlanDesc">累计看50次广告<br>永久解锁全部功能</div>
+                        <span class="plan-badge plan-badge-p" id="permanentPlanBadge">看广告解锁</span>
                     </div>
                 </div>
             </div>
@@ -968,7 +953,7 @@
             <div class="nav-icon">🏠</div>
             <span>首页</span>
         </a>
-        <a href="/profile.html" class="nav-item">
+        <a href="/more.html" class="nav-item">
             <div class="nav-icon">🔮</div>
             <span>更多</span>
         </a>
@@ -1273,62 +1258,92 @@
                 
                 // 到期时间
                 const expireEl = document.getElementById('vipExpire');
-                if (data.vip_expire) {
+                if (data.vip_level === 'permanent') {
+                    expireEl.textContent = '永久有效';
+                } else if (data.vip_expire) {
                     const d = new Date(data.vip_expire);
                     expireEl.textContent = '到期: ' + d.toLocaleDateString('zh-CN');
                 } else {
-                    expireEl.textContent = data.vip_level === 'free' ? '' : '永久';
+                    expireEl.textContent = '';
                 }
                 
-                // 剩余时长
+                // 剩余时长 / 永久进度
                 const remainEl = document.getElementById('vipRemaining');
                 const progressBar = document.getElementById('vipProgressBar');
-                if (data.vip_remaining) {
-                    remainEl.textContent = '剩余: ' + data.vip_remaining;
-                    // 简单进度（按天算比例）
+                const totalAdCount = data.total_ad_count || 0;
+                const threshold = data.permanent_threshold || 50;
+                
+                if (data.vip_level === 'permanent') {
+                    remainEl.textContent = '🎉 已解锁永久会员';
+                    progressBar.style.width = '100%';
+                } else if (data.vip_remaining) {
+                    remainEl.textContent = '剩余: ' + data.vip_remaining + ' | 累计看广告 ' + totalAdCount + '/' + threshold + ' 次';
                     const expireDate = new Date(data.vip_expire);
                     const now = new Date();
                     const total = expireDate - now;
-                    const max = 7 * 24 * 3600 * 1000;  // 以7天为满
+                    const max = 7 * 24 * 3600 * 1000;
                     const pct = Math.min(100, Math.max(0, (total / max) * 100));
                     progressBar.style.width = pct + '%';
                 } else {
-                    remainEl.textContent = data.vip_level === 'free' ? '看广告免费升级会员' : '已过期';
-                    progressBar.style.width = '0%';
+                    const permPct = Math.min(100, Math.round((totalAdCount / threshold) * 100));
+                    remainEl.textContent = '累计看广告 ' + totalAdCount + '/' + threshold + ' 次（满' + threshold + '次解锁永久会员）';
+                    progressBar.style.width = permPct + '%';
                 }
                 
                 // 广告按钮
                 const adBtn = document.getElementById('vipAdBtn');
                 const adCount = document.getElementById('adRemain');
                 const remaining = data.max_daily_ads - data.today_ads;
-                adCount.textContent = '剩' + remaining;
                 
-                if (remaining <= 0) {
+                if (data.vip_level === 'permanent') {
+                    adBtn.disabled = false;
+                    adBtn.innerHTML = '📺 看广告（剩' + remaining + '次）';
+                } else if (remaining <= 0) {
                     adBtn.disabled = true;
                     adBtn.innerHTML = '📺 今日次数已用完';
                 } else {
                     adBtn.disabled = false;
+                    adCount.textContent = '剩' + remaining;
+                }
+
+                // 更新永久会员方案卡片
+                var pp = document.getElementById('planPermanent');
+                if (pp) {
+                    var ppDesc = document.getElementById('permanentPlanDesc');
+                    var ppBadge = document.getElementById('permanentPlanBadge');
+                    if (data.vip_level === 'permanent') {
+                        if (ppDesc) ppDesc.textContent = '已永久解锁全部功能';
+                        if (ppBadge) { ppBadge.textContent = '已解锁'; ppBadge.className = 'plan-badge plan-badge-p'; }
+                    } else {
+                        if (ppDesc) ppDesc.textContent = '累计看' + threshold + '次广告\n永久解锁全部功能';
+                        if (ppBadge) { ppBadge.textContent = totalAdCount + '/' + threshold; ppBadge.className = 'plan-badge plan-badge-p'; }
+                    }
                 }
 
                 // 高亮当前方案卡片
                 document.querySelectorAll('.vip-plan-card').forEach(function(c) { c.classList.remove('active'); });
                 var allBadges = document.querySelectorAll('.vip-plan-card .plan-badge');
-                allBadges.forEach(function(b) { b.textContent = ''; });
+                allBadges.forEach(function(b) {
+                    if (b.id !== 'permanentPlanBadge') b.textContent = '';
+                });
+                
                 if (data.vip_level === 'free') {
                     var pf = document.getElementById('planFree');
                     if (pf) { pf.classList.add('active'); pf.querySelector('.plan-badge').textContent = '当前'; }
                     var pb = document.getElementById('planBasic');
                     if (pb) pb.querySelector('.plan-badge').textContent = '可升级';
-                    var pp = document.getElementById('planPremium');
-                    if (pp) pp.querySelector('.plan-badge').textContent = '即将上线';
                 } else if (data.vip_level === 'basic') {
                     var pb = document.getElementById('planBasic');
                     if (pb) { pb.classList.add('active'); pb.querySelector('.plan-badge').textContent = '当前'; }
                     var pf = document.getElementById('planFree');
                     if (pf) pf.querySelector('.plan-badge').textContent = '';
-                } else if (data.vip_level === 'premium') {
-                    var pp = document.getElementById('planPremium');
-                    if (pp) { pp.classList.add('active'); pp.querySelector('.plan-badge').textContent = '当前'; }
+                } else if (data.vip_level === 'permanent') {
+                    var pp2 = document.getElementById('planPermanent');
+                    if (pp2) { pp2.classList.add('active'); }
+                    var pf2 = document.getElementById('planFree');
+                    if (pf2) pf2.querySelector('.plan-badge').textContent = '';
+                    var pb2 = document.getElementById('planBasic');
+                    if (pb2) pb2.querySelector('.plan-badge').textContent = '';
                 }
             } catch (e) {
                 console.error('加载会员状态失败:', e);
@@ -1382,8 +1397,16 @@
                 });
                 const data = await resp.json();
                 if (data.success) {
-                    showToast('✅ ' + data.message);
-                    loadVIPStatus();
+                    if (data.unlocked_permanent) {
+                        showToast('🎉 ' + data.message);
+                        // 永久解锁时延迟刷新，让用户看到庆祝消息
+                        setTimeout(() => {
+                            loadVIPStatus();
+                        }, 1500);
+                    } else {
+                        showToast('✅ ' + data.message);
+                        loadVIPStatus();
+                    }
                 } else {
                     showToast('⚠️ ' + data.message);
                 }

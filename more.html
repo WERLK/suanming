@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="玄机算命">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>更多模块 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/profile-compatible.css">
+    <style>
+        .content-area { padding: 1rem; max-width: 1200px; margin: 0 auto; }
+        .section-title {
+            color: #ffd700;
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.7rem;
+        }
+        .mod-card {
+            background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(22,33,62,0.9));
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 12px;
+            padding: 0.9rem 0.6rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+        .mod-card:hover {
+            border-color: rgba(255,215,0,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(255,215,0,0.1);
+        }
+        .mod-card .icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+        .mod-card .name { color: #ffd700; font-size: 0.9rem; font-weight: 500; }
+        .mod-card .desc { color: rgba(255,255,255,0.45); font-size: 0.72rem; margin-top: 0.2rem; }
+
+        @media (max-width: 480px) {
+            .module-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 0.5rem; }
+            .mod-card { padding: 0.7rem 0.4rem; }
+            .mod-card .icon { font-size: 1.4rem; }
+            .mod-card .name { font-size: 0.78rem; }
+            .mod-card .desc { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/'">←</button>
+    <h1>更多功能</h1>
+</div>
+<div class="content-area">
+    <div class="stars" id="stars"></div>
+
+    <div class="section-title">🔮 八字命理</div>
+    <div class="module-grid" id="gridBazi"></div>
+
+    <div class="section-title">⭐ 紫微斗数</div>
+    <div class="module-grid" id="gridZiwei"></div>
+
+    <div class="section-title">🕊️ 生肖运势</div>
+    <div class="module-grid" id="gridShengxiao"></div>
+
+    <div class="section-title">📛 姓名测算</div>
+    <div class="module-grid" id="gridXingming"></div>
+
+    <div class="section-title">🏠 风水布局</div>
+    <div class="module-grid" id="gridFengshui"></div>
+
+    <div class="section-title">🃏 塔罗占卜</div>
+    <div class="module-grid" id="gridTarot"></div>
+
+    <div class="section-title">💭 周公解梦</div>
+    <div class="module-grid" id="gridZhougong"></div>
+
+    <div class="section-title">🎯 面相手相</div>
+    <div class="module-grid" id="gridMianxiang"></div>
+
+    <div class="section-title">📅 黄道吉日</div>
+    <div class="module-grid" id="gridJiri"></div>
+
+    <div class="section-title">🔭 占卜问事</div>
+    <div class="module-grid" id="gridZhanbu"></div>
+
+    <div class="section-title">♈ 星座命理</div>
+    <div class="module-grid" id="gridXingzuo"></div>
+
+    <div class="section-title">🩸 血型性格</div>
+    <div class="module-grid" id="gridXuexing"></div>
+
+    <div class="section-title">🔢 数字灵数</div>
+    <div class="module-grid" id="gridShuzi"></div>
+
+    <div class="section-title">☯️ 奇门遁甲</div>
+    <div class="module-grid" id="gridQimen"></div>
+
+    <div class="section-title">🌸 梅花易数</div>
+    <div class="module-grid" id="gridMeihua"></div>
+
+    <div class="section-title">🔧 太乙神数</div>
+    <div class="module-grid" id="gridTaiyi"></div>
+
+    <div class="section-title">🔩 铁板神数</div>
+    <div class="module-grid" id="gridTieban"></div>
+
+    <div class="section-title">🧧 符咒灵符</div>
+    <div class="module-grid" id="gridFuzhou"></div>
+</div>
+
+<script>
+(function() {
+    var modules = [
+        { cat:"Bazi", icon:"🔮", name:"八字排盘", file:"bazi.html" },
+        { cat:"Bazi", icon:"🌿", name:"十神分析", file:"十神分析_1.html" },
+        { cat:"Bazi", icon:"🌀", name:"大运流年", file:"大运流年_2.html" },
+        { cat:"Bazi", icon:"💑", name:"八字合婚", file:"八字合婚_3.html" },
+        { cat:"Bazi", icon:"👶", name:"八字起名", file:"八字起名_4.html" },
+        { cat:"Bazi", icon:"📅", name:"八字择日", file:"八字择日_5.html" },
+        { cat:"Bazi", icon:"🏠", name:"八字风水", file:"八字风水_6.html" },
+        { cat:"Bazi", icon:"🔄", name:"八字改运", file:"八字改运_7.html" },
+        { cat:"Bazi", icon:"💊", name:"八字问病", file:"八字问病_8.html" },
+        { cat:"Bazi", icon:"💰", name:"八字求财", file:"八字求财_9.html" },
+
+        { cat:"Ziwei", icon:"⭐", name:"紫微斗数", file:"ziwei.html" },
+        { cat:"Ziwei", icon:"📊", name:"命盘排盘", file:"命盘排盘_10.html" },
+        { cat:"Ziwei", icon:"🌟", name:"主星分析", file:"主星分析_11.html" },
+        { cat:"Ziwei", icon:"✨", name:"四化飞星", file:"四化飞星_12.html" },
+        { cat:"Ziwei", icon:"🏰", name:"十二宫位", file:"十二宫位_13.html" },
+        { cat:"Ziwei", icon:"💍", name:"紫微合婚", file:"紫微合婚_14.html" },
+        { cat:"Ziwei", icon:"💼", name:"紫微择职", file:"紫微择职_15.html" },
+        { cat:"Ziwei", icon:"💵", name:"紫微问财", file:"紫微问财_16.html" },
+        { cat:"Ziwei", icon:"❤️", name:"紫微健康", file:"紫微健康_17.html" },
+
+        { cat:"Shengxiao", icon:"🕊️", name:"生肖运势", file:"shengxiao.html" },
+        { cat:"Shengxiao", icon:"🐭", name:"鼠年运势", file:"鼠年运势_20.html" },
+        { cat:"Shengxiao", icon:"🐮", name:"牛年运势", file:"牛年运势_21.html" },
+        { cat:"Shengxiao", icon:"🐯", name:"虎年运势", file:"虎年运势_22.html" },
+        { cat:"Shengxiao", icon:"🐰", name:"兔年运势", file:"兔年运势_23.html" },
+        { cat:"Shengxiao", icon:"🐲", name:"龙年运势", file:"龙年运势_24.html" },
+        { cat:"Shengxiao", icon:"🐍", name:"蛇年运势", file:"蛇年运势_25.html" },
+        { cat:"Shengxiao", icon:"🐴", name:"马年运势", file:"马年运势_26.html" },
+        { cat:"Shengxiao", icon:"🐑", name:"羊年运势", file:"羊年运势_27.html" },
+        { cat:"Shengxiao", icon:"🐵", name:"猴年运势", file:"猴年运势_28.html" },
+        { cat:"Shengxiao", icon:"🐔", name:"鸡年运势", file:"鸡年运势_29.html" },
+        { cat:"Shengxiao", icon:"🐶", name:"狗年运势", file:"狗年运势_30.html" },
+        { cat:"Shengxiao", icon:"🐷", name:"猪年运势", file:"猪年运势_31.html" },
+
+        { cat:"Xingming", icon:"📛", name:"姓名测算", file:"xingming.html" },
+        { cat:"Xingming", icon:"📐", name:"五格剖象", file:"五格剖象_32.html" },
+        { cat:"Xingming", icon:"☯️", name:"三才配置", file:"三才配置_33.html" },
+        { cat:"Xingming", icon:"🎵", name:"姓名音律", file:"姓名音律_34.html" },
+        { cat:"Xingming", icon:"✍️", name:"姓名字形", file:"姓名字形_35.html" },
+        { cat:"Xingming", icon:"📖", name:"姓名义理", file:"姓名义理_36.html" },
+        { cat:"Xingming", icon:"🔄", name:"姓名改运", file:"姓名改运_37.html" },
+        { cat:"Xingming", icon:"💑", name:"姓名合婚", file:"姓名合婚_38.html" },
+        { cat:"Xingming", icon:"📊", name:"姓名评分", file:"姓名评分_41.html" },
+
+        { cat:"Fengshui", icon:"🏠", name:"风水布局", file:"fengshui.html" },
+        { cat:"Fengshui", icon:"🛋️", name:"家居风水", file:"家居风水_62.html" },
+        { cat:"Fengshui", icon:"🏢", name:"办公风水", file:"办公风水_63.html" },
+        { cat:"Fengshui", icon:"🏪", name:"商铺风水", file:"商铺风水_64.html" },
+        { cat:"Fengshui", icon:"🌅", name:"阳宅风水", file:"阳宅风水_66.html" },
+        { cat:"Fengshui", icon:"📅", name:"风水择日", file:"风水择日_67.html" },
+        { cat:"Fengshui", icon:"💰", name:"风水招财", file:"风水招财_70.html" },
+
+        { cat:"Tarot", icon:"🃏", name:"塔罗占卜", file:"tarot.html" },
+        { cat:"Tarot", icon:"🌌", name:"大阿卡纳", file:"大阿卡纳_82.html" },
+        { cat:"Tarot", icon:"💕", name:"爱情塔罗", file:"爱情塔罗_84.html" },
+        { cat:"Tarot", icon:"💼", name:"事业塔罗", file:"事业塔罗_85.html" },
+        { cat:"Tarot", icon:"💰", name:"财运塔罗", file:"财运塔罗_86.html" },
+        { cat:"Tarot", icon:"❤️", name:"健康塔罗", file:"健康塔罗_87.html" },
+        { cat:"Tarot", icon:"🔮", name:"预测塔罗", file:"预测塔罗_91.html" },
+
+        { cat:"Zhougong", icon:"💭", name:"周公解梦", file:"zhougong.html" },
+        { cat:"Zhougong", icon:"🐱", name:"动物梦境", file:"动物梦境_72.html" },
+        { cat:"Zhougong", icon:"🌿", name:"植物梦境", file:"植物梦境_73.html" },
+        { cat:"Zhougong", icon:"🏔️", name:"自然梦境", file:"自然梦境_74.html" },
+        { cat:"Zhougong", icon:"🏗️", name:"建筑梦境", file:"建筑梦境_75.html" },
+        { cat:"Zhougong", icon:"🧑", name:"人物梦境", file:"人物梦境_77.html" },
+        { cat:"Zhougong", icon:"🍔", name:"食物梦境", file:"食物梦境_80.html" },
+
+        { cat:"Mianxiang", icon:"🎯", name:"面相分析", file:"mianxiang.html" },
+        { cat:"Mianxiang", icon:"👁️", name:"五官面相", file:"五官面相_42.html" },
+        { cat:"Mianxiang", icon:"🟤", name:"痣相学", file:"痣相学_45.html" },
+        { cat:"Mianxiang", icon:"🦴", name:"骨相学", file:"骨相学_46.html" },
+        { cat:"Mianxiang", icon:"🤲", name:"手相解析", file:"shouxiang.html" },
+        { cat:"Mianxiang", icon:"📏", name:"智慧线", file:"智慧线解析_53.html" },
+        { cat:"Mianxiang", icon:"💕", name:"感情线", file:"感情线解析_54.html" },
+        { cat:"Mianxiang", icon:"🧭", name:"命运线", file:"命运线解析_55.html" },
+        { cat:"Mianxiang", icon:"💍", name:"婚姻线", file:"婚姻线解析_56.html" },
+        { cat:"Mianxiang", icon:"💵", name:"财运线", file:"财运线解析_57.html" },
+
+        { cat:"Jiri", icon:"📅", name:"黄道吉日", file:"huangdao.html" },
+        { cat:"Jiri", icon:"💒", name:"嫁娶吉日", file:"嫁娶吉日_92.html" },
+        { cat:"Jiri", icon:"🎉", name:"开业吉日", file:"开业吉日_93.html" },
+        { cat:"Jiri", icon:"🚚", name:"搬家吉日", file:"搬家吉日_94.html" },
+        { cat:"Jiri", icon:"✈️", name:"出行吉日", file:"出行吉日_95.html" },
+        { cat:"Jiri", icon:"🙏", name:"祭祀吉日", file:"祭祀吉日_96.html" },
+        { cat:"Jiri", icon:"🔨", name:"动土吉日", file:"动土吉日_97.html" },
+        { cat:"Jiri", icon:"💵", name:"纳财吉日", file:"纳财吉日_99.html" },
+
+        { cat:"Zhanbu", icon:"🔭", name:"解星问事", file:"jiexing.html" },
+        { cat:"Zhanbu", icon:"💼", name:"事业占卜", file:"事业占卜_102.html" },
+        { cat:"Zhanbu", icon:"💰", name:"财运占卜", file:"财运占卜_103.html" },
+        { cat:"Zhanbu", icon:"💍", name:"婚姻占卜", file:"婚姻占卜_104.html" },
+        { cat:"Zhanbu", icon:"❤️", name:"健康占卜", file:"健康占卜_105.html" },
+        { cat:"Zhanbu", icon:"📚", name:"学业占卜", file:"学业占卜_106.html" },
+
+        { cat:"Xingzuo", icon:"♈", name:"星座运势", file:"xingzuo.html" },
+        { cat:"Xingzuo", icon:"🐏", name:"白羊座", file:"白羊座运势_122.html" },
+        { cat:"Xingzuo", icon:"🐂", name:"金牛座", file:"金牛座运势_123.html" },
+        { cat:"Xingzuo", icon:"👯", name:"双子座", file:"双子座运势_124.html" },
+        { cat:"Xingzuo", icon:"🦀", name:"巨蟹座", file:"巨蟹座运势_125.html" },
+        { cat:"Xingzuo", icon:"🦁", name:"狮子座", file:"狮子座运势_126.html" },
+        { cat:"Xingzuo", icon:"👧", name:"处女座", file:"处女座运势_127.html" },
+        { cat:"Xingzuo", icon:"⚖️", name:"天秤座", file:"天秤座运势_128.html" },
+        { cat:"Xingzuo", icon:"🦂", name:"天蝎座", file:"天蝎座运势_129.html" },
+        { cat:"Xingzuo", icon:"🏹", name:"射手座", file:"射手座运势_130.html" },
+        { cat:"Xingzuo", icon:"🐐", name:"摩羯座", file:"摩羯座运势_131.html" },
+        { cat:"Xingzuo", icon:"🏺", name:"水瓶座", file:"水瓶座运势_132.html" },
+        { cat:"Xingzuo", icon:"🐟", name:"双鱼座", file:"双鱼座运势_133.html" },
+
+        { cat:"Xuexing", icon:"🩸", name:"血型分析", file:"xuexing.html" },
+        { cat:"Xuexing", icon:"🅰️", name:"A型血性格", file:"A型血性格_112.html" },
+        { cat:"Xuexing", icon:"🅱️", name:"B型血性格", file:"B型血性格_113.html" },
+        { cat:"Xuexing", icon:"🅾️", name:"O型血性格", file:"O型血性格_114.html" },
+        { cat:"Xuexing", icon:"🆎", name:"AB型血性格", file:"AB型血性格_115.html" },
+        { cat:"Xuexing", icon:"💕", name:"血型配对", file:"血型配对_116.html" },
+
+        { cat:"Shuzi", icon:"🔢", name:"数字灵数", file:"taiyang.html" },
+        { cat:"Shuzi", icon:"📱", name:"手机号码", file:"手机号码_174.html" },
+        { cat:"Shuzi", icon:"🚗", name:"车牌号码", file:"车牌号码_175.html" },
+        { cat:"Shuzi", icon:"🏠", name:"门牌号码", file:"门牌号码_176.html" },
+        { cat:"Shuzi", icon:"🪪", name:"身份证号", file:"身份证号码_177.html" },
+        { cat:"Shuzi", icon:"💳", name:"银行卡号", file:"银行卡号_178.html" },
+        { cat:"Shuzi", icon:"💬", name:"QQ号码", file:"QQ号码_179.html" },
+        { cat:"Shuzi", icon:"💚", name:"微信号码", file:"微信号码_180.html" },
+
+        { cat:"Qimen", icon:"☯️", name:"奇门遁甲", file:"liuya.html" },
+        { cat:"Qimen", icon:"📐", name:"奇门排盘", file:"奇门排盘_134.html" },
+        { cat:"Qimen", icon:"🔍", name:"奇门用神", file:"奇门用神_135.html" },
+        { cat:"Qimen", icon:"📅", name:"奇门择吉", file:"奇门择吉_136.html" },
+        { cat:"Qimen", icon:"🔮", name:"奇门预测", file:"奇门预测_137.html" },
+        { cat:"Qimen", icon:"🏠", name:"奇门风水", file:"奇门风水_138.html" },
+
+        { cat:"Meihua", icon:"🌸", name:"梅花易数", file:"梅花起卦_164.html" },
+        { cat:"Meihua", icon:"🔮", name:"梅花预测", file:"梅花预测_166.html" },
+        { cat:"Meihua", icon:"💑", name:"梅花合婚", file:"梅花合婚_169.html" },
+        { cat:"Meihua", icon:"💰", name:"梅花求财", file:"梅花求财_170.html" },
+        { cat:"Meihua", icon:"🏠", name:"梅花风水", file:"梅花风水_168.html" },
+
+        { cat:"Taiyi", icon:"🔧", name:"太乙排盘", file:"太乙排盘_144.html" },
+        { cat:"Taiyi", icon:"🔮", name:"太乙预测", file:"太乙预测_146.html" },
+        { cat:"Taiyi", icon:"📅", name:"太乙择吉", file:"太乙择吉_147.html" },
+        { cat:"Taiyi", icon:"🏠", name:"太乙风水", file:"太乙风水_148.html" },
+        { cat:"Taiyi", icon:"💑", name:"太乙合婚", file:"太乙合婚_150.html" },
+
+        { cat:"Tieban", icon:"🔩", name:"铁板排盘", file:"铁板排盘_154.html" },
+        { cat:"Tieban", icon:"🔐", name:"铁板密码", file:"铁板密码_155.html" },
+        { cat:"Tieban", icon:"🔮", name:"铁板预测", file:"铁板预测_156.html" },
+        { cat:"Tieban", icon:"💑", name:"铁板合婚", file:"铁板合婚_157.html" },
+        { cat:"Tieban", icon:"💰", name:"铁板求财", file:"铁板求财_161.html" },
+
+        { cat:"Fuzhou", icon:"🧧", name:"招财符", file:"招财符_184.html" },
+        { cat:"Fuzhou", icon:"💕", name:"桃花符", file:"桃花符_185.html" },
+        { cat:"Fuzhou", icon:"🛡️", name:"平安符", file:"平安符_186.html" },
+        { cat:"Fuzhou", icon:"❤️", name:"健康符", file:"健康符_187.html" },
+        { cat:"Fuzhou", icon:"📚", name:"学业符", file:"学业符_188.html" },
+        { cat:"Fuzhou", icon:"🔄", name:"化解符", file:"化解符_190.html" },
+        { cat:"Fuzhou", icon:"🏠", name:"镇宅符", file:"镇宅符_191.html" },
+        { cat:"Fuzhou", icon:"👹", name:"驱邪符", file:"驱邪符_192.html" },
+    ];
+
+    var catToGrid = {
+        Bazi: "gridBazi", Ziwei: "gridZiwei", Shengxiao: "gridShengxiao",
+        Xingming: "gridXingming", Fengshui: "gridFengshui", Tarot: "gridTarot",
+        Zhougong: "gridZhougong", Mianxiang: "gridMianxiang", Jiri: "gridJiri",
+        Zhanbu: "gridZhanbu", Xingzuo: "gridXingzuo", Xuexing: "gridXuexing",
+        Shuzi: "gridShuzi", Qimen: "gridQimen", Meihua: "gridMeihua",
+        Taiyi: "gridTaiyi", Tieban: "gridTieban", Fuzhou: "gridFuzhou",
+    };
+
+    modules.forEach(function(m) {
+        var grid = document.getElementById(catToGrid[m.cat]);
+        if (!grid) return;
+        var a = document.createElement('a');
+        a.className = 'mod-card';
+        a.href = '/modules/' + m.file;
+        a.innerHTML = '<div class="icon">' + m.icon + '</div><div class="name">' + m.name + '</div>';
+        grid.appendChild(a);
+    });
+
+    // Remove empty section titles and grids
+    Object.keys(catToGrid).forEach(function(cat) {
+        var grid = document.getElementById(catToGrid[cat]);
+        if (grid && grid.children.length === 0) {
+            var title = grid.previousElementSibling;
+            if (title && title.classList.contains('section-title')) title.remove();
+            grid.remove();
+        }
+    });
+})();
+</script>
+</body>
+</html>

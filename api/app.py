@@ -531,7 +531,7 @@ def register():
             'create_time': datetime.now().isoformat(),
             'last_login': datetime.now().isoformat(),
             'status': 'active',
-            'vip_level': 'free',
+            'vip_level': 'basic',
             'vip_expire': None,
             'ad_watch_count': 0,
             'ad_watch_date': ''
@@ -921,13 +921,13 @@ def auto_update():
 # ========== 会员VIP系统 ==========
 
 VIP_LEVELS = {
-    'free': {'name': 'Free', 'color': '#888', 'max_daily_ads': 3},
-    'basic': {'name': 'Basic', 'color': '#4caf50', 'max_daily_ads': 5},
-    'permanent': {'name': 'Permanent', 'color': '#ffd700', 'max_daily_ads': 10},
+    'free':      {'name': '免费用户', 'color': '#888',    'max_daily_ads': 3},
+    'basic':     {'name': '基础会员', 'color': '#4caf50', 'max_daily_ads': 5},
+    'permanent': {'name': '永久会员', 'color': '#ffd700', 'max_daily_ads': 10},
 }
 
-AD_REWARD_HOURS = 2  # each ad gives 2 hours basic
-PERMANENT_AD_THRESHOLD = 50  # watch 50 ads to unlock permanent access
+AD_REWARD_HOURS = 2
+PERMANENT_AD_THRESHOLD = 20
 
 
 def _get_today():
@@ -956,7 +956,12 @@ def _ensure_vip_fields(user):
         'vip_expire': None,
         'ad_watch_count': 0,
         'ad_watch_date': '',
-        'total_ad_count': 0
+        'total_ad_count': 0,
+        'points': 0,
+        'last_checkin': '',
+        'checkin_streak': 0,
+        'wheel_spins_today': 0,
+        'wheel_date': ''
     }
     for k, v in defaults.items():
         if k not in user:
@@ -996,6 +1001,12 @@ def vip_status():
 
         total_ad_count = user.get('total_ad_count', 0)
 
+        today_checked_in = (user.get('last_checkin', '') == today)
+        wheel_date = user.get('wheel_date', '')
+        wheel_spins_today = user.get('wheel_spins_today', 0) if wheel_date == today else 0
+        max_wheel_spins = 5
+        wheel_spins_remaining = max(0, max_wheel_spins - wheel_spins_today)
+
         return jsonify({
             'success': True,
             'vip_level': user.get('vip_level', 'free'),
@@ -1008,7 +1019,12 @@ def vip_status():
             'max_daily_ads': max_ads,
             'ad_reward_hours': AD_REWARD_HOURS,
             'total_ad_count': total_ad_count,
-            'permanent_threshold': PERMANENT_AD_THRESHOLD
+            'permanent_threshold': PERMANENT_AD_THRESHOLD,
+            'points': user.get('points', 0),
+            'checkin_streak': user.get('checkin_streak', 0),
+            'last_checkin': user.get('last_checkin', ''),
+            'today_checked_in': today_checked_in,
+            'wheel_spins_remaining': wheel_spins_remaining
         }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1108,6 +1124,234 @@ def vip_watch_ad():
             }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 签到系统 ==========
+
+@app.route('/api/vip/checkin', methods=['POST'])
+def vip_checkin():
+    """每日签到获取积分和VIP时长"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+        _ensure_vip_fields(user)
+        user_index = next(i for i, u in enumerate(users) if u['id'] == user['id'])
+
+        today = _get_today()
+        if user.get('last_checkin', '') == today:
+            return jsonify({'success': False, 'message': '今日已签到，明天再来吧'}), 400
+
+        # 检查连续签到
+        yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+        if user.get('last_checkin', '') == yesterday:
+            streak = user.get('checkin_streak', 0) + 1
+        else:
+            streak = 1
+        users[user_index]['checkin_streak'] = streak
+        users[user_index]['last_checkin'] = today
+
+        # 计算奖励：10 基础 + streak 加成（上限30）
+        bonus = min(streak - 1, 10) * 2
+        earned_points = 10 + bonus
+        users[user_index]['points'] = user.get('points', 0) + earned_points
+
+        # 赠送 2 小时 basic VIP
+        now = datetime.now()
+        vip_expire = user.get('vip_expire')
+        if vip_expire:
+            expire_dt = datetime.fromisoformat(vip_expire)
+            if expire_dt < now:
+                expire_dt = now
+        else:
+            expire_dt = now
+        new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
+        users[user_index]['vip_expire'] = new_expire.isoformat()
+        users[user_index]['vip_level'] = 'basic'
+
+        save_users(users)
+
+        return jsonify({
+            'success': True,
+            'message': f'签到成功！获得 {earned_points} 积分 + {AD_REWARD_HOURS}小时会员',
+            'points_earned': earned_points,
+            'total_points': users[user_index]['points'],
+            'streak': streak,
+            'vip_extended': AD_REWARD_HOURS
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 积分兑换 ==========
+
+@app.route('/api/vip/redeem', methods=['POST'])
+def vip_redeem():
+    """积分兑换VIP时长/广告次数/永久会员"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+        _ensure_vip_fields(user)
+        user_index = next(i for i, u in enumerate(users) if u['id'] == user['id'])
+
+        data = request.get_json() or {}
+        redeem_type = data.get('type', '')
+
+        redeem_options = {
+            'ad1': {'points': 20,   'label': '1次广告计次', 'action': 'add_ad'},
+            'vip3': {'points': 50,  'label': '3小时会员', 'action': 'extend_vip', 'hours': 3},
+            'vip24': {'points': 200, 'label': '24小时会员', 'action': 'extend_vip', 'hours': 24},
+            'permanent': {'points': 500, 'label': '永久会员', 'action': 'unlock_permanent'},
+        }
+
+        if redeem_type not in redeem_options:
+            return jsonify({'success': False, 'message': '无效的兑换类型'}), 400
+
+        opt = redeem_options[redeem_type]
+        if user.get('points', 0) < opt['points']:
+            return jsonify({'success': False, 'message': f'积分不足，需要 {opt["points"]} 积分'}), 400
+
+        users[user_index]['points'] = user['points'] - opt['points']
+        message = ''
+
+        if opt['action'] == 'add_ad':
+            users[user_index]['total_ad_count'] = user.get('total_ad_count', 0) + 1
+            message = f'兑换成功！获得 1 次广告计次'
+            # 检查是否达到永久阈值
+            if users[user_index]['total_ad_count'] >= PERMANENT_AD_THRESHOLD:
+                users[user_index]['vip_level'] = 'permanent'
+                users[user_index]['vip_expire'] = None
+                message += '，并已解锁永久会员！'
+
+        elif opt['action'] == 'extend_vip':
+            now = datetime.now()
+            vip_expire = user.get('vip_expire')
+            if vip_expire:
+                expire_dt = datetime.fromisoformat(vip_expire)
+                if expire_dt < now:
+                    expire_dt = now
+            else:
+                expire_dt = now
+            new_expire = expire_dt + timedelta(hours=opt['hours'])
+            users[user_index]['vip_expire'] = new_expire.isoformat()
+            users[user_index]['vip_level'] = 'basic'
+            message = f'兑换成功！获得 {opt["hours"]} 小时会员'
+
+        elif opt['action'] == 'unlock_permanent':
+            users[user_index]['vip_level'] = 'permanent'
+            users[user_index]['vip_expire'] = None
+            message = '兑换成功！已解锁永久会员'
+
+        save_users(users)
+
+        return jsonify({
+            'success': True,
+            'message': message,
+            'remaining_points': users[user_index]['points'],
+            'vip_level': users[user_index]['vip_level']
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ========== 幸运转盘 ==========
+
+@app.route('/api/vip/wheel', methods=['POST'])
+def vip_wheel():
+    """幸运转盘抽奖"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+        _ensure_vip_fields(user)
+        user_index = next(i for i, u in enumerate(users) if u['id'] == user['id'])
+
+        today = _get_today()
+        wheel_date = user.get('wheel_date', '')
+        spins_today = user.get('wheel_spins_today', 0) if wheel_date == today else 0
+        max_spins = 5
+
+        if spins_today >= max_spins:
+            return jsonify({'success': False, 'message': f'今日转盘次数已用完（{max_spins}次）'}), 400
+
+        # 更新转盘计数
+        if wheel_date == today:
+            users[user_index]['wheel_spins_today'] = spins_today + 1
+        else:
+            users[user_index]['wheel_spins_today'] = 1
+            users[user_index]['wheel_date'] = today
+
+        # 奖品池（无空奖）
+        import random
+        roll = random.random() * 100
+        # 1. 1小时VIP — 25%
+        # 2. 2小时VIP — 20%
+        # 3. 5积分 — 20%
+        # 4. 10积分 — 15%
+        # 5. 1次广告计次 — 10%
+        # 6. 3次广告计次 — 5%
+        # 7. 24小时VIP — 3%
+        # 8. 50积分 — 2%
+        if roll < 25:
+            prize_type, prize_value, prize_name = 'vip_hours', 1, '1小时VIP会员'
+        elif roll < 45:
+            prize_type, prize_value, prize_name = 'vip_hours', 2, '2小时VIP会员'
+        elif roll < 65:
+            prize_type, prize_value, prize_name = 'points', 5, '5积分'
+        elif roll < 80:
+            prize_type, prize_value, prize_name = 'points', 10, '10积分'
+        elif roll < 90:
+            prize_type, prize_value, prize_name = 'ad_credit', 1, '1次广告计次'
+        elif roll < 95:
+            prize_type, prize_value, prize_name = 'ad_credit', 3, '3次广告计次'
+        elif roll < 98:
+            prize_type, prize_value, prize_name = 'vip_hours', 24, '24小时VIP会员'
+        else:
+            prize_type, prize_value, prize_name = 'points', 50, '50积分'
+
+        # 发放奖品
+        if prize_type == 'points':
+            users[user_index]['points'] = user.get('points', 0) + prize_value
+        elif prize_type == 'vip_hours':
+            now = datetime.now()
+            vip_expire = user.get('vip_expire')
+            if vip_expire:
+                expire_dt = datetime.fromisoformat(vip_expire)
+                if expire_dt < now:
+                    expire_dt = now
+            else:
+                expire_dt = now
+            new_expire = expire_dt + timedelta(hours=prize_value)
+            users[user_index]['vip_expire'] = new_expire.isoformat()
+            users[user_index]['vip_level'] = 'basic'
+        elif prize_type == 'ad_credit':
+            users[user_index]['total_ad_count'] = user.get('total_ad_count', 0) + prize_value
+            if users[user_index]['total_ad_count'] >= PERMANENT_AD_THRESHOLD:
+                users[user_index]['vip_level'] = 'permanent'
+                users[user_index]['vip_expire'] = None
+
+        save_users(users)
+
+        remaining = max_spins - users[user_index]['wheel_spins_today']
+        message = f'🎰 恭喜获得：{prize_name}！'
+        if prize_type == 'ad_credit' and users[user_index]['vip_level'] == 'permanent' and user.get('vip_level') != 'permanent':
+            message += ' 累计广告计次已达到永久门槛，已解锁永久会员！'
+
+        return jsonify({
+            'success': True,
+            'message': message,
+            'prize_type': prize_type,
+            'prize_value': prize_value,
+            'prize_name': prize_name,
+            'remaining_spins': remaining,
+            'total_points': users[user_index].get('points', 0),
+            'vip_level': users[user_index]['vip_level'],
+            'unlocked_permanent': (prize_type == 'ad_credit' and users[user_index]['vip_level'] == 'permanent' and user.get('vip_level') != 'permanent')
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 
 # ========== 头像上传（带自动审核）==========
 from api.avatar_audit import AvatarAuditor

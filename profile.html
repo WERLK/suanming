@@ -344,6 +344,65 @@
             font-size: 0.9rem;
         }
 
+        /* 签到与积分 */
+        .points-row { display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; }
+        .points-display { text-align:center; min-width:60px; }
+        .points-value { color:#ffd700; font-size:1.6rem; font-weight:bold; display:block; }
+        .points-label { color:rgba(255,255,255,0.5); font-size:0.7rem; }
+        .checkin-area { flex:1; display:flex; align-items:center; gap:0.5rem; }
+        .checkin-btn {
+            padding:0.6rem 1rem; border:none; border-radius:10px;
+            background:linear-gradient(135deg,#ffd700,#ffc107); color:#000;
+            font-size:0.85rem; font-weight:bold; cursor:pointer; white-space:nowrap;
+        }
+        .checkin-btn:disabled { opacity:0.4; cursor:not-allowed; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); }
+        .checkin-btn.checked { background:rgba(76,175,80,0.3); color:#4caf50; }
+        .streak-badge { color:rgba(255,255,255,0.5); font-size:0.78rem; white-space:nowrap; }
+        .streak-badge.fire { color:#ff6b35; }
+        .redeem-btn {
+            padding:0.6rem 0.9rem; border:1px solid rgba(255,215,0,0.3); border-radius:10px;
+            background:rgba(255,215,0,0.08); color:#ffd700; font-size:0.85rem; cursor:pointer; white-space:nowrap;
+        }
+        .redeem-btn:hover { background:rgba(255,215,0,0.15); }
+
+        /* 幸运转盘 */
+        .wheel-container { display:flex; flex-direction:column; align-items:center; gap:0.8rem; position:relative; }
+        .wheel-pointer { font-size:1.8rem; color:#ffd700; position:absolute; top:-8px; z-index:2; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+        #wheelCanvas { border-radius:50%; box-shadow:0 0 20px rgba(255,215,0,0.15); }
+        .wheel-spin-btn {
+            padding:0.7rem 1.5rem; border:none; border-radius:12px;
+            background:linear-gradient(135deg,#ff6b35,#ff4500); color:#fff;
+            font-size:0.9rem; font-weight:bold; cursor:pointer; transition:all 0.3s;
+        }
+        .wheel-spin-btn:hover { transform:scale(1.03); box-shadow:0 4px 16px rgba(255,107,53,0.3); }
+        .wheel-spin-btn:disabled { opacity:0.4; cursor:not-allowed; background:rgba(255,255,255,0.1); transform:none; box-shadow:none; }
+        .wheel-prizes { display:grid; grid-template-columns:repeat(4,1fr); gap:0.3rem; width:100%; max-width:320px; }
+        .wheel-prizes span { font-size:0.65rem; color:rgba(255,255,255,0.4); text-align:center; }
+
+        /* 积分兑换弹窗 */
+        .redeem-modal { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.85); z-index:1003; align-items:center; justify-content:center; }
+        .redeem-modal.show { display:flex; }
+        .redeem-content {
+            background:linear-gradient(135deg,#1a1a2e,#16213e); border:1px solid rgba(255,215,0,0.2);
+            border-radius:16px; padding:1.5rem; max-width:380px; width:90%;
+        }
+        .redeem-balance { text-align:center; color:rgba(255,255,255,0.7); margin-bottom:1rem; font-size:0.9rem; }
+        .redeem-balance strong { color:#ffd700; font-size:1.3rem; }
+        .redeem-options { display:flex; flex-direction:column; gap:0.5rem; }
+        .redeem-option {
+            display:flex; align-items:center; padding:0.7rem 1rem;
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,215,0,0.1);
+            border-radius:10px; cursor:pointer; transition:all 0.2s;
+        }
+        .redeem-option:hover { background:rgba(255,215,0,0.05); border-color:rgba(255,215,0,0.3); }
+        .ro-icon { font-size:1.3rem; margin-right:0.6rem; }
+        .ro-label { flex:1; color:#fff; font-size:0.85rem; }
+        .ro-cost { color:#ffd700; font-size:0.82rem; font-weight:bold; }
+        .btn-close-redeem {
+            width:100%; padding:0.7rem; margin-top:1rem; border:1px solid rgba(255,255,255,0.1);
+            border-radius:10px; background:transparent; color:rgba(255,255,255,0.5); cursor:pointer; font-size:0.85rem;
+        }
+
         /* 头像选择弹窗 */
         .avatar-picker-modal {
             display: none;
@@ -704,12 +763,48 @@
                         <div class="plan-icon">👑</div>
                         <div class="plan-name">永久会员</div>
                         <div class="plan-price">看广告<small>/免费获取</small></div>
-                        <div class="plan-desc" id="permanentPlanDesc">累计看50次广告<br>永久解锁全部功能</div>
+                        <div class="plan-desc" id="permanentPlanDesc">累计看20次广告<br>永久解锁全部功能</div>
                         <span class="plan-badge plan-badge-p" id="permanentPlanBadge">看广告解锁</span>
                     </div>
                 </div>
             </div>
             
+            <!-- 积分与签到 -->
+            <div class="profile-section">
+                <h3 class="section-title">🎯 积分与签到</h3>
+                <div class="points-row">
+                    <div class="points-display">
+                        <span class="points-value" id="pointsValue">0</span>
+                        <span class="points-label">积分</span>
+                    </div>
+                    <div class="checkin-area">
+                        <button class="checkin-btn" id="checkinBtn" onclick="doCheckin()">
+                            ✅ 每日签到
+                        </button>
+                        <span class="streak-badge" id="streakBadge">连续0天</span>
+                    </div>
+                    <button class="redeem-btn" id="redeemBtn" onclick="openRedeem()">
+                        🛒 积分兑换
+                    </button>
+                </div>
+            </div>
+
+            <!-- 幸运转盘 -->
+            <div class="profile-section">
+                <h3 class="section-title">🎰 幸运转盘 <span style="font-size:0.7rem;color:rgba(255,255,255,0.4);">(每日5次)</span></h3>
+                <div class="wheel-container">
+                    <canvas id="wheelCanvas" width="260" height="260"></canvas>
+                    <div class="wheel-pointer">▼</div>
+                    <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">
+                        🎰 免费转转盘（剩<span id="wheelRemain">5</span>次）
+                    </button>
+                    <div class="wheel-prizes">
+                        <span>🎁 1hVIP</span><span>⏰ 2hVIP</span><span>⭐ 5分</span><span>💎 10分</span>
+                        <span>📺 1次广告</span><span>📺 3次广告</span><span>🏆 24hVIP</span><span>👑 50分</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- 会员权益 -->
             <div class="profile-section">
                 <h3 class="section-title">🎁 会员权益</h3>
@@ -945,6 +1040,40 @@
             <button class="ad-skip-btn" id="adSkipBtn" onclick="closeAdModal()" style="display:none;">
                 ✅ 领取奖励
             </button>
+        </div>
+    </div>
+
+    <!-- 积分兑换弹窗 -->
+    <div class="redeem-modal" id="redeemModal">
+        <div class="redeem-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🛒 积分兑换</h3>
+                <button class="modal-close" onclick="closeRedeem()">×</button>
+            </div>
+            <p class="redeem-balance">当前积分：<strong id="redeemPoints">0</strong></p>
+            <div class="redeem-options">
+                <div class="redeem-option" onclick="doRedeem('ad1')">
+                    <span class="ro-icon">📺</span>
+                    <span class="ro-label">1次广告计次</span>
+                    <span class="ro-cost">20积分</span>
+                </div>
+                <div class="redeem-option" onclick="doRedeem('vip3')">
+                    <span class="ro-icon">⏰</span>
+                    <span class="ro-label">3小时会员</span>
+                    <span class="ro-cost">50积分</span>
+                </div>
+                <div class="redeem-option" onclick="doRedeem('vip24')">
+                    <span class="ro-icon">🌟</span>
+                    <span class="ro-label">24小时会员</span>
+                    <span class="ro-cost">200积分</span>
+                </div>
+                <div class="redeem-option" onclick="doRedeem('permanent')" style="border-color:rgba(255,215,0,0.3);">
+                    <span class="ro-icon">👑</span>
+                    <span class="ro-label">永久会员</span>
+                    <span class="ro-cost">500积分</span>
+                </div>
+            </div>
+            <button class="btn-close-redeem" onclick="closeRedeem()">关闭</button>
         </div>
     </div>
 
@@ -1278,7 +1407,7 @@
                 const remainEl = document.getElementById('vipRemaining');
                 const progressBar = document.getElementById('vipProgressBar');
                 const totalAdCount = data.total_ad_count || 0;
-                const threshold = data.permanent_threshold || 50;
+                const threshold = data.permanent_threshold || 20;
                 
                 if (data.vip_level === 'permanent') {
                     remainEl.textContent = '🎉 已解锁永久会员';
@@ -1351,6 +1480,37 @@
                     if (pf2) pf2.querySelector('.plan-badge').textContent = '';
                     var pb2 = document.getElementById('planBasic');
                     if (pb2) pb2.querySelector('.plan-badge').textContent = '';
+                }
+
+                // 更新积分与签到状态
+                document.getElementById('pointsValue').textContent = data.points || 0;
+                const checkinBtn = document.getElementById('checkinBtn');
+                const streakBadge = document.getElementById('streakBadge');
+                if (data.today_checked_in) {
+                    checkinBtn.classList.add('checked');
+                    checkinBtn.textContent = '✅ 已签到';
+                    checkinBtn.disabled = true;
+                } else {
+                    checkinBtn.classList.remove('checked');
+                    checkinBtn.textContent = '✅ 每日签到';
+                    checkinBtn.disabled = false;
+                }
+                const streak = data.checkin_streak || 0;
+                streakBadge.textContent = '连续' + streak + '天';
+                if (streak >= 7) streakBadge.classList.add('fire');
+                else streakBadge.classList.remove('fire');
+
+                // 更新转盘状态
+                const wheelRemain = document.getElementById('wheelRemain');
+                const wheelBtn = document.getElementById('wheelSpinBtn');
+                const remaining = data.wheel_spins_remaining || 0;
+                wheelRemain.textContent = remaining;
+                if (remaining <= 0) {
+                    wheelBtn.disabled = true;
+                    wheelBtn.innerHTML = '🎰 今日次数已用完';
+                } else {
+                    wheelBtn.disabled = false;
+                    wheelBtn.innerHTML = '🎰 免费转转盘（剩<span id="wheelRemain">' + remaining + '</span>次）';
                 }
             } catch (e) {
                 console.error('加载会员状态失败:', e);
@@ -1439,6 +1599,175 @@
                 closeAdModal();
             }
         });
+
+        // ========== 签到 ==========
+        async function doCheckin() {
+            const token = Auth.getToken();
+            if (!token) return;
+            const btn = document.getElementById('checkinBtn');
+            btn.disabled = true;
+            btn.textContent = '签到中...';
+            try {
+                const resp = await fetch('/api/vip/checkin', {
+                    method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    loadVIPStatus();
+                } else {
+                    showToast('⚠️ ' + data.message);
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                showToast('网络错误，请重试');
+                btn.disabled = false;
+            }
+        }
+
+        // ========== 积分兑换 ==========
+        function openRedeem() {
+            const points = document.getElementById('pointsValue').textContent;
+            document.getElementById('redeemPoints').textContent = points;
+            document.getElementById('redeemModal').classList.add('show');
+        }
+        function closeRedeem() {
+            document.getElementById('redeemModal').classList.remove('show');
+        }
+        async function doRedeem(type) {
+            const token = Auth.getToken();
+            if (!token) return;
+            try {
+                const resp = await fetch('/api/vip/redeem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ type: type })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    closeRedeem();
+                    loadVIPStatus();
+                } else {
+                    showToast('⚠️ ' + data.message);
+                }
+            } catch (e) {
+                showToast('网络错误，请重试');
+            }
+        }
+        document.getElementById('redeemModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRedeem();
+        });
+
+        // ========== 幸运转盘 ==========
+        var wheelSpinning = false;
+        var wheelColors = ['#ff6b35','#ff9f43','#ffd700','#feca57','#54a0ff','#5f27cd','#00d2d3','#1dd1a1'];
+        var wheelPrizes = ['1hVIP','2hVIP','5分','10分','1次广告','3次广告','24hVIP','50分'];
+
+        function drawWheel() {
+            var canvas = document.getElementById('wheelCanvas');
+            var ctx = canvas.getContext('2d');
+            var cx = canvas.width / 2, cy = canvas.height / 2, r = 120;
+            var segAngle = (2 * Math.PI) / 8;
+
+            for (var i = 0; i < 8; i++) {
+                var startAngle = i * segAngle;
+                var endAngle = startAngle + segAngle;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, r, startAngle, endAngle);
+                ctx.fillStyle = wheelColors[i];
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Prize text
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(startAngle + segAngle / 2);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(wheelPrizes[i], r * 0.6, 4);
+                ctx.restore();
+            }
+
+            // Center circle
+            ctx.beginPath();
+            ctx.arc(cx, cy, 22, 0, 2 * Math.PI);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,215,0,0.5)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        async function spinWheel() {
+            if (wheelSpinning) return;
+            wheelSpinning = true;
+            const btn = document.getElementById('wheelSpinBtn');
+            btn.disabled = true;
+
+            // Random target segment (0-7)
+            var targetSegment = Math.floor(Math.random() * 8);
+            // Spin: 5 full rotations + target segment
+            var totalRotation = (5 * 360) + (targetSegment * 45) + Math.random() * 30;
+            var currentRotation = 0;
+            var spinDuration = 3000; // 3 seconds
+
+            var canvas = document.getElementById('wheelCanvas');
+            var startTime = Date.now();
+
+            function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+            function animateSpin() {
+                var elapsed = Date.now() - startTime;
+                var progress = Math.min(1, elapsed / spinDuration);
+                var easedProgress = easeOutCubic(progress);
+                currentRotation = totalRotation * easedProgress;
+
+                canvas.style.transform = 'rotate(' + currentRotation + 'deg)';
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    // Spin complete
+                    wheelSpinning = false;
+                    // Call API to claim prize
+                    claimWheelPrize();
+                }
+            }
+            requestAnimationFrame(animateSpin);
+        }
+
+        async function claimWheelPrize() {
+            const token = Auth.getToken();
+            if (!token) { wheelSpinning = false; return; }
+            try {
+                const resp = await fetch('/api/vip/wheel', {
+                    method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast(data.message);
+                    if (data.unlocked_permanent) {
+                        setTimeout(() => loadVIPStatus(), 1500);
+                    } else {
+                        loadVIPStatus();
+                    }
+                } else {
+                    showToast('⚠️ ' + data.message);
+                    loadVIPStatus();
+                }
+            } catch (e) {
+                showToast('网络错误，请重试');
+                loadVIPStatus();
+            }
+        }
+
+        // Draw wheel on load
+        document.addEventListener('DOMContentLoaded', function() { drawWheel(); });
 
         // ========== 头像选择功能 ==========
         function openAvatarPicker() {

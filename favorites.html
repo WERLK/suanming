@@ -94,6 +94,27 @@
         .empty-text {
             font-size: 1rem;
         }
+    .back-btn {
+        background: none;
+        border: none;
+        color: #ffd700;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+        border-bottom: 1px solid rgba(255,215,0,0.15);
+    }
+    .page-header h1 {
+        font-size: 1.2rem;
+        color: #ffd700;
+        font-weight: 600;
+    }
     </style>
 </head>
 <body class="has-desktop-sidebar">
@@ -136,15 +157,12 @@
 <script src="/js/main.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    if (!Auth.requireAuth()) return;
     loadFavorites();
 });
 
 async function loadFavorites() {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/login.html';
-        return;
-    }
+    const token = Auth.getToken();
     
     try {
         const resp = await fetch('/api/favorites', {
@@ -215,7 +233,7 @@ function enterModule(moduleId) {
 async function removeFavorite(moduleId, moduleName) {
     if (!confirm(`确定取消收藏"${moduleName}"吗？`)) return;
     
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = Auth.getToken();
     
     try {
         const resp = await fetch('/api/favorites', {

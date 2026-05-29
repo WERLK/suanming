@@ -18,6 +18,27 @@
         .share-platform { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
         .share-time { color: rgba(255,255,255,0.4); font-size: 0.75rem; margin-top: 0.3rem; }
         .empty-state { text-align: center; padding: 3rem 1rem; color: rgba(255,255,255,0.5); }
+    .back-btn {
+        background: none;
+        border: none;
+        color: #ffd700;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+        border-bottom: 1px solid rgba(255,215,0,0.15);
+    }
+    .page-header h1 {
+        font-size: 1.2rem;
+        color: #ffd700;
+        font-weight: 600;
+    }
     </style>
 </head>
 <body class="has-desktop-sidebar">
@@ -46,11 +67,13 @@
 
 <script src="/js/main.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => loadShares());
+document.addEventListener('DOMContentLoaded', function() {
+    if (!Auth.requireAuth()) return;
+    loadShares();
+});
 
 async function loadShares() {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) { window.location.href = '/login.html'; return; }
+    const token = Auth.getToken();
     
     try {
         const resp = await fetch('/api/shares', { headers: { 'Authorization': `Bearer ${token}` } });

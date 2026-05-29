@@ -137,6 +137,27 @@
                 gap: 1.5rem;
             }
         }
+    .back-btn {
+        background: none;
+        border: none;
+        color: #ffd700;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+        border-bottom: 1px solid rgba(255,215,0,0.15);
+    }
+    .page-header h1 {
+        font-size: 1.2rem;
+        color: #ffd700;
+        font-weight: 600;
+    }
     </style>
 </head>
 <body class="has-desktop-sidebar">
@@ -257,18 +278,14 @@
     <script>
         // 创建星空背景
         document.addEventListener('DOMContentLoaded', function() {
+            if (!Auth.requireAuth()) return;
             createStars();
             loadHistory();
         });
         
         // 加载算命历史
         async function loadHistory() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            
-            if (!token) {
-                window.location.href = '/login.html';
-                return;
-            }
+            const token = Auth.getToken();
             
             try {
                 const response = await fetch('/api/divination-history', {
@@ -352,7 +369,7 @@
         
         // 显示历史详情
         async function showHistoryDetail(historyId) {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = Auth.getToken();
             
             try {
                 const response = await fetch('/api/divination-history', {
@@ -416,7 +433,7 @@
         async function deleteHistory(historyId) {
             if (!confirm('确定要删除这条记录吗？')) return;
             
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = Auth.getToken();
             
             try {
                 const response = await fetch(`/api/divination-history/${historyId}`, {

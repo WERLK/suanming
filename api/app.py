@@ -26,6 +26,7 @@ import base64
 import threading
 import time
 import fcntl
+import fcntl
 
 app = Flask(__name__, static_folder='../', static_url_path='')
 app.secret_key = os.environ.get('JWT_SECRET', 'xuanji_fortune_secret_key_2026!!')
@@ -50,34 +51,23 @@ CAPTCHA_FILE = os.path.join(DATA_DIR, 'captcha_store.json')
 _captcha_lock = threading.Lock()
 
 def _load_captcha_store():
-    """从文件加载验证码存储（进程安全 - 使用文件锁）"""
-    if not os.path.exists(CAPTCHA_FILE):
-        return {}
+    if not os.path.exists(CAPTCHA_FILE):return {}
     try:
-        with open(CAPTCHA_FILE, 'r', encoding='utf-8') as f:
-            # 获取共享读锁（允许并发读取）
-            fcntl.flock(f.fileno(), fcntl.LOCK_SH)
-            try:
-                return json.load(f)
-            finally:
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-    except (json.JSONDecodeError, IOError):
-        return {}
-
+    with open(CAPTCHA_FILE,'r') as f:
+        fcntl.flock(f.fileno(),fcntl.LOCK_SH)
+        try:return json.load(f)
+        finally:fcntl.flock(f.fileno(),fcntl.LOCK_UN)
+    except:return {}
 def _save_captcha_store(store):
-    """保存验证码存储到文件（进程安全 - 使用文件锁）"""
-    # 先清理过期条目
-    now = datetime.now().isoformat()
-    store = {k: v for k, v in store.items() if v.get('expire_time', '') > now}
-    # 使用排他写锁（阻塞其他读写）
-    fd = os.open(CAPTCHA_FILE, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0o644)
+    now=datetime.now().isoformat()
+    store={k:v for k,v in store.items() if v.get('expire_time','')>now}
+    fd=os.open(CAPTCHA_FILE,os.O_CREAT|os.O_WRONLY|os.O_TRUNC,0o644)
     try:
-        fcntl.flock(fd, fcntl.LOCK_EX)
-        os.write(fd, json.dumps(store, ensure_ascii=False).encode('utf-8'))
+        fcntl.flock(fd,fcntl.LOCK_EX)
+        os.write(fd,json.dumps(store,ensure_ascii=False).encode())
     finally:
-        fcntl.flock(fd, fcntl.LOCK_UN)
+        fcntl.flock(fd,fcntl.LOCK_UN)
         os.close(fd)
-
 def _get_captcha_entry(captcha_id):
     """获取单个验证码条目"""
     store = _load_captcha_store()

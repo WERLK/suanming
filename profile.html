@@ -706,24 +706,26 @@
     </nav>
     
     <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
     <script>
         // 创建星空背景
         document.addEventListener('DOMContentLoaded', function() {
+            // 统一认证检查（所有页面一致的token校验）
+            if (!Auth.requireAuth()) return;
             createStars();
             checkLoginStatus();
         });
         
-        // 检查登录状态
+        // 检查登录状态（从后端加载用户数据）
         async function checkLoginStatus() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            
-            if (!token) {
-                // 未登录，跳转到登录页面
-                window.location.href = '/login.html';
-                return;
-            }
-            
             try {
+                // 使用统一Auth模块获取token
+                const token = Auth.getToken();
+                if (!token) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
                 // 从后端API获取用户信息
                 const response = await fetch('/api/profile', {
                     headers: {
@@ -731,13 +733,16 @@
                     }
                 });
                 
-                if (!response.ok) {
-                    // token无效，清除并跳转
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('currentUser');
-                    sessionStorage.removeItem('token');
-                    sessionStorage.removeItem('currentUser');
+                // 只在token真正无效时（401）清除并跳转，服务端其它错误不处理
+                if (response.status === 401 || response.status === 403) {
+                    Auth.clearToken();
                     window.location.href = '/login.html';
+                    return;
+                }
+                
+                if (!response.ok) {
+                    // 服务端临时错误（500/502/503等），尝试从本地缓存加载
+                    loadFromLocalCache();
                     return;
                 }
                 
@@ -779,22 +784,36 @@
                 
             } catch (error) {
                 console.error('获取用户信息失败:', error);
-                showToast('获取用户信息失败，请重试');
-                
-                // 尝试从本地存储加载
-                const localUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-                if (localUser) {
+                // 网络错误等，尝试从本地缓存加载
+                loadFromLocalCache();
+            }
+        }
+        
+        // 从本地缓存加载用户数据（服务端不可用时的降级方案）
+        function loadFromLocalCache() {
+            const localUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (localUser) {
+                try {
                     const user = JSON.parse(localUser);
                     document.getElementById('profileName').textContent = user.username || '未设置用户名';
-                    
                     let infoText = '';
                     if (user.phone) infoText += user.phone;
                     if (user.email) infoText += (infoText ? ' · ' : '') + user.email;
                     document.getElementById('profileInfo').textContent = infoText || '暂无联系方式';
-                    
+                    document.getElementById('editUsername').value = user.username || '';
+                    document.getElementById('editPhone').value = user.phone || '';
+                    document.getElementById('editEmail').value = user.email || '';
+                    document.getElementById('editBirthday').value = user.birthday || '';
+                    document.getElementById('editGender').value = user.gender || '';
                     loadUserStats(user);
+                    loadVIPStatus();
+                } catch(e) {
+                    showToast('加载用户数据失败');
                 }
+            } else {
+                showToast('加载用户数据失败，请刷新重试');
             }
+        }
         }
         
         // 加载用户统计数据
@@ -830,7 +849,7 @@
         async function saveProfile(event) {
             event.preventDefault();
             
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = Auth.getToken();
             
             if (!token) {
                 showToast('请先登录');
@@ -904,28 +923,7 @@
         
         // 处理退出登录
         async function handleLogout() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            
-            try {
-                // 调用后端API登出
-                if (token) {
-                    await fetch('/api/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                }
-            } catch (error) {
-                // 忽略错误，继续登出
-            }
-            
-            // 清除本地存储
-            localStorage.removeItem('token');
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('rememberMe');
-            sessionStorage.removeItem('token');
-            sessionStorage.removeItem('currentUser');
+            await Auth.logout();
             
             showToast('已退出登录');
             
@@ -946,7 +944,7 @@
         let adTimerInterval = null;
 
         async function loadVIPStatus() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = Auth.getToken();
             if (!token) return;
             try {
                 const resp = await fetch('/api/vip/status', {
@@ -1007,7 +1005,7 @@
         }
 
         function watchAdForVIP() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = Auth.getToken();
             if (!token) { window.location.href = '/login.html'; return; }
             
             const modal = document.getElementById('adModal');
@@ -1037,7 +1035,7 @@
             clearInterval(adTimerInterval);
             document.getElementById('adModal').classList.remove('show');
             
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = Auth.getToken();
             if (!token) return;
             
             try {
@@ -1094,7 +1092,7 @@
                     const base64Image = e.target.result;
                     
                     // 获取 token
-                    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                    const token = Auth.getToken();
                     if (!token) {
                         showToast('❌ 请先登录');
                         return;
@@ -1139,7 +1137,7 @@
 
         // 加载用户头像
         async function loadAvatar() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = Auth.getToken();
             if (!token) return;
             
             try {

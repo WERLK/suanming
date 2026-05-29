@@ -26,6 +26,7 @@ window.Auth = (function() {
         sessionStorage.removeItem('token');
         localStorage.removeItem('currentUser');
         sessionStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberMe');
     }
 
     async function request(url, options) {

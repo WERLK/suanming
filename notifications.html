@@ -68,6 +68,27 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(255,215,0,0.3);
         }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="has-desktop-sidebar">
@@ -161,11 +182,13 @@
 
 <script src="/js/main.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => loadSettings());
+document.addEventListener('DOMContentLoaded', function() {
+    if (!Auth.requireAuth()) return;
+    loadSettings();
+});
 
 async function loadSettings() {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) { window.location.href = '/login.html'; return; }
+    const token = Auth.getToken();
     
     try {
         const resp = await fetch('/api/notifications/settings', {
@@ -189,7 +212,7 @@ async function loadSettings() {
 
 async function saveSettings() {
     // 自动保存（每次切换开关时）
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = Auth.getToken();
     if (!token) return;
     
     const settings = {

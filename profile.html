@@ -1155,11 +1155,17 @@
                     clearInterval(adTimerInterval);
                     timer.textContent = '✓';
                     skipBtn.style.display = 'inline-block';
+                    skipBtn.textContent = '领取中...';
+                    skipBtn.disabled = true;
+                    // 广告观看完毕后延迟5秒自动领取
+                    setTimeout(() => {
+                        autoClaimReward();
+                    }, 5000);
                 }
             }, 1000);
         }
 
-        async function closeAdModal() {
+        async function autoClaimReward() {
             clearInterval(adTimerInterval);
             document.getElementById('adModal').classList.remove('show');
             
@@ -1184,9 +1190,14 @@
             }
         }
 
-        // 点击广告弹窗空白处关闭（广告未结束时不能关闭）
+        async function closeAdModal() {
+            clearInterval(adTimerInterval);
+            document.getElementById('adModal').classList.remove('show');
+        }
+
+        // 点击广告弹窗空白处关闭（不会取消自动领取，奖励已在后台发放）
         document.getElementById('adModal').addEventListener('click', function(e) {
-            if (e.target === this && document.getElementById('adSkipBtn').style.display !== 'none') {
+            if (e.target === this) {
                 closeAdModal();
             }
         });

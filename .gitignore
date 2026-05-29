@@ -48,3 +48,6 @@ PythonAnywhere_部署*报告.md
 
 # Keep these specific reports:
 !后端运行脚本配置完成报告.md
+
+# Data files (user accounts, NEVER commit)
+data/

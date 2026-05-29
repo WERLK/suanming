@@ -18,9 +18,26 @@ log "========== Deploy started =========="
 
 # [1/6] Pull latest code
 log "[1/6] Pulling code..."
+
+# Backup user data before git reset (prevent data loss)
+DATA_BACKUP="/tmp/suanming_data_backup"
+rm -rf "$DATA_BACKUP"
+if [ -d "$PROJECT_DIR/data" ]; then
+    cp -r "$PROJECT_DIR/data" "$DATA_BACKUP" 2>/dev/null
+    log "Data backed up to $DATA_BACKUP"
+fi
+
 cd "$PROJECT_DIR"
 git fetch origin main
 git reset --hard origin/main
+
+# Restore user data after git reset
+if [ -d "$DATA_BACKUP" ]; then
+    mkdir -p "$PROJECT_DIR/data"
+    cp -f "$DATA_BACKUP"/*.json "$PROJECT_DIR/data/" 2>/dev/null
+    log "Data restored from backup"
+fi
+
 log "Code updated to $(git rev-parse --short HEAD)"
 
 # [2/6] Init data files

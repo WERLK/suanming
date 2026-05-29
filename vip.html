@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="玄机算命">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="msapplication-TileImage" content="/icon-192.png">
+    <meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>会员中心 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/profile-compatible.css">
+    <style>
+        .vip-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .profile-section {
+            background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(22,33,62,0.9));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .section-title {
+            color: #ffd700;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        /* VIP卡片 */
+        .vip-card {
+            background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95));
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .vip-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            background: rgba(255,215,0,0.05);
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+        .vip-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .vip-badge.free { background: rgba(136,136,136,0.2); color: #888; }
+        .vip-badge.basic { background: rgba(76,175,80,0.2); color: #4caf50; }
+        .vip-badge.permanent { background: rgba(255,215,0,0.2); color: #ffd700; }
+        .vip-expire { color: rgba(255,255,255,0.5); font-size: 0.78rem; }
+        .vip-card-body { padding: 1rem 1.2rem; }
+        .vip-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+        }
+        .vip-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffc107);
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+        .vip-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .vip-info-row span {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            flex: 1;
+        }
+        .vip-ad-btn {
+            padding: 0.5rem 0.8rem;
+            background: linear-gradient(135deg, #ffd700, #ffc107);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 0.78rem;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        .vip-ad-btn:hover {
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+            transform: scale(1.02);
+        }
+        .vip-ad-btn:disabled {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+        /* 方案对比 */
+        .vip-plans {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 640px) {
+            .vip-plans { grid-template-columns: 1fr; gap: 0.8rem; }
+        }
+        .vip-plan-card {
+            background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(22,33,62,0.9));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+        }
+        .vip-plan-card.active {
+            border-color: rgba(255,215,0,0.4);
+            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
+        }
+        .vip-plan-card .plan-icon { font-size: 2rem; margin-bottom: 0.3rem; }
+        .vip-plan-card .plan-name { color: #ffd700; font-size: 0.9rem; font-weight: bold; margin-bottom: 0.3rem; }
+        .vip-plan-card .plan-price { color: #fff; font-size: 1.2rem; font-weight: bold; margin-bottom: 0.4rem; }
+        .vip-plan-card .plan-price small { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+        .vip-plan-card .plan-desc { color: rgba(255,255,255,0.5); font-size: 0.72rem; line-height: 1.5; }
+        .vip-plan-card .plan-badge {
+            display: inline-block;
+            margin-top: 0.4rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .plan-badge-f { background: rgba(136,136,136,0.15); color: #888; }
+        .plan-badge-b { background: rgba(76,175,80,0.15); color: #4caf50; }
+        .plan-badge-p { background: rgba(255,215,0,0.15); color: #ffd700; }
+        /* 权益 */
+        .vip-benefits {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 640px) {
+            .vip-benefits { grid-template-columns: 1fr; }
+        }
+        .vip-benefit-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,215,0,0.08);
+            border-radius: 10px;
+            padding: 0.8rem;
+            display: flex;
+            gap: 0.6rem;
+            align-items: flex-start;
+        }
+        .vip-benefit-item .b-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .vip-benefit-item .b-text h4 { color: #ffd700; font-size: 0.82rem; margin-bottom: 0.15rem; }
+        .vip-benefit-item .b-text p { color: rgba(255,255,255,0.5); font-size: 0.72rem; }
+
+        /* 广告观看弹窗 */
+        .ad-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .ad-modal.show { display: flex; }
+        .ad-modal-content { text-align: center; max-width: 320px; }
+        .ad-timer { font-size: 3rem; color: #ffd700; margin: 1rem 0; font-weight: bold; }
+        .ad-hint { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 1rem; }
+        .ad-skip-btn {
+            padding: 0.6rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* 签到与积分 */
+        .points-row { display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; }
+        .points-display { text-align:center; min-width:60px; }
+        .points-value { color:#ffd700; font-size:1.6rem; font-weight:bold; display:block; }
+        .points-label { color:rgba(255,255,255,0.5); font-size:0.7rem; }
+        .checkin-area { flex:1; display:flex; align-items:center; gap:0.5rem; }
+        .checkin-btn {
+            padding:0.6rem 1rem; border:none; border-radius:10px;
+            background:linear-gradient(135deg,#ffd700,#ffc107); color:#000;
+            font-size:0.85rem; font-weight:bold; cursor:pointer; white-space:nowrap;
+        }
+        .checkin-btn:disabled { opacity:0.4; cursor:not-allowed; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); }
+        .checkin-btn.checked { background:rgba(76,175,80,0.3); color:#4caf50; }
+        .streak-badge { color:rgba(255,255,255,0.5); font-size:0.78rem; white-space:nowrap; }
+        .streak-badge.fire { color:#ff6b35; }
+        .redeem-btn {
+            padding:0.6rem 0.9rem; border:1px solid rgba(255,215,0,0.3); border-radius:10px;
+            background:rgba(255,215,0,0.08); color:#ffd700; font-size:0.85rem; cursor:pointer; white-space:nowrap;
+        }
+        .redeem-btn:hover { background:rgba(255,215,0,0.15); }
+
+        /* 幸运转盘 */
+        .wheel-container { display:flex; flex-direction:column; align-items:center; gap:0.8rem; position:relative; }
+        .wheel-pointer { font-size:1.8rem; color:#ffd700; position:absolute; top:-8px; z-index:2; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+        #vipWheelCanvas { border-radius:50%; box-shadow:0 0 20px rgba(255,215,0,0.15); }
+        .wheel-spin-btn {
+            padding:0.7rem 1.5rem; border:none; border-radius:12px;
+            background:linear-gradient(135deg,#ff6b35,#ff4500); color:#fff;
+            font-size:0.9rem; font-weight:bold; cursor:pointer; transition:all 0.3s;
+        }
+        .wheel-spin-btn:hover { transform:scale(1.03); box-shadow:0 4px 16px rgba(255,107,53,0.3); }
+        .wheel-spin-btn:disabled { opacity:0.4; cursor:not-allowed; background:rgba(255,255,255,0.1); transform:none; box-shadow:none; }
+        .wheel-prizes { display:grid; grid-template-columns:repeat(4,1fr); gap:0.3rem; width:100%; max-width:320px; }
+        .wheel-prizes span { font-size:0.65rem; color:rgba(255,255,255,0.4); text-align:center; }
+
+        /* 积分兑换弹窗 */
+        .redeem-modal { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.85); z-index:1003; align-items:center; justify-content:center; }
+        .redeem-modal.show { display:flex; }
+        .redeem-content {
+            background:linear-gradient(135deg,#1a1a2e,#16213e); border:1px solid rgba(255,215,0,0.2);
+            border-radius:16px; padding:1.5rem; max-width:380px; width:90%;
+        }
+        .redeem-balance { text-align:center; color:rgba(255,255,255,0.7); margin-bottom:1rem; font-size:0.9rem; }
+        .redeem-balance strong { color:#ffd700; font-size:1.3rem; }
+        .redeem-options { display:flex; flex-direction:column; gap:0.5rem; }
+        .redeem-option {
+            display:flex; align-items:center; padding:0.7rem 1rem;
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,215,0,0.1);
+            border-radius:10px; cursor:pointer; transition:all 0.2s;
+        }
+        .redeem-option:hover { background:rgba(255,215,0,0.05); border-color:rgba(255,215,0,0.3); }
+        .ro-icon { font-size:1.3rem; margin-right:0.6rem; }
+        .ro-label { flex:1; color:#fff; font-size:0.85rem; }
+        .ro-cost { color:#ffd700; font-size:0.82rem; font-weight:bold; }
+        .btn-close-redeem {
+            width:100%; padding:0.7rem; margin-top:1rem; border:1px solid rgba(255,255,255,0.1);
+            border-radius:10px; background:transparent; color:rgba(255,255,255,0.5); cursor:pointer; font-size:0.85rem;
+        }
+    </style>
+    <style>
+        .back-btn {
+            background: none; border: none; color: #ffd700; font-size: 1.2rem;
+            cursor: pointer; padding: 0.5rem;
+        }
+        .page-header {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 { font-size: 1.2rem; color: #ffd700; font-weight: 600; }
+        .vip-hero {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: linear-gradient(180deg, rgba(255,215,0,0.08), transparent);
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+            margin-bottom: 1rem;
+        }
+        .vip-hero h2 { color: #ffd700; font-size: 1.3rem; }
+        .vip-hero p { color: rgba(255,255,255,0.5); font-size: 0.82rem; margin-top: 0.3rem; }
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000;
+            background: rgba(0,0,0,0.9); color: #fff; padding: 0.8rem 1.5rem;
+            border-radius: 10px; font-size: 0.9rem; pointer-events: none;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body class="has-desktop-sidebar">
+
+<!-- 桌面端侧边栏 -->
+<aside class="desktop-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔮</div>
+        <div>
+            <span class="logo-text">玄机算命网</span>
+            <span class="logo-sub">传承千年智慧</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">主导航</div>
+            <a href="/" class="sidebar-nav-item">
+                <span class="nav-icon">🏠</span> 首页
+            </a>
+            <a href="/more.html" class="sidebar-nav-item">
+                <span class="nav-icon">🔮</span> 更多模块
+            </a>
+            <a href="/vip.html" class="sidebar-nav-item active">
+                <span class="nav-icon">👑</span> 会员中心
+            </a>
+            <a href="/profile.html" class="sidebar-nav-item">
+                <span class="nav-icon">👤</span> 个人中心
+            </a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="user-avatar">👤</div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">加载中...</div>
+                <div class="user-status">已登录</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/'">←</button>
+    <h1>会员中心</h1>
+</div>
+
+<div class="content-area">
+    <div class="stars" id="stars"></div>
+    <div class="toast" id="toast"></div>
+    <div class="app">
+        <div class="vip-container">
+
+            <!-- 会员Hero区 -->
+            <div class="vip-hero">
+                <div class="vip-badge free" id="vipHeroBadge" style="font-size:1rem;padding:0.4rem 1.2rem;">👑 会员中心</div>
+                <h2 id="vipHeroTitle">解锁更多免费功能</h2>
+                <p id="vipHeroSub">签到、转转盘、看广告都能免费获取会员</p>
+            </div>
+
+            <!-- 会员卡片 -->
+            <div class="vip-card" id="vipCard">
+                <div class="vip-card-header">
+                    <span class="vip-badge" id="vipBadge">免费用户</span>
+                    <span class="vip-expire" id="vipExpire"></span>
+                </div>
+                <div class="vip-card-body">
+                    <div class="vip-progress">
+                        <div class="vip-progress-bar" id="vipProgressBar" style="width:0%"></div>
+                    </div>
+                    <div class="vip-info-row">
+                        <span id="vipRemaining">未开通会员</span>
+                        <button class="vip-ad-btn" id="vipAdBtn" onclick="watchAdForVIP()">
+                            📺 看广告赚时长（<span id="adRemain">0</span>次）
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 会员方案对比 -->
+            <div class="profile-section">
+                <h3 class="section-title">💎 会员方案</h3>
+                <div class="vip-plans" id="vipPlans">
+                    <div class="vip-plan-card" id="planFree">
+                        <div class="plan-icon">🆓</div>
+                        <div class="plan-name">免费用户</div>
+                        <div class="plan-price">¥0<small>/永久</small></div>
+                        <div class="plan-desc">基础算命<br>每日3次免费</div>
+                        <span class="plan-badge plan-badge-f">当前</span>
+                    </div>
+                    <div class="vip-plan-card" id="planBasic">
+                        <div class="plan-icon">⭐</div>
+                        <div class="plan-name">基础会员</div>
+                        <div class="plan-price">看广告<small>/免费获取</small></div>
+                        <div class="plan-desc">每日10次算命<br>详细命理报告</div>
+                        <span class="plan-badge plan-badge-b">可升级</span>
+                    </div>
+                    <div class="vip-plan-card" id="planPermanent">
+                        <div class="plan-icon">👑</div>
+                        <div class="plan-name">永久会员</div>
+                        <div class="plan-price">看广告<small>/免费获取</small></div>
+                        <div class="plan-desc" id="permanentPlanDesc">累计看20次广告<br>永久解锁全部功能</div>
+                        <span class="plan-badge plan-badge-p" id="permanentPlanBadge">看广告解锁</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 积分与签到 -->
+            <div class="profile-section">
+                <h3 class="section-title">🎯 积分与签到</h3>
+                <div class="points-row">
+                    <div class="points-display">
+                        <span class="points-value" id="pointsValue">0</span>
+                        <span class="points-label">积分</span>
+                    </div>
+                    <div class="checkin-area">
+                        <button class="checkin-btn" id="checkinBtn" onclick="doCheckin()">
+                            ✅ 每日签到
+                        </button>
+                        <span class="streak-badge" id="streakBadge">连续0天</span>
+                    </div>
+                    <button class="redeem-btn" id="redeemBtn" onclick="openRedeem()">
+                        🛒 积分兑换
+                    </button>
+                </div>
+            </div>
+
+            <!-- 幸运转盘 -->
+            <div class="profile-section">
+                <h3 class="section-title">🎰 幸运转盘 <span style="font-size:0.7rem;color:rgba(255,255,255,0.4);">(每日5次)</span></h3>
+                <div class="wheel-container">
+                    <canvas id="vipWheelCanvas" width="260" height="260"></canvas>
+                    <div class="wheel-pointer">▼</div>
+                    <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">
+                        🎰 免费转转盘（剩<span id="wheelRemain">5</span>次）
+                    </button>
+                    <div class="wheel-prizes">
+                        <span>🎁 1hVIP</span><span>⏰ 2hVIP</span><span>⭐ 5分</span><span>💎 10分</span>
+                        <span>📺 1次广告</span><span>📺 3次广告</span><span>🏆 24hVIP</span><span>👑 50分</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 会员权益 -->
+            <div class="profile-section">
+                <h3 class="section-title">🎁 会员权益</h3>
+                <div class="vip-benefits">
+                    <div class="vip-benefit-item">
+                        <div class="b-icon">📊</div>
+                        <div class="b-text"><h4>详细命理报告</h4><p>八字分析、运势预测、五行解读</p></div>
+                    </div>
+                    <div class="vip-benefit-item">
+                        <div class="b-icon">🤖</div>
+                        <div class="b-text"><h4>AI深度分析</h4><p>智能算法解读命盘，个性化建议</p></div>
+                    </div>
+                    <div class="vip-benefit-item">
+                        <div class="b-icon">📈</div>
+                        <div class="b-text"><h4>运势趋势图</h4><p>可视化运势变化，一目了然</p></div>
+                    </div>
+                    <div class="vip-benefit-item">
+                        <div class="b-icon">🔓</div>
+                        <div class="b-text"><h4>无限算命次数</h4><p>永久会员每日10次，告别限制</p></div>
+                    </div>
+                    <div class="vip-benefit-item">
+                        <div class="b-icon">🎁</div>
+                        <div class="b-text"><h4>专属签到奖励</h4><p>每日签到赚积分，兑换VIP时长</p></div>
+                    </div>
+                    <div class="vip-benefit-item">
+                        <div class="b-icon">🎰</div>
+                        <div class="b-text"><h4>幸运转盘</h4><p>每天5次免费抽奖，100%中奖</p></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 广告观看弹窗 -->
+<div class="ad-modal" id="adModal">
+    <div class="ad-modal-content">
+        <div style="color:#fff;font-size:1.1rem;margin-bottom:0.5rem;">📺 正在观看广告...</div>
+        <div class="ad-timer" id="adTimer">15</div>
+        <div class="ad-hint">秒后自动完成，感谢支持！</div>
+        <button class="ad-skip-btn" onclick="completeAdWatch()">完成观看 →</button>
+    </div>
+</div>
+
+<!-- 积分兑换弹窗 -->
+<div class="redeem-modal" id="redeemModal" onclick="if(event.target===this)closeRedeem()">
+    <div class="redeem-content">
+        <h3 style="color:#ffd700;text-align:center;margin-bottom:0.8rem;">🛒 积分兑换</h3>
+        <div class="redeem-balance">当前积分：<strong id="redeemPoints">0</strong></div>
+        <div class="redeem-options">
+            <div class="redeem-option" onclick="doRedeem('ad1')">
+                <span class="ro-icon">📺</span>
+                <span class="ro-label">1次广告计次</span>
+                <span class="ro-cost">20积分</span>
+            </div>
+            <div class="redeem-option" onclick="doRedeem('vip3')">
+                <span class="ro-icon">⏰</span>
+                <span class="ro-label">3小时VIP会员</span>
+                <span class="ro-cost">50积分</span>
+            </div>
+            <div class="redeem-option" onclick="doRedeem('vip24')">
+                <span class="ro-icon">🌟</span>
+                <span class="ro-label">24小时VIP会员</span>
+                <span class="ro-cost">200积分</span>
+            </div>
+            <div class="redeem-option" onclick="doRedeem('permanent')">
+                <span class="ro-icon">👑</span>
+                <span class="ro-label">永久会员</span>
+                <span class="ro-cost">500积分</span>
+            </div>
+        </div>
+        <button class="btn-close-redeem" onclick="closeRedeem()">关闭</button>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+// 创建星空背景
+document.addEventListener('DOMContentLoaded', function() {
+    if (!Auth.requireAuth()) return;
+    createStars();
+    loadVIPStatus();
+    drawWheel();
+});
+
+// Toast
+function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+// ========== 加载用户信息 ==========
+async function loadUserInfo() {
+    try {
+        var token = Auth.getToken();
+        if (!token) return;
+        var resp = await fetch('/api/profile', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!resp.ok) return;
+        var data = await resp.json();
+        if (!data.success) return;
+        var user = data.user;
+        var displayName = user.nickname || user.username || '用户';
+        var sidebarName = document.getElementById('sidebarUserName');
+        if (sidebarName) sidebarName.textContent = displayName;
+    } catch(e) {}
+}
+
+// ========== 会员VIP系统 ==========
+var adTimerInterval = null;
+
+async function loadVIPStatus() {
+    var token = Auth.getToken();
+    if (!token) return;
+    try {
+        var resp = await fetch('/api/vip/status', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        var data = await resp.json();
+        if (!data.success) {
+            console.warn('VIP status API returned failure:', data.message);
+            return;
+        }
+
+        var card = document.getElementById('vipCard');
+        if (!card) return;
+        card.style.display = 'block';
+
+        // 会员等级徽章
+        var badge = document.getElementById('vipBadge');
+        badge.textContent = data.vip_level_name;
+        badge.className = 'vip-badge ' + data.vip_level;
+
+        // Hero区更新
+        var heroBadge = document.getElementById('vipHeroBadge');
+        var heroTitle = document.getElementById('vipHeroTitle');
+        var heroSub = document.getElementById('vipHeroSub');
+        if (data.vip_level === 'permanent') {
+            heroBadge.textContent = '👑 永久会员';
+            heroBadge.className = 'vip-badge permanent';
+            heroTitle.textContent = '恭喜！您已是永久会员';
+            heroSub.textContent = '所有功能永久免费使用';
+        } else if (data.vip_level === 'basic') {
+            heroBadge.textContent = '⭐ 基础会员';
+            heroBadge.className = 'vip-badge basic';
+            heroTitle.textContent = '继续看广告升级永久会员';
+            heroSub.textContent = '签到、转转盘、积分兑换都能获取会员';
+        } else {
+            heroBadge.textContent = '🆓 免费用户';
+            heroBadge.className = 'vip-badge free';
+            heroTitle.textContent = '解锁更多免费功能';
+            heroSub.textContent = '签到、转转盘、看广告都能免费获取会员';
+        }
+
+        // 到期时间
+        var expireEl = document.getElementById('vipExpire');
+        if (data.vip_level === 'permanent') {
+            expireEl.textContent = '永久有效';
+        } else if (data.vip_expire) {
+            var d = new Date(data.vip_expire);
+            expireEl.textContent = '到期: ' + d.toLocaleDateString('zh-CN');
+        } else {
+            expireEl.textContent = '';
+        }
+
+        // 剩余时长 / 永久进度
+        var remainEl = document.getElementById('vipRemaining');
+        var progressBar = document.getElementById('vipProgressBar');
+        var totalAdCount = data.total_ad_count || 0;
+        var threshold = data.permanent_threshold || 20;
+
+        if (data.vip_level === 'permanent') {
+            remainEl.textContent = '🎉 已解锁永久会员';
+            progressBar.style.width = '100%';
+        } else if (data.vip_remaining) {
+            remainEl.textContent = '剩余: ' + data.vip_remaining + ' | 累计看广告 ' + totalAdCount + '/' + threshold + ' 次';
+            var expireDate = new Date(data.vip_expire);
+            var now = new Date();
+            var total = expireDate - now;
+            var max = 7 * 24 * 3600 * 1000;
+            var pct = Math.min(100, Math.max(0, (total / max) * 100));
+            progressBar.style.width = pct + '%';
+        } else {
+            var permPct = Math.min(100, Math.round((totalAdCount / threshold) * 100));
+            remainEl.textContent = '累计看广告 ' + totalAdCount + '/' + threshold + ' 次（满' + threshold + '次解锁永久会员）';
+            progressBar.style.width = permPct + '%';
+        }
+
+        // 广告按钮
+        var adBtn = document.getElementById('vipAdBtn');
+        var adCount = document.getElementById('adRemain');
+        var adRemaining = data.max_daily_ads - data.today_ads;
+
+        if (adRemaining <= 0) {
+            adBtn.disabled = true;
+            adBtn.innerHTML = '📺 今日次数已用完';
+        } else {
+            adBtn.disabled = false;
+            adCount.textContent = '剩' + adRemaining;
+        }
+
+        // 更新永久会员方案卡片
+        var pp = document.getElementById('planPermanent');
+        if (pp) {
+            var ppDesc = document.getElementById('permanentPlanDesc');
+            var ppBadge = document.getElementById('permanentPlanBadge');
+            if (data.vip_level === 'permanent') {
+                if (ppDesc) ppDesc.textContent = '已永久解锁全部功能';
+                if (ppBadge) { ppBadge.textContent = '已解锁'; ppBadge.className = 'plan-badge plan-badge-p'; }
+            } else {
+                if (ppDesc) ppDesc.textContent = '累计看' + threshold + '次广告\n永久解锁全部功能';
+                if (ppBadge) { ppBadge.textContent = totalAdCount + '/' + threshold; ppBadge.className = 'plan-badge plan-badge-p'; }
+            }
+        }
+
+        // 高亮当前方案卡片
+        document.querySelectorAll('.vip-plan-card').forEach(function(c) { c.classList.remove('active'); });
+        var allBadges = document.querySelectorAll('.vip-plan-card .plan-badge');
+        allBadges.forEach(function(b) {
+            if (b.id !== 'permanentPlanBadge') b.textContent = '';
+        });
+
+        if (data.vip_level === 'free') {
+            var pf = document.getElementById('planFree');
+            if (pf) { pf.classList.add('active'); pf.querySelector('.plan-badge').textContent = '当前'; }
+            var pb = document.getElementById('planBasic');
+            if (pb) pb.querySelector('.plan-badge').textContent = '可升级';
+        } else if (data.vip_level === 'basic') {
+            var pb = document.getElementById('planBasic');
+            if (pb) { pb.classList.add('active'); pb.querySelector('.plan-badge').textContent = '当前'; }
+            var pf = document.getElementById('planFree');
+            if (pf) pf.querySelector('.plan-badge').textContent = '';
+        } else if (data.vip_level === 'permanent') {
+            var pp2 = document.getElementById('planPermanent');
+            if (pp2) { pp2.classList.add('active'); }
+            var pf2 = document.getElementById('planFree');
+            if (pf2) pf2.querySelector('.plan-badge').textContent = '';
+            var pb2 = document.getElementById('planBasic');
+            if (pb2) pb2.querySelector('.plan-badge').textContent = '';
+        }
+
+        // 更新积分与签到状态
+        document.getElementById('pointsValue').textContent = data.points || 0;
+        var checkinBtn = document.getElementById('checkinBtn');
+        var streakBadge = document.getElementById('streakBadge');
+        if (data.today_checked_in) {
+            checkinBtn.classList.add('checked');
+            checkinBtn.textContent = '✅ 已签到';
+            checkinBtn.disabled = true;
+        } else {
+            checkinBtn.classList.remove('checked');
+            checkinBtn.textContent = '✅ 每日签到';
+            checkinBtn.disabled = false;
+        }
+        var streak = data.checkin_streak || 0;
+        streakBadge.textContent = '连续' + streak + '天';
+        if (streak >= 7) streakBadge.classList.add('fire');
+        else streakBadge.classList.remove('fire');
+
+        // 更新转盘状态
+        var wheelRemain = document.getElementById('wheelRemain');
+        var wheelBtn = document.getElementById('wheelSpinBtn');
+        var wheelRemaining = data.wheel_spins_remaining || 0;
+        wheelRemain.textContent = wheelRemaining;
+        if (wheelRemaining <= 0) {
+            wheelBtn.disabled = true;
+            wheelBtn.innerHTML = '🎰 今日次数已用完';
+        } else {
+            wheelBtn.disabled = false;
+            wheelBtn.innerHTML = '🎰 免费转转盘（剩<span id="wheelRemain">' + wheelRemaining + '</span>次）';
+        }
+
+        // 更新兑换积分
+        document.getElementById('redeemPoints').textContent = data.points || 0;
+    } catch (e) {
+        console.error('加载会员状态失败:', e);
+        var card = document.getElementById('vipCard');
+        if (card) card.style.display = 'block';
+        var remainEl = document.getElementById('vipRemaining');
+        if (remainEl) remainEl.textContent = '⚠️ 会员信息加载失败，请刷新重试';
+    }
+}
+
+// ========== 看广告 ==========
+function watchAdForVIP() {
+    var adModal = document.getElementById('adModal');
+    adModal.classList.add('show');
+    var timerEl = document.getElementById('adTimer');
+    var seconds = 15;
+    timerEl.textContent = seconds;
+
+    if (adTimerInterval) clearInterval(adTimerInterval);
+    adTimerInterval = setInterval(function() {
+        seconds--;
+        timerEl.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(adTimerInterval);
+            adTimerInterval = null;
+            completeAdWatch();
+        }
+    }, 1000);
+}
+
+async function completeAdWatch() {
+    var adModal = document.getElementById('adModal');
+    adModal.classList.remove('show');
+    if (adTimerInterval) { clearInterval(adTimerInterval); adTimerInterval = null; }
+
+    var token = Auth.getToken();
+    if (!token) { showToast('请先登录'); return; }
+
+    try {
+        var resp = await fetch('/api/vip/watch-ad', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        var data = await resp.json();
+        if (data.success) {
+            showToast(data.message);
+            loadVIPStatus();
+        } else {
+            showToast('⚠️ ' + data.message);
+        }
+    } catch (e) {
+        showToast('网络错误，请重试');
+    }
+}
+
+// ========== 签到 ==========
+async function doCheckin() {
+    var token = Auth.getToken();
+    if (!token) { showToast('请先登录'); return; }
+    var btn = document.getElementById('checkinBtn');
+    btn.disabled = true;
+    try {
+        var resp = await fetch('/api/vip/checkin', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        var data = await resp.json();
+        if (data.success) {
+            showToast(data.message);
+            loadVIPStatus();
+        } else {
+            showToast('⚠️ ' + data.message);
+            loadVIPStatus();
+        }
+    } catch (e) {
+        showToast('网络错误，请重试');
+        btn.disabled = false;
+    }
+}
+
+// ========== 积分兑换 ==========
+function openRedeem() {
+    document.getElementById('redeemModal').classList.add('show');
+}
+function closeRedeem() {
+    document.getElementById('redeemModal').classList.remove('show');
+}
+async function doRedeem(type) {
+    var token = Auth.getToken();
+    if (!token) { showToast('请先登录'); return; }
+    try {
+        var resp = await fetch('/api/vip/redeem', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ type: type })
+        });
+        var data = await resp.json();
+        if (data.success) {
+            showToast(data.message);
+            closeRedeem();
+            loadVIPStatus();
+        } else {
+            showToast('⚠️ ' + data.message);
+        }
+    } catch (e) {
+        showToast('网络错误，请重试');
+    }
+}
+
+// ========== 幸运转盘 ==========
+var wheelSpinning = false;
+var wheelColors = ['#ff6b35','#ff9f43','#ffd700','#feca57','#54a0ff','#5f27cd','#00d2d3','#1dd1a1'];
+var wheelPrizes = ['1hVIP','2hVIP','5分','10分','1次广告','3次广告','24hVIP','50分'];
+
+function drawWheel() {
+    var canvas = document.getElementById('vipWheelCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var cx = canvas.width / 2, cy = canvas.height / 2, r = 120;
+    var segAngle = (2 * Math.PI) / 8;
+
+    for (var i = 0; i < 8; i++) {
+        var startAngle = i * segAngle;
+        var endAngle = startAngle + segAngle;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, startAngle, endAngle);
+        ctx.fillStyle = wheelColors[i];
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Prize text
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(startAngle + segAngle / 2);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(wheelPrizes[i], r * 0.6, 4);
+        ctx.restore();
+    }
+
+    // Center circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, 22, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,215,0,0.5)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+async function spinWheel() {
+    if (wheelSpinning) return;
+    wheelSpinning = true;
+    var btn = document.getElementById('wheelSpinBtn');
+    btn.disabled = true;
+
+    // Random target segment (0-7)
+    var targetSegment = Math.floor(Math.random() * 8);
+    // Spin: 5 full rotations + target segment
+    var totalRotation = (5 * 360) + (targetSegment * 45) + Math.random() * 30;
+    var currentRotation = 0;
+    var spinDuration = 3000; // 3 seconds
+
+    var canvas = document.getElementById('vipWheelCanvas');
+    var startTime = Date.now();
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function animateSpin() {
+        var elapsed = Date.now() - startTime;
+        var progress = Math.min(1, elapsed / spinDuration);
+        var easedProgress = easeOutCubic(progress);
+        currentRotation = totalRotation * easedProgress;
+
+        canvas.style.transform = 'rotate(' + currentRotation + 'deg)';
+
+        if (progress < 1) {
+            requestAnimationFrame(animateSpin);
+        } else {
+            // Spin complete
+            wheelSpinning = false;
+            // Call API to claim prize
+            claimWheelPrize();
+        }
+    }
+    requestAnimationFrame(animateSpin);
+}
+
+async function claimWheelPrize() {
+    var token = Auth.getToken();
+    if (!token) { wheelSpinning = false; return; }
+    try {
+        var resp = await fetch('/api/vip/wheel', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + token }
+        });
+        var data = await resp.json();
+        if (data.success) {
+            showToast(data.message);
+            if (data.unlocked_permanent) {
+                setTimeout(function() { loadVIPStatus(); }, 1500);
+            } else {
+                loadVIPStatus();
+            }
+        } else {
+            showToast('⚠️ ' + data.message);
+            loadVIPStatus();
+        }
+    } catch (e) {
+        showToast('网络错误，请重试');
+        loadVIPStatus();
+    }
+}
+
+// 初始化用户信息
+loadUserInfo();
+</script>
+<script src="/js/footer.js"></script>
+</body>
+</html>

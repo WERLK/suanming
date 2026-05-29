@@ -1429,17 +1429,17 @@
                 // 广告按钮
                 const adBtn = document.getElementById('vipAdBtn');
                 const adCount = document.getElementById('adRemain');
-                const remaining = data.max_daily_ads - data.today_ads;
+                const adRemaining = data.max_daily_ads - data.today_ads;
                 
                 if (data.vip_level === 'permanent') {
                     adBtn.disabled = false;
-                    adBtn.innerHTML = '📺 看广告（剩' + remaining + '次）';
-                } else if (remaining <= 0) {
+                    adBtn.innerHTML = '📺 看广告（剩' + adRemaining + '次）';
+                } else if (adRemaining <= 0) {
                     adBtn.disabled = true;
                     adBtn.innerHTML = '📺 今日次数已用完';
                 } else {
                     adBtn.disabled = false;
-                    adCount.textContent = '剩' + remaining;
+                    adCount.textContent = '剩' + adRemaining;
                 }
 
                 // 更新永久会员方案卡片

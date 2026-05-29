@@ -26,6 +26,17 @@
         .auth-links { text-align:center; margin-top:1rem; font-size:0.9rem; }
         .auth-links a { color:#ffd700; text-decoration:none; }
         .strength-bar { height:4px; border-radius:2px; margin-top:0.3rem; transition:width 0.3s,background 0.3s; }
+        .site-footer {
+            text-align: center; padding: 1.5rem 1rem 1rem;
+            margin-top: 2rem; border-top: 1px solid rgba(255,215,0,0.08);
+        }
+        .footer-version {
+            color: rgba(255,255,255,0.3); font-size: 0.7rem; margin-bottom: 0.3rem;
+        }
+        .footer-beian { font-size: 0.7rem; }
+        .footer-beian a { color: rgba(255,255,255,0.25); text-decoration: none; }
+        .footer-beian a:hover { color: rgba(255,215,0,0.6); }
+        .footer-sep { color: rgba(255,255,255,0.15); margin: 0 0.5rem; }
     </style>
 </head>
 <body>
@@ -147,6 +158,14 @@
     });
 })();
 </script>
+<div class="site-footer">
+    <div class="footer-version">v1.0.0 · commit e251c16</div>
+    <div class="footer-beian">
+        <span id="icpBeian"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">ICP备案号</a></span>
+        <span class="footer-sep">|</span>
+        <span id="gaBeian"><a href="https://www.beian.gov.cn/" target="_blank" rel="noopener">公安联网备案</a></span>
+    </div>
+</div>
 </div>
 </body>
 </html>

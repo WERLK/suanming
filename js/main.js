@@ -182,6 +182,16 @@ function initSearch() {
     document.head.appendChild(s);
 })();
 
+// ===== 动态背景加载（modules页面无footer.js时自动加载） =====
+(function() {
+    if (document.getElementById('__bgCanvas')) return;
+    if (document.querySelector('script[src*="bg.js"]')) return;
+    var s = document.createElement('script');
+    s.src = '/js/bg.js?v=1.4.3';
+    s.async = true;
+    document.head.appendChild(s);
+})();
+
 // ===== 初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     initSearch();

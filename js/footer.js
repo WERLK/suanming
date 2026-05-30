@@ -62,9 +62,20 @@
         document.head.appendChild(s);
     }
 
+    // 加载动态背景模块（如果尚未加载）
+    function loadBgModule() {
+        if (document.getElementById('__bgCanvas')) return;
+        if (document.querySelector('script[src*="bg.js"]')) return;
+        var s = document.createElement('script');
+        s.src = '/js/bg.js?v=' + encodeURIComponent(FALLBACK_VERSION);
+        s.async = true;
+        document.head.appendChild(s);
+    }
+
     // 页面加载时从 version.json 获取最新版本号并注入
     document.addEventListener('DOMContentLoaded', function() {
         loadAdModule();
+        loadBgModule();
         fetch('/version.json?_=' + Date.now())
             .then(function(resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);

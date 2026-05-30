@@ -39,8 +39,19 @@
         container.appendChild(div.firstElementChild);
     }
 
+    // 加载广告模块（如果尚未加载）
+    function loadAdModule() {
+        if (window.BaiduAd) return;
+        if (document.querySelector('script[src*="ads.js"]')) return;
+        var s = document.createElement('script');
+        s.src = '/js/ads.js?v=' + encodeURIComponent(FALLBACK_VERSION);
+        s.async = true;
+        document.head.appendChild(s);
+    }
+
     // 页面加载时从 version.json 获取最新版本号并注入
     document.addEventListener('DOMContentLoaded', function() {
+        loadAdModule();
         fetch('/version.json?_=' + Date.now())
             .then(function(resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);

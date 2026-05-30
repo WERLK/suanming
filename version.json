@@ -1,8 +1,8 @@
 {
-  "version": "1.2.2",
-  "build_time": "2026-05-30T18:55:00Z",
-  "git_commit": "3868f0e",
+  "version": "1.3.0",
+  "build_time": "2026-05-30T19:45:00Z",
+  "git_commit": "3496e57",
   "author": "玄机算命网",
-  "description": "每日登录VIP时长改为随机1-6小时",
-  "fix_count": 2
+  "description": "重构广告系统：底部小横幅广告栏（不弹窗不遮挡）+ 全站注入 + 百度联盟对接预留",
+  "fix_count": 3
 }

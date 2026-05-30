@@ -162,6 +162,16 @@ function initSearch() {
     }
 })();
 
+// ===== 广告模块加载（modules页面无footer.js时自动加载） =====
+(function() {
+    if (window.BaiduAd) return;
+    if (document.querySelector('script[src*="ads.js"]')) return;
+    var s = document.createElement('script');
+    s.src = '/js/ads.js?v=1.3.0';
+    s.async = true;
+    document.head.appendChild(s);
+})();
+
 // ===== 初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     initSearch();

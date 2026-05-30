@@ -1,8 +1,8 @@
 {
-  "version": "1.1.1",
-  "build_time": "2026-05-30T16:20:00Z",
-  "git_commit": "afbbe65",
+  "version": "1.1.2",
+  "build_time": "2026-05-30T16:28:00Z",
+  "git_commit": "TBD",
   "author": "玄机算命网",
-  "description": "修复广告观看后会员信息加载失败",
-  "fix_count": 1
+  "description": "修复手机版个人中心广告无法观看（BaiduAd未定义容错+DOM空值保护）",
+  "fix_count": 2
 }

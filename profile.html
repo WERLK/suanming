@@ -1541,7 +1541,8 @@
                 }
 
                 // 更新积分与签到状态
-                document.getElementById('pointsValue').textContent = data.points || 0;
+                var pointsVal2 = document.getElementById('pointsValue');
+                if (pointsVal2) pointsVal2.textContent = data.points || 0;
                 const checkinBtn = document.getElementById('checkinBtn');
                 const streakBadge = document.getElementById('streakBadge');
                 if (data.today_checked_in) {
@@ -1554,16 +1555,18 @@
                     checkinBtn.disabled = false;
                 }
                 const streak = data.checkin_streak || 0;
-                streakBadge.textContent = '连续' + streak + '天';
-                if (streak >= 7) streakBadge.classList.add('fire');
-                else streakBadge.classList.remove('fire');
+                if (streakBadge) {
+                    streakBadge.textContent = '连续' + streak + '天';
+                    if (streak >= 7) streakBadge.classList.add('fire');
+                    else streakBadge.classList.remove('fire');
+                }
 
                 // 更新转盘状态
                 const wheelRemain = document.getElementById('wheelRemain');
                 const wheelBtn = document.getElementById('wheelSpinBtn');
                 const remaining = data.wheel_spins_remaining || 0;
-                wheelRemain.textContent = remaining;
-                if (remaining <= 0) {
+                if (wheelRemain) wheelRemain.textContent = remaining;
+                if (wheelBtn) {
                     wheelBtn.disabled = true;
                     wheelBtn.innerHTML = '🎰 今日次数已用完';
                 } else {
@@ -1588,10 +1591,12 @@
         function watchAdForVIP() {
             try {
                 const token = Auth.getToken();
-            if (!token) { window.location.href = '/login.html'; return; }
+                if (!token) { window.location.href = '/login.html'; return; }
 
-            adRewardSeconds = BaiduAd.getRewardSeconds();
-            adSecondsWatched = 0;
+                // 安全获取 BaiduAd，防止脚本未加载时崩溃
+                var _baidu = (typeof BaiduAd !== 'undefined') ? BaiduAd : null;
+                adRewardSeconds = (_baidu && _baidu.getRewardSeconds) ? _baidu.getRewardSeconds() : 5;
+                adSecondsWatched = 0;
 
             const modal = document.getElementById('adModal');
             const timer = document.getElementById('adTimer');
@@ -1609,8 +1614,8 @@
             modal.classList.add('show');
 
             // 尝试加载真广告，否则用 fallback
-            if (BaiduAd.isReady()) {
-                BaiduAd.show('adContainer', function() {
+            if (_baidu && _baidu.isReady && _baidu.isReady()) {
+                _baidu.show('adContainer', function() {
                     startAdCountdown();
                 });
             } else {
@@ -1655,7 +1660,7 @@
 
             clearInterval(adTimerInterval);
             document.getElementById('adModal').classList.remove('show');
-            BaiduAd.destroy('adContainer');
+            if (typeof BaiduAd !== 'undefined' && BaiduAd.destroy) BaiduAd.destroy('adContainer');
 
             const token = Auth.getToken();
             if (!token) return;
@@ -1687,10 +1692,10 @@
         function closeAdModal() {
             clearInterval(adTimerInterval);
             document.getElementById('adModal').classList.remove('show');
-            BaiduAd.destroy('adContainer');
+            if (typeof BaiduAd !== 'undefined' && BaiduAd.destroy) BaiduAd.destroy('adContainer');
         }
 
-        // 点击广告弹窗空白处关闭（不会取消自动领取，奖励已在后台发放）
+        // 点击广告弹窗空白处关闭
         document.getElementById('adModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeAdModal();

@@ -120,6 +120,48 @@ function initSearch() {
     });
 }
 
+// ===== 全站版本号注入（modules页面无footer.js时自动显示） =====
+(function() {
+    var FALLBACK_VERSION = 'v1.0.0';
+    var FALLBACK_COMMIT = 'unknown';
+
+    function injectVersionFooter(version, commit) {
+        // 如果 footer.js 已注入 site-footer 则跳过，避免重复
+        if (document.querySelector('.site-footer')) return;
+        var container = document.body;
+        if (!container) return;
+        var html = '<div class="site-footer" style="text-align:center;padding:1.5rem 1rem 3rem;margin-top:2rem;border-top:1px solid rgba(255,215,0,0.08);">' +
+            '<div style="color:rgba(255,255,255,0.25);font-size:0.7rem;">' + version + ' · commit ' + commit + '</div>' +
+            '</div>';
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        container.appendChild(div.firstElementChild);
+    }
+
+    function tryInject() {
+        fetch('/version.json?_=' + Date.now())
+            .then(function(resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function(data) {
+                var version = data.version ? 'v' + data.version : FALLBACK_VERSION;
+                var commit = data.git_commit || FALLBACK_COMMIT;
+                injectVersionFooter(version, commit);
+            })
+            .catch(function() {
+                injectVersionFooter(FALLBACK_VERSION, FALLBACK_COMMIT);
+            });
+    }
+
+    // 等 DOM 就绪后再注入
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryInject);
+    } else {
+        tryInject();
+    }
+})();
+
 // ===== 初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     initSearch();

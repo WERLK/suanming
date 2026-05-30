@@ -199,13 +199,30 @@ function showFortuneError(containerId, message, onRetry, onFallback) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
+    let retryHtml = '';
+    let fallbackHtml = '';
+    
+    if (onRetry) {
+        const retryId = 'retry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        window._fortuneRetryCallbacks = window._fortuneRetryCallbacks || {};
+        window._fortuneRetryCallbacks[retryId] = onRetry;
+        retryHtml = `<button class="fortune-btn fortune-btn-retry" onclick="(window._fortuneRetryCallbacks['${retryId}'] || function(){})();">🔄 重新获取</button>`;
+    }
+    
+    if (onFallback) {
+        const fallbackId = 'fallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        window._fortuneRetryCallbacks = window._fortuneRetryCallbacks || {};
+        window._fortuneRetryCallbacks[fallbackId] = onFallback;
+        fallbackHtml = `<button class="fortune-btn fortune-btn-fallback" onclick="(window._fortuneRetryCallbacks['${fallbackId}'] || function(){})();">📡 使用本地计算</button>`;
+    }
+    
     container.innerHTML = `
         <div class="fortune-error-state">
             <div class="fortune-error-icon">⚠️</div>
             <p class="fortune-error-message">${message || '数据获取失败'}</p>
             <div class="fortune-error-actions">
-                ${onRetry ? '<button class="fortune-btn fortune-btn-retry" onclick="(' + onRetry.toString() + ')()">🔄 重新获取</button>' : ''}
-                ${onFallback ? '<button class="fortune-btn fortune-btn-fallback" onclick="(' + onFallback.toString() + ')()">📡 使用本地计算</button>' : ''}
+                ${retryHtml}
+                ${fallbackHtml}
             </div>
         </div>
     `;

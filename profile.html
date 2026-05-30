@@ -775,7 +775,7 @@
                     </div>
                     <div class="vip-info-row">
                         <span id="vipRemaining">未开通会员</span>
-                        <button class="vip-ad-btn" id="vipAdBtn" onclick="watchAdForVIP()">
+                        <button class="vip-ad-btn" id="vipAdBtn">
                             📺 看广告赚时长（<span id="adRemain">0</span>次）
                         </button>
                     </div>
@@ -1511,15 +1511,24 @@
                 var maxAds = data.max_daily_ads || 0;
                 var todayAds = data.today_ads || 0;
                 var adRemaining = maxAds - todayAds;
+                console.log('[VIP] adBtn存在:', !!adBtn, 'adCount存在:', !!adCount, 'maxAds:', maxAds, 'todayAds:', todayAds, 'adRemaining:', adRemaining);
                 
                 if (adBtn) {
                     if (adRemaining <= 0) {
                         adBtn.disabled = true;
                         adBtn.innerHTML = '📺 今日次数已用完';
+                        console.log('[VIP] 广告按钮已禁用（次数用完）');
                     } else {
                         adBtn.disabled = false;
-                        if (adCount) adCount.textContent = '剩' + adRemaining;
+                        if (adCount) {
+                            adCount.textContent = '剩' + adRemaining;
+                            console.log('[VIP] 广告按钮已启用，剩余:', adRemaining);
+                        } else {
+                            console.error('[VIP] adCount 元素不存在！');
+                        }
                     }
+                } else {
+                    console.error('[VIP] adBtn 元素不存在！');
                 }
 
                 // 更新永久会员方案卡片
@@ -1612,11 +1621,14 @@
         var adRewardSeconds = 5;
 
         function watchAdForVIP() {
+            console.log('[AD] ===== watchAdForVIP 被调用 =====');
             try {
             var token = Auth.getToken();
+            console.log('[AD] token:', token ? '存在' : '不存在');
             if (!token) { window.location.href = '/login.html'; return; }
 
             adRewardSeconds = BaiduAd.getRewardSeconds();
+            console.log('[AD] 奖励秒数:', adRewardSeconds, 'BaiduAd存在:', typeof BaiduAd);
             adSecondsWatched = 0;
 
             var modal = document.getElementById('adModal');
@@ -1632,12 +1644,15 @@
             container.innerHTML = '<div class="ad-loading">正在加载广告...</div>';
 
             modal.classList.add('show');
+            console.log('[AD] 弹窗已显示, modal元素:', !!modal);
 
             if (BaiduAd.isReady()) {
+                console.log('[AD] BaiduAd 已就绪，调用 show()');
                 BaiduAd.show('adContainer', function() {
                     startAdCountdown();
                 });
             } else {
+                console.log('[AD] BaiduAd 未就绪，使用 fallback 模式');
                 setTimeout(function() {
                     container.innerHTML = '<div class="ad-fallback">'
                         + '<span class="ad-fallback-icon">📺</span>'
@@ -1648,8 +1663,10 @@
                 }, 400);
             }
             } catch (e) {
-                console.error('[VIP] 广告加载失败:', e);
-                showToast('广告加载失败，请稍后再试');
+                console.error('[AD] ===== 广告函数异常 =====');
+                console.error('[AD] 错误信息:', e.message);
+                console.error('[AD] 错误堆栈:', e.stack);
+                alert('广告加载出错: ' + e.message);
             }
         }
 
@@ -1706,6 +1723,26 @@
             document.getElementById('adModal').classList.remove('show');
             BaiduAd.destroy('adContainer');
         }
+
+        // ===== 广告按钮事件绑定（移动端兼容：click + touchend） =====
+        (function bindAdButton() {
+            var btn = document.getElementById('vipAdBtn');
+            if (!btn) { console.error('[AD-BTN] vipAdBtn 元素未找到！'); return; }
+
+            // 移除可能残留的 inline onclick 防止重复
+            btn.removeAttribute('onclick');
+
+            function onAdTap(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[AD-BTN] 广告按钮被点击，类型:', e.type);
+                watchAdForVIP();
+            }
+
+            btn.addEventListener('click', onAdTap);
+            btn.addEventListener('touchend', onAdTap);
+            console.log('[AD-BTN] 广告按钮事件已绑定');
+        })();
 
         // 点击广告弹窗空白处关闭（不会取消自动领取，奖励已在后台发放）
         document.getElementById('adModal').addEventListener('click', function(e) {

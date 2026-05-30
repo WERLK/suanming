@@ -935,11 +935,18 @@ def _get_today():
 
 
 def _get_auth_user():
-    """获取当前登录用户"""
-    token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
-    if not token:
-        return None
-    user_id = verify_token(token)
+    """获取当前登录用户——优先验证Authorization头，cookie作为fallback"""
+    header_token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    cookie_token = request.cookies.get('token')
+
+    user_id = None
+    # 优先使用前端主动传递的 Authorization 头
+    if header_token:
+        user_id = verify_token(header_token)
+    # 头 token 无效时，尝试 cookie 中的 token
+    if not user_id and cookie_token:
+        user_id = verify_token(cookie_token)
+
     if not user_id:
         return None
     users = load_users()

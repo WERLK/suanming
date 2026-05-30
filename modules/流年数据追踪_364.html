@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>流年数据追踪 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🌐 流年数据追踪</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>流年数据追踪简介</h2>
+            <p>流年数据追踪是一个长期运势监测系统，它持续记录和分析你在各年份的运势数据变化，生成直观的趋势图表和波动分析，帮助你把握运势的宏观走向。</p>
+            <p>传统的流年分析只看当年，而本模块关注的是多年数据的连续变化，让你能够发现运势的长周期规律、转折点和周期性波动。</p>
+            <p>通过流年数据追踪，你可以建立个人的运势档案，观察过往运势的准确性，优化对未来运势的判断和规划。</p>
+        </div>
+
+        <div class="section">
+            <h2>数据追踪原理</h2>
+            <p><strong>时间序列分析：</strong>将各年份的运势评分构建为时间序列数据，使用ARIMA和指数平滑等模型分析趋势和季节性波动。</p>
+            <p><strong>断点检测：</strong>通过Chow检验等统计方法自动识别运势的显著变化点，标注人生的重要转折年份。</p>
+            <p><strong>周期分析：</strong>使用傅里叶变换和自相关分析发现运势波动的周期性规律，预测未来运势的波动模式。</p>
+            <p><strong>关联分析：</strong>将运势数据与你记录的生活事件进行关联分析，验证命理预测与实际经历之间的对应关系。</p>
+        </div>
+
+        <div class="section">
+            <h2>追踪分析维度</h2>
+            <p>1. <strong>运势趋势线：</strong>展示你在过去和未来各年份的综合运势趋势曲线，直观呈现运势的上升、下降和平稳阶段。</p>
+            <p>2. <strong>年度波动分析：</strong>细化到月度运势波动，帮助你识别一年中运势最佳的月份和最需谨慎的月份。</p>
+            <p>3. <strong>维度分解：</strong>将综合运势分解为事业、财运、感情、健康等各维度的独立追踪曲线，找到影响综合运势的关键因素。</p>
+            <p>4. <strong>预测准确性评估：</strong>将历史预测与实际反馈进行比对，评估系统预测的准确性，持续优化预测模型参数。</p>
+        </div>
+
+        <div class="section">
+            <h2>数据追踪使用技巧</h2>
+            <p><strong>建议一：</strong>坚持记录每年每月的重要事件和感受，丰富的标注数据能让追踪分析更加有意义</p>
+            <p><strong>建议二：</strong>关注运势的长期趋势而非短期波动，大趋势比单月数据更有参考价值</p>
+            <p><strong>建议三：</strong>在运势低谷期保持耐心，历史数据显示大部分人的运势都会周期性回升</p>
+            <p><strong>建议四：</strong>利用追踪数据验证改运措施的效果，用数据驱动的方式优化你的命理策略</p>
+            <p><strong>建议五：</strong>导入至少3年以上的连续数据，才能获得可靠的周期分析和趋势判断</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户通过3年的流年数据追踪，发现自己的财运呈现明显的「春夏高、秋冬低」的季节性规律，据此调整了投资策略</p>
+            <p><strong>案例二：</strong>某用户利用断点检测功能发现在某一年运势经历了显著上升，回溯发现与自己当年的职业变动高度吻合</p>
+            <p><strong>案例三：</strong>某用户通过追踪数据验证了自己改运措施的有效性，数据显示改运后运势均值提升了15%</p>
+            <p><strong>案例四：</strong>某用户使用追踪分析规划了未来3年的重大事项时间安排，避开了多个预测的低谷期</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>数据追踪需要多久才能产生有价值的分析？</p>
+            <p><strong>A：</strong>建议至少持续追踪1年以上。3年以上的数据能提供可靠的趋势分析，5年以上能发现明显的周期规律。</p>
+            <p><strong>Q2：</strong>历史运势数据可以删除或修改吗？</p>
+            <p><strong>A：</strong>可以。你可以在个人中心管理自己的历史运势数据，包括添加、修改和删除记录。</p>
+            <p><strong>Q3：</strong>追踪数据的隐私如何保护？</p>
+            <p><strong>A：</strong>所有数据都经过加密存储，仅你自己可见。系统使用匿名聚合数据进行模型优化，不会泄露个人隐私。</p>
+            <p><strong>Q4：</strong>流年追踪与日常的八字排盘有什么关系？</p>
+            <p><strong>A：</strong>八字排盘是基础数据，流年追踪是在此基础上的长期监测和分析。两者结合使用可以同时把握当下运势和长期趋势。</p>
+        </div>
+
+        <div class="section">
+            <h2>运势追踪的发展</h2>
+            <p>古人就有记录运势变化的传统，古代帝王有专门的史官记录天象和重大事件，民间也有家族运势谱的传承。</p>
+            <p>现代时间序列分析方法的成熟为运势数据的量化追踪提供了科学工具，使得运势变化可以被精确测量。</p>
+            <p>移动互联网和云存储技术的发展使长期运势追踪变得简单便捷，AI技术则使自动化的趋势发现和模式识别成为可能。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的流年数据追踪分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>87分（满分100分）</p>
+            <p><strong>运势概况：</strong>中上</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '流年数据追踪';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

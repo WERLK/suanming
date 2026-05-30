@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>实时预测引擎 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>⚡ 实时预测引擎</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>实时预测引擎简介</h2>
+            <p>实时预测引擎是一个快速响应的运势预测系统，能够在秒级时间内完成对当前时刻或近期的运势评估。与传统的静态排盘不同，它能够根据实时数据（如当前时间、地理位置、天气等因素）动态调整预测结果。</p>
+            <p>当你需要快速决策——比如决定是否要出门、是否要签合同、是否要约会时，实时预测引擎能为你提供即时参考。{name}此刻的实时运势正在动态计算中。</p>
+            <p>本模块采用流式计算架构，持续接收和分析最新的天文数据和环境信息，确保预测结果始终与时俱进。</p>
+        </div>
+
+        <div class="section">
+            <h2>实时预测原理</h2>
+            <p><strong>流式数据处理：</strong>采用Apache Kafka流处理架构，持续接收和处理天文历法数据、气象数据、星象数据等实时信息源。</p>
+            <p><strong>即时八字推算：</strong>根据当前时刻的精确时间，实时推算即时八字和奇门局，捕捉当下的时空能量场分布。</p>
+            <p><strong>环境因子融合：</strong>综合天气、地理位置、月相等环境因素，评估这些外部条件对你当前运势的影响方向和强度。</p>
+            <p><strong>微服务架构：</strong>采用微服务架构保证系统的低延迟和高可用性，99%的请求在500ms内返回结果。</p>
+        </div>
+
+        <div class="section">
+            <h2>实时预测维度</h2>
+            <p>1. <strong>当前时刻运势：</strong>基于精确到分钟级的实时八字推算，评估当前时刻你做各类事项的宜忌和成功率。</p>
+            <p>2. <strong>2小时短时预测：</strong>预测未来2小时内的运势变化，帮助你选择最佳的行动时机，如会议、面试、约会等。</p>
+            <p>3. <strong>今日余下时段：</strong>综合今日已过去时段的运势表现，预测今天剩余时间的运势走向和需要注意的事项。</p>
+            <p>4. <strong>即时风险预警：</strong>当检测到当前时段对你存在明显不利因素时，系统会主动推送预警提醒和规避建议。</p>
+        </div>
+
+        <div class="section">
+            <h2>实时预测使用技巧</h2>
+            <p><strong>建议一：</strong>在重要会议或决策前快速查询，了解此刻的运势状态，选择最佳的行动时机</p>
+            <p><strong>建议二：</strong>开启风险预警功能，让系统在检测到不利信号时主动提醒你</p>
+            <p><strong>建议三：</strong>结合2小时短时预测规划日常活动序列，将重要事项安排在高分时段</p>
+            <p><strong>建议四：</strong>不要过度依赖实时预测，它更适合短期决策参考，长期规划需要结合其他分析工具</p>
+            <p><strong>建议五：</strong>在不同地理位置使用时，系统会考虑当地的风水气场差异，出差旅行时尤为有用</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户在与客户谈判前使用实时预测引擎，选择运势高峰时段进行电话沟通，顺利达成合作</p>
+            <p><strong>案例二：</strong>某上班族利用2小时短时预测安排当天的工作顺序，在高效能时段处理重要事务，工作效率明显提升</p>
+            <p><strong>案例三：</strong>某用户收到风险预警后，推迟了原计划的高速公路出行，避开了不利时段，确保出行安全</p>
+            <p><strong>案例四：</strong>某投资者使用实时预测引擎辅助短线交易决策，在运势高峰时段交易的成功率显著高于低谷时段</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>实时预测是否会消耗很多服务器资源？</p>
+            <p><strong>A：</strong>系统的微服务架构设计保证了高效响应，单次查询的计算资源消耗很低，不会对系统造成负担。</p>
+            <p><strong>Q2：</strong>实时预测结果多久更新一次？</p>
+            <p><strong>A：</strong>运势评分每小时自动更新一次，但你随时可以手动触发重新计算，确保获得最新鲜的预测数据。</p>
+            <p><strong>Q3：</strong>实时预测的准确性如何？</p>
+            <p><strong>A：</strong>实时预测基于八字和时空能量的即时计算，理论基础扎实。但短时间窗口的预测不确定性更大，建议作为辅助参考。</p>
+            <p><strong>Q4：</strong>实时预测引擎需要获取我的位置信息吗？</p>
+            <p><strong>A：</strong>是的。地理位置影响风水气场的评估，但你可以选择不共享位置，系统将使用默认位置进行计算。</p>
+        </div>
+
+        <div class="section">
+            <h2>实时预测的发展</h2>
+            <p>古代占卜就是一种实时预测形式，通过龟甲裂纹或蓍草排列来判断当前时刻的吉凶。</p>
+            <p>现代天文计算的发展使精确到分钟级的星历计算成为可能，为实时命理预测奠定了技术基础。</p>
+            <p>流式计算和微服务架构的成熟使大规模实时预测服务成为现实，用户可以随时随地获得即时运势参考。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的实时预测引擎分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>89分（满分100分）</p>
+            <p><strong>运势概况：</strong>中平</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '实时预测引擎';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>眉形分析 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>👁️ 眉形分析</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>眉形分析简介</h2>
+            <p>眉形分析是专门针对眉毛形态的命理分析工具。在面相学中，眉毛被称为「保寿官」，不仅反映一个人的性格特质和思维方式，还与兄弟缘、朋友缘和31-34岁期间的运势密切相关。</p>
+            <p>眉形包括眉毛的长度、浓密度、弧度、高低、间距等多个维度，每种特征都有对应的命理解读。AI系统通过精确的图像分析，识别你的眉形特征并提供详细运势解读。</p>
+            <p>研究表明，眉形整齐清秀的人往往人际关系良好、思路清晰；而杂乱的眉毛则可能暗示生活中存在更多不确定性。通过眉形分析了解自己的性格和运势，是改善人际关系的有力工具。</p>
+        </div>
+
+        <div class="section">
+            <h2>眉形识别技术</h2>
+            <p><strong>眉形分割：</strong>通过语义分割技术精确分离眉毛区域，提取眉毛的轮廓、密度分布和生长方向等精细特征。</p>
+            <p><strong>形态分类：</strong>将眉形分为柳叶眉、一字眉、剑眉、八字眉、浓眉、淡眉等10种标准类型，每种类型对应不同的性格和运势。</p>
+            <p><strong>对称性分析：</strong>比较左右眉的对称程度，面相学中左右眉不对称可能暗示性格中矛盾的一面或运势的偏颇。</p>
+            <p><strong>眉间距计算：</strong>精确计算双眉之间的距离（印堂宽度），印堂宽窄在面相学中与心胸开阔程度和贵人运密切相关。</p>
+        </div>
+
+        <div class="section">
+            <h2>眉形分析维度</h2>
+            <p>1. <strong>眉形性格：</strong>根据眉形判断你的性格特征——剑眉者果敢刚毅、柳叶眉者温婉灵秀、一字眉者理性务实等。</p>
+            <p>2. <strong>兄弟朋友运：</strong>眉形反映与兄弟姐妹和朋友的关系质量，以及你在社交圈中的受欢迎程度。你的眉形呈现{shu_type}特征。</p>
+            <p>3. <strong>31-34岁运程：</strong>眉运主管31-34岁的运势，这段时间是人生的重要转折期，眉形状态决定这个阶段的成败得失。</p>
+            <p>4. <strong>眉运改善建议：</strong>基于眉形分析，提供通过眉形微调来改善运势的实用建议，如适当修整眉形、调整眉间距等。</p>
+        </div>
+
+        <div class="section">
+            <h2>眉形拍照技巧</h2>
+            <p><strong>建议一：</strong>正面拍摄，眉毛清晰可见，不要有头发或眼镜遮挡眉毛</p>
+            <p><strong>建议二：</strong>自然表情拍摄，不要刻意抬眉或皱眉，自然状态下的眉形才准确</p>
+            <p><strong>建议三：</strong>如果平时有画眉习惯，建议素眉和妆后眉都拍一张做对比分析</p>
+            <p><strong>建议四：</strong>光线均匀，避免从头顶直射造成眉毛区域出现阴影</p>
+            <p><strong>建议五：</strong>眉形可以通过修整来改善，分析后可根据建议适当调整眉形</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户眉形为典型的「一字眉」，AI分析其性格理性务实、做事有计划，用户确认这与自己的职场风格完全吻合</p>
+            <p><strong>案例二：</strong>某用户印堂（眉间距）偏窄，AI提示心胸可能较狭隘、易纠结小事，用户反思后刻意调整心态，人际关系有所改善</p>
+            <p><strong>案例三：</strong>某用户在31岁时眉形出现杂毛增多的情况，AI预警该年运势可能有波折，用户做了充分准备顺利度过</p>
+            <p><strong>案例四：</strong>某用户根据分析建议微调了眉形（修整杂毛、调整弧度），之后朋友反馈看起来更加精神和友善</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>修眉会改变运势吗？</p>
+            <p><strong>A：</strong>适度修整可以改善面相，但不宜过度改变眉形的基本结构。建议保留自然眉形的基础上做微调。</p>
+            <p><strong>Q2：</strong>左右眉不对称意味着什么？</p>
+            <p><strong>A：</strong>传统上，「左眉为阳、右眉为阴」，不对称可能反映内心的一种矛盾或对外的不一致。轻微不对称是正常的。</p>
+            <p><strong>Q3：</strong>眉毛稀疏怎么办？</p>
+            <p><strong>A：</strong>眉毛稀疏在面相学中与体质和精力有关。除了可以通过画眉改善面相，更重要的是调理身体、增强体质。</p>
+            <p><strong>Q4：</strong>眉形分析有年龄限制吗？</p>
+            <p><strong>A：</strong>没有。但31-34岁是眉运的「当令」时期，如果正值这个年龄段，眉形分析的参考意义会更大。</p>
+        </div>
+
+        <div class="section">
+            <h2>眉相学的发展</h2>
+            <p>面相学中眉相研究源远流长，《太清神鉴》和《麻衣相法》中均有详细的眉相论述，认为「眉为两目之华盖」。</p>
+            <p>古代文人墨客常以眉形来描绘人物性格，如「剑眉星目」形容英雄气概，「柳叶弯眉」形容女子温婉。</p>
+            <p>现代图像处理技术使眉形的精确量化分析成为可能，AI可以识别人类肉眼难以察觉的细微眉形特征。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的眉形分析分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请上传分析照片</label>
+                    <input type="file" id="userImage" accept="image/*" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" onchange="handleImageUpload(event)">
+                </div>
+                <div id="imagePreview" style="display:none; margin-bottom: 1.2rem; text-align: center;">
+                    <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid rgba(255,215,0,0.2);" />
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">📷 开始分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>87分（满分100分）</p>
+            <p><strong>运势概况：</strong>大吉</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'image';
+var MODULE_NAME = '眉形分析';
+var MODULE_CATEGORY = '图片上传算';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+// 图片上传处理
+var uploadedImageBase64 = null;
+
+function handleImageUpload(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        uploadedImageBase64 = e.target.result.split(',')[1];
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('previewImg').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var payload = {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    };
+    
+    if (uploadedImageBase64) {
+        payload.base64_data = uploadedImageBase64;
+    }
+    
+    var result = await fortuneAPI('analyze', payload);
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

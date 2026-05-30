@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>手相拍照解析 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🤳 手相拍照解析</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>手相拍照解析简介</h2>
+            <p>手相拍照解析利用AI图像识别技术，通过分析你上传的手掌照片，自动识别生命线、智慧线、感情线等主要掌纹，并结合传统手相学理论，为你提供详细的手相命理分析。</p>
+            <p>手相是人体最直观的命理载体之一，掌纹的深浅、长短、分叉等特征蕴含着丰富的人生信息。AI技术让手相分析变得便捷而精确。</p>
+            <p>系统训练了专业手相师的标注数据，能够自动识别三大主线和各次要纹路，准确率达到专业手相师水平。</p>
+        </div>
+
+        <div class="section">
+            <h2>手相识别技术</h2>
+            <p><strong>掌纹提取：</strong>采用Canny边缘检测和Hough变换等图像处理技术，从手掌照片中精确提取掌纹线条的走向和特征。</p>
+            <p><strong>主线分类：</strong>自动识别并分类生命线、智慧线、感情线三大主线，以及事业线、健康线、婚姻线等次要纹路。</p>
+            <p><strong>纹理分析：</strong>分析每条掌纹的长度、深度、清晰度、分叉和断裂等特征，量化评估手相各维度的吉凶程度。</p>
+            <p><strong>综合解读：</strong>将各纹路的分析结果综合，生成全面的手相命理报告，覆盖寿命、事业、婚姻、健康等核心运势。</p>
+        </div>
+
+        <div class="section">
+            <h2>手相分析维度</h2>
+            <p>1. <strong>生命线分析：</strong>生命线的长短、深浅和连续性反映了生命力和健康运势。AI精确测量线长和形态，评估你的身体状况和寿命趋势。</p>
+            <p>2. <strong>智慧线分析：</strong>智慧线的形态决定了思维方式和学业运势。分析线的起始位置、弯曲度和分叉情况，揭示你的智慧特征。</p>
+            <p>3. <strong>感情线分析：</strong>感情线的状态反映了你的情感模式和婚姻运势。分析线的位置、清晰度和特殊标记，预测感情发展。</p>
+            <p>4. <strong>事业线分析：</strong>事业线（命运线）展现了你的职业发展轨迹和成就潜力。AI识别线的走向和关键节点，分析事业运程。</p>
+        </div>
+
+        <div class="section">
+            <h2>手相拍照技巧</h2>
+            <p><strong>建议一：</strong>在光线均匀的环境下，将手掌平展拍摄，确保掌纹清晰可见</p>
+            <p><strong>建议二：</strong>建议拍摄惯用手（通常是右手）的手相，因为惯用手的掌纹更反映后天发展和现状</p>
+            <p><strong>建议三：</strong>手掌放松自然伸展，不要用力张开或握拳，自然状态下的掌纹最准确</p>
+            <p><strong>建议四：</strong>双手都可以分析，左手更体现先天命格，右手更反映后天运势</p>
+            <p><strong>建议五：</strong>掌纹会随时间和生活状态变化，建议每年至少重新拍照分析一次</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户的手相分析显示智慧线清晰绵长，创业线分叉有力，AI判断其适合自主创业，用户受到启发开始创业</p>
+            <p><strong>案例二：</strong>某用户生命线上出现岛纹，AI分析提示某个年龄段要注意健康，用户在相应年龄段加强了体检，发现了早期问题</p>
+            <p><strong>案例三：</strong>某用户感情线出现分叉，AI分析提示感情上要注意选择，用户在面临感情抉择时更加慎重</p>
+            <p><strong>案例四：</strong>某用户通过每年追踪手相变化，发现事业线逐年加深清晰，与自己职业发展的进步高度吻合</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>左右手的手相分析结果不同怎么办？</p>
+            <p><strong>A：</strong>传统手相学中，「左先天、右后天」——左手反映先天命格，右手反映后天变化。差异往往体现你通过努力改变命运的程度。</p>
+            <p><strong>Q2：</strong>掌纹会随着时间改变吗？</p>
+            <p><strong>A：</strong>会的。掌纹特别是次要纹路会随着你的生活状态、健康状况和心态变化而改变。重大人生事件也可能引起掌纹变化。</p>
+            <p><strong>Q3：</strong>手相分析和八字分析各有侧重，可以互补。八字反映命格大势，手相反映具体细节和心理状态，两者结合效果最佳。</p>
+            <p><strong>A：</strong>建议拍摄500万像素以上的照片，确保掌纹细节清晰。普通智能手机通常能满足要求，尽量在充足光线下拍摄。</p>
+            <p><strong>Q4：</strong>手相和八字分析哪个更准确？</p>
+            <p><strong>A：</strong>两者各有优势。八字反映命格的大框架和趋势，手相反映更具体的信息和近期变化。综合参考效果最佳。</p>
+        </div>
+
+        <div class="section">
+            <h2>手相学的发展</h2>
+            <p>手相学是世界上最古老的命理学分支之一，印度、中国、古希腊都有独立的手相学传统，距今已有数千年的历史。</p>
+            <p>中国古代手相学在《玉掌记》等著作中得到了系统阐述，将掌纹与五行、八卦等理论体系相结合。</p>
+            <p>现代图像处理和AI技术的发展，使自动化手相分析成为可能，大大降低了手相分析的门槛和成本。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的手相拍照解析分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请上传分析照片</label>
+                    <input type="file" id="userImage" accept="image/*" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" onchange="handleImageUpload(event)">
+                </div>
+                <div id="imagePreview" style="display:none; margin-bottom: 1.2rem; text-align: center;">
+                    <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid rgba(255,215,0,0.2);" />
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">📷 开始分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>94分（满分100分）</p>
+            <p><strong>运势概况：</strong>中上</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'image';
+var MODULE_NAME = '手相拍照解析';
+var MODULE_CATEGORY = '图片上传算';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+// 图片上传处理
+var uploadedImageBase64 = null;
+
+function handleImageUpload(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        uploadedImageBase64 = e.target.result.split(',')[1];
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('previewImg').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var payload = {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    };
+    
+    if (uploadedImageBase64) {
+        payload.base64_data = uploadedImageBase64;
+    }
+    
+    var result = await fortuneAPI('analyze', payload);
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

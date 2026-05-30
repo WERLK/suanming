@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>历史命例库 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>📚 历史命例库</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>历史命例库简介</h2>
+            <p>历史命例库是一个收录古今名人八字命格的大型数据库，涵盖政治家、企业家、艺术家、科学家等超过5000位历史人物的详细命理信息。通过研究这些名人的命格，你可以汲取历史智慧，了解不同类型命格的人生轨迹。</p>
+            <p>本数据库不仅记录了名人的基本命理信息，还包括他们的生平大事记、运势转折点和关键决策，形成了完整的命理与人生的对照资料。</p>
+            <p>通过检索和分析历史命例，你可以找到与自己命格相似的历史人物，参考他们的人生经验和命理走势，为自己的发展规划提供独特视角。</p>
+        </div>
+
+        <div class="section">
+            <h2>命例库结构</h2>
+            <p><strong>名人收录：</strong>收录5000+位中外名人，涵盖200+个不同领域，时间跨度从古代到当代，与你的数据分析精准度相匹配。</p>
+            <p><strong>多维标注：</strong>每位名人都标注了八字、大运、流年关键节点、成就里程碑和人生低谷等信息，形成完整的命理人生图谱。</p>
+            <p><strong>相似度检索：</strong>支持按八字相似度、五行结构、十神配置等多种方式进行模糊检索，帮助你找到最相关的参考案例。</p>
+            <p><strong>趋势分析：</strong>对同类型名人的运势走势进行统计分析，发现该类命格的典型发展模式和关键转折窗口。</p>
+        </div>
+
+        <div class="section">
+            <h2>命例检索维度</h2>
+            <p>1. <strong>八字相似检索：</strong>输入你的八字，系统自动检索命例库中八字结构最相似的10位名人，展示他们的生平轨迹和运势走势。</p>
+            <p>2. <strong>行业领域检索：</strong>按行业分类浏览名人命例，了解不同领域的成功命格特征，为自己的职业选择提供命理参考。</p>
+            <p>3. <strong>历史时期检索：</strong>按朝代或年代检索名人命例，研究不同历史背景下命格发挥的特点和差异。</p>
+            <p>4. <strong>运势模式检索：</strong>按运势模式（如少年得志型、大器晚成型、起伏不定型）分类检索，找到与你的运势轨迹最相似的名人。</p>
+        </div>
+
+        <div class="section">
+            <h2>命例库使用技巧</h2>
+            <p><strong>建议一：</strong>不要机械套用历史人物的经验，时代背景和个人选择同样重要</p>
+            <p><strong>建议二：</strong>关注与你有相似命格结构的名人在关键年龄节点的选择，这往往是重要参考</p>
+            <p><strong>建议三：</strong>对比不同历史时期同类型命格的表现，理解时代对命格发挥的放大或制约作用</p>
+            <p><strong>建议四：</strong>将名人大运走势作为时间参考，但你的具体流年需要结合个人实际情况判断</p>
+            <p><strong>建议五：</strong>命例库不仅用于自我参考，也是学习命理学知识的绝佳素材</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户发现自己与一位著名的成功企业家八字高度相似，参考其大运走势调整了事业规划，准确把握了发展时机</p>
+            <p><strong>案例二：</strong>某研究者通过检索命例库，发现同一领域内成功人士的命格具有显著的五行特征，发表了有价值的命理学论文</p>
+            <p><strong>案例三：</strong>某用户在命例库中找到了与自己命格相似的失败案例，从中总结教训，避免了类似的错误决策</p>
+            <p><strong>案例四：</strong>一位命理爱好者通过系统研究命例库中的500+名人，显著提升了自己的命理分析能力</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>命例库中的八字信息是否准确？</p>
+            <p><strong>A：</strong>系统收录的名人八字均经过多位命理专家的交叉验证，对于出生时刻有争议的名人会特别标注不确定性。</p>
+            <p><strong>Q2：</strong>历史名人的八字与现代人有参考价值吗？</p>
+            <p><strong>A：</strong>有。八字命理的核心规律不因时代而改变，但解读时需要结合时代背景。系统会给出相关提示。</p>
+            <p><strong>Q3：</strong>我的八字与名人相似意味着什么？</p>
+            <p><strong>A：</strong>八字相似意味着你们在命理特质上有共性，但最终成就取决于个人选择、时代机遇和努力程度等多重因素。</p>
+            <p><strong>Q4：</strong>命例库会不断更新吗？</p>
+            <p><strong>A：</strong>会的。系统团队持续研究和验证新的历史人物命例，同时也会收录值得研究的当代人物案例。</p>
+        </div>
+
+        <div class="section">
+            <h2>命例研究的历史</h2>
+            <p>收集和研究名人命例是中国命理学的传统，宋代徐子平的《渊海子平》中就收录了大量历史名人的命例分析。</p>
+            <p>明代万民英的《三命通会》系统整理了历代名人命例，成为命理学研究的重要参考文献。</p>
+            <p>数字技术的发展使大规模命例研究成为可能，AI的引入使命例相似度检索和模式发现达到了前所未有的精度。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的历史命例库分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>96分（满分100分）</p>
+            <p><strong>运势概况：</strong>中平</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '历史命例库';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

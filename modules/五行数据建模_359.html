@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>五行数据建模 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🔬 五行数据建模</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>五行数据建模简介</h2>
+            <p>五行数据建模是将传统五行学说用现代数学语言重新描述和建模的创新方法。通过建立五行生克关系的数学模型，我们可以量化分析五行力量的变化和相互作用，为命理分析提供严密的数学基础。</p>
+            <p>本模块将五行关系转化为图论模型和微分方程组，利用数值计算和仿真模拟来展现五行力量的动态变化过程，使得传统五行理论能够被精确计算和可视化呈现。</p>
+            <p>通过五行数据建模，你能够直观地了解自身五行的强弱分布、生克关系和最优补益方案，为改运调理提供数据支撑。</p>
+        </div>
+
+        <div class="section">
+            <h2>五行建模原理</h2>
+            <p><strong>图论表示：</strong>将五行（金木水火土）表示为有向图的5个节点，生克关系表示为边。生（相生）为正向边，克（相克）为负向边，构建五行关系的有向加权图。</p>
+            <p><strong>微分方程模型：</strong>将五行力量的变化建模为Lotka-Volterra改进方程，描述五行之间的动态竞争和共生关系，通过数值求解预测力量变化趋势。</p>
+            <p><strong>平衡态分析：</strong>计算五行系统的平衡点（纳什均衡），识别当前状态与最优状态之间的差距，提供精准的补益方向和力度建议。</p>
+            <p><strong>敏感性分析：</strong>对模型中各参数进行敏感性分析，识别对运势影响最大的关键五行因素，帮助用户聚焦最重要的改善方向。</p>
+        </div>
+
+        <div class="section">
+            <h2>建模分析维度</h2>
+            <p>1. <strong>五行强度量化：</strong>基于八字天干地支，量化计算金、木、水、火、土五行的综合强度值（0-100分），展示五行分布雷达图。</p>
+            <p>2. <strong>生克关系矩阵：</strong>建立5×5的生克关系矩阵，量化每个生克对的相互作用强度，识别关键的强化和制约关系。</p>
+            <p>3. <strong>动态演化模拟：</strong>模拟在大运流年的影响下，五行力量在未来各时间点的变化轨迹，预测运势的波动和转折点。</p>
+            <p>4. <strong>最优补益方案：</strong>通过优化算法计算使五行达到最佳平衡所需的最小补益措施，推荐颜色、方位、职业等具体调整方案。</p>
+        </div>
+
+        <div class="section">
+            <h2>建模分析使用技巧</h2>
+            <p><strong>建议一：</strong>将五行雷达图作为主要参考，最弱的五行往往是最需要补益的方向</p>
+            <p><strong>建议二：</strong>关注动态演化中的转折点，这些时间节点是运势变化的关键窗口</p>
+            <p><strong>建议三：</strong>结合现实生活中的选择（职业、方位等）来实施补益方案，效果更加显著</p>
+            <p><strong>建议四：</strong>定期更新分析，因为大运流年的变化会改变五行的平衡状态</p>
+            <p><strong>建议五：</strong>对于模型显示的结构性问题（长期五行失衡），建议从生活习惯层面进行系统性调整</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户通过五行建模发现自己「木弱金强」，选择了木属性行业并调整了居住环境，半年后事业运势明显提升</p>
+            <p><strong>案例二：</strong>某用户在面临职业选择时，通过五行补益方案计算出最适合的行业方向，成功转型并获得了更好的发展</p>
+            <p><strong>案例三：</strong>某用户根据动态演化模拟，在运势转折点前一个月做了充分准备，顺利渡过了职业调整期</p>
+            <p><strong>案例四：</strong>一位家长利用五行建模分析了孩子的五行平衡状态，针对性地选择了课外活动和培养方向，孩子发展更加均衡</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>五行建模的数学基础是否可靠？</p>
+            <p><strong>A：</strong>五行建模采用了图论、微分方程、优化算法等成熟的数学工具，模型本身在数学上是严谨的，但五行赋值的主观性会引入一定的不确定性。</p>
+            <p><strong>Q2：</strong>模型结果与传统命理师判断是否一致？</p>
+            <p><strong>A：</strong>大多数情况下趋势一致，因为模型基于相同的五行生克理论。但量化模型能够提供更精确的数值参考，弥补传统方法的不足。</p>
+            <p><strong>Q3：</strong>五行强度评分是固定的吗？</p>
+            <p><strong>A：</strong>不是固定的。五行强度受大运流年的影响而变化，系统会动态更新评分，反映不同时间段的五行状态。</p>
+            <p><strong>Q4：</strong>建模分析适合哪些人群？</p>
+            <p><strong>A：</strong>适合所有对命理有理性认知需求的用户，尤其是喜欢用数据和逻辑思考问题的理性主义者。</p>
+        </div>
+
+        <div class="section">
+            <h2>五行的现代研究</h2>
+            <p>五行学说最早见于《尚书·洪范》，是中华文明对世界运行规律最深刻的理解之一，影响了中医、建筑、艺术等多个领域。</p>
+            <p>20世纪以来，系统论和控制论的发展为五行学说的数学化提供了理论工具，五行被类比为多变量反馈控制系统。</p>
+            <p>近年来，人工智能和数据科学的发展使五行建模更加精确和实用，为传统五行理论注入了新的生命力。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的五行数据建模分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>94分（满分100分）</p>
+            <p><strong>运势概况：</strong>中吉</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '五行数据建模';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

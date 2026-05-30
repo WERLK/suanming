@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>命理模式识别 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🧩 命理模式识别</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>命理模式识别简介</h2>
+            <p>命理模式识别是利用机器学习的模式识别算法，在海量命例数据中自动发现隐藏的命理规律和模式。与人工总结规律不同，AI能够发现人类命理师难以察觉的复杂关联和微妙模式。</p>
+            <p>本模块采用无监督学习（聚类分析、关联规则挖掘）和有监督学习（分类、回归）等多种方法，全方位探索命理数据的深层结构和规律。</p>
+            <p>通过命理模式识别，你可以了解自己属于哪种命理类别，该类别的典型特征和发展规律是什么，为个人发展提供群体智慧。</p>
+        </div>
+
+        <div class="section">
+            <h2>模式识别原理</h2>
+            <p><strong>聚类分析：</strong>使用K-means和DBSCAN算法将数百万命例自动分为若干命理类型，每个类型具有相似的五行结构和运势特征。</p>
+            <p><strong>关联规则挖掘：</strong>使用Apriori算法发现命理特征之间的关联规则，例如「日柱为甲木且月柱见庚金→30岁前事业有成」。</p>
+            <p><strong>分类模型：</strong>训练随机森林和XGBoost分类器，根据命理特征预测人生关键事件的概率和类型。</p>
+            <p><strong>异常检测：</strong>使用孤立森林算法识别命例库中的异常命格，发现命理规律的特殊例外和边界条件。</p>
+        </div>
+
+        <div class="section">
+            <h2>模式分析维度</h2>
+            <p>1. <strong>命理聚类分析：</strong>自动将你的命格归类到最相似的命理集群中，展示该集群的共性特征和典型发展路径。</p>
+            <p>2. <strong>关键特征识别：</strong>通过特征重要性排序，识别对你的运势影响最大的命理特征，让你聚焦最关键的因素。</p>
+            <p>3. <strong>关联规则发现：</strong>展示与你命格高度相关的命理规则，这些规则是从海量数据中挖掘出的经验性规律。</p>
+            <p>4. <strong>预测置信度：</strong>对每条命理规则的预测给出置信度评分，帮助你判断哪些规律更可靠、更值得信赖。</p>
+        </div>
+
+        <div class="section">
+            <h2>模式识别使用技巧</h2>
+            <p><strong>建议一：</strong>关注高置信度的关联规则，这些规则经过了大量数据的验证，参考价值最高</p>
+            <p><strong>建议二：</strong>了解你所处的命理集群特征，参照同群他人的成功经验制定发展策略</p>
+            <p><strong>建议三：</strong>对于异常检测发现的特殊命理特征，建议进行深入分析而非简单归类</p>
+            <p><strong>建议四：</strong>将模式识别结果与传统命理分析相互印证，不同方法的一致性结果可信度更高</p>
+            <p><strong>建议五：</strong>定期关注新发现的命理模式，随着数据的积累，系统会不断发现新的规律</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>通过聚类分析，某用户发现自己的命格属于「少年得志型」集群，据此在年轻时抓住发展机遇，取得了显著成就</p>
+            <p><strong>案例二：</strong>关联规则挖掘发现某类命格在35岁前后有财运转折点，某用户据此在34岁开始做准备，35岁成功完成职业转型</p>
+            <p><strong>案例三：</strong>异常检测发现某用户命格具有罕见的特殊结构，经过深入分析后量身定制了独特的改运方案</p>
+            <p><strong>案例四：</strong>某研究者利用命理模式识别发现了一条前所未有的命理规律，在命理学术圈引起了广泛讨论</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>模式识别发现的规律是否绝对可靠？</p>
+            <p><strong>A：</strong>不是绝对的。模式识别基于统计规律，反映的是「大概率如此」而非「必然如此」。每条规则都附有置信度供参考。</p>
+            <p><strong>Q2：</strong>AI发现的规律与传统命理理论是否一致？</p>
+            <p><strong>A：</strong>大部分发现的规律与传统理论一致，这验证了传统命理的合理性。少数不一致的发现可能揭示传统理论的盲区，建议保持开放态度。</p>
+            <p><strong>Q3：</strong>我的个人数据会被用于模式发现吗？</p>
+            <p><strong>A：</strong>系统使用匿名化和聚合的数据进行模式发现，不会追溯和暴露个人身份信息，严格遵守数据隐私保护原则。</p>
+            <p><strong>Q4：</strong>模式识别多久更新一次结果？</p>
+            <p><strong>A：</strong>基础模式每月更新一次，随着新增数据的积累，模式会不断优化和完善。重要发现会通过系统通知告知用户。</p>
+        </div>
+
+        <div class="section">
+            <h2>模式识别的发展</h2>
+            <p>模式识别作为人工智能的核心技术之一，起源于20世纪50年代，早期主要用于图像识别和语音识别。</p>
+            <p>21世纪以来，大数据和深度学习的发展使模式识别能力飞跃，开始在金融、医疗和人文研究等领域发挥重要作用。</p>
+            <p>将模式识别应用于命理学是一个全新的跨学科方向，有望为这个古老学问带来革命性的科学化变革。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的命理模式识别分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>85分（满分100分）</p>
+            <p><strong>运势概况：</strong>中吉</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '命理模式识别';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

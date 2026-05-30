@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>运势概率预测 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🎯 运势概率预测</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>运势概率预测简介</h2>
+            <p>运势概率预测是基于贝叶斯统计理论的创新命理分析工具。通过建立先验概率分布，结合用户输入的个人信息，系统能够动态更新各项运势的概率估计，提供量化的运势预测。</p>
+            <p>传统的运势描述往往是模糊的、定性的，而本模块将运势转化为可量化的概率值，让你清楚地了解每项运势的成功可能性和风险程度。</p>
+            <p>本模块使用贝叶斯推断算法，将历史命例数据作为先验知识，用户个人信息作为观测证据，不断迭代更新，生成最符合你实际情况的运势概率分布。</p>
+        </div>
+
+        <div class="section">
+            <h2>贝叶斯命理原理</h2>
+            <p><strong>贝叶斯定理：</strong>P(A|B) = P(B|A)×P(A)/P(B)，其中P(A)是运势的先验概率，P(B|A)是观测到用户特征的条件概率，P(A|B)即为更新后的后验概率。</p>
+            <p><strong>先验分布构建：</strong>基于20万+命例数据，为每项运势（事业、财运、感情、健康等）建立先验概率分布，反映一般人群的运势基准水平。</p>
+            <p><strong>似然函数：</strong>根据用户的八字五行、生肖属相、姓名格局等个人信息，计算在实际观测条件下的似然函数，量化个人因素对运势的影响程度。</p>
+            <p><strong>后验推断：</strong>综合先验分布和似然函数，通过MCMC（马尔可夫链蒙特卡洛）方法采样，生成各项运势的后验概率分布和置信区间。</p>
+        </div>
+
+        <div class="section">
+            <h2>概率预测维度</h2>
+            <p>1. <strong>事业成功率：</strong>基于当前时间窗口和用户命理特征，预测事业晋升、创业成功、跳槽有利等事件的概率，附带90%置信区间。</p>
+            <p>2. <strong>财富增长概率：</strong>分析正财偏财格局，结合流年大运，预测投资获利、收入增长等事件的概率分布和预期收益范围。</p>
+            <p>3. <strong>感情发展概率：</strong>根据桃花星旺衰、夫妻宫状态和流年影响，预测恋爱成功、婚姻稳定、感情升温等事件的概率。</p>
+            <p>4. <strong>健康风险概率：</strong>综合八字五行偏枯、流年刑冲等信息，预测各类健康隐患的概率，提供预防性调养建议。</p>
+        </div>
+
+        <div class="section">
+            <h2>使用概率预测的技巧</h2>
+            <p><strong>建议一：</strong>关注置信区间而不仅仅是点估计值，宽的置信区间意味着不确定性大，应更谨慎对待</p>
+            <p><strong>建议二：</strong>定期更新预测结果，因为流年大运的变化会显著影响各项运势的概率分布</p>
+            <p><strong>建议三：</strong>将不同时间段（3个月、6个月、1年）的概率预测进行对比，识别运势的变化趋势</p>
+            <p><strong>建议四：</strong>概率预测仅供参考，不应作为唯一决策依据，关键决策还需结合实际情况和专业知识</p>
+            <p><strong>建议五：</strong>对于概率较低的事项，建议采取更保守的策略和充分的准备，降低风险</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某创业者使用运势概率预测，发现近3个月创业成功率为76%，果断启动项目并取得成功</p>
+            <p><strong>案例二：</strong>某投资者通过财富增长概率预测，发现当前投资获利的后验概率仅为32%，选择暂缓投资，避免了损失</p>
+            <p><strong>案例三：</strong>某用户利用感情发展概率预测，把握概率高峰时段表白，成功建立了恋爱关系</p>
+            <p><strong>案例四：</strong>某用户根据健康风险概率预警，在风险上升期提前进行了体检，及早发现并处理了健康隐患</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>概率预测的结果是否会随时间变化？</p>
+            <p><strong>A：</strong>是的。随着流年大运的变化和个人信息的更新，概率预测结果会动态调整，建议定期查看最新预测。</p>
+            <p><strong>Q2：</strong>概率值高就一定会有好结果吗？</p>
+            <p><strong>A：</strong>不一定。概率预测反映的是统计规律和可能性，高概率意味着有利因素多，但最终结果还受到现实决策和行为的影响。</p>
+            <p><strong>Q3：</strong>概率预测是否考虑个人的主观努力？</p>
+            <p><strong>A：</strong>概率预测主要基于命理数据和统计模型，无法完全体现个人的主观努力。但好的运势加上积极努力往往能取得更好的效果。</p>
+            <p><strong>Q4：</strong>贝叶斯算法的优势是什么？</p>
+            <p><strong>A：</strong>贝叶斯算法能够充分利用先验知识和新数据不断更新预测，使结果更加准确和个性化，特别适合命理这种需要结合普遍规律和个人特征的场景。</p>
+        </div>
+
+        <div class="section">
+            <h2>概率命理的发展</h2>
+            <p>概率论起源于17世纪帕斯卡和费马的通信，贝叶斯定理由托马斯·贝叶斯在18世纪提出，为不确定性推理奠定了理论基础。</p>
+            <p>21世纪以来，随着计算能力的提升和MCMC等采样方法的发展，贝叶斯方法在医学、金融等领域得到广泛应用。</p>
+            <p>近年，研究者开始将贝叶斯统计方法应用于命理学研究，尝试用量化的概率模型来描述和预测运势变化，开启了科学命理的新纪元。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的运势概率预测分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>90分（满分100分）</p>
+            <p><strong>运势概况：</strong>中平</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '运势概率预测';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

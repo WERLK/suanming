@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>对比分析 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>🔄 对比分析</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>命格对比分析简介</h2>
+            <p>命格对比分析是一种创新的命理分析方式，它不再仅仅对你的命格进行独立分析，而是将你的命格与数据库中同类型、同区域、同行业的命格进行横向对比，让你了解自己在大数据中的定位。</p>
+            <p>通过对比分析，你能够清楚地了解自己在同龄人、同行者或同类命格群体中的运势水平、优势和劣势，为个人发展提供有价值的参考信息。</p>
+            <p>本模块支持多维度的对比分析，包括同行对比、同龄人对比、同八字对比和自定义对比，分析结果以直观的图表和排名形式呈现。</p>
+        </div>
+
+        <div class="section">
+            <h2>对比分析原理</h2>
+            <p><strong>数据分层：</strong>将命例数据库按年龄、职业、地域、八字类型等维度进行分层抽样，为每种对比构建具有统计意义的对照组。</p>
+            <p><strong>标准化评分：</strong>将所有参与对比的命格进行标准化处理，消除不同评估维度之间的量纲差异，使对比结果具有可比性。</p>
+            <p><strong>百分位排名：</strong>计算你在各对比维度上的百分位排名，让你了解你在参考群体中的相对位置和竞争力。</p>
+            <p><strong>差异显著性检验：</strong>使用统计检验方法判断你与对照组之间的差异是否具有统计学显著性，避免随机波动带来的误导。</p>
+        </div>
+
+        <div class="section">
+            <h2>对比分析维度</h2>
+            <p>1. <strong>综合运势对比：</strong>与同类型的命格群体进行全面对比，包括事业、财运、感情、健康四个核心维度，展示你在各维度的相对排名。</p>
+            <p>2. <strong>同龄人对比：</strong>与同龄人群体（±3岁）进行对比，了解你的运势在同龄人中的水平。{name}的整体运势在同龄人中属于{fb_level}。</p>
+            <p>3. <strong>行业精英对比：</strong>将你的命格与行业内成功人士的命格进行对比分析，识别你与成功者之间的命理差异和改进方向。</p>
+            <p>4. <strong>自定义对比：</strong>支持你选择特定的命格群体进行自定义对比，实现高度灵活的对比分析需求。</p>
+        </div>
+
+        <div class="section">
+            <h2>对比分析使用技巧</h2>
+            <p><strong>建议一：</strong>避免过度关注单项排名，综合各维度的整体表现更有参考价值</p>
+            <p><strong>建议二：</strong>将对比分析结果作为自我定位的参考，而不是焦虑的来源，排名高低不等同于人生成败</p>
+            <p><strong>建议三：</strong>定期进行对比分析，观察自己在群体中排名的变化趋势，评估改运措施的效果</p>
+            <p><strong>建议四：</strong>将对比分析与其他分析模块（八字排盘、运势概率等）结合使用，获得更全面的认知</p>
+            <p><strong>建议五：</strong>注意对比群体的选择，不同群体（如创业者vs公务员）的对比结果含义可能完全不同</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某职员通过对比分析发现自己在同龄人中财运排名靠后，调整了职业方向后，一年内排名提升了30个百分点</p>
+            <p><strong>案例二：</strong>某学生通过与同龄人对比分析，发现自己学业运势排名前15%，增强了自信心，学习动力更强</p>
+            <p><strong>案例三：</strong>某创业者通过行业精英对比发现了自己命格中的关键差距，有针对性地进行了五行调理，业务渐入佳境</p>
+            <p><strong>案例四：</strong>某退休人员通过对比分析了解了自己在退休人群中的健康运势排名，采取了积极措施保持健康状态</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>对比分析的数据基础是什么？</p>
+            <p><strong>A：</strong>对比分析基于系统收录的数百万条命例数据，通过科学的抽样和统计方法确保对比的公正性和代表性。</p>
+            <p><strong>Q2：</strong>排名低是否意味着运势差？</p>
+            <p><strong>A：</strong>不一定。排名反映的是相对位置，如果你选择的是高水平群体（如成功企业家），即使排名中等也说明你的运势不错。</p>
+            <p><strong>Q3：</strong>对比分析的结果会随时间变化吗？</p>
+            <p><strong>A：</strong>会的。你的命格数据和对照组数据都会随时间更新，排名会动态变化。建议每季度更新一次对比分析。</p>
+            <p><strong>Q4：</strong>自定义对比应该选择什么样的群体？</p>
+            <p><strong>A：</strong>选择你关心或想要效仿的群体，例如你所在行业的从业者、你向往的生活方式群体等，对比结果才有实际参考意义。</p>
+        </div>
+
+        <div class="section">
+            <h2>对比分析的发展</h2>
+            <p>横向对比是人类认知世界的基本方式之一，从古代的科举排名到现代的各类榜单，对比帮助我们了解自身定位。</p>
+            <p>统计学的发展为对比分析提供了科学基础，正态分布、显著度检验等方法确保对比结果的可靠性。</p>
+            <p>大数据时代，对比分析的能力得到了极大增强，我们可以以前所未有的广度和深度进行命格对比，发现隐藏的规律。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的对比分析分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>92分（满分100分）</p>
+            <p><strong>运势概况：</strong>中上</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '对比分析';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

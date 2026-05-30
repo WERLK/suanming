@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>智能择吉引擎 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>📅 智能择吉引擎</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>智能择吉引擎简介</h2>
+            <p>智能择吉引擎是一种基于多维度数据驱动的新一代择吉系统。它综合了黄历宜忌、天星位置、个人八字、五行旺衰、风水方位等超过15个维度的信息，通过优化算法为你智能推荐最佳的时间窗口。</p>
+            <p>传统择吉主要依赖黄历和命理师的个人经验，智能择吉引擎则在此基础上引入了天文学数据、气象数据和历史事件数据，使择吉更加全面和精准。</p>
+            <p>无论你是在选择婚期、开业日、出行日还是装修动工日，智能择吉引擎都能为你提供多个备选日期及其优劣分析。</p>
+        </div>
+
+        <div class="section">
+            <h2>择吉算法原理</h2>
+            <p><strong>多维数据融合：</strong>整合黄历宜忌、二十八星宿、十二建除、八字喜用、五行旺衰、风水方位、天星运行等15个核心维度数据。</p>
+            <p><strong>加权评分模型：</strong>为不同的择吉场景（婚嫁、开业、出行、动土等）设计差异化的权重方案，使评分更贴近实际需求。</p>
+            <p><strong>约束优化算法：</strong>在众多候选日期中，通过遗传算法搜索满足多项约束条件（避开冲煞日、选择吉星高照日等）的最优解。</p>
+            <p><strong>鲁棒性评估：</strong>对推荐的最优日期进行敏感性测试，确保选择不会因为个别因素的小幅波动而劣化。</p>
+        </div>
+
+        <div class="section">
+            <h2>择吉分析维度</h2>
+            <p>1. <strong>黄历宜忌：</strong>基于正宗黄历数据，分析各日期的宜忌事项，自动筛选出适合你需求类型的候选日期。建议在{name}吉星高照的日期行事。</p>
+            <p>2. <strong>天星吉凶：</strong>计算二十八星宿和各吉神凶煞在候选日期的分布情况，优选吉星汇聚、凶煞回避的最佳时间。</p>
+            <p>3. <strong>个人适配度：</strong>将候选日期与你的八字喜用神进行匹配，计算个人适配度评分，优选对你的命格最为有利的日期。</p>
+            <p>4. <strong>综合排名：</strong>综合所有维度评分，生成候选日期的排名列表，并提供每个日期的优劣势分析和具体建议。</p>
+        </div>
+
+        <div class="section">
+            <h2>择吉实用建议</h2>
+            <p><strong>建议一：</strong>婚嫁等重要大事至少提前一个月进行择吉分析，以获得足够的时间窗口选择</p>
+            <p><strong>建议二：</strong>选择3-5个备选日期而非锁定单一日期，给自己留出灵活调整的空间</p>
+            <p><strong>建议三：</strong>除了择吉引擎推荐，也要考虑实际因素（天气、参与者的时间等）进行综合决策</p>
+            <p><strong>建议四：</strong>对于快速决策类的事项（如商务会面），可以使用简化择吉模式快速获得最佳时间</p>
+            <p><strong>建议五：</strong>长期项目（如装修）可以在多个阶段分别择吉，开工和竣工分别选择吉日</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>一对新人利用智能择吉引擎，在3个候选吉日中选择了与双方八字最匹配的婚期，婚后生活和谐美满</p>
+            <p><strong>案例二：</strong>某企业家通过择吉分析选取了公司开业的最佳时间，开业当天客户盈门，开业后业务蒸蒸日上</p>
+            <p><strong>案例三：</strong>某用户计划长途旅行，择吉引擎推荐了避开冲煞的出行日期，旅途中一切顺利</p>
+            <p><strong>案例四：</strong>某家庭在装修时利用择吉分析选择了动工和竣工的吉日，装修过程顺利、入住后家庭和睦</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>择吉分析可以预测未来多久的吉日？</p>
+            <p><strong>A：</strong>系统可以分析未来12个月内的所有日期，你可以设置时间范围来筛选最合适的日期。</p>
+            <p><strong>Q2：</strong>如果最佳吉日因为现实原因无法使用怎么办？</p>
+            <p><strong>A：</strong>系统会提供排名列表，你可以选择次优的备选日期，同时系统会给出如何弥补非最优日期的建议。</p>
+            <p><strong>Q3：</strong>智能择吉与传统择吉师的选择是否一致？</p>
+            <p><strong>A：</strong>大多数情况下核心推荐是一致的，因为底层都基于黄历和命理理论。但智能择吉能考虑更多维度，可能发现传统方法遗漏的良机。</p>
+            <p><strong>Q4：</strong>择吉需要考虑出生时间吗？</p>
+            <p><strong>A：</strong>是的。系统会根据你的八字（含时辰）进行个性化匹配，时辰不同可能影响最优日期的选择。</p>
+        </div>
+
+        <div class="section">
+            <h2>择吉文化发展</h2>
+            <p>择吉术是中国最古老的方术之一，殷商甲骨文中就有占卜择日的记载，汉代的《日书》是早期择吉的集大成之作。</p>
+            <p>唐代以后，择吉与八字命理进一步融合，从单纯的好日子选择发展为结合个人命理的个性化择吉。</p>
+            <p>现代算法和计算能力使择吉分析能够考虑前所未有的维度数量，从经验驱动发展为数据驱动，准确性大幅提升。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的智能择吉引擎分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>87分（满分100分）</p>
+            <p><strong>运势概况：</strong>大吉</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '智能择吉引擎';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>命理问卷分析 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>📋 命理问卷分析</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>命理问卷分析简介</h2>
+            <p>命理问卷分析是一种将心理学量表方法与八字命理相结合的创新分析工具。通过多维度的问卷测试，系统能够精准识别你的性格特质、行为偏好和潜在需求，再与命理分析结果交叉验证，提供更加个性化的命理建议。</p>
+            <p>本模块设计了包含性格、决策、情感、社交、职业等多个维度的综合问卷，每道题目经过专业命理师和心理学家的联合设计，确保问题的科学性和有效性。</p>
+            <p>基于问卷分析结果，系统利用AI算法匹配最适合你的命理建议和改运方案，实现了从「千人一面」到「千人千面」的个性化服务升级。</p>
+        </div>
+
+        <div class="section">
+            <h2>问卷分析原理</h2>
+            <p><strong>多维度评估：</strong>问卷覆盖性格特质（五行倾向）、决策风格（阴阳属性）、情感模式（桃花类型）等6大维度，每个维度包含5-8个专业问题。</p>
+            <p><strong>AI匹配算法：</strong>采用协同过滤和内容推荐相结合的方式，将问卷结果与海量命例数据中的成功案例进行匹配，找到最相似的参考案例。</p>
+            <p><strong>交叉验证：</strong>将问卷分析结果与传统八字排盘结果进行交叉验证，识别一致性和差异性，生成综合评估报告。</p>
+            <p><strong>个性化建议：</strong>根据问卷揭示的个人特质和命理分析结果，生成高度个性化的改运建议和行动方案。</p>
+        </div>
+
+        <div class="section">
+            <h2>问卷分析维度</h2>
+            <p>1. <strong>五行倾向评估：</strong>通过情景判断题评估你的五行属性倾向，了解你天生属于金、木、水、火、土中的哪一种主导类型。</p>
+            <p>2. <strong>阴阳决策风格：</strong>分析你在面对选择时的决策模式，是偏向阳性的果断进取还是阴性的谨慎保守，为企业管理和职业选择提供参考。</p>
+            <p>3. <strong>情感模式识别：</strong>识别你的恋爱类型和情感需求，匹配最适合的桃花运走向和感情经营策略。</p>
+            <p>4. <strong>压力应对模式：</strong>评估你在压力下的行为反应模式，结合命理中的喜用神信息，制定个性化的压力管理和运势优化方案。</p>
+        </div>
+
+        <div class="section">
+            <h2>问卷填写建议</h2>
+            <p><strong>建议一：</strong>认真思考每个问题，尽量选择最符合你真实情况的选项，不要刻意选择「理想」答案</p>
+            <p><strong>建议二：</strong>在心情平静时填写问卷，避免情绪波动对选择的影响，确保结果的客观性</p>
+            <p><strong>建议三：</strong>可以多次填写问卷，对比不同时期的结果变化，观察自己的性格成长轨迹</p>
+            <p><strong>建议四：</strong>将问卷结果分享给亲近的人，听听他们的反馈可以验证结果的准确性和参考价值</p>
+            <p><strong>建议五：</strong>配合八字排盘结果一起解读，能够获得更全面的自我认知和运势指导</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某职场人士通过问卷发现自己具有典型的「木型」特质，选择创业方向时侧重创意和开拓性业务，取得了事业突破</p>
+            <p><strong>案例二：</strong>某用户通过情感模式问卷发现了自己潜意识中的择偶偏好，调整了恋爱策略，成功找到了契合的伴侣</p>
+            <p><strong>案例三：</strong>某管理者利用阴阳决策风格分析优化了团队管理方式，提升了团队工作效率和员工满意度</p>
+            <p><strong>案例四：</strong>某用户通过压力应对模式问卷发现了自己容易忽视的问题，并采取针对性的改善措施，提升了生活幸福感</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>问卷分析结果会不会有偏差？</p>
+            <p><strong>A：</strong>任何问卷都可能存在一定的偏差。系统采用多维度交叉验证和群体参照的方法来校正偏差，提高结果的可靠性。</p>
+            <p><strong>Q2：</strong>问卷分析需要多长时间？</p>
+            <p><strong>A：</strong>完整问卷约40道题目，预计需要15-20分钟完成。建议在时间充裕时认真作答。</p>
+            <p><strong>Q3：</strong>问卷结果会长期保存吗？</p>
+            <p><strong>A：</strong>会的。系统会保存你的问卷结果，方便你随时回顾和对比不同时期的分析报告。</p>
+            <p><strong>Q4：</strong>问卷分析与其他命理分析有什么区别？</p>
+            <p><strong>A：</strong>问卷分析侧重于你的主观特质和行为模式，与八字、面相等客观命理分析形成互补，综合参考效果更佳。</p>
+        </div>
+
+        <div class="section">
+            <h2>问卷命理的发展</h2>
+            <p>心理测量学起源于19世纪的实验心理学，经过一个多世纪的发展，已成为心理学研究的重要方法。</p>
+            <p>21世纪初，随着互联网的普及，在线问卷和性格测试开始流行，MBTI、大五人格等测试工具广为人知。</p>
+            <p>近年来，AI技术的进步使问卷分析能够与命理学深度融合，实现更加精准的个性化服务和智能推荐。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的命理问卷分析分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>82分（满分100分）</p>
+            <p><strong>运势概况：</strong>中吉</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '命理问卷分析';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

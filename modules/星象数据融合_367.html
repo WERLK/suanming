@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>星象数据融合 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>📡 星象数据融合</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>星象数据融合简介</h2>
+            <p>星象数据融合是将现代天文学精确的天体运行数据与中国传统星命学相结合的前沿分析工具。系统实时接入天文台的星历数据，精确计算日月五星的位置和角度，与传统八字、紫微斗数等进行深度融合。</p>
+            <p>传统命理中的星象推算往往依赖简化的历表，而本模块使用NASA/JPL的高精度星历（DE440），将天体位置计算精度提升到亚角秒级别，使星象分析更加精确。</p>
+            <p>通过星象数据融合，你能够获得传统方法难以实现的精细星象分析，包括行星逆行影响、日月食冲击、行星相位变化等对个人运势的精确影响。</p>
+        </div>
+
+        <div class="section">
+            <h2>星象融合原理</h2>
+            <p><strong>高精度星历：</strong>采用NASA JPL DE440星历，精确计算日、月、金、木、水、火、土七大星体在任意时刻的天球坐标和地心黄经。</p>
+            <p><strong>星盘叠加：</strong>将实时天象星盘与你的出生星盘（八字转化为星盘）叠加，计算行星过宫、相位角度和影响力强弱。</p>
+            <p><strong>中西合璧：</strong>将西方占星的相位理论（合相、三分相、对冲等）与中国七政四余星命理论融合，建立统一的星象分析框架。</p>
+            <p><strong>长期预测：</strong>基于可预测的星体运动规律，对未来数十年的星象影响进行精确计算和预测，精度远超传统方法。</p>
+        </div>
+
+        <div class="section">
+            <h2>星象分析维度</h2>
+            <p>1. <strong>实时星象影响：</strong>计算当前时刻各行星对你的影响强度和性质，识别当前的有利星象和不利星象，指导日常行动选择。</p>
+            <p>2. <strong>行星周期分析：</strong>分析各行星的运行周期与你的运势周期的对应关系，如木星12年周期（传统「本命年」）对你的具体影响。</p>
+            <p>3. <strong>特殊天象预警：</strong>提前预告日食、月食、行星逆行等特殊天象，以及这些天象将对你的哪些运势维度产生影响。</p>
+            <p>4. <strong>星象趋势预测：</strong>基于未来星体运行轨迹，预测未来1-5年的星象运势走势，为中长期规划提供天文依据。</p>
+        </div>
+
+        <div class="section">
+            <h2>星象分析使用技巧</h2>
+            <p><strong>建议一：</strong>行星逆行期（特别是水逆期）谨慎对待沟通和签约，但不必过度恐惧</p>
+            <p><strong>建议二：</strong>日月食前后一周是运势转换的关键期，适合进行总结和调整</p>
+            <p><strong>建议三：</strong>关注木星（岁星）进入你的命宫或财帛宫的年份，这往往是运势上升的信号</p>
+            <p><strong>建议四：</strong>将星象分析与八字分析结合使用，两者相互印证时结论更可靠</p>
+            <p><strong>建议五：</strong>利用星象趋势预测提前规划重要事项的时间安排</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>某用户关注到木星即将进入自己命宫，提前布局事业拓展，在木星入宫后顺利完成了公司扩张</p>
+            <p><strong>案例二：</strong>某投资者参考了行星相位分析，在金星与木星形成三分相的时段进行投资，获得了可观回报</p>
+            <p><strong>案例三：</strong>某用户在水星逆行预警期间特别注意合同细节和沟通方式，成功避免了一起潜在的合同纠纷</p>
+            <p><strong>案例四：</strong>某用户根据月食前后的运势提示，在月食期间进行了深度反思和规划，调整了人生方向</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>星象影响是否真的有科学依据？</p>
+            <p><strong>A：</strong>天体引力对地球的影响是客观存在的（如潮汐），星象分析建立在天体运行规律与人类行为之间可能存在的关联性假设上。</p>
+            <p><strong>Q2：</strong>中国命理也用星象吗？</p>
+            <p><strong>A：</strong>是的。中国传统命理中「七政四余」（日月五星+四余星）就是一套完整的星命体系，与八字命理共同构成了传统命理的两大支柱。</p>
+            <p><strong>Q3：</strong>行星逆行的影响真的那么可怕吗？</p>
+            <p><strong>A：</strong>行星逆行是正常的轨道现象，并非「灾难信号」。它更多意味着适合回顾、反思和调整，而非不宜行动。</p>
+            <p><strong>Q4：</strong>星象融合分析需要精确的出生时间吗？</p>
+            <p><strong>A：</strong>出生时间越精确，星盘叠加越准确。如果不知道具体时辰，可以使用中午12点作为默认时间，但结果会有一定偏差。</p>
+        </div>
+
+        <div class="section">
+            <h2>星命学的发展</h2>
+            <p>中国古代的星命学源远流长，唐代《开元占经》和印度传入的《宿曜经》标志着中西星命学的第一次融合。</p>
+            <p>明代以后，七政四余在中国民间的传播达到高峰，星命学与八字命理形成了互补的分析体系。</p>
+            <p>现代高精度星历和计算技术的发展使星象分析达到了前所未有的精度，为传统星命学注入了新的科学活力。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的星象数据融合分析。
+            </p>
+                        <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>92分（满分100分）</p>
+            <p><strong>运势概况：</strong>大吉</p>
+            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
+            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
+            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
+            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '星象数据融合';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.details && data.details.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            for (var i = 0; i < data.details.length; i++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
+            html += '</div>';
+        }
+        
+        if (data.advices && data.advices.length > 0) {
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
+            for (var j = 0; j < data.advices.length; j++) {
+                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

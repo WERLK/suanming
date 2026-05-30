@@ -968,7 +968,9 @@ VIP_LEVELS = {
 }
 
 AD_REWARD_HOURS = 2
-PERMANENT_AD_THRESHOLD = 20
+BONUS_AD_THRESHOLD = 20  # 每累计20次广告触发里程碑奖励
+BONUS_MIN_HOURS = 24     # 里程碑奖励最少1天
+BONUS_MAX_HOURS = 168    # 里程碑奖励最多7天
 
 
 def _get_today():
@@ -1098,7 +1100,7 @@ def vip_status():
             'max_daily_ads': max_ads,
             'ad_reward_hours': AD_REWARD_HOURS,
             'total_ad_count': total_ad_count,
-            'permanent_threshold': PERMANENT_AD_THRESHOLD,
+            'bonus_threshold': BONUS_AD_THRESHOLD,
             'bottom_ad_count': user.get('bottom_ad_count', 0),
             'bottom_ad_date': user.get('bottom_ad_date', ''),
             'bottom_today_ads': bottom_today,
@@ -1143,28 +1145,31 @@ def vip_watch_ad():
         total_ad_count = user.get('total_ad_count', 0) + 1
         users[user_index]['total_ad_count'] = total_ad_count
 
-        # 检查是否达到永久会员阈值
-        unlocked_permanent = False
-        if total_ad_count >= PERMANENT_AD_THRESHOLD:
-            users[user_index]['vip_level'] = 'permanent'
-            users[user_index]['vip_expire'] = None
-            unlocked_permanent = True
-        else:
-            # 增加会员时长
-            now = datetime.now()
-            vip_expire = user.get('vip_expire')
-            if vip_expire:
-                expire_dt = _safe_parse_datetime(vip_expire)
-                if expire_dt is None:
-                    expire_dt = now
-                elif expire_dt < now:
-                    expire_dt = now
-            else:
-                expire_dt = now
+        # 里程碑奖励：每累计20次广告，随机获得1-7天VIP
+        milestone_bonus = False
+        bonus_hours = 0
+        if total_ad_count > 0 and total_ad_count % BONUS_AD_THRESHOLD == 0:
+            milestone_bonus = True
+            bonus_hours = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
 
-            new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
-            users[user_index]['vip_expire'] = new_expire.isoformat()
-            users[user_index]['vip_level'] = 'basic'
+        # 计算实际奖励时长
+        reward_hours = bonus_hours if milestone_bonus else AD_REWARD_HOURS
+
+        # 增加会员时长
+        now = datetime.now()
+        vip_expire = user.get('vip_expire')
+        if vip_expire:
+            expire_dt = _safe_parse_datetime(vip_expire)
+            if expire_dt is None:
+                expire_dt = now
+            elif expire_dt < now:
+                expire_dt = now
+        else:
+            expire_dt = now
+
+        new_expire = expire_dt + timedelta(hours=reward_hours)
+        users[user_index]['vip_expire'] = new_expire.isoformat()
+        users[user_index]['vip_level'] = 'basic'
 
         # 更新每日广告计数
         if ad_date == today:
@@ -1175,28 +1180,16 @@ def vip_watch_ad():
 
         save_users(users)
 
-        if unlocked_permanent:
-            return jsonify({
-                'success': True,
-                'message': f'🎉 恭喜！已累计观看{total_ad_count}次广告，解锁永久会员！',
-                'vip_level': 'permanent',
-                'vip_level_name': '永久会员',
-                'vip_remaining': '永久有效',
-                'vip_expire': None,
-                'today_ads': users[user_index]['ad_watch_count'],
-                'max_daily_ads': max_ads,
-                'total_ad_count': total_ad_count,
-                'permanent_threshold': PERMANENT_AD_THRESHOLD,
-                'unlocked_permanent': True
-            }), 200
-        else:
-            remaining = new_expire - datetime.now()
-            hours = int(remaining.total_seconds() // 3600)
-            minutes = int((remaining.total_seconds() % 3600) // 60)
+        remaining = new_expire - datetime.now()
+        hours = int(remaining.total_seconds() // 3600)
+        minutes = int((remaining.total_seconds() % 3600) // 60)
 
+        if milestone_bonus:
+            bonus_days = bonus_hours // 24
             return jsonify({
                 'success': True,
-                'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时（累计{total_ad_count}/{PERMANENT_AD_THRESHOLD}次，满{PERMANENT_AD_THRESHOLD}次解锁永久会员）',
+                'milestone': True,
+                'message': f'🎉 里程碑奖励！累计观看{total_ad_count}次广告，获得随机{bonus_days}天VIP会员！',
                 'vip_level': 'basic',
                 'vip_level_name': '基础会员',
                 'vip_remaining': f'{hours}小时{minutes}分钟',
@@ -1204,7 +1197,23 @@ def vip_watch_ad():
                 'today_ads': users[user_index]['ad_watch_count'],
                 'max_daily_ads': max_ads,
                 'total_ad_count': total_ad_count,
-                'permanent_threshold': PERMANENT_AD_THRESHOLD
+                'bonus_threshold': BONUS_AD_THRESHOLD,
+                'bonus_hours': bonus_hours
+            }), 200
+        else:
+            next_milestone = ((total_ad_count // BONUS_AD_THRESHOLD) + 1) * BONUS_AD_THRESHOLD
+            return jsonify({
+                'success': True,
+                'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时（累计{total_ad_count}次，距里程碑还差{next_milestone - total_ad_count}次）',
+                'vip_level': 'basic',
+                'vip_level_name': '基础会员',
+                'vip_remaining': f'{hours}小时{minutes}分钟',
+                'vip_expire': new_expire.isoformat(),
+                'today_ads': users[user_index]['ad_watch_count'],
+                'max_daily_ads': max_ads,
+                'total_ad_count': total_ad_count,
+                'bonus_threshold': BONUS_AD_THRESHOLD,
+                'next_milestone': next_milestone
             }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1243,56 +1252,65 @@ def vip_bottom_ad():
             users[user_index]['bottom_ad_count'] = 1
             users[user_index]['bottom_ad_date'] = today
 
-        # 累计总广告次数（底部+个人中心合计，用于永久会员解锁）
+        # 累计总广告次数（底部+个人中心合计，用于里程碑奖励）
         total_ad_count = user.get('total_ad_count', 0) + 1
         users[user_index]['total_ad_count'] = total_ad_count
 
-        # 检查永久会员
-        unlocked_permanent = False
-        if total_ad_count >= PERMANENT_AD_THRESHOLD:
-            users[user_index]['vip_level'] = 'permanent'
-            users[user_index]['vip_expire'] = None
-            unlocked_permanent = True
-        else:
-            now = datetime.now()
-            vip_expire = user.get('vip_expire')
-            if vip_expire:
-                expire_dt = _safe_parse_datetime(vip_expire)
-                if expire_dt is None:
-                    expire_dt = now
-                elif expire_dt < now:
-                    expire_dt = now
-            else:
+        # 里程碑奖励：每累计20次广告，随机获得1-7天VIP
+        milestone_bonus = False
+        bonus_hours = 0
+        if total_ad_count > 0 and total_ad_count % BONUS_AD_THRESHOLD == 0:
+            milestone_bonus = True
+            bonus_hours = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
+
+        reward_hours = bonus_hours if milestone_bonus else AD_REWARD_HOURS
+
+        now = datetime.now()
+        vip_expire = user.get('vip_expire')
+        if vip_expire:
+            expire_dt = _safe_parse_datetime(vip_expire)
+            if expire_dt is None:
                 expire_dt = now
-            new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
-            users[user_index]['vip_expire'] = new_expire.isoformat()
-            users[user_index]['vip_level'] = 'basic'
+            elif expire_dt < now:
+                expire_dt = now
+        else:
+            expire_dt = now
+        new_expire = expire_dt + timedelta(hours=reward_hours)
+        users[user_index]['vip_expire'] = new_expire.isoformat()
+        users[user_index]['vip_level'] = 'basic'
 
         save_users(users)
 
-        if unlocked_permanent:
+        remaining = new_expire - datetime.now()
+        hours = int(remaining.total_seconds() // 3600)
+        minutes = int((remaining.total_seconds() % 3600) // 60)
+
+        if milestone_bonus:
+            bonus_days = bonus_hours // 24
             return jsonify({
                 'success': True,
-                'message': f'🎉 恭喜！累计观看{total_ad_count}次广告，解锁永久会员！',
-                'vip_level': 'permanent',
-                'today_ads': users[user_index]['bottom_ad_count'],
-                'max_daily_ads': max_ads,
-                'total_ad_count': total_ad_count,
-                'unlocked_permanent': True
-            }), 200
-        else:
-            remaining = new_expire - datetime.now()
-            hours = int(remaining.total_seconds() // 3600)
-            minutes = int((remaining.total_seconds() % 3600) // 60)
-            return jsonify({
-                'success': True,
-                'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时（累计{total_ad_count}/{PERMANENT_AD_THRESHOLD}次）',
+                'milestone': True,
+                'message': f'🎉 里程碑奖励！累计观看{total_ad_count}次广告，获得随机{bonus_days}天VIP会员！',
                 'vip_level': 'basic',
                 'vip_remaining': f'{hours}小时{minutes}分钟',
                 'today_ads': users[user_index]['bottom_ad_count'],
                 'max_daily_ads': max_ads,
                 'total_ad_count': total_ad_count,
-                'permanent_threshold': PERMANENT_AD_THRESHOLD
+                'bonus_threshold': BONUS_AD_THRESHOLD,
+                'bonus_hours': bonus_hours
+            }), 200
+        else:
+            next_milestone = ((total_ad_count // BONUS_AD_THRESHOLD) + 1) * BONUS_AD_THRESHOLD
+            return jsonify({
+                'success': True,
+                'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时（累计{total_ad_count}次，距里程碑还差{next_milestone - total_ad_count}次）',
+                'vip_level': 'basic',
+                'vip_remaining': f'{hours}小时{minutes}分钟',
+                'today_ads': users[user_index]['bottom_ad_count'],
+                'max_daily_ads': max_ads,
+                'total_ad_count': total_ad_count,
+                'bonus_threshold': BONUS_AD_THRESHOLD,
+                'next_milestone': next_milestone
             }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1391,12 +1409,20 @@ def vip_redeem():
 
         if opt['action'] == 'add_ad':
             users[user_index]['total_ad_count'] = user.get('total_ad_count', 0) + 1
+            new_total = users[user_index]['total_ad_count']
             message = f'兑换成功！获得免广卡x1'
-            # 检查是否达到永久阈值
-            if users[user_index]['total_ad_count'] >= PERMANENT_AD_THRESHOLD:
-                users[user_index]['vip_level'] = 'permanent'
-                users[user_index]['vip_expire'] = None
-                message += '，并已解锁永久会员！'
+            # 检查是否触发里程碑奖励
+            if new_total > 0 and new_total % BONUS_AD_THRESHOLD == 0:
+                bonus_hours = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
+                bonus_days = bonus_hours // 24
+                now = datetime.now()
+                vip_expire = user.get('vip_expire')
+                expire_dt = _safe_parse_datetime(vip_expire) if vip_expire else None
+                if expire_dt is None or expire_dt < now:
+                    expire_dt = now
+                users[user_index]['vip_expire'] = (expire_dt + timedelta(hours=bonus_hours)).isoformat()
+                users[user_index]['vip_level'] = 'basic'
+                message += f'，并触发里程碑奖励：+{bonus_days}天VIP！'
 
         elif opt['action'] == 'extend_vip':
             now = datetime.now()
@@ -1501,16 +1527,27 @@ def vip_wheel():
             users[user_index]['vip_level'] = 'basic'
         elif prize_type == 'ad_credit':
             users[user_index]['total_ad_count'] = user.get('total_ad_count', 0) + prize_value
-            if users[user_index]['total_ad_count'] >= PERMANENT_AD_THRESHOLD:
-                users[user_index]['vip_level'] = 'permanent'
-                users[user_index]['vip_expire'] = None
+            new_total = users[user_index]['total_ad_count']
+            # 检查是否触发里程碑奖励
+            if new_total > 0 and new_total % BONUS_AD_THRESHOLD == 0:
+                bonus_hours_w = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
+                bonus_days_w = bonus_hours_w // 24
+                now = datetime.now()
+                vip_expire = user.get('vip_expire')
+                expire_dt = _safe_parse_datetime(vip_expire) if vip_expire else None
+                if expire_dt is None or expire_dt < now:
+                    expire_dt = now
+                users[user_index]['vip_expire'] = (expire_dt + timedelta(hours=bonus_hours_w)).isoformat()
+                users[user_index]['vip_level'] = 'basic'
 
         save_users(users)
 
         remaining = max_spins - users[user_index]['wheel_spins_today']
         message = f'🎰 恭喜获得：{prize_name}！'
-        if prize_type == 'ad_credit' and users[user_index]['vip_level'] == 'permanent' and user.get('vip_level') != 'permanent':
-            message += ' 累计广告计次已达到永久门槛，已解锁永久会员！'
+        if prize_type == 'ad_credit':
+            nt = users[user_index]['total_ad_count']
+            if nt > 0 and nt % BONUS_AD_THRESHOLD == 0:
+                message += f' 触发里程碑奖励：+{bonus_days_w}天VIP！'
 
         return jsonify({
             'success': True,
@@ -1520,8 +1557,7 @@ def vip_wheel():
             'prize_name': prize_name,
             'remaining_spins': remaining,
             'total_points': users[user_index].get('points', 0),
-            'vip_level': users[user_index]['vip_level'],
-            'unlocked_permanent': (prize_type == 'ad_credit' and users[user_index]['vip_level'] == 'permanent' and user.get('vip_level') != 'permanent')
+            'vip_level': users[user_index]['vip_level']
         }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500

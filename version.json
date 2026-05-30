@@ -1,8 +1,8 @@
 {
-  "version": "1.3.2",
-  "build_time": "2026-05-30T20:15:00Z",
-  "git_commit": "d496b88",
+  "version": "1.4.0",
+  "build_time": "2026-05-30T20:19:00Z",
+  "git_commit": "49066ec",
   "author": "玄机算命网",
-  "description": "底部横幅广告与个人中心广告独立计数；新增 /api/vip/bottom-ad 端点 + bottom_ad_count/bottom_ad_date 字段",
-  "fix_count": 2
+  "description": "累计20次广告改为随机1-7天VIP里程碑奖励（取代永久会员解锁）；profile.html/vip.html 文案与进度同步更新",
+  "fix_count": 3
 }

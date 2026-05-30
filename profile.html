@@ -892,8 +892,8 @@
                         <div class="plan-icon">👑</div>
                         <div class="plan-name">永久会员</div>
                         <div class="plan-price">看广告<small>/免费获取</small></div>
-                        <div class="plan-desc" id="permanentPlanDesc">累计观看20次广告<br>永久解锁全部功能</div>
-                        <span class="plan-badge plan-badge-p" id="permanentPlanBadge">看广告解锁</span>
+                        <div class="plan-desc" id="permanentPlanDesc">累计观看20次广告<br>触发随机VIP里程碑奖励</div>
+                        <span class="plan-badge plan-badge-p" id="permanentPlanBadge">里程碑</span>
                     </div>
                 </div>
             </div>
@@ -1539,21 +1539,21 @@
                     }
                 }
                 
-                // 剩余时长 / 永久进度
+                // 剩余时长 / 里程碑进度
                 var totalAdCount = data.total_ad_count || 0;
-                var threshold = data.permanent_threshold || 20;
+                var threshold = data.bonus_threshold || 20;
                 var todayAds = data.today_ads || 0;
                 var maxAds = data.max_daily_ads || 0;
                 var adRemaining = Math.max(0, maxAds - todayAds);
                 updateVipAdInfo(todayAds, maxAds);
 
                 if (data.vip_level === 'permanent') {
-                    safeText('vipRemaining', '🎉 已解锁永久会员（今日可看广告' + maxAds + '次）');
+                    safeText('vipRemaining', '🎉 永久会员（今日可看广告' + maxAds + '次）');
                     var pb2 = document.getElementById('vipProgressBar');
                     if (pb2) pb2.style.width = '100%';
                 } else if (data.vip_remaining) {
                     var remainEl = document.getElementById('vipRemaining');
-                    if (remainEl) remainEl.textContent = '剩余: ' + data.vip_remaining + ' | 今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 永久进度 ' + totalAdCount + '/' + threshold;
+                    if (remainEl) remainEl.textContent = '剩余: ' + data.vip_remaining + ' | 今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 里程碑 ' + totalAdCount + '/' + threshold;
                     var expireDate = new Date(data.vip_expire);
                     var now = new Date();
                     var total = expireDate - now;
@@ -1564,22 +1564,23 @@
                 } else {
                     var permPct = Math.min(100, Math.round((totalAdCount / threshold) * 100));
                     var remainEl2 = document.getElementById('vipRemaining');
-                    if (remainEl2) remainEl2.textContent = '今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 永久进度 ' + totalAdCount + '/' + threshold + '（满' + threshold + '次解锁永久会员）';
+                    if (remainEl2) remainEl2.textContent = '今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 里程碑 ' + totalAdCount + '/' + threshold + '（每' + threshold + '次触发随机奖励）';
                     var pb4 = document.getElementById('vipProgressBar');
                     if (pb4) pb4.style.width = permPct + '%';
                 }
 
-                // 更新永久会员方案卡片
+                // 更新里程碑方案卡片
                 var pp = document.getElementById('planPermanent');
                 if (pp) {
                     var ppDesc = document.getElementById('permanentPlanDesc');
                     var ppBadge = document.getElementById('permanentPlanBadge');
                     if (data.vip_level === 'permanent') {
-                        if (ppDesc) ppDesc.textContent = '已永久解锁全部功能';
+                        if (ppDesc) ppDesc.textContent = '已解锁永久会员\n全部功能永久使用';
                         if (ppBadge) { ppBadge.textContent = '已解锁'; ppBadge.className = 'plan-badge plan-badge-p'; }
                     } else {
-                        if (ppDesc) ppDesc.textContent = '累计观看' + threshold + '次广告\n永久解锁全部功能';
-                        if (ppBadge) { ppBadge.textContent = totalAdCount + '/' + threshold; ppBadge.className = 'plan-badge plan-badge-p'; }
+                        var nextMilestone = Math.ceil(totalAdCount / threshold) * threshold;
+                        if (ppDesc) ppDesc.textContent = '每累计' + threshold + '次广告\n触发随机VIP里程碑奖励';
+                        if (ppBadge) { ppBadge.textContent = totalAdCount + '/' + nextMilestone; ppBadge.className = 'plan-badge plan-badge-p'; }
                     }
                 }
 
@@ -1977,11 +1978,8 @@
                 const data = await resp.json();
                 if (data.success) {
                     showToast(data.message);
-                    if (data.unlocked_permanent) {
-                        setTimeout(() => loadVIPStatus(), 1500);
-                    } else {
-                        loadVIPStatus();
-                    }
+                    loadVIPStatus();
+                }
                 } else {
                     showToast('⚠️ ' + data.message);
                     loadVIPStatus();

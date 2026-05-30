@@ -209,7 +209,7 @@
         var token = getAuthToken();
         if (!token) { resetAdBar(); return; }
 
-        fetch('/api/vip/watch-ad', {
+        fetch('/api/vip/bottom-ad', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token }
         }).then(function(r) { return r.json(); })

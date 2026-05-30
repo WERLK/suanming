@@ -1029,7 +1029,9 @@ def _ensure_vip_fields(user):
         'checkin_streak': 0,
         'wheel_spins_today': 0,
         'wheel_date': '',
-        'last_login_reward_date': ''
+        'last_login_reward_date': '',
+        'bottom_ad_count': 0,
+        'bottom_ad_date': ''
     }
     for k, v in defaults.items():
         if k not in user:
@@ -1074,6 +1076,10 @@ def vip_status():
 
         total_ad_count = user.get('total_ad_count', 0)
 
+        # 底部横幅广告独立计数
+        bottom_date = user.get('bottom_ad_date', '')
+        bottom_today = user.get('bottom_ad_count', 0) if bottom_date == today else 0
+
         today_checked_in = (user.get('last_checkin', '') == today)
         wheel_date = user.get('wheel_date', '')
         wheel_spins_today = user.get('wheel_spins_today', 0) if wheel_date == today else 0
@@ -1093,6 +1099,9 @@ def vip_status():
             'ad_reward_hours': AD_REWARD_HOURS,
             'total_ad_count': total_ad_count,
             'permanent_threshold': PERMANENT_AD_THRESHOLD,
+            'bottom_ad_count': user.get('bottom_ad_count', 0),
+            'bottom_ad_date': user.get('bottom_ad_date', ''),
+            'bottom_today_ads': bottom_today,
             'points': user.get('points', 0),
             'checkin_streak': user.get('checkin_streak', 0),
             'last_checkin': user.get('last_checkin', ''),
@@ -1193,6 +1202,94 @@ def vip_watch_ad():
                 'vip_remaining': f'{hours}小时{minutes}分钟',
                 'vip_expire': new_expire.isoformat(),
                 'today_ads': users[user_index]['ad_watch_count'],
+                'max_daily_ads': max_ads,
+                'total_ad_count': total_ad_count,
+                'permanent_threshold': PERMANENT_AD_THRESHOLD
+            }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/vip/bottom-ad', methods=['POST'])
+def vip_bottom_ad():
+    """底部横幅广告 - 独立计数，与个人中心广告互不影响"""
+    try:
+        result = _get_auth_user()
+        if not result:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user, users = result
+        _ensure_vip_fields(user)
+
+        user_index = None
+        for i, u in enumerate(users):
+            if u['id'] == user['id']:
+                user_index = i
+                break
+
+        today = _get_today()
+        bottom_date = user.get('bottom_ad_date', '')
+        today_ads = user.get('bottom_ad_count', 0) if bottom_date == today else 0
+        max_ads = VIP_LEVELS[user.get('vip_level', 'free')]['max_daily_ads']
+
+        if today_ads >= max_ads:
+            return jsonify({
+                'success': False, 'message': f'今日底部广告次数已达上限（{max_ads}次），明天再来吧'
+            }), 400
+
+        # 更新每日底部广告计数
+        if bottom_date == today:
+            users[user_index]['bottom_ad_count'] = today_ads + 1
+        else:
+            users[user_index]['bottom_ad_count'] = 1
+            users[user_index]['bottom_ad_date'] = today
+
+        # 累计总广告次数（底部+个人中心合计，用于永久会员解锁）
+        total_ad_count = user.get('total_ad_count', 0) + 1
+        users[user_index]['total_ad_count'] = total_ad_count
+
+        # 检查永久会员
+        unlocked_permanent = False
+        if total_ad_count >= PERMANENT_AD_THRESHOLD:
+            users[user_index]['vip_level'] = 'permanent'
+            users[user_index]['vip_expire'] = None
+            unlocked_permanent = True
+        else:
+            now = datetime.now()
+            vip_expire = user.get('vip_expire')
+            if vip_expire:
+                expire_dt = _safe_parse_datetime(vip_expire)
+                if expire_dt is None:
+                    expire_dt = now
+                elif expire_dt < now:
+                    expire_dt = now
+            else:
+                expire_dt = now
+            new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
+            users[user_index]['vip_expire'] = new_expire.isoformat()
+            users[user_index]['vip_level'] = 'basic'
+
+        save_users(users)
+
+        if unlocked_permanent:
+            return jsonify({
+                'success': True,
+                'message': f'🎉 恭喜！累计观看{total_ad_count}次广告，解锁永久会员！',
+                'vip_level': 'permanent',
+                'today_ads': users[user_index]['bottom_ad_count'],
+                'max_daily_ads': max_ads,
+                'total_ad_count': total_ad_count,
+                'unlocked_permanent': True
+            }), 200
+        else:
+            remaining = new_expire - datetime.now()
+            hours = int(remaining.total_seconds() // 3600)
+            minutes = int((remaining.total_seconds() % 3600) // 60)
+            return jsonify({
+                'success': True,
+                'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时（累计{total_ad_count}/{PERMANENT_AD_THRESHOLD}次）',
+                'vip_level': 'basic',
+                'vip_remaining': f'{hours}小时{minutes}分钟',
+                'today_ads': users[user_index]['bottom_ad_count'],
                 'max_daily_ads': max_ads,
                 'total_ad_count': total_ad_count,
                 'permanent_threshold': PERMANENT_AD_THRESHOLD

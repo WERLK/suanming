@@ -1,8 +1,8 @@
 {
-  "version": "1.1.4",
-  "build_time": "2026-05-30T17:01:56Z",
-  "git_commit": "1cfdcb2",
+  "version": "1.2.0",
+  "build_time": "2026-05-30T17:27:00Z",
+  "git_commit": "",
   "author": "玄机算命网",
-  "description": "全站页面底部动态显示版本号：footer.js动态获取+main.js为modules页面注入版本号",
-  "fix_count": 4
+  "description": "修复手机端个人中心广告按钮无反应：loadVIPStatus安全模式同步vip.html（safeSet/safeClass/空值保护+转盘逻辑修正+innerHTML保护span元素）",
+  "fix_count": 0
 }

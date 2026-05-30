@@ -1428,76 +1428,95 @@
 
         // ========== 会员VIP系统 ==========
 
+        // DOM 安全辅助函数（防止元素缺失时崩溃）
+        function safeSet(id, prop, val) {
+            var el = document.getElementById(id);
+            if (el) el[prop] = val;
+        }
+        function safeClass(id, cls) {
+            var el = document.getElementById(id);
+            if (el) el.className = cls;
+        }
+        function safeText(id, text) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
         async function loadVIPStatus() {
-            const token = Auth.getToken();
+            var token = Auth.getToken();
             if (!token) return;
             try {
-                const resp = await fetch('/api/vip/status', {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                var resp = await fetch('/api/vip/status', {
+                    headers: { 'Authorization': 'Bearer ' + token }
                 });
-                const data = await resp.json();
+                var data = await resp.json();
                 if (!data.success) {
                     console.warn('VIP status API returned failure:', data.message);
                     return;
                 }
                 
-                const card = document.getElementById('vipCard');
+                var card = document.getElementById('vipCard');
                 if (!card) return;
                 card.style.display = 'block';
                 
                 // 会员等级徽章
-                const badge = document.getElementById('vipBadge');
-                badge.textContent = data.vip_level_name;
-                badge.className = 'vip-badge ' + data.vip_level;
+                safeSet('vipBadge', 'textContent', data.vip_level_name || '');
+                safeClass('vipBadge', 'vip-badge ' + (data.vip_level || 'free'));
                 
                 // 到期时间
-                const expireEl = document.getElementById('vipExpire');
-                if (data.vip_level === 'permanent') {
-                    expireEl.textContent = '永久有效';
-                } else if (data.vip_expire) {
-                    const d = new Date(data.vip_expire);
-                    expireEl.textContent = '到期: ' + d.toLocaleDateString('zh-CN');
-                } else {
-                    expireEl.textContent = '';
+                var expireEl = document.getElementById('vipExpire');
+                if (expireEl) {
+                    if (data.vip_level === 'permanent') {
+                        expireEl.textContent = '永久有效';
+                    } else if (data.vip_expire) {
+                        var d = new Date(data.vip_expire);
+                        expireEl.textContent = '到期: ' + d.toLocaleDateString('zh-CN');
+                    } else {
+                        expireEl.textContent = '';
+                    }
                 }
                 
                 // 剩余时长 / 永久进度
-                const remainEl = document.getElementById('vipRemaining');
-                const progressBar = document.getElementById('vipProgressBar');
-                const totalAdCount = data.total_ad_count || 0;
-                const threshold = data.permanent_threshold || 20;
+                var totalAdCount = data.total_ad_count || 0;
+                var threshold = data.permanent_threshold || 20;
                 
                 if (data.vip_level === 'permanent') {
-                    remainEl.textContent = '🎉 已解锁永久会员';
-                    progressBar.style.width = '100%';
+                    safeText('vipRemaining', '🎉 已解锁永久会员');
+                    var pb2 = document.getElementById('vipProgressBar');
+                    if (pb2) pb2.style.width = '100%';
                 } else if (data.vip_remaining) {
-                    remainEl.textContent = '剩余: ' + data.vip_remaining + ' | 累计看广告 ' + totalAdCount + '/' + threshold + ' 次';
-                    const expireDate = new Date(data.vip_expire);
-                    const now = new Date();
-                    const total = expireDate - now;
-                    const max = 7 * 24 * 3600 * 1000;
-                    const pct = Math.min(100, Math.max(0, (total / max) * 100));
-                    progressBar.style.width = pct + '%';
+                    var remainEl = document.getElementById('vipRemaining');
+                    if (remainEl) remainEl.textContent = '剩余: ' + data.vip_remaining + ' | 累计看广告 ' + totalAdCount + '/' + threshold + ' 次';
+                    var expireDate = new Date(data.vip_expire);
+                    var now = new Date();
+                    var total = expireDate - now;
+                    var max = 7 * 24 * 3600 * 1000;
+                    var pct = Math.min(100, Math.max(0, (total / max) * 100));
+                    var pb3 = document.getElementById('vipProgressBar');
+                    if (pb3) pb3.style.width = pct + '%';
                 } else {
-                    const permPct = Math.min(100, Math.round((totalAdCount / threshold) * 100));
-                    remainEl.textContent = '累计看广告 ' + totalAdCount + '/' + threshold + ' 次（满' + threshold + '次解锁永久会员）';
-                    progressBar.style.width = permPct + '%';
+                    var permPct = Math.min(100, Math.round((totalAdCount / threshold) * 100));
+                    var remainEl2 = document.getElementById('vipRemaining');
+                    if (remainEl2) remainEl2.textContent = '累计看广告 ' + totalAdCount + '/' + threshold + ' 次（满' + threshold + '次解锁永久会员）';
+                    var pb4 = document.getElementById('vipProgressBar');
+                    if (pb4) pb4.style.width = permPct + '%';
                 }
                 
-                // 广告按钮
-                const adBtn = document.getElementById('vipAdBtn');
-                const adCount = document.getElementById('adRemain');
-                const adRemaining = data.max_daily_ads - data.today_ads;
+                // 广告按钮（使用 vip.html 安全模式，不覆盖 innerHTML 以保护 span#adRemain）
+                var adBtn = document.getElementById('vipAdBtn');
+                var adCount = document.getElementById('adRemain');
+                var maxAds = data.max_daily_ads || 0;
+                var todayAds = data.today_ads || 0;
+                var adRemaining = maxAds - todayAds;
                 
-                if (data.vip_level === 'permanent') {
-                    adBtn.disabled = false;
-                    adBtn.innerHTML = '📺 看广告（剩' + adRemaining + '次）';
-                } else if (adRemaining <= 0) {
-                    adBtn.disabled = true;
-                    adBtn.innerHTML = '📺 今日次数已用完';
-                } else {
-                    adBtn.disabled = false;
-                    adCount.textContent = '剩' + adRemaining;
+                if (adBtn) {
+                    if (adRemaining <= 0) {
+                        adBtn.disabled = true;
+                        adBtn.innerHTML = '📺 今日次数已用完';
+                    } else {
+                        adBtn.disabled = false;
+                        if (adCount) adCount.textContent = '剩' + adRemaining;
+                    }
                 }
 
                 // 更新永久会员方案卡片
@@ -1541,45 +1560,46 @@
                 }
 
                 // 更新积分与签到状态
-                var pointsVal2 = document.getElementById('pointsValue');
-                if (pointsVal2) pointsVal2.textContent = data.points || 0;
-                const checkinBtn = document.getElementById('checkinBtn');
-                const streakBadge = document.getElementById('streakBadge');
-                if (data.today_checked_in) {
-                    checkinBtn.classList.add('checked');
-                    checkinBtn.textContent = '✅ 已签到';
-                    checkinBtn.disabled = true;
-                } else {
-                    checkinBtn.classList.remove('checked');
-                    checkinBtn.textContent = '✅ 每日签到';
-                    checkinBtn.disabled = false;
+                safeText('pointsValue', data.points || 0);
+                var checkinBtn = document.getElementById('checkinBtn');
+                var streakBadge = document.getElementById('streakBadge');
+                if (checkinBtn) {
+                    if (data.today_checked_in) {
+                        checkinBtn.classList.add('checked');
+                        checkinBtn.textContent = '✅ 已签到';
+                        checkinBtn.disabled = true;
+                    } else {
+                        checkinBtn.classList.remove('checked');
+                        checkinBtn.textContent = '✅ 每日签到';
+                        checkinBtn.disabled = false;
+                    }
                 }
-                const streak = data.checkin_streak || 0;
+                var streak = data.checkin_streak || 0;
                 if (streakBadge) {
                     streakBadge.textContent = '连续' + streak + '天';
                     if (streak >= 7) streakBadge.classList.add('fire');
                     else streakBadge.classList.remove('fire');
                 }
 
-                // 更新转盘状态
-                const wheelRemain = document.getElementById('wheelRemain');
-                const wheelBtn = document.getElementById('wheelSpinBtn');
-                const remaining = data.wheel_spins_remaining || 0;
-                if (wheelRemain) wheelRemain.textContent = remaining;
+                // 更新转盘状态（修复：正确判断剩余次数而非元素是否存在）
+                var wheelRemain = document.getElementById('wheelRemain');
+                var wheelBtn = document.getElementById('wheelSpinBtn');
+                var wheelRemaining = data.wheel_spins_remaining || 0;
+                if (wheelRemain) wheelRemain.textContent = wheelRemaining;
                 if (wheelBtn) {
-                    wheelBtn.disabled = true;
-                    wheelBtn.innerHTML = '🎰 今日次数已用完';
-                } else {
-                    wheelBtn.disabled = false;
-                    wheelBtn.innerHTML = '🎰 免费转转盘（剩<span id="wheelRemain">' + remaining + '</span>次）';
+                    if (wheelRemaining <= 0) {
+                        wheelBtn.disabled = true;
+                        wheelBtn.innerHTML = '🎰 今日次数已用完';
+                    } else {
+                        wheelBtn.disabled = false;
+                        wheelBtn.innerHTML = '🎰 免费转转盘（剩<span id="wheelRemain">' + wheelRemaining + '</span>次）';
+                    }
                 }
             } catch (e) {
                 console.error('加载会员状态失败:', e);
-                // 显示错误状态
-                const card = document.getElementById('vipCard');
-                if (card) card.style.display = 'block';
-                const remainEl = document.getElementById('vipRemaining');
-                if (remainEl) remainEl.textContent = '⚠️ 会员信息加载失败，请刷新重试';
+                var card2 = document.getElementById('vipCard');
+                if (card2) card2.style.display = 'block';
+                safeText('vipRemaining', '⚠️ 会员信息加载失败: ' + (e.message || '请刷新重试'));
             }
         }
 

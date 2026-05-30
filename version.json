@@ -1,7 +1,8 @@
 {
-  "version": "1.0.0",
-  "build_time": "2026-05-27T21:50:00Z",
-  "git_commit": "",
+  "version": "1.1.0",
+  "build_time": "2026-05-30T15:50:00Z",
+  "git_commit": "5d902a9",
   "author": "玄机算命网",
-  "description": "动态版本管理配置文件"
+  "description": "累计修复5个问题：三个关键Bug、MODULE_MAP扩展、_global_cache修复、json导入修复、bazi时间解析修复",
+  "fix_count": 0
 }

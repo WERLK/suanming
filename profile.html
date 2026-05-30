@@ -1089,7 +1089,7 @@
     <div class="ad-modal" id="adModal">
         <button class="ad-close-btn" onclick="closeAdModal()">✕</button>
         <div class="ad-modal-content">
-            <p style="color:#ffd700;font-size:1.1rem;">📺 看广告获取 VIP 时长</p>
+            <div style="color:#ffd700;font-size:1.1rem;">📺 看广告获取 VIP 时长</div>
             <!-- 广告展示区域 -->
             <div class="ad-container" id="adContainer">
                 <div class="ad-loading">正在加载广告...</div>
@@ -1590,20 +1590,17 @@
 
         function watchAdForVIP() {
             try {
-                const token = Auth.getToken();
-                if (!token) { window.location.href = '/login.html'; return; }
+            var token = Auth.getToken();
+            if (!token) { window.location.href = '/login.html'; return; }
 
-                // 安全获取 BaiduAd，防止脚本未加载时崩溃
-                var _baidu = (typeof BaiduAd !== 'undefined') ? BaiduAd : null;
-                adRewardSeconds = (_baidu && _baidu.getRewardSeconds) ? _baidu.getRewardSeconds() : 5;
-                adSecondsWatched = 0;
+            adRewardSeconds = BaiduAd.getRewardSeconds();
+            adSecondsWatched = 0;
 
-            const modal = document.getElementById('adModal');
-            const timer = document.getElementById('adTimer');
-            const claimBtn = document.getElementById('adClaimBtn');
-            const container = document.getElementById('adContainer');
+            var modal = document.getElementById('adModal');
+            var timer = document.getElementById('adTimer');
+            var claimBtn = document.getElementById('adClaimBtn');
+            var container = document.getElementById('adContainer');
 
-            // 重置状态
             if (adTimerInterval) clearInterval(adTimerInterval);
             claimBtn.disabled = true;
             claimBtn.classList.remove('ready');
@@ -1613,13 +1610,11 @@
 
             modal.classList.add('show');
 
-            // 尝试加载真广告，否则用 fallback
-            if (_baidu && _baidu.isReady && _baidu.isReady()) {
-                _baidu.show('adContainer', function() {
+            if (BaiduAd.isReady()) {
+                BaiduAd.show('adContainer', function() {
                     startAdCountdown();
                 });
             } else {
-                // Fallback 模式：展示模拟广告占位
                 setTimeout(function() {
                     container.innerHTML = '<div class="ad-fallback">'
                         + '<span class="ad-fallback-icon">📺</span>'
@@ -1636,8 +1631,8 @@
         }
 
         function startAdCountdown() {
-            const timer = document.getElementById('adTimer');
-            const claimBtn = document.getElementById('adClaimBtn');
+            var timer = document.getElementById('adTimer');
+            var claimBtn = document.getElementById('adClaimBtn');
 
             adTimerInterval = setInterval(function() {
                 adSecondsWatched++;
@@ -1660,31 +1655,25 @@
 
             clearInterval(adTimerInterval);
             document.getElementById('adModal').classList.remove('show');
-            if (typeof BaiduAd !== 'undefined' && BaiduAd.destroy) BaiduAd.destroy('adContainer');
+            BaiduAd.destroy('adContainer');
 
-            const token = Auth.getToken();
-            if (!token) return;
+            var token = Auth.getToken();
+            if (!token) { showToast('请先登录'); return; }
 
             try {
-                const resp = await fetch('/api/vip/watch-ad', {
+                var resp = await fetch('/api/vip/watch-ad', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 if (resp.status === 401) { Auth.handleAuthError(); return; }
-                const data = await resp.json();
+                var data = await resp.json();
                 if (data.success) {
-                    if (data.unlocked_permanent) {
-                        showToast('🎉 ' + data.message);
-                        setTimeout(function() { loadVIPStatus(); }, 1500);
-                    } else {
-                        showToast('✅ ' + data.message);
-                        loadVIPStatus();
-                    }
+                    showToast(data.message);
+                    loadVIPStatus();
                 } else {
                     showToast('⚠️ ' + data.message);
                 }
             } catch (e) {
-                console.error('广告奖励失败:', e);
                 showToast('网络错误，请重试');
             }
         }
@@ -1692,15 +1681,17 @@
         function closeAdModal() {
             clearInterval(adTimerInterval);
             document.getElementById('adModal').classList.remove('show');
-            if (typeof BaiduAd !== 'undefined' && BaiduAd.destroy) BaiduAd.destroy('adContainer');
+            BaiduAd.destroy('adContainer');
         }
 
-        // 点击广告弹窗空白处关闭
+        // 点击广告弹窗空白处关闭（不会取消自动领取，奖励已在后台发放）
         document.getElementById('adModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeAdModal();
             }
         });
+
+        // ========== 签到 ==========
 
         // ========== 签到 ==========
         async function doCheckin() {

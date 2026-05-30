@@ -38,33 +38,87 @@
 .content-area {
     padding: 1rem;
     padding-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 80px);
 }
-.section {
+.dev-card {
     background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.1);
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
 }
-.section h2 {
-    color: #ffd700;
-    font-size: 1rem;
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255,215,0,0.1);
-}
-.section p {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 0.5rem;
-}
-.fortune-result-area {
-    display: none;
-    margin-bottom: 1rem;
-}
-.fortune-result-area.show {
+.dev-icon {
+    font-size: 4rem;
+    margin-bottom: 1.2rem;
     display: block;
+}
+.dev-title {
+    color: #ffd700;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+}
+.dev-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(255,180,0,0.15), rgba(255,140,0,0.1));
+    border: 1px solid rgba(255,180,0,0.3);
+    color: #ffb347;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+}
+.dev-desc {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+.dev-features {
+    text-align: left;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+.dev-features h3 {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+.dev-features li {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin-bottom: 0.3rem;
+    padding-left: 1rem;
+    position: relative;
+}
+.dev-features li::before {
+    content: "🔜";
+    position: absolute;
+    left: -0.2rem;
+}
+.back-home-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,215,0,0.3);
+    background: transparent;
+    color: #ffd700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.back-home-btn:hover {
+    background: rgba(255,215,0,0.1);
 }
 </style>
 </head>
@@ -79,205 +133,31 @@
     </div>
 
     <div class="content-area">
-        <div class="section">
-            <h2>眼型分析简介</h2>
-            <p>眼型分析是面相学中最重要的分析维度之一——眼睛被称为「监察官」，是心灵的窗户，在面相中权重最高。眼型不仅反映一个人的智慧、性格和心地，更直接关系到桃花运和感情运势。</p>
-            <p>AI系统通过分析眼睛的形状、大小、眼距、眼角形态、眼神光泽等10+个维度，精准判断你的眼型类别和对应的运势含义，特别是在感情和人际关系方面的表现。</p>
-            <p>传统面相学认为「眼正心正」，眼睛形态良好的人往往心地善良、运势顺遂。通过眼型分析了解自己的眼相特征，对改善感情生活和个人形象都有帮助。</p>
-        </div>
-
-        <div class="section">
-            <h2>眼型识别技术</h2>
-            <p><strong>眼部关键点检测：</strong>利用面部关键点检测技术精确定位眼睑轮廓、内外眼角、瞳孔中心等20+个眼部关键点。</p>
-            <p><strong>眼型分类：</strong>将眼型分为桃花眼、丹凤眼、杏眼、狐眼、三角眼、圆眼等12种标准类型，每种对应不同的性格和桃花运特征。</p>
-            <p><strong>眼神分析：</strong>通过分析瞳孔与眼白的比例、眼神的光泽度等指标，评估「眼神」的好坏，这是面相学中极为重要的指标。</p>
-            <p><strong>眼距计算：</strong>精确计算眼距和眼宽的比例，判断眼距的宽窄，「眼距宽者心宽，眼距窄者心细」是传统面相的重要判断依据。</p>
-        </div>
-
-        <div class="section">
-            <h2>眼型分析维度</h2>
-            <p>1. <strong>眼型性格：</strong>根据眼型判断你的内在性格——桃花眼者魅力强、丹凤眼者聪慧精明、杏眼者纯真善良等。你的眼型呈现{shu_type}特征。</p>
-            <p>2. <strong>桃花运分析：</strong>眼型是桃花运的最重要指标之一，分析你的桃花运类型（正桃花、烂桃花、偏桃花）和运势强度。</p>
-            <p>3. <strong>智慧与判断力：</strong>眼睛的清澈度和形态反映了思维清晰度和判断能力，「目光如炬」者往往有出色的洞察力。</p>
-            <p>4. <strong>35-40岁运程：</strong>眼运主管35-40岁，这个年龄段的运势与眼部形态密切相关，是事业和家庭的关键期。</p>
-        </div>
-
-        <div class="section">
-            <h2>眼型拍照技巧</h2>
-            <p><strong>建议一：</strong>正面平视镜头拍摄，不要侧脸或低头，眼睛自然睁开</p>
-            <p><strong>建议二：</strong>自然光下拍摄，避免闪光灯直射眼睛造成红眼或反光</p>
-            <p><strong>建议三：</strong>不要眯眼或瞪眼，保持自然放松的状态</p>
-            <p><strong>建议四：</strong>如果戴眼镜，建议取掉眼镜拍摄以避免镜片反光干扰</p>
-            <p><strong>建议五：</strong>可以分别在疲劳状态和精力充沛状态下拍摄对比，观察眼神的变化</p>
-        </div>
-
-        <div class="section">
-            <h2>案例分析</h2>
-            <p><strong>案例一：</strong>某用户被AI识别为典型的「桃花眼」，分析显示其异性缘极佳但需注意区分正桃花和烂桃花，用户反馈确实桃花运一直很旺</p>
-            <p><strong>案例二：</strong>某用户眼型为「丹凤眼」，AI判断其聪慧精明、善于观察，用户在商界凭借敏锐的判断力获得了成功</p>
-            <p><strong>案例三：</strong>某用户眼神略显浑浊，AI提示要注意健康和生活作息，用户调整作息后两周复查发现眼神明显清澈</p>
-            <p><strong>案例四：</strong>一位38岁的用户关注眼运分析，AI评估其35-40岁运程平稳有升，与用户近几年的发展轨迹一致</p>
-        </div>
-
-        <div class="section">
-            <h2>常见问题</h2>
-            <p><strong>Q1：</strong>单眼皮和双眼皮在面相中有什么不同？</p>
-            <p><strong>A：</strong>面相学不特别区分单双眼皮，更注重眼睛的整体形态、眼神和眼型。单眼皮也可能有很好的桃花运和贵人运。</p>
-            <p><strong>Q2：</strong>近视会影响眼型分析吗？</p>
-            <p><strong>A：</strong>近视本身不影响分析，但如果长期戴眼镜导致眼神涣散或眼球变形，可能会被系统检测到。建议取掉眼镜后自然恢复片刻再拍摄。</p>
-            <p><strong>Q3：</strong>能通过眼部微整形改善运势吗？</p>
-            <p><strong>A：</strong>眼部微整容可以改善外观但对面相命理的影响尚存争议。建议先从内在修养和健康调理入手，再考虑外在改动。</p>
-            <p><strong>Q4：</strong>眼神好具体指什么？</p>
-            <p><strong>A：</strong>眼神好指的是眼睛有神采、清澈有光、黑白分明，反映一个人精力充沛、心地纯正、思维清晰。</p>
-        </div>
-
-        <div class="section">
-            <h2>眼相学的发展</h2>
-            <p>眼睛在面相学中的地位至高无上，《麻衣相法》云：「天地之大，托日月以为光。日月为万物之鉴，眼乃人一身之日月也。」</p>
-            <p>古代相士将眼型分为数十种，每种都有详细的命理解读，眼睛的分析在面相学全书中通常占据最长的篇幅。</p>
-            <p>现代计算机视觉技术使得眼型的精细分析成为可能，AI可以比人类更精确地测量眼部参数和识别细微特征。</p>
-        </div>
-
-        <div class="section">
-            <h2>⚡ 大数据联网实时分析</h2>
-            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
-                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的眼型分析分析。
-            </p>
-                        <div style="max-width: 500px; margin: 0 auto;">
-                <div style="margin-bottom: 1.2rem;">
-                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请上传分析照片</label>
-                    <input type="file" id="userImage" accept="image/*" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" onchange="handleImageUpload(event)">
-                </div>
-                <div id="imagePreview" style="display:none; margin-bottom: 1.2rem; text-align: center;">
-                    <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid rgba(255,215,0,0.2);" />
-                </div>
-                <div style="margin-bottom: 1.2rem;">
-                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
-                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
-                </div>
-                <div style="margin-bottom: 1.2rem;">
-                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
-                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
-                </div>
-                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">📷 开始分析</button>
+        <div class="dev-card">
+            <span class="dev-icon">🚧</span>
+            <div class="dev-title">眼型分析</div>
+            <div class="dev-badge">🔧 开发中</div>
+            <div class="dev-desc">
+                该功能正在紧锣密鼓地开发中，我们的技术团队正在全力优化AI识别算法和图像分析引擎。敬请期待！
             </div>
-            
-            <div class="fortune-result-area" id="apiResult">
+            <div class="dev-features">
+                <h3>✨ 即将上线功能预览</h3>
+                <li>AI智能图像识别与分析</li>
+                <li>深度学习特征提取</li>
+                <li>传统相学与现代AI融合</li>
+                <li>多维度综合运势评估</li>
+                <li>实时拍照即时分析</li>
             </div>
-        </div>
-
-        <div class="section">
-            <h2>2026年运势分析示例</h2>
-            <p><strong>综合评分：</strong>86分（满分100分）</p>
-            <p><strong>运势概况：</strong>中平</p>
-            <p><strong>事业运：</strong>事业发展有良好机遇，需把握时机</p>
-            <p><strong>财运：</strong>财运稳中有升，适合长期投资规划</p>
-            <p><strong>感情运：</strong>感情运势平稳，单身者有机会遇到合适的对象</p>
-            <p><strong>健康运：</strong>整体健康状态良好，注意劳逸结合</p>
+            <button class="back-home-btn" onclick="history.back()">← 返回功能列表</button>
         </div>
     </div>
 </div>
 
 <script src="/js/main.js"></script>
-<script src="/js/fortune-api.js"></script>
 <script>
-var MODULE_TYPE = 'image';
-var MODULE_NAME = '眼型分析';
-var MODULE_CATEGORY = '图片上传算';
-
 document.addEventListener('DOMContentLoaded', function() {
     createStars();
 });
-
-// 图片上传处理
-var uploadedImageBase64 = null;
-
-function handleImageUpload(event) {
-    var file = event.target.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        uploadedImageBase64 = e.target.result.split(',')[1];
-        document.getElementById('imagePreview').style.display = 'block';
-        document.getElementById('previewImg').src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-async function runAnalysis() {
-    var name = document.getElementById('userName').value || '匿名用户';
-    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
-    var time = document.getElementById('userTime').value || '12:00';
-    var resultArea = document.getElementById('apiResult');
-    
-    var payload = {
-        module_type: MODULE_TYPE,
-        module_subtype: MODULE_NAME,
-        name: name,
-        birth_date: birth,
-        birth_time: time
-    };
-    
-    if (uploadedImageBase64) {
-        payload.base64_data = uploadedImageBase64;
-    }
-    
-    var result = await fortuneAPI('analyze', payload);
-    
-    if (result && result.data) {
-        resultArea.classList.add('show');
-        showDataBadge(result.meta.source || 'realtime', 'apiResult');
-        
-        var data = result.data;
-        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
-        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
-        
-        if (data.scores) {
-            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
-            for (var k in data.scores) {
-                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
-            }
-            html += '</div>';
-        }
-        
-        if (data.summary) {
-            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
-        }
-        
-        if (data.details && data.details.length > 0) {
-            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
-            for (var i = 0; i < data.details.length; i++) {
-                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.6;margin-bottom:0.3rem;">' + data.details[i] + '</p>';
-            }
-            html += '</div>';
-        }
-        
-        if (data.lucky_elements) {
-            var le = data.lucky_elements;
-            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
-            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
-            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
-            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
-            if (le.element) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🌟 五行喜: ' + le.element + '</span>';
-            html += '</div>';
-        }
-        
-        if (data.advices && data.advices.length > 0) {
-            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
-            html += '<p style="color:#ffd700;font-size:0.85rem;margin-bottom:0.5rem;">💡 建议：</p>';
-            for (var j = 0; j < data.advices.length; j++) {
-                html += '<p style="color:rgba(255,255,255,0.7);font-size:0.8rem;line-height:1.6;margin-bottom:0.2rem;">• ' + data.advices[j] + '</p>';
-            }
-            html += '</div>';
-        }
-        
-        html += '</div>';
-        resultArea.innerHTML = html;
-        resultArea.scrollIntoView({ behavior: 'smooth' });
-    } else {
-        showFortuneError('apiResult', '分析失败，请检查网络后重试', runAnalysis, null);
-        resultArea.classList.add('show');
-    }
-}
 </script>
 
 </body>

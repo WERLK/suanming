@@ -188,45 +188,8 @@
     background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,215,0,0.1));
 }
 
-.knowledge-preview {
-    padding: 1rem;
-    margin-top: 1rem;
-}
-
-.knowledge-card-large {
-    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.1);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.knowledge-card-large h3 {
-    color: #ffd700;
-    font-size: 1rem;
-    margin-bottom: 0.8rem;
-}
-
-.knowledge-card-large p {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 0.5rem;
-}
-
-/* 桌面端知识区双栏布局 */
+/* 桌面端布局 */
 @media (min-width: 1024px) {
-    .knowledge-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-    }
-    .knowledge-card-large {
-        margin-bottom: 0;
-    }
-    .knowledge-preview {
-        padding: 1.5rem 2.5rem !important;
-    }
     .featured-section {
         padding: 1.5rem 2.5rem;
     }
@@ -415,31 +378,6 @@
         </button>
     </div>
 
-    <div class="knowledge-preview">
-        <h2 class="section-title">📚 算命知识科普</h2>
-        <div class="knowledge-grid">
-            <div class="knowledge-card-large">
-                <h3>什么是八字？</h3>
-                <p>八字，即生辰八字，是一个人出生时的干支历日期。年干和年支组成年柱，月干和月支组成月柱，日干和日支组成日柱，时干和时支组成时柱；一共四柱，四个干和四个支共八个字，所以称为"八字"。</p>
-                <p>八字命理学通过天干地支的五行生克制化关系，分析一个人的性格、事业、婚姻、健康等各方面的运势走向。</p>
-            </div>
-
-            <div class="knowledge-card-large">
-                <h3>紫微斗数的起源</h3>
-                <p>紫微斗数起源于道家，相传为陈抟老祖（陈希夷）所创。它将人的命运分为12宫位，每宫位有14主星坐守，通过星曜的组合和四化飞星的变化，精准推断人生百态。</p>
-                <p>紫微斗数与八字命理并称为"命理双壁"，前者重星曜组合，后者重五行生克，两者相辅相成。</p>
-            </div>
-
-            <div class="knowledge-card-large">
-                <h3>如何正确使用算命工具？</h3>
-                <p>1. <strong>心态端正</strong>：算命是为提供参考，而非绝对定论。命运掌握在自己手中。</p>
-                <p>2. <strong>信息准确</strong>：输入准确的出生时间（最好精确到分钟），确保排盘准确。</p>
-                <p>3. <strong>综合分析</strong>：不要只看单一指标，要结合八字、紫微、面相、手相等多方面综合判断。</p>
-                <p>4. <strong>理性对待</strong>：算命结果仅供参考，重大决策还需结合现实情况理性分析。</p>
-            </div>
-        </div>
-    </div>
-    
     <!-- 手机端底部导航 -->
     <nav class="bottom-nav">
         <a href="/" class="nav-item active">

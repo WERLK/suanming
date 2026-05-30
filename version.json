@@ -1,8 +1,8 @@
 {
-  "version": "1.2.1",
-  "build_time": "2026-05-30T18:47:00Z",
-  "git_commit": "9a2b650",
+  "version": "1.2.2",
+  "build_time": "2026-05-30T18:55:00Z",
+  "git_commit": "3868f0e",
   "author": "玄机算命网",
-  "description": "移除广告按钮，改为每日登录自动获取VIP时长；修复手机端广告按钮长期无响应问题",
-  "fix_count": 1
+  "description": "每日登录VIP时长改为随机1-6小时",
+  "fix_count": 2
 }

@@ -587,10 +587,11 @@ def login():
         if user.get('status') != 'active':
             return jsonify({'success': False, 'message': '账户已被禁用'}), 200
 
-        # 每日登录自动发放 VIP 时长
+        # 每日登录自动发放随机 VIP 时长
         _ensure_vip_fields(user)
         today = _get_today()
         login_reward_given = False
+        login_reward_hours = 0
         if user.get('last_login_reward_date', '') != today:
             now = datetime.now()
             vip_expire = user.get('vip_expire')
@@ -602,7 +603,8 @@ def login():
                     expire_dt = now
             else:
                 expire_dt = now
-            new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
+            login_reward_hours = random.randint(1, 6)
+            new_expire = expire_dt + timedelta(hours=login_reward_hours)
             user['vip_expire'] = new_expire.isoformat()
             user['vip_level'] = 'basic'
             user['last_login_reward_date'] = today
@@ -620,7 +622,7 @@ def login():
             'success': True,
             'token': token,
             'login_reward': login_reward_given,
-            'reward_hours': AD_REWARD_HOURS if login_reward_given else 0,
+            'reward_hours': login_reward_hours,
             'user': {
                 'id': user['id'],
                 'username': user['username'],
@@ -2006,7 +2008,7 @@ def get_help_topic(topic):
             },
             'vip': {
                 'title': '如何获得VIP会员？',
-                'content': '每天登录自动获得2小时VIP会员时长，每日签到还可额外获得积分和VIP时长奖励。'
+                'content': '每天登录自动随机获得1-6小时VIP会员时长，每日签到还可额外获得积分和VIP时长奖励。'
             },
             'avatar': {
                 'title': '如何上传头像？',

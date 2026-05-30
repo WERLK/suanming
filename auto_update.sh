@@ -58,11 +58,11 @@ start_daemon() {
                     log "Gunicorn is DOWN, starting recovery deploy..."
                 fi
                 
-                bash "$PROJECT_DIR/start_gunicorn.sh" >> "$LOG_DIR/auto_update.log" 2>&1
+                bash "$PROJECT_DIR/reload_server.sh" >> "$LOG_DIR/auto_update.log" 2>&1
                 log "Redeploy finished"
             elif ! pgrep -f gunicorn > /dev/null 2>&1; then
                 log "Gunicorn not running, attempting recovery..."
-                bash "$PROJECT_DIR/start_gunicorn.sh" >> "$LOG_DIR/auto_update.log" 2>&1
+                bash "$PROJECT_DIR/reload_server.sh" >> "$LOG_DIR/auto_update.log" 2>&1
                 log "Recovery deploy finished"
             fi
 

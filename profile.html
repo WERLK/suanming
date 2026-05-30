@@ -1422,12 +1422,17 @@
             }, 1000);
         }
         
-        // 点击弹窗外部关闭弹窗
-        document.getElementById('editProfileModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeEditProfile();
+        // 点击弹窗外部关闭弹窗（安全绑定）
+        try {
+            var editModal = document.getElementById('editProfileModal');
+            if (editModal) {
+                editModal.addEventListener('click', function(event) {
+                    if (event.target === this) {
+                        closeEditProfile();
+                    }
+                });
             }
-        });
+        } catch(e) { console.warn('[PROFILE] editProfileModal 绑定失败:', e.message); }
 
         // ========== 会员VIP系统 ==========
 
@@ -1724,32 +1729,64 @@
             BaiduAd.destroy('adContainer');
         }
 
-        // ===== 广告按钮事件绑定（移动端兼容：click + touchend） =====
-        (function bindAdButton() {
-            var btn = document.getElementById('vipAdBtn');
-            if (!btn) { console.error('[AD-BTN] vipAdBtn 元素未找到！'); return; }
-
-            // 移除可能残留的 inline onclick 防止重复
-            btn.removeAttribute('onclick');
-
-            function onAdTap(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[AD-BTN] 广告按钮被点击，类型:', e.type);
-                watchAdForVIP();
+        // ===== 广告按钮事件绑定（DOMContentLoaded 后延迟执行，确保元素就绪） =====
+        (function initAdButtonBinding() {
+            function doBind() {
+                try {
+                    var btn = document.getElementById('vipAdBtn');
+                    if (!btn) {
+                        // 如果元素还没准备好，等 200ms 再试一次
+                        setTimeout(function() {
+                            var retryBtn = document.getElementById('vipAdBtn');
+                            if (retryBtn) bindEvents(retryBtn);
+                            else console.error('[AD-BTN] vipAdBtn 重试后仍未找到！');
+                        }, 200);
+                        return;
+                    }
+                    bindEvents(btn);
+                } catch(e) {
+                    console.error('[AD-BTN] 绑定失败:', e.message);
+                }
             }
 
-            btn.addEventListener('click', onAdTap);
-            btn.addEventListener('touchend', onAdTap);
-            console.log('[AD-BTN] 广告按钮事件已绑定');
+            function bindEvents(btn) {
+                btn.removeAttribute('onclick');
+                var lastTap = 0;
+                
+                function onAdTap(e) {
+                    var now = Date.now();
+                    // 防止 touchend + click 双重触发（300ms 内只执行一次）
+                    if (now - lastTap < 300) return;
+                    lastTap = now;
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('[AD-BTN] 广告按钮被点击，类型:', e.type);
+                    watchAdForVIP();
+                }
+
+                btn.addEventListener('click', onAdTap);
+                btn.addEventListener('touchend', onAdTap);
+                console.log('[AD-BTN] 广告按钮事件已绑定: click + touchend');
+            }
+
+            // DOM 就绪后立即绑定
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', doBind);
+            } else {
+                doBind();
+            }
         })();
 
-        // 点击广告弹窗空白处关闭（不会取消自动领取，奖励已在后台发放）
-        document.getElementById('adModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeAdModal();
+        // 点击广告弹窗空白处关闭（安全绑定）
+        try {
+            var adModal = document.getElementById('adModal');
+            if (adModal) {
+                adModal.addEventListener('click', function(e) {
+                    if (e.target === this) closeAdModal();
+                });
             }
-        });
+        } catch(e) { console.warn('[PROFILE] adModal 绑定失败:', e.message); }
 
         // ========== 签到 ==========
 
@@ -1810,9 +1847,12 @@
                 showToast('网络错误，请重试');
             }
         }
-        document.getElementById('redeemModal').addEventListener('click', function(e) {
-            if (e.target === this) closeRedeem();
-        });
+        try {
+            var redeemModal = document.getElementById('redeemModal');
+            if (redeemModal) redeemModal.addEventListener('click', function(e) {
+                if (e.target === this) closeRedeem();
+            });
+        } catch(e) { console.warn('[PROFILE] redeemModal 绑定失败:', e.message); }
 
         // ========== 幸运转盘 ==========
         var wheelSpinning = false;
@@ -1992,9 +2032,12 @@
         }
 
         // 弹窗点击空白处关闭
-        document.getElementById('avatarPickerModal').addEventListener('click', function(e) {
-            if (e.target === this) closeAvatarPicker();
-        });
+        try {
+            var avatarPickerModal = document.getElementById('avatarPickerModal');
+            if (avatarPickerModal) avatarPickerModal.addEventListener('click', function(e) {
+                if (e.target === this) closeAvatarPicker();
+            });
+        } catch(e) { console.warn('[PROFILE] avatarPickerModal 绑定失败:', e.message); }
 
         // ========== 头像上传功能 ==========
         async function uploadAvatar() {

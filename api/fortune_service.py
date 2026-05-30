@@ -766,7 +766,11 @@ class BaziCalculator:
             if isinstance(birth_time, str) and birth_time in SHICHEN_MAP:
                 hour = SHICHEN_MAP[birth_time]
             elif isinstance(birth_time, str):
-                hour = int(birth_time)
+                # 支持 "HH:MM" 格式和纯数字字符串
+                if ':' in birth_time:
+                    hour = int(birth_time.split(':')[0])
+                else:
+                    hour = int(birth_time)
             else:
                 hour = int(birth_time)
 
@@ -1748,58 +1752,64 @@ class UniversalAnalyzer:
 
             result = None
 
-            if normalized == 'bazi':
-                result = BaziCalculator.calc_full(
-                    name=params.get('name', '未知'),
-                    gender=params.get('gender', '男'),
-                    birth_date_str=params.get('birth_date', '2000-01-01'),
-                    birth_time=params.get('birth_time', 12),
-                    region_lon=params.get('region_lon', 116.4)
-                )
-            elif normalized == 'shengxiao':
-                result = ShengxiaoCalculator.get_fortune(
-                    zodiac=params.get('zodiac', '鼠'),
-                    year=params.get('year', datetime.now().year),
-                    month=params.get('month', 1),
-                    day=params.get('day', 1)
-                )
-            elif normalized == 'xingming':
-                result = XingmingCalculator.analyze(
-                    name_str=params.get('name', '')
-                )
-            elif normalized == 'heyun':
-                result = HeYunCalculator.match(
-                    name1=params.get('name1', ''),
-                    birth1=params.get('birth1', '2000-01-01'),
-                    name2=params.get('name2', ''),
-                    birth2=params.get('birth2', '2000-01-01')
-                )
-            elif normalized == 'huangli':
-                result = HuangliService.get_huangli(
-                    date_str=params.get('date', datetime.now().strftime('%Y-%m-%d'))
-                )
-            elif normalized == 'jiemeng':
-                result = JieMengService.analyze(
-                    keyword=params.get('keyword', '')
-                )
-            elif normalized == 'tarot':
-                n = params.get('n', 3)
-                result = TarotAPIClient.draw_random(n=n)
-            elif normalized == 'horoscope':
-                sign = params.get('sign', 'aries')
-                period = params.get('period', 'daily')
-                if period == 'weekly':
-                    result = HoroscopeAPIClient.get_weekly(sign)
-                elif period == 'monthly':
-                    result = HoroscopeAPIClient.get_monthly(sign)
+            try:
+                if normalized == 'bazi':
+                    result = BaziCalculator.calc_full(
+                        name=params.get('name', '未知'),
+                        gender=params.get('gender', '男'),
+                        birth_date_str=params.get('birth_date', '2000-01-01'),
+                        birth_time=params.get('birth_time', 12),
+                        region_lon=params.get('region_lon', 116.4)
+                    )
+                    if result and isinstance(result, dict) and 'error' not in result:
+                        result = cls._enrich_bazi_result(result)
+                elif normalized == 'shengxiao':
+                    result = ShengxiaoCalculator.get_fortune(
+                        zodiac=params.get('zodiac', '鼠'),
+                        year=params.get('year', datetime.now().year),
+                        month=params.get('month', 1),
+                        day=params.get('day', 1)
+                    )
+                elif normalized == 'xingming':
+                    result = XingmingCalculator.analyze(
+                        name_str=params.get('name', '')
+                    )
+                elif normalized == 'heyun':
+                    result = HeYunCalculator.match(
+                        name1=params.get('name1', ''),
+                        birth1=params.get('birth1', '2000-01-01'),
+                        name2=params.get('name2', ''),
+                        birth2=params.get('birth2', '2000-01-01')
+                    )
+                elif normalized == 'huangli':
+                    result = HuangliService.get_huangli(
+                        date_str=params.get('date', datetime.now().strftime('%Y-%m-%d'))
+                    )
+                elif normalized == 'jiemeng':
+                    result = JieMengService.analyze(
+                        keyword=params.get('keyword', '')
+                    )
+                elif normalized == 'tarot':
+                    n = params.get('n', 3)
+                    result = TarotAPIClient.draw_random(n=n)
+                elif normalized == 'horoscope':
+                    sign = params.get('sign', 'aries')
+                    period = params.get('period', 'daily')
+                    if period == 'weekly':
+                        result = HoroscopeAPIClient.get_weekly(sign)
+                    elif period == 'monthly':
+                        result = HoroscopeAPIClient.get_monthly(sign)
+                    else:
+                        result = HoroscopeAPIClient.get_daily(sign)
+                elif normalized == 'image':
+                    result = analyze_image(
+                        params.get('base64_data', ''),
+                        params.get('module_type', 'face')
+                    )
                 else:
-                    result = HoroscopeAPIClient.get_daily(sign)
-            elif normalized == 'image':
-                result = analyze_image(
-                    params.get('base64_data', ''),
-                    params.get('module_type', 'face')
-                )
-            else:
+                    result = cls._smart_fallback(normalized, params)
+            except Exception as e:
+                log_warning(f"专用计算器失败 ({normalized}): {str(e)}，回退到智能仿真")
                 result = cls._smart_fallback(normalized, params)
 
             if result is not None:
@@ -1807,7 +1817,88 @@ class UniversalAnalyzer:
 
             return result
         except Exception as e:
-            return {'error': str(e)}
+            log_error(f"analyze 全局异常: {str(e)}")
+            return cls._smart_fallback(normalized if 'normalized' in dir() else module_type, params)
+
+    @classmethod
+    def _enrich_bazi_result(cls, bazi_data):
+        """
+        为八字排盘结果添加通用分析字段（scores/summary/lucky_elements 等），
+        使前端通用模板能够正确渲染展示。
+        """
+        import random
+        import hashlib
+        # 基于姓名+日柱生成确定性评分
+        seed_str = bazi_data.get('name', '') + bazi_data.get('day_master', '')
+        seed_val = int(hashlib.md5(seed_str.encode()).hexdigest()[:8], 16)
+        rng = random.Random(seed_val)
+
+        # 五行平衡度评分
+        wuxing = bazi_data.get('wuxing_stats', {})
+        total = sum(wuxing.values()) if wuxing else 1
+        balance = 100 - int(max(abs(v/total - 0.2) for v in wuxing.values()) * 200) if wuxing else 70
+        balance = max(50, min(95, balance))
+
+        overall = rng.randint(70, 92)
+        scores = {
+            '综合': overall,
+            '五行平衡': balance,
+            '事业': rng.randint(65, 95),
+            '财运': rng.randint(60, 90),
+            '婚姻': rng.randint(65, 92),
+            '健康': rng.randint(70, 95),
+        }
+
+        day_master = bazi_data.get('day_master', '日')
+        day_master_element = bazi_data.get('day_master_element', '')
+        xiyong = bazi_data.get('xiyong', {})
+        xishen = xiyong.get('喜神', '')
+        yongshen = xiyong.get('用神', '')
+
+        summary = (
+            f"八字排盘分析：日主为{day_master}（{day_master_element}），"
+            f"喜神{xishen}，用神{yongshen}。"
+            f"整体运势{'较佳' if overall >= 80 else '平稳'}，"
+            f"五行{'' if balance >= 75 else '略欠'}平衡，"
+            f"建议顺势而为，把握机遇。"
+        )
+
+        # 幸运元素
+        lucky_elements = {
+            'colors': f"{yongshen}色、{xishen}色" if yongshen and xishen else '白色、青色',
+            'numbers': str(rng.choice([2, 4, 6, 8])) + '、' + str(rng.choice([1, 3, 5, 7, 9])),
+            'directions': rng.choice(['东、东南', '南、西南', '西、西北', '北、东北']),
+            'element': yongshen or day_master_element or '木',
+        }
+
+        # 详情列表
+        details = []
+        if bazi_data.get('shishen'):
+            for gan, shen in list(bazi_data['shishen'].items())[:4]:
+                details.append(f"{gan}：{shen}")
+        if bazi_data.get('pillars'):
+            details.append(
+                "四柱：" + " ".join([p['ganzhi'] for p in bazi_data['pillars']])
+            )
+
+        # 建议列表
+        advices = [
+            f"五行喜{lucky_elements['element']}，可多接触相关属性事物增强运势",
+            f"幸运方位：{lucky_elements['directions']}，办事宜面向此方",
+            f"幸运颜色：{lucky_elements['colors']}，可在衣物或配饰中选用",
+            f"幸运数字：{lucky_elements['numbers']}，选择日期时可优先考虑",
+            "保持心态平和，顺势而为，方能事半功倍",
+        ]
+
+        bazi_data['scores'] = scores
+        bazi_data['overall'] = overall
+        bazi_data['summary'] = summary
+        bazi_data['details'] = details
+        bazi_data['advices'] = advices
+        bazi_data['lucky_elements'] = lucky_elements
+        bazi_data['module_type'] = 'bazi'
+        bazi_data['source'] = '八字排盘分析'
+        return bazi_data
 
     @classmethod
     def _smart_fallback(cls, normalized, params):

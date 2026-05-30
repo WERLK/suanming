@@ -235,6 +235,9 @@
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.3s;
+            position: relative;
+            z-index: 5;
+            flex-shrink: 0;
         }
         .vip-ad-btn:hover {
             background: linear-gradient(135deg, #ffed4e, #ffd700);
@@ -1583,7 +1586,8 @@
         var adRewardSeconds = 5;
 
         function watchAdForVIP() {
-            const token = Auth.getToken();
+            try {
+                const token = Auth.getToken();
             if (!token) { window.location.href = '/login.html'; return; }
 
             adRewardSeconds = BaiduAd.getRewardSeconds();
@@ -1619,6 +1623,10 @@
                         + '</div>';
                     startAdCountdown();
                 }, 400);
+            }
+            } catch (e) {
+                console.error('[VIP] 广告加载失败:', e);
+                showToast('广告加载失败，请稍后再试');
             }
         }
 

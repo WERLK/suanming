@@ -26,7 +26,6 @@ import base64
 import threading
 import time
 import fcntl
-import fcntl
 
 app = Flask(__name__, static_folder='../', static_url_path='')
 app.secret_key = os.environ.get('JWT_SECRET', 'xuanji_fortune_secret_key_2026!!')
@@ -167,15 +166,26 @@ def verify_token(token):
     except Exception:
         return None
 
-# 读取用户数据
+# 读取用户数据（带文件锁，防止多worker竞态条件）
 def load_users():
     with open(USERS_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
+        fcntl.flock(f.fileno(), fcntl.LOCK_SH)  # 共享锁
+        try:
+            data = json.load(f)
+        finally:
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        return data
 
-# 保存用户数据
+# 保存用户数据（带文件锁，防止多worker竞态条件导致数据丢失）
 def save_users(users):
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(users, f, ensure_ascii=False, indent=2)
+    with open(USERS_FILE, 'r+', encoding='utf-8') as f:
+        fcntl.flock(f.fileno(), fcntl.LOCK_EX)  # 排他锁
+        try:
+            f.seek(0)
+            f.truncate()
+            json.dump(users, f, ensure_ascii=False, indent=2)
+        finally:
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
 
 # 发送邮件（用于密码重置）
 # SMTP 配置优先级：环境变量 > mail_config.json > 演示模式

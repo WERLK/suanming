@@ -432,8 +432,10 @@ def fortune_analyze():
         raise ValueError('module_type不能为空')
 
     cache_key = f"analyze:{module_type}:{module_subtype}:{json.dumps(payload, sort_keys=True)}"
+    if module_subtype:
+        payload['module_subtype'] = module_subtype
     data, source = _cache_or_fetch(cache_key, 86400, lambda: universal_analyzer.analyze(
-        module_type, module_subtype, payload
+        module_type, payload
     ))
     if data is None:
         return error_response('请求过于频繁，请稍后重试', 429)

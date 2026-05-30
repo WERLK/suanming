@@ -1657,6 +1657,7 @@
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
+                if (resp.status === 401) { Auth.handleAuthError(); return; }
                 const data = await resp.json();
                 if (data.success) {
                     if (data.unlocked_permanent) {
@@ -1699,6 +1700,7 @@
                 const resp = await fetch('/api/vip/checkin', {
                     method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
                 });
+                if (resp.status === 401) { Auth.handleAuthError(); return; }
                 const data = await resp.json();
                 if (data.success) {
                     showToast('✅ ' + data.message);
@@ -1731,6 +1733,7 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ type: type })
                 });
+                if (resp.status === 401) { Auth.handleAuthError(); return; }
                 const data = await resp.json();
                 if (data.success) {
                     showToast('✅ ' + data.message);
@@ -1836,6 +1839,7 @@
                 const resp = await fetch('/api/vip/wheel', {
                     method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
                 });
+                if (resp.status === 401) { wheelSpinning = false; Auth.handleAuthError(); return; }
                 const data = await resp.json();
                 if (data.success) {
                     showToast(data.message);

@@ -773,6 +773,9 @@ var adSecondsWatched = 0;
 var adRewardSeconds = 5;
 
 function watchAdForVIP() {
+    var token = Auth.getToken();
+    if (!token) { window.location.href = '/login.html'; return; }
+
     adRewardSeconds = BaiduAd.getRewardSeconds();
     adSecondsWatched = 0;
 
@@ -841,6 +844,7 @@ async function claimAdReward() {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token }
         });
+        if (resp.status === 401) { Auth.handleAuthError(); return; }
         var data = await resp.json();
         if (data.success) {
             showToast(data.message);
@@ -870,6 +874,7 @@ async function doCheckin() {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token }
         });
+        if (resp.status === 401) { Auth.handleAuthError(); return; }
         var data = await resp.json();
         if (data.success) {
             showToast(data.message);
@@ -1003,6 +1008,7 @@ async function claimWheelPrize() {
         var resp = await fetch('/api/vip/wheel', {
             method: 'POST', headers: { 'Authorization': 'Bearer ' + token }
         });
+        if (resp.status === 401) { wheelSpinning = false; Auth.handleAuthError(); return; }
         var data = await resp.json();
         if (data.success) {
             showToast(data.message);

@@ -33,7 +33,18 @@ window.Auth = (function() {
     }
 
     function getToken() {
-        return localStorage.getItem('token') || sessionStorage.getItem('token');
+        var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) return null;
+        // 快速过期检查：解析 JWT payload 中的 exp（不验证签名，仅做前端预检）
+        try {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.exp && payload.exp * 1000 < Date.now()) {
+                // token 已过期，清理并返回 null
+                clearToken();
+                return null;
+            }
+        } catch (e) { /* 解析失败，让后端验证 */ }
+        return token;
     }
 
     function setToken(token, remember) {
@@ -61,14 +72,13 @@ window.Auth = (function() {
     }
 
     /**
-     * 同步登录状态到另一个存储
-     * 解决 localStorage 和 sessionStorage 之间的不同步问题
+     * 同步登录状态到另一个存储（仅在需要跨存储同步时调用）
+     * 警告：不应在登录/注册后无条件调用，会破坏 remember 语义
      */
     function syncTokenToBoth() {
-        var token = getToken();
-        var user = getStorage().getItem('currentUser');
+        var token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        var user = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
         if (token) {
-            // 确保 localStorage 和 sessionStorage 都有 token（双写策略）
             localStorage.setItem('token', token);
             sessionStorage.setItem('token', token);
             if (user) {
@@ -128,6 +138,34 @@ window.Auth = (function() {
         return false;
     }
 
+    /**
+     * 处理 API 返回的 401 未授权响应
+     * 清除过期 token 并跳转登录页
+     * @returns {boolean} 是否触发了跳转
+     */
+    function handleAuthError() {
+        clearToken();
+        window.location.replace('/login.html');
+        return true;
+    }
+
+    /**
+     * 快速验证 token 是否有效（异步调用 /api/vip/status 轻量验证）
+     * 用于在关键操作前确认登录状态
+     */
+    async function verifyToken() {
+        var token = getToken();
+        if (!token) return false;
+        try {
+            var resp = await fetch(API_BASE + '/api/vip/status', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            return resp.status === 200;
+        } catch (e) {
+            return false;
+        }
+    }
+
     // ========== 登录/注册/登出 ==========
 
     async function login(username, password, remember) {
@@ -141,8 +179,6 @@ window.Auth = (function() {
                 var storage = getStorage();
                 storage.setItem('currentUser', JSON.stringify(data.user));
             }
-            // 同步到双存储，确保多标签页都能读到
-            syncTokenToBoth();
             // 通知其他标签页
             _broadcastAuthChange('login');
         }
@@ -314,7 +350,9 @@ window.Auth = (function() {
         verifySMS: verifySMS,
         showMsg: showMsg,
         onAuthChange: onAuthChange,
-        syncTokenToBoth: syncTokenToBoth
+        syncTokenToBoth: syncTokenToBoth,
+        handleAuthError: handleAuthError,
+        verifyToken: verifyToken
     };
 })();
 

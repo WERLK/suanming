@@ -120,19 +120,29 @@ function initSearch() {
     });
 }
 
-// ===== 全站版本号注入（modules页面无footer.js时自动显示） =====
+// ===== 全站版本号 + 备案号注入（modules页面无footer.js时自动显示） =====
 (function() {
     var FALLBACK_VERSION = 'v1.0.0';
     var FALLBACK_COMMIT = 'unknown';
+    var ICP_NUMBER = '辽ICP备2026010972号-1';
+    var ICP_URL = 'https://beian.miit.gov.cn/';
 
     function injectVersionFooter(version, commit) {
         // 如果 footer.js 已注入 site-footer 则跳过，避免重复
         if (document.querySelector('.site-footer')) return;
         var container = document.body;
         if (!container) return;
-        var html = '<div class="site-footer" style="text-align:center;padding:1.5rem 1rem 3rem;margin-top:2rem;border-top:1px solid rgba(255,215,0,0.08);">' +
-            '<div style="color:rgba(255,255,255,0.25);font-size:0.7rem;">' + version + ' · commit ' + commit + '</div>' +
-            '</div>';
+        var html = '<div class="site-footer" style="text-align:center;padding:1.5rem 1rem 4rem;margin-top:2rem;border-top:1px solid rgba(255,215,0,0.08);">' +
+            '<div style="margin-bottom:0.5rem;">' +
+            '<span style="display:inline-block;background:rgba(255,215,0,0.08);border-radius:4px;padding:0.15rem 0.5rem;' +
+            'font-family:monospace;font-size:0.68rem;color:rgba(255,215,0,0.5);letter-spacing:0.5px;">' +
+            version + ' · ' + commit + '</span></div>' +
+            '<div style="font-size:0.7rem;">' +
+            '<a href="' + ICP_URL + '" target="_blank" rel="noopener" ' +
+            'style="color:rgba(255,255,255,0.3);text-decoration:none;">' + ICP_NUMBER + '</a>' +
+            '<span style="color:rgba(255,255,255,0.1);margin:0 0.6rem;">|</span>' +
+            '<span style="color:rgba(255,255,255,0.12);">公安联网备案审核中</span>' +
+            '</div></div>';
         var div = document.createElement('div');
         div.innerHTML = html;
         container.appendChild(div.firstElementChild);

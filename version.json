@@ -1,8 +1,8 @@
 {
-  "version": "1.4.1",
-  "build_time": "2026-05-30T20:38:00Z",
-  "git_commit": "2188fff",
+  "version": "1.4.2",
+  "build_time": "2026-05-30T20:42:00Z",
+  "git_commit": "a9b5d8c",
   "author": "玄机算命网",
-  "description": "修复底部广告栏遮挡ICP备案号：body增加48px底部间距",
+  "description": "底部排版：版本号+ICP备案号+公安联网备案号统一排版，版本号带金色标签样式",
   "fix_count": 1
 }

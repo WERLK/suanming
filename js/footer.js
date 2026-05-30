@@ -1,5 +1,5 @@
 /**
- * 玄机算命网 - 全站底部备案信息 + 版本号
+ * 玄机算命网 - 全站底部：版本号 + ICP备案 + 公安联网备案
  * 所有页面统一引用，修改一处全站生效
  * 版本号从 /version.json 动态获取
  */
@@ -12,17 +12,31 @@
     var FALLBACK_COMMIT = 'unknown';
 
     function buildFooterHTML(version, commit) {
-        var html = '<div class="site-footer" style="text-align:center;padding:1.5rem 1rem 3rem;margin-top:2rem;border-top:1px solid rgba(255,215,0,0.08);">' +
-            '<div style="color:rgba(255,255,255,0.3);font-size:0.7rem;margin-bottom:0.3rem;">' + version + ' · commit ' + commit + '</div>' +
-            '<div style="font-size:0.7rem;">' +
-            '<a href="' + ICP_URL + '" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.3);text-decoration:none;">' + ICP_NUMBER + '</a>';
+        var html = '<div class="site-footer" style="text-align:center;padding:1.5rem 1rem 4rem;margin-top:2rem;border-top:1px solid rgba(255,215,0,0.08);">';
+
+        // 行1：版本号 + commit
+        html += '<div style="margin-bottom:0.5rem;">' +
+            '<span style="display:inline-block;background:rgba(255,215,0,0.08);border-radius:4px;padding:0.15rem 0.5rem;' +
+            'font-family:monospace;font-size:0.68rem;color:rgba(255,215,0,0.5);letter-spacing:0.5px;">' +
+            version + ' · ' + commit +
+            '</span></div>';
+
+        // 行2：备案号
+        html += '<div style="font-size:0.7rem;line-height:1.6;">' +
+            '<a href="' + ICP_URL + '" target="_blank" rel="noopener" ' +
+            'style="color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;" ' +
+            'onmouseover="this.style.color=\'rgba(255,215,0,0.6)\'" ' +
+            'onmouseout="this.style.color=\'rgba(255,255,255,0.3)\'">' + ICP_NUMBER + '</a>';
+
+        html += '<span style="color:rgba(255,255,255,0.1);margin:0 0.6rem;">|</span>';
 
         if (GA_NUMBER) {
-            html += '<span style="color:rgba(255,255,255,0.15);margin:0 0.5rem;">|</span>' +
-                '<a href="' + GA_URL + '" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.3);text-decoration:none;">' + GA_NUMBER + '</a>';
+            html += '<a href="' + GA_URL + '" target="_blank" rel="noopener" ' +
+                'style="color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;" ' +
+                'onmouseover="this.style.color=\'rgba(255,215,0,0.6)\'" ' +
+                'onmouseout="this.style.color=\'rgba(255,255,255,0.3)\'">' + GA_NUMBER + '</a>';
         } else {
-            html += '<span style="color:rgba(255,255,255,0.15);margin:0 0.5rem;">|</span>' +
-                '<span style="color:rgba(255,255,255,0.15);">公安联网备案审核中</span>';
+            html += '<span style="color:rgba(255,255,255,0.12);">公安联网备案审核中</span>';
         }
 
         html += '</div></div>';
@@ -30,7 +44,6 @@
     }
 
     function injectFooter(version, commit) {
-        // 如果页面已有 site-footer，跳过（避免重复）
         if (document.querySelector('.site-footer')) return;
         var container = document.body;
         if (!container) return;
@@ -63,7 +76,6 @@
                 injectFooter(version, commit);
             })
             .catch(function() {
-                // 获取失败时使用回退版本号
                 injectFooter(FALLBACK_VERSION, FALLBACK_COMMIT);
             });
     });

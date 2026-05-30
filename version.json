@@ -1,8 +1,8 @@
 {
-  "version": "1.5.7",
-  "build_time": "2026-05-30T15:37:00Z",
+  "version": "1.6.0",
+  "build_time": "2026-05-31T00:07:00Z",
   "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "底部导航栏改为右侧可折叠侧边菜单+FAB按钮",
+  "description": "新增用户行为分析数据库（SQLite），全自动追踪算命事件/登录/页面访问，含管理看板",
   "fix_count": 0
 }

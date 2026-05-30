@@ -548,6 +548,16 @@ def register():
         }
         users.append(new_user)
         save_users(users)
+
+        # 记录注册事件到分析数据库
+        try:
+            snapshot_user(user_id=new_user['id'], username=username,
+                         gender='', birth_str='', vip_level='basic', is_new=True)
+            from api.analytics_db import track_session as _ts2
+            _ts2(user_id=new_user['id'], event_type='signup', page='/api/register',
+                 client_ip=request.remote_addr or '')
+        except: pass
+
         token = generate_token(new_user['id'])
         return jsonify({
             'success': True,
@@ -617,6 +627,17 @@ def login():
 
         user['last_login'] = datetime.now().isoformat()
         save_users(users)
+
+        # 记录登录事件到分析数据库
+        try:
+            snapshot_user(user_id=user['id'], username=user['username'],
+                         gender=user.get('gender', ''), birth_str=user.get('birthday', ''),
+                         vip_level=user.get('vip_level', 'basic'))
+            from api.analytics_db import track_session as _ts
+            _ts(user_id=user['id'], event_type='login', page='/api/login',
+                client_ip=request.remote_addr or '')
+        except: pass
+
         token = generate_token(user['id'])
         response = jsonify({
             'success': True,
@@ -852,6 +873,73 @@ try:
     print("算命API蓝图已加载（/api/fortune/*）")
 except Exception as e:
     print(f"算命API蓝图加载失败: {e}")
+
+# 加载分析数据库
+try:
+    from api.analytics_db import init_db, track_session, snapshot_user, track_divination
+    init_db()
+    print("分析数据库已加载")
+except Exception as e:
+    print(f"分析数据库加载失败: {e}")
+
+# ===== 全局请求追踪 =====
+@app.before_request
+def before_request_track():
+    """记录每个请求的页面访问"""
+    if request.method == 'GET' and not request.path.startswith('/api/'):
+        try:
+            track_session(
+                event_type='page_view',
+                page=request.path,
+                referrer=request.referrer or '',
+                client_ip=request.remote_addr or ''
+            )
+        except Exception:
+            pass
+
+# ===== 算命事件追踪 =====
+@app.after_request
+def after_request_track(response):
+    """自动追踪所有 fortune API 请求"""
+    if request.path.startswith('/api/fortune/'):
+        try:
+            parts = request.path.split('/')
+            module_id = parts[3] if len(parts) > 3 else ''
+            module_names = {
+                'bazi': '八字排盘', 'ziwei': '紫微斗数', 'tarot': '塔罗牌',
+                'shengxiao': '生肖运势', 'xingming': '姓名测试', 'xingzuo': '星座运势',
+                'hehun': '合婚配对', 'jiemeng': '周公解梦', 'fengshui': '风水堪舆',
+                'huangli': '黄道吉日', 'qs': '每日运势', 'liuyao': '六爻占卜',
+                'caishen': '财神方位', 'analyze': '智能分析'
+            }
+            module_name = module_names.get(module_id, module_id)
+            token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
+            user_id = None
+            if token:
+                try:
+                    uid = verify_token(token)
+                    if uid: user_id = uid
+                except: pass
+
+            track_divination(
+                user_id=user_id,
+                module_name=module_name,
+                module_id=module_id,
+                is_logged_in=bool(user_id),
+                client_ip=request.remote_addr or '',
+                user_agent=request.headers.get('User-Agent', '')[:200]
+            )
+        except Exception:
+            pass
+    return response
+
+# 注册分析API蓝图
+try:
+    from api.analytics_routes import analytics_bp
+    app.register_blueprint(analytics_bp, url_prefix='/api/admin/analytics')
+    print("分析API蓝图已加载（/api/admin/analytics/*）")
+except Exception as e:
+    print(f"分析API蓝图加载失败: {e}")
 
 @app.route('/api/image-analyze', methods=['POST'])
 def image_analyze():

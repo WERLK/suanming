@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据分析 — 玄机算命网</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    background:#0a0a1a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    padding:20px;min-height:100vh;
+}
+h1{color:#ffd700;margin-bottom:24px;font-size:1.5rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.card{
+    background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.12);
+    border-radius:10px;padding:16px;text-align:center
+}
+.card .num{font-size:2rem;color:#ffd700;font-weight:bold}
+.card .label{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:4px}
+.section{margin-bottom:24px}
+.section h2{color:#ffd700;font-size:1.1rem;margin-bottom:12px;padding-bottom:6px;
+    border-bottom:1px solid rgba(255,215,0,0.1)}
+.chart-bars{display:flex;flex-direction:column;gap:6px}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bar-row .name{width:100px;font-size:0.8rem;text-align:right;color:rgba(255,255,255,0.7);flex-shrink:0}
+.bar-row .bar-wrap{flex:1;height:22px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden}
+.bar-row .bar{height:100%;background:linear-gradient(90deg,rgba(255,215,0,0.4),rgba(255,215,0,0.7));
+    border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:0.7rem;color:#fff;
+    transition:width 0.6s ease}
+.bar-row .count{width:40px;font-size:0.75rem;color:rgba(255,255,255,0.5)}
+.chart-canvas{width:100%;height:200px;position:relative;margin-top:8px}
+.loading{text-align:center;color:rgba(255,255,255,0.3);padding:40px}
+.error{color:#f44;text-align:center;padding:20px}
+.pie-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.pie-card{background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.08);
+    border-radius:10px;padding:16px}
+.pie-card h3{font-size:0.85rem;color:#ffd700;margin-bottom:12px}
+.pie-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:0.8rem}
+.pie-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.pie-item .val{margin-left:auto;color:rgba(255,255,255,0.5)}
+@media(max-width:600px){.cards{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<h1>📊 数据分析看板</h1>
+
+<div class="cards" id="overviewCards"><div class="loading">加载中...</div></div>
+
+<div class="section">
+    <h2>🔥 模块热度排行（近30天）</h2>
+    <div class="chart-bars" id="moduleBars"><div class="loading">加载中...</div></div>
+</div>
+
+<div class="section">
+    <h2>📈 每日算命请求（近30天）</h2>
+    <canvas id="dailyChart" class="chart-canvas"></canvas>
+</div>
+
+<div class="section">
+    <h2>⏰ 时段分布（近7天）</h2>
+    <canvas id="hourlyChart" class="chart-canvas" style="height:160px"></canvas>
+</div>
+
+<div class="section">
+    <h2>👥 用户画像</h2>
+    <div class="pie-grid" id="profileGrid"><div class="loading">加载中...</div></div>
+</div>
+
+<script>
+function $(id){return document.getElementById(id)}
+async function fetchJSON(url){
+    const r=await fetch(url)
+    const d=await r.json()
+    if(!d.success)throw new Error(d.message)
+    return d.data
+}
+
+function renderOverview(data){
+    const t=data
+    $('overviewCards').innerHTML=
+        '<div class="card"><div class="num">'+t.total_users+'</div><div class="label">累计用户</div></div>'+
+        '<div class="card"><div class="num">'+t.today+'</div><div class="label">今日算命</div></div>'+
+        '<div class="card"><div class="num">'+t.week+'</div><div class="label">近7天</div></div>'+
+        '<div class="card"><div class="num">'+t.month+'</div><div class="label">近30天</div></div>'+
+        '<div class="card"><div class="num">'+t.today_logged_in+'</div><div class="label">今日登录用户</div></div>'+
+        '<div class="card"><div class="num">'+t.today_anonymous+'</div><div class="label">今日匿名用户</div></div>'
+}
+
+function renderModules(data){
+    if(!data.length){$('moduleBars').innerHTML='<div class="loading">暂无数据</div>';return}
+    const max=data[0].cnt
+    $('moduleBars').innerHTML=data.map(r=>{
+        const pct=Math.round(r.cnt/max*100)
+        return '<div class="bar-row">'+
+            '<span class="name">'+r.module_name+'</span>'+
+            '<div class="bar-wrap"><div class="bar" style="width:'+pct+'%">'+r.cnt+'</div></div>'+
+            '<span class="count">'+r.unique_users+'人</span></div>'
+    }).join('')
+}
+
+function renderDaily(data){
+    const c=$('dailyChart'),ctx=c.getContext('2d')
+    const W=c.parentElement.clientWidth;c.width=W*2;c.height=400;c.style.width=W+'px';c.style.height='200px'
+    ctx.scale(2,2);const w=W,h=200;ctx.clearRect(0,0,w,h)
+
+    if(!data.length){ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='14px sans-serif';
+        ctx.textAlign='center';ctx.fillText('暂无数据',w/2,h/2);return}
+
+    const pad={l:40,r:20,t:20,b:30}
+    const pw=w-pad.l-pad.r,ph=h-pad.t-pad.b
+    const max=Math.max(...data.map(d=>d.count),1)
+    const stepW=pw/(data.length-1||1)
+
+    ctx.strokeStyle='rgba(255,215,0,0.15)';ctx.lineWidth=1
+    for(let i=0;i<=4;i++){const y=pad.t+ph*i/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke()}
+
+    ctx.beginPath();ctx.strokeStyle='rgba(255,215,0,0.8)';ctx.lineWidth=2
+    data.forEach((d,i)=>{
+        const x=pad.l+i*stepW,y=pad.t+ph-(d.count/max*ph)
+        if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)
+        ctx.fillStyle='#ffd700';ctx.font='9px sans-serif';ctx.textAlign='center'
+        ctx.fillText(d.day.slice(5),x,h-pad.b+14)
+    })
+    ctx.stroke()
+
+    data.forEach((d,i)=>{
+        const x=pad.l+i*stepW,y=pad.t+ph-(d.count/max*ph)
+        ctx.beginPath();ctx.fillStyle='rgba(255,215,0,0.9)';ctx.arc(x,y,3,0,Math.PI*2);ctx.fill()
+    })
+}
+
+function renderHourly(data){
+    const c=$('hourlyChart'),ctx=c.getContext('2d')
+    const W=c.parentElement.clientWidth;c.width=W*2;c.height=320;c.style.width=W+'px';c.style.height='160px'
+    ctx.scale(2,2);const w=W,h=160
+
+    const hours=Array(24).fill(0)
+    data.forEach(d=>{hours[parseInt(d.hour)]=d.count})
+    const max=Math.max(...hours,1)
+    const pad={l:35,r:15,t:10,b:25},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b
+    const bw=pw/24-1
+
+    hours.forEach((v,i)=>{
+        const x=pad.l+i*(pw/24),barH=Math.max(v/max*ph,1)
+        ctx.fillStyle=v>0?'rgba(255,215,0,0.7)':'rgba(255,215,0,0.1)'
+        ctx.fillRect(x,pad.t+ph-barH,bw,barH)
+    })
+
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='9px sans-serif';ctx.textAlign='center'
+    for(let i=0;i<24;i+=4){
+        ctx.fillText(i+'时',pad.l+i*(pw/24)+bw/2,h-pad.b+12)
+    }
+}
+
+function renderProfile(data){
+    let html=''
+
+    if(data.gender&&data.gender.length){
+        html+='<div class="pie-card"><h3>性别分布</h3>'
+        const colors=['#ffd700','#ff6b6b','#4ecdc4']
+        data.gender.forEach((g,i)=>{
+            html+='<div class="pie-item"><span class="pie-dot" style="background:'+colors[i%3]+'"></span>'+
+                (g.gender==='male'?'男':g.gender==='female'?'女':g.gender)+
+                '<span class="val">'+g.cnt+'人</span></div>'
+        })
+        html+='</div>'
+    }
+
+    if(data.vip&&data.vip.length){
+        html+='<div class="pie-card"><h3>会员分布</h3>'
+        const vc=['#ffd700','#87ceeb','#ff69b4']
+        data.vip.forEach((v,i)=>{
+            html+='<div class="pie-item"><span class="pie-dot" style="background:'+vc[i%3]+'"></span>'+
+                (v.vip_level==='permanent'?'永久会员':v.vip_level==='free'?'免费用户':v.vip_level)+
+                '<span class="val">'+v.cnt+'人</span></div>'
+        })
+        html+='</div>'
+    }
+
+    if(data.age&&data.age.length){
+        html+='<div class="pie-card"><h3>年龄段</h3>'
+        const ac=['#ffd700','#ffa502','#7bed9f','#70a1ff','#ff6b81','#a4b0be']
+        data.age.forEach((a,i)=>{
+            html+='<div class="pie-item"><span class="pie-dot" style="background:'+ac[i%6]+'"></span>'+
+                a.group+'岁<span class="val">'+a.count+'人</span></div>'
+        })
+        html+='</div>'
+    }
+
+    $('profileGrid').innerHTML=html||'<div class="loading">暂无数据</div>'
+}
+
+async function loadAll(){
+    try{
+        const overview=await fetchJSON('/api/admin/analytics/overview')
+        renderOverview(overview)
+    }catch(e){$('overviewCards').innerHTML='<div class="error">加载失败</div>'}
+
+    try{
+        const modules=await fetchJSON('/api/admin/analytics/modules')
+        renderModules(modules)
+    }catch(e){$('moduleBars').innerHTML='<div class="error">加载失败</div>'}
+
+    try{
+        const daily=await fetchJSON('/api/admin/analytics/daily')
+        renderDaily(daily)
+    }catch(e){$('dailyChart').parentElement.innerHTML='<div class="error">加载失败</div>'}
+
+    try{
+        const hourly=await fetchJSON('/api/admin/analytics/hours')
+        renderHourly(hourly)
+    }catch(e){$('hourlyChart').parentElement.innerHTML='<div class="error">加载失败</div>'}
+
+    try{
+        const profile=await fetchJSON('/api/admin/analytics/users')
+        renderProfile(profile)
+    }catch(e){$('profileGrid').innerHTML='<div class="error">加载失败</div>'}
+}
+
+window.onload=loadAll
+window.onresize=function(){
+    loadAll().catch(()=>{})
+}
+</script>
+</body>
+</html>

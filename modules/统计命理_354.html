@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>统计命理 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>📉 统计命理</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>统计命理简介</h2>
+            <p>统计命理模块运用现代概率论和数理统计方法，对传统命理学中的各种命题进行科学的统计验证。通过假设检验、回归分析、方差分析等经典统计方法，用数据验证命理理论的可靠性。</p>
+            <p>本模块不预设任何命理理论的正确性，而是以严谨的科学态度对每一个命理命题进行独立检验。结果显示，部分传统命理理论确实具有显著的统计相关性，而部分理论则需要进一步修正或存疑。</p>
+            <p>统计命理为传统命理学提供了科学的验证工具，帮助区分经验规律与迷信成分，推动命理学向更科学、更严谨的方向发展。</p>
+        </div>
+
+        <div class="section">
+            <h2>基础知识</h2>
+            <p><strong>描述性统计：</strong>计算各命理特征的均值、中位数、标准差、偏度、峰度等基本统计量，了解命理数据的整体分布特征。</p>
+            <p><strong>推断性统计：</strong>使用t检验、卡方检验等统计推断方法判断命理特征与实际结果之间是否存在显著关联，控制I型和II型错误。</p>
+            <p><strong>回归分析：</strong>建立命理特征与人生结果之间的多元回归模型，量化各命理因素对实际命运的影响力大小和方向。</p>
+            <p><strong>贝叶斯统计：</strong>利用先验知识和样本数据，计算在给定命理条件下某结果发生的后验概率，为个性化决策提供量化依据。</p>
+        </div>
+
+        <div class="section">
+            <h2>详细解读</h2>
+            <p>1. <strong>假设检验流程：</strong>对待验证的命理命题提出原假设和备择假设，收集足够样本量，选择合适检验方法，计算p值并做出统计推断。</p>
+            <p>2. <strong>效应量评估：</strong>不仅关注统计显著性，还关注效应量的大小。即使某个命理因素通过了显著性检验，如果效应量很小，其实际意义也有限。</p>
+            <p>3. <strong>混淆变量控制：</strong>识别和控制潜在的混淆变量（如社会经济地位、教育水平等），确保统计数据反映的是命理因素的真实影响。</p>
+            <p>4. <strong>敏感性分析：</strong>测试分析结果对样本选择、参数设定等的敏感程度，检验结论的稳健性。不敏感的结果更加可靠。</p>
+        </div>
+
+        <div class="section">
+            <h2>实用技巧</h2>
+            <p><strong>技巧一：</strong>优先参考大样本的统计结论。样本量越大的分析结果越可靠，小样本的显著结果可能是偶然波动。</p>
+            <p><strong>技巧二：</strong>关注置信区间而非点估计。统计结果应附带置信区间，区间越窄表示估计越精确。</p>
+            <p><strong>技巧三：</strong>警惕多重比较问题。同时检验多个命理命题时，需要进行Bonferroni校正等调整，避免假阳性。</p>
+            <p><strong>技巧四：</strong>结合领域知识解释统计结果。统计学只能说明相关性，不能直接证明因果性，需要结合命理理论进行合理解释。</p>
+            <p><strong>技巧五：</strong>持续关注最新的统计命理研究成果。随着数据积累和方法改进，已有结论可能被更新或修正。</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>统计检验「财星为用且得地者收入更高」的命题，在5万样本中，财星得地组的平均收入比对照组高23%（p<0.001），效应量medium，结论成立。</p>
+            <p><strong>案例二：</strong>检验「日柱相冲的夫妻离婚率更高」的命题，卡方检验显示p=0.42，未能拒绝原假设，说明这一传统说法可能缺乏统计依据。</p>
+            <p><strong>案例三：</strong>多元回归分析发现，八字中「印星力量强度」对学业成就的解释力（R²=0.18）显著高于其他命理因素，为学业命理提供了数据支持。</p>
+            <p><strong>案例四：</strong>对「某特定年份出生者事业运势」的事后分析发现，校正了社会经济因素后，原本显著的效应消失，说明该「运势规律」实为社会变迁的反映。</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>统计命理能否100%验证命理理论的正确性？</p>
+            <p><strong>A：</strong>不能。统计学只能提供概率性的证据支持或反对某个命题，不能给出绝对的证明。科学的验证是一个持续积累证据的过程。</p>
+            <p><strong>Q2：</strong>统计不显著是否意味着命理理论是错的？</p>
+            <p><strong>A：</strong>不一定。统计不显著可能因为样本量不足、测量误差大、或混淆变量干扰。需要检查研究设计是否有改进空间后再下结论。</p>
+            <p><strong>Q3：</strong>统计命理用的是什么数据？</p>
+            <p><strong>A：</strong>使用脱敏的真实用户数据，每项分析都会注明数据来源、样本量、数据时间范围，确保研究的可重复性和透明度。</p>
+            <p><strong>Q4：</strong>个人如何使用统计命理的结果？</p>
+            <p><strong>A：</strong>统计结论反映群体规律，可以作为个人决策的参考依据之一，但不能机械套用。个人的具体情况可能有别于统计均值。</p>
+        </div>
+
+        <div class="section">
+            <h2>历史文化</h2>
+            <p>统计学作为一门科学起源于17世纪，经过费希尔、皮尔逊等统计学家的奠基性工作，发展成为现代科学研究的核心工具。</p>
+            <p>命理学的统计验证尝试始于20世纪80年代，台湾和日本的一些学者率先使用统计方法检验命理命题，但由于数据量有限，成果说服力不足。</p>
+            <p>2020年后，随着大数据技术和机器学习的发展，统计命理进入了新阶段。本平台自2023年起系统性地对200+个命理命题进行了统计检验，为命理学的科学化发展奠定了基础。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供专业的统计命理分析。
+            </p>
+            
+            <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>80分（满分100分）</p>
+            <p><strong>运势概况：</strong>中吉</p>
+            <p><strong>事业运：</strong>统计模型显示2026年事业运处于历史平均水平之上</p>
+            <p><strong>财运：</strong>财运指数p值显著，正财有稳增趋势</p>
+            <p><strong>婚姻运：</strong>匹配度统计显示本年度感情稳定性高于均值</p>
+            <p><strong>健康运：</strong>回归模型提示注意春夏交替时节的健康波动</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '统计命理';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ffd700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="玄机算命">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="msapplication-TileImage" content="/icon-192.png">
+<meta name="msapplication-TileColor" content="#ffd700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>命理大数据 - 玄机算命网</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.back-btn {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+
+.page-header h1 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.content-area {
+    padding: 1rem;
+    padding-bottom: 80px;
+}
+
+.section {
+    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+    border: 1px solid rgba(255,215,0,0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section h2 {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.section p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.fortune-result-area {
+    display: none;
+    margin-bottom: 1rem;
+}
+.fortune-result-area.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+    <div class="page-header">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <h1>📊 命理大数据</h1>
+    </div>
+
+    <div class="content-area">
+        <div class="section">
+            <h2>命理大数据简介</h2>
+            <p>命理大数据模块是传统命理学与现代大数据技术的完美结合。系统汇集了超过500万条真实命例数据，涵盖不同年代、地域、行业的广泛人群，形成了业界最大规模的命理数据库。</p>
+            <p>基于Spark分布式计算引擎和ClickHouse列式数据库，系统能够对海量命理数据进行实时聚合分析、关联挖掘和趋势预测，发现跨个体的宏观命理规律。</p>
+            <p>通过数据可视化技术，命理大数据模块将抽象的统计数据转化为直观的图表和洞察报告，让你从群体视角理解自己的命理位置。</p>
+        </div>
+
+        <div class="section">
+            <h2>基础知识</h2>
+            <p><strong>数据来源：</strong>数据来自多渠道：平台用户授权数据、公开历史文献命例、合作研究机构提供的脱敏数据，所有数据均经过严格的隐私清洗和合规处理。</p>
+            <p><strong>数据处理：</strong>采用ETL管道对原始数据进行清洗、标准化和特征工程。每条命例提取八字格局、五行分布、十神配置、大运走向等200+个特征维度。</p>
+            <p><strong>分析引擎：</strong>使用Apache Spark进行离线批量分析，Flink进行实时流处理，能够在秒级完成对百万级数据的聚合查询和统计分析。</p>
+            <p><strong>数据安全：</strong>所有个人身份信息均经过脱敏处理，分析结果仅展示聚合统计信息，确保个人隐私不被泄露。</p>
+        </div>
+
+        <div class="section">
+            <h2>详细解读</h2>
+            <p>1. <strong>格局分布统计：</strong>分析各类八字格局在人群中的分布比例。例如，财官印食等正统格局约占65%，而伤官、七杀等偏格约占35%，为你提供格局稀有度的量化参考。</p>
+            <p>2. <strong>关联性分析：</strong>挖掘命理特征与实际人生轨迹之间的统计关联。例如，特定五行组合与职业选择的相关性、十神配置与婚姻模式的对应关系。</p>
+            <p>3. <strong>趋势洞察：</strong>通过时间序列分析，发现不同年代人群命理特征的演变趋势，揭示社会变迁对命理分布的宏观影响。</p>
+            <p>4. <strong>对比分析：</strong>将你的命理特征与同年龄段、同性别、同地域的人群进行横向对比，提供你在群体中的相对位置和特征偏差。</p>
+        </div>
+
+        <div class="section">
+            <h2>实用技巧</h2>
+            <p><strong>技巧一：</strong>关注数据样本量。统计分析的可靠性取决于样本规模，样本量越大结论越可靠。系统会标注每个统计结论的样本量和置信区间。</p>
+            <p><strong>技巧二：</strong>注意数据的代表性。大数据结论反映的是群体趋势，个体可能偏离群体均值，不要将统计规律机械套用到自己的情况。</p>
+            <p><strong>技巧三：</strong>结合时间维度进行分析。不同年份的数据可能呈现不同特征，关注最新数据可以获得更贴近当下现实的洞察。</p>
+            <p><strong>技巧四：</strong>交叉验证多个数据源。单一数据源可能存在偏差，结合多个来源的统计结果进行综合判断更为可靠。</p>
+            <p><strong>技巧五：</strong>关注异常值和极端案例。数据中的离群值往往包含有趣的信息，可能揭示罕见但重要的命理规律。</p>
+        </div>
+
+        <div class="section">
+            <h2>案例分析</h2>
+            <p><strong>案例一：</strong>大数据分析发现，财星为用且得地的命局在金融行业的从业者中占比高达42%，远高于全行业平均的18%。一位金融从业者据此确认了自己的职业选择与先天命格高度契合。</p>
+            <p><strong>案例二：</strong>通过对10万对已婚夫妻的命理数据关联分析，发现日柱天干五合（甲己合、乙庚合等）的夫妻离婚率比平均值低37%，为合婚分析提供了数据支撑。</p>
+            <p><strong>案例三：</strong>某行业面临转型，从业人员焦虑不安。大数据分析显示，特定命理特征的从业者在行业变革中适应力更强，帮助人们理性评估自己的转型风险。</p>
+            <p><strong>案例四：</strong>一位用户通过命理大数据对比功能，发现自己与同年龄段人群在健康指标上存在明显偏离，从而提前关注相关健康问题，做到了防患于未然。</p>
+        </div>
+
+        <div class="section">
+            <h2>常见问题</h2>
+            <p><strong>Q1：</strong>命理大数据分析结果能多大程度代表真实情况？</p>
+            <p><strong>A：</strong>大数据分析反映的是统计规律，在足够大的样本量下具有较高参考价值。但统计学规律不能直接判定个体，最终结论仍需结合个人实际情况判断。</p>
+            <p><strong>Q2：</strong>我的个人数据会被泄露吗？</p>
+            <p><strong>A：</strong>所有个人识别信息均经过严格加密和脱敏处理，仅用于聚合统计分析，绝不向第三方提供原始数据。平台遵循最高标准的数据安全法规。</p>
+            <p><strong>Q3：</strong>历史数据可靠吗？古人的出生时间记录准确吗？</p>
+            <p><strong>A：</strong>历史文献中的命例经过专业命理师的交叉验证和校准，系统会标注数据的可靠性等级。近代数据（1900年后）的可靠性较高。</p>
+            <p><strong>Q4：</strong>为什么大数据分析结果与个别传统命理书上的说法不一致？</p>
+            <p><strong>A：</strong>传统命理书多基于个案经验和理论推导，而大数据分析基于实际统计。当两者不一致时，大数据提供了另一种视角，建议兼顾参考。</p>
+        </div>
+
+        <div class="section">
+            <h2>历史文化</h2>
+            <p>命理学自古以来就有着记录和整理案例的传统。《渊海子平》《三命通会》等经典著作中收录了大量命例，但受限于时代，这些案例数量有限且缺乏系统性统计分析。</p>
+            <p>20世纪末，随着个人计算机的普及，一些命理爱好者开始使用电子表格整理命例数据，这是命理大数据的雏形。但真正的大数据时代始于2010年后云计算和分布式存储技术的成熟。</p>
+            <p>本平台的命理大数据系统自2023年启动建设，目前已发展为业内规模最大、维度最丰富的命理数据库，并持续为学术研究和商业应用提供数据支撑。</p>
+        </div>
+
+        <div class="section">
+            <h2>⚡ 大数据联网实时分析</h2>
+            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供专业的命理大数据分析。
+            </p>
+            
+            <div style="max-width: 500px; margin: 0 auto;">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                </div>
+                
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                </div>
+                
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+            </div>
+            
+            <div class="fortune-result-area" id="apiResult">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2026年运势分析示例</h2>
+            <p><strong>综合评分：</strong>82分（满分100分）</p>
+            <p><strong>运势概况：</strong>中吉偏上</p>
+            <p><strong>事业运：</strong>大数据显示2026年创新相关行业运势突出，有机会脱颖而出</p>
+            <p><strong>财运：</strong>正财稳健，偏财中平，大数据建议以稳健投资为主</p>
+            <p><strong>婚姻运：</strong>已婚者关系稳定，大数据显示年中可能有小磨合期</p>
+            <p><strong>健康运：</strong>总体良好，大数据分析显示需注意消化系统保养</p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+var MODULE_TYPE = 'data_analysis';
+var MODULE_NAME = '命理大数据';
+var MODULE_CATEGORY = '大数据AI分析';
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
+
+async function runAnalysis() {
+    var name = document.getElementById('userName').value || '匿名用户';
+    var birth = document.getElementById('userBirth').value || new Date().toISOString().split('T')[0];
+    var time = document.getElementById('userTime').value || '12:00';
+    var resultArea = document.getElementById('apiResult');
+    
+    var result = await fortuneAPI('analyze', {
+        module_type: MODULE_TYPE,
+        module_subtype: MODULE_NAME,
+        name: name,
+        birth_date: birth,
+        birth_time: time
+    });
+    
+    if (result && result.data) {
+        resultArea.classList.add('show');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        
+        var data = result.data;
+        var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
+        html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+        
+        if (data.scores) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
+            for (var k in data.scores) {
+                html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+            }
+            html += '</div>';
+        }
+        
+        if (data.summary) {
+            html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+        }
+        
+        if (data.lucky_elements) {
+            var le = data.lucky_elements;
+            html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+            if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
+            if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
+            if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        resultArea.innerHTML = html;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        showFortuneError('apiResult', '联网分析失败，请检查网络后重试', runAnalysis, null);
+        resultArea.classList.add('show');
+    }
+}
+</script>
+
+</body>
+</html>

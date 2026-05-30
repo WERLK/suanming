@@ -1,8 +1,8 @@
 {
-  "version": "1.5.3",
-  "build_time": "2026-05-30T13:25:00Z",
+  "version": "1.5.4",
+  "build_time": "2026-05-30T13:54:00Z",
   "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "移除首页算命知识科普，仅保留个人中心入口",
+  "description": "移除首页顶部导航栏，紧凑化布局",
   "fix_count": 0
 }

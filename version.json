@@ -1,8 +1,8 @@
 {
-  "version": "1.2.0",
-  "build_time": "2026-05-30T17:27:00Z",
-  "git_commit": "c827f95",
+  "version": "1.2.1",
+  "build_time": "2026-05-30T18:47:00Z",
+  "git_commit": "9a2b650",
   "author": "玄机算命网",
-  "description": "修复手机端个人中心广告按钮无反应：loadVIPStatus安全模式同步vip.html（safeSet/safeClass/空值保护+转盘逻辑修正+innerHTML保护span元素）",
-  "fix_count": 2
+  "description": "移除广告按钮，改为每日登录自动获取VIP时长；修复手机端广告按钮长期无响应问题",
+  "fix_count": 1
 }

@@ -586,12 +586,41 @@ def login():
             return jsonify({'success': False, 'message': '密码错误'}), 200
         if user.get('status') != 'active':
             return jsonify({'success': False, 'message': '账户已被禁用'}), 200
+
+        # 每日登录自动发放 VIP 时长
+        _ensure_vip_fields(user)
+        today = _get_today()
+        login_reward_given = False
+        if user.get('last_login_reward_date', '') != today:
+            now = datetime.now()
+            vip_expire = user.get('vip_expire')
+            if vip_expire:
+                expire_dt = _safe_parse_datetime(vip_expire)
+                if expire_dt is None:
+                    expire_dt = now
+                elif expire_dt < now:
+                    expire_dt = now
+            else:
+                expire_dt = now
+            new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
+            user['vip_expire'] = new_expire.isoformat()
+            user['vip_level'] = 'basic'
+            user['last_login_reward_date'] = today
+            login_reward_given = True
+            # 找到用户索引并保存
+            for i, u in enumerate(users):
+                if u['id'] == user['id']:
+                    users[i] = user
+                    break
+
         user['last_login'] = datetime.now().isoformat()
         save_users(users)
         token = generate_token(user['id'])
         response = jsonify({
             'success': True,
             'token': token,
+            'login_reward': login_reward_given,
+            'reward_hours': AD_REWARD_HOURS if login_reward_given else 0,
             'user': {
                 'id': user['id'],
                 'username': user['username'],
@@ -997,7 +1026,8 @@ def _ensure_vip_fields(user):
         'last_checkin': '',
         'checkin_streak': 0,
         'wheel_spins_today': 0,
-        'wheel_date': ''
+        'wheel_date': '',
+        'last_login_reward_date': ''
     }
     for k, v in defaults.items():
         if k not in user:
@@ -1976,7 +2006,7 @@ def get_help_topic(topic):
             },
             'vip': {
                 'title': '如何获得VIP会员？',
-                'content': '您可以通过观看广告赚取VIP时长，每次观看广告可获得2小时会员时长。'
+                'content': '每天登录自动获得2小时VIP会员时长，每日签到还可额外获得积分和VIP时长奖励。'
             },
             'avatar': {
                 'title': '如何上传头像？',

@@ -17,7 +17,6 @@
     <title>个人中心 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css?v=1.2.0">
     <link rel="stylesheet" href="/css/profile-compatible.css?v=1.2.0">
-    <script src="/js/ads.js?v=1.2.0"></script>
     <style>
         /* 个人中心页面特定样式 */
         .profile-container {
@@ -775,9 +774,6 @@
                     </div>
                     <div class="vip-info-row">
                         <span id="vipRemaining">未开通会员</span>
-                        <button class="vip-ad-btn" id="vipAdBtn">
-                            📺 看广告赚时长（<span id="adRemain">0</span>次）
-                        </button>
                     </div>
                 </div>
             </div>
@@ -1088,23 +1084,6 @@
         </div>
     </div>
     
-    <!-- 广告观看弹窗 -->
-    <div class="ad-modal" id="adModal">
-        <button class="ad-close-btn" onclick="closeAdModal()">✕</button>
-        <div class="ad-modal-content">
-            <div style="color:#ffd700;font-size:1.1rem;">📺 看广告获取 VIP 时长</div>
-            <!-- 广告展示区域 -->
-            <div class="ad-container" id="adContainer">
-                <div class="ad-loading">正在加载广告...</div>
-            </div>
-            <!-- 观看进度 -->
-            <div class="ad-timer" id="adTimer">观看广告即可领取奖励</div>
-            <button class="ad-skip-btn" id="adClaimBtn" onclick="claimAdReward()" disabled>
-                请先观看广告 (0/5秒)
-            </button>
-        </div>
-    </div>
-
     <!-- 积分兑换弹窗 -->
     <div class="redeem-modal" id="redeemModal">
         <div class="redeem-content">
@@ -1510,32 +1489,6 @@
                     if (pb4) pb4.style.width = permPct + '%';
                 }
                 
-                // 广告按钮（使用 vip.html 安全模式，不覆盖 innerHTML 以保护 span#adRemain）
-                var adBtn = document.getElementById('vipAdBtn');
-                var adCount = document.getElementById('adRemain');
-                var maxAds = data.max_daily_ads || 0;
-                var todayAds = data.today_ads || 0;
-                var adRemaining = maxAds - todayAds;
-                console.log('[VIP] adBtn存在:', !!adBtn, 'adCount存在:', !!adCount, 'maxAds:', maxAds, 'todayAds:', todayAds, 'adRemaining:', adRemaining);
-                
-                if (adBtn) {
-                    if (adRemaining <= 0) {
-                        adBtn.disabled = true;
-                        adBtn.innerHTML = '📺 今日次数已用完';
-                        console.log('[VIP] 广告按钮已禁用（次数用完）');
-                    } else {
-                        adBtn.disabled = false;
-                        if (adCount) {
-                            adCount.textContent = '剩' + adRemaining;
-                            console.log('[VIP] 广告按钮已启用，剩余:', adRemaining);
-                        } else {
-                            console.error('[VIP] adCount 元素不存在！');
-                        }
-                    }
-                } else {
-                    console.error('[VIP] adBtn 元素不存在！');
-                }
-
                 // 更新永久会员方案卡片
                 var pp = document.getElementById('planPermanent');
                 if (pp) {
@@ -1619,174 +1572,6 @@
                 safeText('vipRemaining', '⚠️ 会员信息加载失败: ' + (e.message || '请刷新重试'));
             }
         }
-
-        // ========== 广告观看系统 ==========
-        var adTimerInterval = null;
-        var adSecondsWatched = 0;
-        var adRewardSeconds = 5;
-
-        function watchAdForVIP() {
-            console.log('[AD] ===== watchAdForVIP 被调用 =====');
-            try {
-            var token = Auth.getToken();
-            console.log('[AD] token:', token ? '存在' : '不存在');
-            if (!token) { window.location.href = '/login.html'; return; }
-
-            adRewardSeconds = BaiduAd.getRewardSeconds();
-            console.log('[AD] 奖励秒数:', adRewardSeconds, 'BaiduAd存在:', typeof BaiduAd);
-            adSecondsWatched = 0;
-
-            var modal = document.getElementById('adModal');
-            var timer = document.getElementById('adTimer');
-            var claimBtn = document.getElementById('adClaimBtn');
-            var container = document.getElementById('adContainer');
-
-            if (adTimerInterval) clearInterval(adTimerInterval);
-            claimBtn.disabled = true;
-            claimBtn.classList.remove('ready');
-            claimBtn.textContent = '请先观看广告 (0/' + adRewardSeconds + '秒)';
-            timer.textContent = '观看广告即可领取奖励';
-            container.innerHTML = '<div class="ad-loading">正在加载广告...</div>';
-
-            modal.classList.add('show');
-            console.log('[AD] 弹窗已显示, modal元素:', !!modal);
-
-            if (BaiduAd.isReady()) {
-                console.log('[AD] BaiduAd 已就绪，调用 show()');
-                BaiduAd.show('adContainer', function() {
-                    startAdCountdown();
-                });
-            } else {
-                console.log('[AD] BaiduAd 未就绪，使用 fallback 模式');
-                setTimeout(function() {
-                    container.innerHTML = '<div class="ad-fallback">'
-                        + '<span class="ad-fallback-icon">📺</span>'
-                        + '<p style="margin:0.3rem 0;">百度广告加载中...</p>'
-                        + '<p style="font-size:0.7rem;color:rgba(255,255,255,0.3);">接入百度联盟后将展示真实广告</p>'
-                        + '</div>';
-                    startAdCountdown();
-                }, 400);
-            }
-            } catch (e) {
-                console.error('[AD] ===== 广告函数异常 =====');
-                console.error('[AD] 错误信息:', e.message);
-                console.error('[AD] 错误堆栈:', e.stack);
-                alert('广告加载出错: ' + e.message);
-            }
-        }
-
-        function startAdCountdown() {
-            var timer = document.getElementById('adTimer');
-            var claimBtn = document.getElementById('adClaimBtn');
-
-            adTimerInterval = setInterval(function() {
-                adSecondsWatched++;
-                timer.textContent = '⏱ 已观看 ' + adSecondsWatched + ' / ' + adRewardSeconds + ' 秒';
-
-                if (adSecondsWatched >= adRewardSeconds) {
-                    clearInterval(adTimerInterval);
-                    timer.textContent = '✅ 观看完成！';
-                    claimBtn.disabled = false;
-                    claimBtn.classList.add('ready');
-                    claimBtn.textContent = '🎁 领取奖励';
-                } else {
-                    claimBtn.textContent = '请先观看广告 (' + adSecondsWatched + '/' + adRewardSeconds + '秒)';
-                }
-            }, 1000);
-        }
-
-        async function claimAdReward() {
-            if (adSecondsWatched < adRewardSeconds) return;
-
-            clearInterval(adTimerInterval);
-            document.getElementById('adModal').classList.remove('show');
-            BaiduAd.destroy('adContainer');
-
-            var token = Auth.getToken();
-            if (!token) { showToast('请先登录'); return; }
-
-            try {
-                var resp = await fetch('/api/vip/watch-ad', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (resp.status === 401) { Auth.handleAuthError(); return; }
-                var data = await resp.json();
-                if (data.success) {
-                    showToast(data.message);
-                    loadVIPStatus();
-                } else {
-                    showToast('⚠️ ' + data.message);
-                }
-            } catch (e) {
-                showToast('网络错误，请重试');
-            }
-        }
-
-        function closeAdModal() {
-            clearInterval(adTimerInterval);
-            document.getElementById('adModal').classList.remove('show');
-            BaiduAd.destroy('adContainer');
-        }
-
-        // ===== 广告按钮事件绑定（DOMContentLoaded 后延迟执行，确保元素就绪） =====
-        (function initAdButtonBinding() {
-            function doBind() {
-                try {
-                    var btn = document.getElementById('vipAdBtn');
-                    if (!btn) {
-                        // 如果元素还没准备好，等 200ms 再试一次
-                        setTimeout(function() {
-                            var retryBtn = document.getElementById('vipAdBtn');
-                            if (retryBtn) bindEvents(retryBtn);
-                            else console.error('[AD-BTN] vipAdBtn 重试后仍未找到！');
-                        }, 200);
-                        return;
-                    }
-                    bindEvents(btn);
-                } catch(e) {
-                    console.error('[AD-BTN] 绑定失败:', e.message);
-                }
-            }
-
-            function bindEvents(btn) {
-                btn.removeAttribute('onclick');
-                var lastTap = 0;
-                
-                function onAdTap(e) {
-                    var now = Date.now();
-                    // 防止 touchend + click 双重触发（300ms 内只执行一次）
-                    if (now - lastTap < 300) return;
-                    lastTap = now;
-                    
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('[AD-BTN] 广告按钮被点击，类型:', e.type);
-                    watchAdForVIP();
-                }
-
-                btn.addEventListener('click', onAdTap);
-                btn.addEventListener('touchend', onAdTap);
-                console.log('[AD-BTN] 广告按钮事件已绑定: click + touchend');
-            }
-
-            // DOM 就绪后立即绑定
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', doBind);
-            } else {
-                doBind();
-            }
-        })();
-
-        // 点击广告弹窗空白处关闭（安全绑定）
-        try {
-            var adModal = document.getElementById('adModal');
-            if (adModal) {
-                adModal.addEventListener('click', function(e) {
-                    if (e.target === this) closeAdModal();
-                });
-            }
-        } catch(e) { console.warn('[PROFILE] adModal 绑定失败:', e.message); }
 
         // ========== 签到 ==========
 

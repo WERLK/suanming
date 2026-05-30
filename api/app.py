@@ -944,6 +944,25 @@ def _get_today():
     return datetime.now().strftime('%Y-%m-%d')
 
 
+def _safe_parse_datetime(date_str):
+    """安全解析日期时间字符串，支持 ISO 格式和其他常见格式"""
+    if not date_str:
+        return None
+    if isinstance(date_str, datetime):
+        return date_str
+    try:
+        return datetime.fromisoformat(date_str)
+    except (ValueError, TypeError):
+        pass
+    # 尝试其他常见格式
+    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%Y/%m/%d %H:%M:%S', '%Y/%m/%d'):
+        try:
+            return datetime.strptime(date_str, fmt)
+        except (ValueError, TypeError):
+            pass
+    return None
+
+
 def _get_auth_user():
     """获取当前登录用户——优先验证Authorization头，cookie作为fallback"""
     header_token = request.headers.get('Authorization', '').replace('Bearer ', '')
@@ -999,17 +1018,22 @@ def vip_status():
         vip_expire = user.get('vip_expire')
         vip_remaining = None
         if vip_expire:
-            expire_dt = datetime.fromisoformat(vip_expire)
-            remaining = expire_dt - datetime.now()
-            if remaining.total_seconds() <= 0:
-                user['vip_level'] = 'free'
+            expire_dt = _safe_parse_datetime(vip_expire)
+            if expire_dt is None:
                 user['vip_expire'] = None
                 save_users(users)
                 vip_expire = None
             else:
-                hours = remaining.total_seconds() // 3600
-                minutes = (remaining.total_seconds() % 3600) // 60
-                vip_remaining = f'{int(hours)}小时{int(minutes)}分钟'
+                remaining = expire_dt - datetime.now()
+                if remaining.total_seconds() <= 0:
+                    user['vip_level'] = 'free'
+                    user['vip_expire'] = None
+                    save_users(users)
+                    vip_expire = None
+                else:
+                    hours = remaining.total_seconds() // 3600
+                    minutes = (remaining.total_seconds() % 3600) // 60
+                    vip_remaining = f'{int(hours)}小时{int(minutes)}分钟'
 
         level_info = VIP_LEVELS.get(user.get('vip_level', 'free'), VIP_LEVELS['free'])
         today = _get_today()
@@ -1089,8 +1113,10 @@ def vip_watch_ad():
             now = datetime.now()
             vip_expire = user.get('vip_expire')
             if vip_expire:
-                expire_dt = datetime.fromisoformat(vip_expire)
-                if expire_dt < now:
+                expire_dt = _safe_parse_datetime(vip_expire)
+                if expire_dt is None:
+                    expire_dt = now
+                elif expire_dt < now:
                     expire_dt = now
             else:
                 expire_dt = now
@@ -1177,8 +1203,10 @@ def vip_checkin():
         now = datetime.now()
         vip_expire = user.get('vip_expire')
         if vip_expire:
-            expire_dt = datetime.fromisoformat(vip_expire)
-            if expire_dt < now:
+            expire_dt = _safe_parse_datetime(vip_expire)
+            if expire_dt is None:
+                expire_dt = now
+            elif expire_dt < now:
                 expire_dt = now
         else:
             expire_dt = now

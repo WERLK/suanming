@@ -227,30 +227,90 @@
             color: rgba(255,255,255,0.7);
             flex: 1;
         }
-        .vip-ad-btn {
-            padding: 0.5rem 0.8rem;
-            background: linear-gradient(135deg, #ffd700, #ffc107);
-            border: none;
+        /* 看广告赚时长区域 */
+        .vip-ad-section {
+            margin-top: 0.6rem;
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px dashed rgba(255,215,0,0.15);
+        }
+        .vip-ad-area {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+            min-height: 44px;
+        }
+        .vip-ad-slot {
+            width: 100px;
+            height: 36px;
+            min-width: 100px;
+            background: rgba(255,215,0,0.04);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .vip-ad-placeholder {
+            font-size: 1rem;
+            opacity: 0.25;
+        }
+        .vip-ad-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .vip-ad-countdown {
+            font-size: 0.72rem;
+            color: rgba(255,215,0,0.6);
+            min-height: 1.1rem;
+            line-height: 1.1rem;
+        }
+        .vip-ad-countdown.urgent {
+            color: #ffd700;
+            font-weight: bold;
+            animation: vip-ad-pulse 0.8s ease-in-out infinite;
+        }
+        @keyframes vip-ad-pulse {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .vip-ad-daily {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.35);
+        }
+        .vip-ad-daily strong { color: rgba(255,215,0,0.7); }
+        .vip-ad-watch-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,193,7,0.15));
+            border: 1px solid rgba(255,215,0,0.3);
             border-radius: 8px;
-            color: #000;
+            color: #ffd700;
             font-size: 0.78rem;
             font-weight: bold;
             cursor: pointer;
-            white-space: nowrap;
             transition: all 0.3s;
-            position: relative;
-            z-index: 5;
-            flex-shrink: 0;
+            white-space: nowrap;
         }
-        .vip-ad-btn:hover {
-            background: linear-gradient(135deg, #ffed4e, #ffd700);
-            transform: scale(1.02);
+        .vip-ad-watch-btn:hover {
+            background: linear-gradient(135deg, rgba(255,215,0,0.35), rgba(255,193,7,0.25));
+            border-color: rgba(255,215,0,0.6);
+            color: #fff;
         }
-        .vip-ad-btn:disabled {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.3);
+        .vip-ad-watch-btn:disabled {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.25);
             cursor: not-allowed;
-            transform: none;
+        }
+        .vip-ad-watch-btn.claim-ready {
+            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,193,7,0.4));
+            border-color: rgba(255,215,0,0.7);
+            color: #fff;
+            animation: vip-ad-pulse 0.6s ease-in-out infinite;
         }
         /* 方案对比 */
         .vip-plans {
@@ -775,6 +835,21 @@
                     </div>
                     <div class="vip-info-row">
                         <span id="vipRemaining">未开通会员</span>
+                    </div>
+                    <!-- 看广告赚时长 -->
+                    <div class="vip-ad-section" id="vipAdSection">
+                        <div class="vip-ad-area" id="vipAdArea">
+                            <div class="vip-ad-slot" id="vipAdSlot">
+                                <span class="vip-ad-placeholder">📺</span>
+                            </div>
+                            <div class="vip-ad-info">
+                                <div class="vip-ad-countdown" id="vipAdCountdown"></div>
+                                <div class="vip-ad-daily" id="vipAdDaily">今日可观看 <strong>0</strong> 次</div>
+                            </div>
+                        </div>
+                        <button class="vip-ad-watch-btn" id="vipAdWatchBtn" onclick="watchVipAd()">
+                            ▶ 观看广告赚时长
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1470,6 +1545,7 @@
                 var todayAds = data.today_ads || 0;
                 var maxAds = data.max_daily_ads || 0;
                 var adRemaining = Math.max(0, maxAds - todayAds);
+                updateVipAdInfo(todayAds, maxAds);
 
                 if (data.vip_level === 'permanent') {
                     safeText('vipRemaining', '🎉 已解锁永久会员（今日可看广告' + maxAds + '次）');
@@ -1574,6 +1650,171 @@
                 var card2 = document.getElementById('vipCard');
                 if (card2) card2.style.display = 'block';
                 safeText('vipRemaining', '⚠️ 会员信息加载失败: ' + (e.message || '请刷新重试'));
+            }
+        }
+
+        // ========== 广告观看（VIP卡内） ==========
+        var _vipAdWatching = false;
+        var _vipAdTimer = null;
+        var _vipAdSeconds = 0;
+        var _vipAdTarget = 15;
+        var _vipAdClaiming = false;
+
+        function watchVipAd() {
+            if (_vipAdWatching || _vipAdClaiming) return;
+            var token = Auth.getToken();
+            if (!token) { window.location.href = '/login.html'; return; }
+
+            // 先检查是否还有次数
+            var dailyRemain = document.getElementById('vipAdDaily');
+            if (dailyRemain) {
+                var strongEl = dailyRemain.querySelector('strong');
+                if (strongEl && parseInt(strongEl.textContent) <= 0) {
+                    showToast('⚠️ 今日广告次数已用完，明天再来吧');
+                    return;
+                }
+            }
+
+            _vipAdWatching = true;
+            _vipAdSeconds = 0;
+            _vipAdTarget = (window.BaiduAd && BaiduAd.getRewardSeconds) ? BaiduAd.getRewardSeconds() : 15;
+
+            var btn = document.getElementById('vipAdWatchBtn');
+            var countdown = document.getElementById('vipAdCountdown');
+            var slot = document.getElementById('vipAdSlot');
+
+            // 更新按钮
+            if (btn) {
+                btn.textContent = '⏱ 观看中 ' + _vipAdTarget + 's';
+                btn.disabled = true;
+                btn.classList.remove('claim-ready');
+            }
+            if (countdown) countdown.textContent = '⏱ 广告播放中… 请勿离开';
+            if (slot) {
+                slot.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;'
+                    + 'color:rgba(255,215,0,0.2);font-size:0.6rem;">广告加载中</div>';
+                // 如果百度广告就绪则加载真广告
+                if (typeof BaiduAd !== 'undefined' && BaiduAd.isReady()) {
+                    BaiduAd.show('vipAdSlot', function() {});
+                }
+            }
+
+            // 倒计时
+            _vipAdTimer = setInterval(function() {
+                _vipAdSeconds++;
+                var remain = _vipAdTarget - _vipAdSeconds;
+                if (btn) btn.textContent = '⏱ 观看中 ' + remain + 's';
+                if (countdown) {
+                    if (remain <= 5) {
+                        countdown.textContent = '⏱ 还剩 ' + remain + ' 秒';
+                        countdown.classList.add('urgent');
+                    } else {
+                        countdown.textContent = '⏱ 广告播放中… ' + remain + 's';
+                    }
+                }
+
+                if (_vipAdSeconds >= _vipAdTarget) {
+                    clearInterval(_vipAdTimer);
+                    _vipAdTimer = null;
+                    _vipAdWatching = false;
+                    if (btn) {
+                        btn.textContent = '🎁 领取 VIP 时长';
+                        btn.disabled = false;
+                        btn.classList.add('claim-ready');
+                        btn.onclick = claimVipAdReward;
+                    }
+                    if (countdown) {
+                        countdown.textContent = '✅ 观看完成！点击下方按钮领取奖励';
+                        countdown.classList.remove('urgent');
+                    }
+                }
+            }, 1000);
+        }
+
+        function claimVipAdReward() {
+            if (_vipAdClaiming) return;
+            _vipAdClaiming = true;
+
+            var btn = document.getElementById('vipAdWatchBtn');
+            var countdown = document.getElementById('vipAdCountdown');
+            var slot = document.getElementById('vipAdSlot');
+
+            if (btn) { btn.disabled = true; btn.textContent = '领取中…'; btn.classList.remove('claim-ready'); }
+            if (countdown) countdown.textContent = '⏳ 正在领取奖励…';
+
+            var token = Auth.getToken();
+            if (!token) { _vipAdClaiming = false; resetVipAdUI(); return; }
+
+            fetch('/api/vip/watch-ad', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    if (countdown) countdown.textContent = '✅ ' + data.message;
+                    if (slot) slot.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;'
+                        + 'color:rgba(255,215,0,0.4);font-size:0.6rem;">✅ 完成</div>';
+                    showToast(data.message);
+                    // 刷新VIP状态
+                    setTimeout(function() {
+                        resetVipAdUI();
+                        loadVIPStatus();
+                    }, 2000);
+                } else {
+                    if (countdown) countdown.textContent = '⚠️ ' + data.message;
+                    showToast('⚠️ ' + data.message);
+                    setTimeout(function() {
+                        resetVipAdUI();
+                    }, 2000);
+                }
+                _vipAdClaiming = false;
+            }).catch(function() {
+                if (countdown) countdown.textContent = '⚠️ 网络错误，请重试';
+                showToast('网络错误，请重试');
+                setTimeout(function() { resetVipAdUI(); }, 2000);
+                _vipAdClaiming = false;
+            });
+        }
+
+        function resetVipAdUI() {
+            _vipAdWatching = false;
+            _vipAdClaiming = false;
+            if (_vipAdTimer) { clearInterval(_vipAdTimer); _vipAdTimer = null; }
+            _vipAdSeconds = 0;
+
+            var btn = document.getElementById('vipAdWatchBtn');
+            var countdown = document.getElementById('vipAdCountdown');
+            var slot = document.getElementById('vipAdSlot');
+
+            if (btn) {
+                btn.textContent = '▶ 观看广告赚时长';
+                btn.disabled = false;
+                btn.classList.remove('claim-ready');
+                btn.onclick = watchVipAd;
+            }
+            if (countdown) { countdown.textContent = ''; countdown.classList.remove('urgent'); }
+            if (slot) {
+                if (typeof BaiduAd !== 'undefined') BaiduAd.destroy('vipAdSlot');
+                slot.innerHTML = '<span class="vip-ad-placeholder">📺</span>';
+            }
+        }
+
+        function updateVipAdInfo(todayAds, maxAds) {
+            var dailyEl = document.getElementById('vipAdDaily');
+            var btn = document.getElementById('vipAdWatchBtn');
+            var remain = Math.max(0, maxAds - todayAds);
+            if (dailyEl) dailyEl.innerHTML = '今日可观看 <strong>' + remain + '</strong> 次';
+            if (btn) {
+                if (remain <= 0) {
+                    btn.textContent = '📺 今日次数已用完';
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                } else if (!_vipAdWatching && !_vipAdClaiming) {
+                    btn.textContent = '▶ 观看广告赚时长';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.onclick = watchVipAd;
+                }
             }
         }
 

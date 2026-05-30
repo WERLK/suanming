@@ -1,8 +1,8 @@
 {
-  "version": "1.4.0",
-  "build_time": "2026-05-30T20:19:00Z",
-  "git_commit": "49066ec",
+  "version": "1.4.1",
+  "build_time": "2026-05-30T20:38:00Z",
+  "git_commit": "2188fff",
   "author": "玄机算命网",
-  "description": "累计20次广告改为随机1-7天VIP里程碑奖励（取代永久会员解锁）；profile.html/vip.html 文案与进度同步更新",
-  "fix_count": 3
+  "description": "修复底部广告栏遮挡ICP备案号：body增加48px底部间距",
+  "fix_count": 1
 }

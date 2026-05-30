@@ -316,7 +316,8 @@
         // 样式
         var style = document.createElement('style');
         style.textContent =
-            '#__adbar{position:fixed;bottom:0;left:0;right:0;z-index:9998;'
+            'body{padding-bottom:48px;}'  // 防止底部内容被广告栏遮挡（含ICP备案号）
+            + '#__adbar{position:fixed;bottom:0;left:0;right:0;z-index:9998;'
             + 'transition:transform 0.3s ease,opacity 0.3s ease;'
             + 'padding-bottom:env(safe-area-inset-bottom,0);'
             + '}'

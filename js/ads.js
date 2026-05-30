@@ -63,17 +63,18 @@
         getRewardSeconds: function() { return AdConfig.rewardSeconds || 15; }
     };
 
-    // ==================== 底部广告横幅 ====================
+    // ==================== 顶部广告横幅 ====================
     var adBar = null;
     var adTimer = null;
     var adSeconds = 0;
     var adTarget = 15;
     var adWatching = false;
     var adBarHidden = false;
+    var adBarCollapsed = false;
     var lastScrollY = 0;
     var scrollTicking = false;
 
-    // 检测是否为个人中心页面（已有 VIP 卡片，横幅位置需预留）
+    // 检测是否为个人中心页面
     function isProfilePage() {
         return window.location.pathname.indexOf('profile') !== -1;
     }
@@ -82,29 +83,30 @@
         var bar = document.createElement('div');
         bar.id = '__adbar';
         bar.innerHTML =
-            '<div class="adbar-inner" style="'
+            '<div class="adbar-inner" id="adbarInner" style="'
             + 'display:flex;align-items:center;justify-content:space-between;'
-            + 'height:40px;padding:0 10px;'
-            + 'background:rgba(20,20,30,0.95);'
-            + 'border-top:1px solid rgba(255,215,0,0.15);'
-            + 'color:rgba(255,255,255,0.85);font-size:0.78rem;'
+            + 'height:36px;padding:0 10px;'
+            + 'background:rgba(20,20,30,0.92);background:linear-gradient(180deg,rgba(20,20,30,0.95) 0%,rgba(20,20,30,0.88) 100%);'
+            + 'border-bottom:1px solid rgba(255,215,0,0.12);'
+            + 'color:rgba(255,255,255,0.85);font-size:0.76rem;'
             + 'cursor:default;user-select:none;'
+            + 'transition:all 0.25s ease;'
             + '">'
-            + '<span class="adbar-label" style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow:hidden;">'
+            + '<span class="adbar-label" style="display:flex;align-items:center;gap:5px;flex:1;min-width:0;overflow:hidden;">'
             + '<span class="adbar-icon">📺</span>'
             + '<span class="adbar-text">看广告赚VIP时长</span>'
             + '</span>'
-            + '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'
-            + '<div class="adbar-ad-slot" id="adbarSlot" style="display:none;width:120px;height:32px;background:rgba(255,215,0,0.06);border-radius:4px;overflow:hidden;"></div>'
+            + '<div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">'
+            + '<div class="adbar-ad-slot" id="adbarSlot" style="display:none;width:110px;height:28px;background:rgba(255,215,0,0.06);border-radius:4px;overflow:hidden;"></div>'
             + '<button class="adbar-watch-btn" id="adbarWatchBtn" style="'
             + 'background:rgba(255,215,0,0.15);color:#ffd700;border:1px solid rgba(255,215,0,0.3);'
-            + 'border-radius:14px;padding:3px 12px;font-size:0.72rem;cursor:pointer;'
+            + 'border-radius:12px;padding:2px 10px;font-size:0.7rem;cursor:pointer;'
             + 'white-space:nowrap;transition:all 0.2s;'
             + '">▶ 观看</button>'
-            + '<button class="adbar-close-btn" id="adbarCloseBtn" style="'
-            + 'background:none;border:none;color:rgba(255,255,255,0.25);font-size:1rem;cursor:pointer;'
-            + 'padding:0 2px;line-height:1;'
-            + '" title="关闭">✕</button>'
+            + '<button class="adbar-collapse-btn" id="adbarCollapseBtn" style="'
+            + 'background:none;border:none;color:rgba(255,255,255,0.25);font-size:0.9rem;cursor:pointer;'
+            + 'padding:0 2px;line-height:1;transition:color 0.2s;'
+            + '" title="收起">−</button>'
             + '</div>'
             + '</div>';
 
@@ -112,10 +114,23 @@
         var statusBar = document.createElement('div');
         statusBar.id = '__adbarStatus';
         statusBar.style.cssText =
-            'display:none;height:0;overflow:hidden;text-align:center;font-size:0.7rem;'
-            + 'color:rgba(255,215,0,0.6);background:rgba(20,20,30,0.95);'
+            'display:none;height:0;overflow:hidden;text-align:center;font-size:0.68rem;'
+            + 'color:rgba(255,215,0,0.55);background:rgba(20,20,30,0.95);'
             + 'transition:height 0.25s ease;';
         bar.appendChild(statusBar);
+
+        // 折叠后的小圆点
+        var dot = document.createElement('div');
+        dot.id = '__adbarDot';
+        dot.style.cssText =
+            'display:none;position:fixed;top:4px;right:12px;z-index:9999;'
+            + 'width:28px;height:28px;border-radius:50%;'
+            + 'background:rgba(20,20,30,0.85);border:1px solid rgba(255,215,0,0.25);'
+            + 'color:#ffd700;font-size:0.8rem;text-align:center;line-height:28px;'
+            + 'cursor:pointer;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+        dot.textContent = '📺';
+        dot.title = '展开广告';
+        bar.appendChild(dot);
 
         return bar;
     }
@@ -259,34 +274,85 @@
         var bar = getAdBar();
         if (bar) {
             bar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-            bar.style.transform = 'translateY(100%)';
+            bar.style.transform = 'translateY(-100%)';
             bar.style.opacity = '0';
         }
         // 3 分钟后重新显示
         setTimeout(function() {
             adBarHidden = false;
             var b = getAdBar();
-            if (b) {
+            if (b && !adBarCollapsed) {
                 b.style.transform = 'translateY(0)';
                 b.style.opacity = '1';
             }
         }, 180000);
     }
 
-    // ===== 滚动控制（向下滚动隐藏，向上滚动显示） =====
-    function handleScroll() {
+    // ===== 折叠/展开 =====
+    function collapseAdBar() {
+        adBarCollapsed = true;
+        var inner = document.getElementById('adbarInner');
+        var status = document.getElementById('__adbarStatus');
+        var dot = document.getElementById('__adbarDot');
+        var bar = getAdBar();
+
+        if (inner) {
+            inner.style.height = '0';
+            inner.style.padding = '0';
+            inner.style.overflow = 'hidden';
+            inner.style.borderBottom = 'none';
+            inner.style.opacity = '0';
+        }
+        if (status) {
+            status.style.display = 'none';
+            status.style.height = '0';
+            status.style.padding = '0';
+        }
+        if (dot) {
+            dot.style.display = 'block';
+            dot.style.opacity = '0';
+            setTimeout(function() { dot.style.opacity = '1'; }, 50);
+        }
+        if (bar) {
+            bar.style.pointerEvents = 'none';
+        }
+    }
+
+    function expandAdBar() {
+        adBarCollapsed = false;
         if (adBarHidden) return;
+
+        var inner = document.getElementById('adbarInner');
+        var dot = document.getElementById('__adbarDot');
+        var bar = getAdBar();
+
+        if (inner) {
+            inner.style.height = '36px';
+            inner.style.padding = '0 10px';
+            inner.style.overflow = '';
+            inner.style.borderBottom = '';
+            inner.style.opacity = '1';
+        }
+        if (dot) dot.style.display = 'none';
+        if (bar) {
+            bar.style.pointerEvents = '';
+            bar.style.transform = 'translateY(0)';
+            bar.style.opacity = '1';
+        }
+    }
+
+    // ===== 滚动控制（向下滚隐藏，向上滚到顶部显示） =====
+    function handleScroll() {
+        if (adBarHidden || adBarCollapsed) return;
         if (!scrollTicking) {
             requestAnimationFrame(function() {
                 var bar = getAdBar();
                 if (!bar) { scrollTicking = false; return; }
                 var currentY = window.pageYOffset;
-                var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-                var nearBottom = (maxScroll - currentY) < 120;
 
-                if (currentY > lastScrollY + 10 && currentY > 100) {
-                    bar.style.transform = 'translateY(100%)';
-                } else if (currentY < lastScrollY - 10 || nearBottom) {
+                if (currentY > lastScrollY + 8 && currentY > 50) {
+                    bar.style.transform = 'translateY(-100%)';
+                } else if (currentY < lastScrollY - 5 || currentY < 10) {
                     bar.style.transform = 'translateY(0)';
                 }
                 lastScrollY = currentY;
@@ -316,32 +382,33 @@
         // 样式
         var style = document.createElement('style');
         style.textContent =
-            'body{padding-bottom:48px;}'  // 防止底部内容被广告栏遮挡（含ICP备案号）
-            + '#__adbar{position:fixed;bottom:0;left:0;right:0;z-index:9998;'
+            'body{padding-top:36px;}'  // 顶部横幅占位
+            + '#__adbar{position:fixed;top:0;left:0;right:0;z-index:9998;'
             + 'transition:transform 0.3s ease,opacity 0.3s ease;'
-            + 'padding-bottom:env(safe-area-inset-bottom,0);'
             + '}'
             + '#__adbar .adbar-watch-btn:hover{background:rgba(255,215,0,0.3)!important;}'
-            + '#__adbar .adbar-close-btn:hover{color:rgba(255,255,255,0.6)!important;}';
+            + '#__adbar .adbar-collapse-btn:hover{color:rgba(255,255,255,0.6)!important;}';
         document.head.appendChild(style);
 
         document.body.appendChild(bar);
 
         // 绑定事件
         var watchBtn = document.getElementById('adbarWatchBtn');
-        var closeBtn = document.getElementById('adbarCloseBtn');
+        var collapseBtn = document.getElementById('adbarCollapseBtn');
+        var dot = document.getElementById('__adbarDot');
         if (watchBtn) watchBtn.onclick = startWatching;
-        if (closeBtn) closeBtn.onclick = closeAdBar;
+        if (collapseBtn) collapseBtn.onclick = collapseAdBar;
+        if (dot) dot.onclick = expandAdBar;
 
         // 滚动监听
         window.addEventListener('scroll', handleScroll, { passive: true });
 
-        // 登录成功后自动显示（监听 storage 变化）
+        // 登录成功后自动显示
         window.addEventListener('storage', function(e) {
             if (e.key === 'token' && e.newValue) {
                 adBarHidden = false;
-                var b = getAdBar();
-                if (b) { b.style.transform = 'translateY(0)'; b.style.opacity = '1'; }
+                adBarCollapsed = false;
+                expandAdBar();
             }
         });
     }
@@ -355,5 +422,5 @@
         setTimeout(injectAdBar, 300);
     }
 
-    console.log('[广告] 底部横幅模块已加载 | 百度广告:', AdConfig.enabled ? '已启用' : '未启用（fallback）');
+    console.log('[广告] 顶部横幅模块已加载 | 百度广告:', AdConfig.enabled ? '已启用' : '未启用（fallback）');
 })();

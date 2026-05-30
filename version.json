@@ -1,8 +1,8 @@
 {
-  "version": "1.5.4",
-  "build_time": "2026-05-30T13:54:00Z",
+  "version": "1.5.5",
+  "build_time": "2026-05-30T14:38:00Z",
   "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "移除首页顶部导航栏，紧凑化布局",
+  "description": "广告栏从底部移至顶部，支持折叠/展开",
   "fix_count": 0
 }

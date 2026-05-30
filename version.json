@@ -1,8 +1,8 @@
 {
-  "version": "1.5.0",
-  "build_time": "2026-05-30T20:43:00Z",
-  "git_commit": "78a622c",
+  "version": "1.5.1",
+  "build_time": "2026-05-30T20:56:00Z",
+  "git_commit": "ecba02e",
   "author": "玄机算命网",
-  "description": "全站动态粒子背景：Canvas粒子系统（星点飘浮+连线+鼠标交互+渐变光晕），CSS动画渐变fallback",
-  "fix_count": 3
+  "description": "紧急修复：profile.html 转盘回调多了一个 } 导致整页JS崩溃（无法登录/退出/加载）",
+  "fix_count": 1
 }

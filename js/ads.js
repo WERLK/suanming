@@ -119,19 +119,6 @@
             + 'transition:height 0.25s ease;';
         bar.appendChild(statusBar);
 
-        // 折叠后的小圆点
-        var dot = document.createElement('div');
-        dot.id = '__adbarDot';
-        dot.style.cssText =
-            'display:none;position:fixed;top:4px;right:12px;z-index:9999;'
-            + 'width:28px;height:28px;border-radius:50%;'
-            + 'background:rgba(20,20,30,0.85);border:1px solid rgba(255,215,0,0.25);'
-            + 'color:#ffd700;font-size:0.8rem;text-align:center;line-height:28px;'
-            + 'cursor:pointer;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.3);';
-        dot.textContent = '📺';
-        dot.title = '展开广告';
-        bar.appendChild(dot);
-
         return bar;
     }
 
@@ -293,7 +280,6 @@
         adBarCollapsed = true;
         var inner = document.getElementById('adbarInner');
         var status = document.getElementById('__adbarStatus');
-        var dot = document.getElementById('__adbarDot');
         var bar = getAdBar();
 
         if (inner) {
@@ -308,14 +294,31 @@
             status.style.height = '0';
             status.style.padding = '0';
         }
-        if (dot) {
-            dot.style.display = 'block';
-            dot.style.opacity = '0';
-            setTimeout(function() { dot.style.opacity = '1'; }, 50);
-        }
         if (bar) {
-            bar.style.pointerEvents = 'none';
+            bar.style.height = '0';
+            bar.style.overflow = 'visible';
         }
+
+        // 创建独立的小圆点（不在 bar 内，避免 pointerEvents 影响）
+        var existingDot = document.getElementById('__adbarDot');
+        if (existingDot) existingDot.remove();
+
+        var dot = document.createElement('div');
+        dot.id = '__adbarDot';
+        dot.style.cssText =
+            'position:fixed;top:4px;right:12px;z-index:9999;'
+            + 'width:28px;height:28px;border-radius:50%;'
+            + 'background:rgba(20,20,30,0.85);border:1px solid rgba(255,215,0,0.25);'
+            + 'color:#ffd700;font-size:0.8rem;text-align:center;line-height:28px;'
+            + 'cursor:pointer;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.3);'
+            + 'opacity:0;';
+        dot.textContent = '📺';
+        dot.title = '展开广告';
+        dot.onclick = expandAdBar;
+        document.body.appendChild(dot);
+
+        // 触发动画
+        requestAnimationFrame(function() { dot.style.opacity = '1'; });
     }
 
     function expandAdBar() {
@@ -323,7 +326,6 @@
         if (adBarHidden) return;
 
         var inner = document.getElementById('adbarInner');
-        var dot = document.getElementById('__adbarDot');
         var bar = getAdBar();
 
         if (inner) {
@@ -333,12 +335,16 @@
             inner.style.borderBottom = '';
             inner.style.opacity = '1';
         }
-        if (dot) dot.style.display = 'none';
         if (bar) {
-            bar.style.pointerEvents = '';
+            bar.style.height = '';
+            bar.style.overflow = '';
             bar.style.transform = 'translateY(0)';
             bar.style.opacity = '1';
         }
+
+        // 移除独立圆点
+        var dot = document.getElementById('__adbarDot');
+        if (dot) dot.remove();
     }
 
     // ===== 滚动控制（向下滚隐藏，向上滚到顶部显示） =====
@@ -395,10 +401,8 @@
         // 绑定事件
         var watchBtn = document.getElementById('adbarWatchBtn');
         var collapseBtn = document.getElementById('adbarCollapseBtn');
-        var dot = document.getElementById('__adbarDot');
         if (watchBtn) watchBtn.onclick = startWatching;
         if (collapseBtn) collapseBtn.onclick = collapseAdBar;
-        if (dot) dot.onclick = expandAdBar;
 
         // 滚动监听
         window.addEventListener('scroll', handleScroll, { passive: true });

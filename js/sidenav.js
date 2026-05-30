@@ -40,10 +40,10 @@
         sidebar = document.createElement('nav');
         sidebar.id = '__sideNav';
         sidebar.style.cssText =
-            'position:fixed;top:0;right:0;bottom:0;width:220px;z-index:9991;'
+            'position:fixed;top:0;left:0;bottom:0;width:220px;z-index:9991;'
             + 'background:linear-gradient(180deg,rgba(20,20,35,0.98) 0%,rgba(15,12,41,0.98) 100%);'
-            + 'backdrop-filter:blur(20px);border-left:1px solid rgba(255,215,0,0.12);'
-            + 'transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);'
+            + 'backdrop-filter:blur(20px);border-right:1px solid rgba(255,215,0,0.12);'
+            + 'transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);'
             + 'display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;';
 
         // 标题
@@ -120,26 +120,26 @@
         fab = document.createElement('div');
         fab.id = '__sideFab';
         fab.style.cssText =
-            'position:fixed;bottom:20px;right:16px;z-index:9980;'
-            + 'width:46px;height:46px;border-radius:50%;'
-            + 'background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,215,0,0.08));'
-            + 'border:1px solid rgba(255,215,0,0.3);'
-            + 'color:#ffd700;font-size:1.2rem;'
+            'position:fixed;top:40px;left:10px;z-index:9980;'
+            + 'width:36px;height:36px;border-radius:8px;'
+            + 'background:rgba(20,20,35,0.9);'
+            + 'border:1px solid rgba(255,215,0,0.25);'
+            + 'color:#ffd700;font-size:1.1rem;'
             + 'display:flex;align-items:center;justify-content:center;'
             + 'cursor:pointer;transition:all 0.3s ease;'
-            + 'box-shadow:0 4px 15px rgba(0,0,0,0.3),0 0 20px rgba(255,215,0,0.1);'
+            + 'box-shadow:0 2px 10px rgba(0,0,0,0.3);'
             + 'user-select:none;-webkit-tap-highlight-color:transparent;';
         fab.innerHTML = '☰';
         fab.title = '导航菜单';
         fab.onclick = toggleSidebar;
 
         fab.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.1)';
-            this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.4),0 0 30px rgba(255,215,0,0.15)';
+            this.style.background = 'rgba(255,215,0,0.12)';
+            this.style.borderColor = 'rgba(255,215,0,0.5)';
         });
         fab.addEventListener('mouseleave', function() {
-            this.style.transform = '';
-            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3),0 0 20px rgba(255,215,0,0.1)';
+            this.style.background = 'rgba(20,20,35,0.9)';
+            this.style.borderColor = 'rgba(255,215,0,0.25)';
         });
 
         document.body.appendChild(fab);
@@ -158,7 +158,7 @@
 
     function closeSidebar() {
         isOpen = false;
-        sidebar.style.transform = 'translateX(100%)';
+        sidebar.style.transform = 'translateX(-100%)';
         overlay.style.opacity = '0';
         overlay.style.pointerEvents = 'none';
         fab.style.opacity = '1';

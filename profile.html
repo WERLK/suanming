@@ -19,776 +19,207 @@
     <link rel="stylesheet" href="/css/profile-compatible.css?v=1.3.0">
     <script src="/js/ads.js?v=1.3.0"></script>
     <style>
-        /* 个人中心页面特定样式 */
-        .profile-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
+        /* 个人中心 - 紧凑化 UI */
+        .profile-container { max-width: 640px; margin: 0 auto; padding: 0 0.8rem 2rem; }
+
+        /* ===== 头像区 ===== */
         .profile-header {
-            text-align: center;
-            padding: 2rem 1rem;
-            background: linear-gradient(180deg, rgba(255,215,0,0.1), transparent);
-            border-bottom: 1px solid rgba(255,215,0,0.15);
-            margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+            padding: 1.2rem 1rem; margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.01));
+            border: 1px solid rgba(255,215,0,0.1); border-radius: 16px;
         }
-        
         .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+            width: 64px; height: 64px; min-width: 64px; border-radius: 50%;
             background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05));
-            border: 2px solid rgba(255,215,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            margin: 0 auto 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
+            border: 2px solid rgba(255,215,0,0.3); display: flex; align-items: center;
+            justify-content: center; font-size: 2rem; cursor: pointer; transition: all 0.3s;
         }
-        
-        .profile-avatar:hover {
-            transform: scale(1.05);
-            border-color: rgba(255,215,0,0.5);
+        .profile-avatar:hover { transform: scale(1.05); border-color: rgba(255,215,0,0.5); }
+        .profile-info-area { flex: 1; min-width: 0; }
+        .profile-name { color: #ffd700; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.15rem; }
+        .profile-meta { color: rgba(255,255,255,0.45); font-size: 0.75rem; }
+        .profile-tags { display: flex; gap: 0.4rem; margin-top: 0.35rem; flex-wrap: wrap; }
+        .profile-tag {
+            display: inline-block; padding: 0.12rem 0.45rem; border-radius: 10px;
+            font-size: 0.65rem; font-weight: bold;
         }
-        
-        .profile-name {
-            color: #ffd700;
-            font-size: 1.5rem;
-            margin-bottom: 0.3rem;
+        .tag-vip { background: rgba(255,215,0,0.15); color: #ffd700; }
+        .tag-vip-active { background: rgba(255,215,0,0.25); color: #ffd700; }
+        .tag-vip-perm { background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(255,215,0,0.2)); color: #ffd700; }
+        .tag-verified { background: rgba(0,200,255,0.12); color: #4dc9ff; }
+        .tag-idcard { background: rgba(0,220,130,0.12); color: #0dc; }
+
+        /* 统计条 */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+            margin-bottom: 0.8rem;
         }
-        
-        .profile-info {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.85rem;
-        }
-        
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
         .stat-item {
-            text-align: center;
-            padding: 1rem;
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
+            text-align: center; padding: 0.7rem 0.4rem; border-radius: 10px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.08);
         }
-        
-        .stat-value {
-            color: #ffd700;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 0.3rem;
-        }
-        
-        .stat-label {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.8rem;
-        }
-        
-        .profile-section {
-            margin-bottom: 1.5rem;
-        }
-        
-        .section-title {
-            color: #ffd700;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255,215,0,0.1);
-        }
-        
-        .menu-list {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255,215,0,0.05);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-        
-        .menu-item:hover {
-            background: rgba(255,215,0,0.05);
-        }
-        
-        .menu-icon {
-            font-size: 1.5rem;
-            margin-right: 1rem;
-            width: 30px;
-            text-align: center;
-        }
-        
-        .menu-text {
-            flex: 1;
-            color: #ffffff;
-            font-size: 0.95rem;
-        }
-        
-        .menu-arrow {
-            color: rgba(255,255,255,0.3);
-            font-size: 1.2rem;
-        }
-        
-        /* 算命知识科普卡片 */
-        .knowledge-card {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 0.8rem;
-        }
-        .knowledge-card h4 {
-            color: #ffd700;
-            font-size: 0.95rem;
-            margin-bottom: 0.6rem;
-        }
-        .knowledge-card p {
-            font-size: 0.82rem;
-            line-height: 1.7;
-            color: rgba(255,255,255,0.75);
-            margin-bottom: 0.4rem;
-        }
-        .knowledge-card p strong {
-            color: rgba(255,215,0,0.8);
-            font-weight: 600;
-        }
+        .stat-value { color: #ffd700; font-size: 1.3rem; font-weight: bold; line-height: 1.2; }
+        .stat-label { color: rgba(255,255,255,0.45); font-size: 0.7rem; margin-top: 0.15rem; }
 
-        .btn-logout {
-            width: 100%;
-            padding: 0.9rem;
-            background: rgba(255,0,0,0.1);
-            border: 1px solid rgba(255,0,0,0.3);
-            border-radius: 12px;
-            color: #ff6b6b;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 1rem;
-        }
-        
-        .btn-logout:hover {
-            background: rgba(255,0,0,0.2);
-        }
-
-        /* ========== 会员卡片 ========== */
+        /* ===== VIP 卡片 ===== */
         .vip-card {
-            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 12px;
-            margin: 0 1rem 1.5rem;
-            overflow: hidden;
-        }
-        .vip-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.8rem 1rem;
-            background: linear-gradient(90deg, rgba(255,215,0,0.15), transparent);
-        }
-        .vip-badge {
-            font-size: 0.9rem;
-            font-weight: bold;
-            padding: 0.25rem 0.7rem;
-            border-radius: 20px;
-        }
-        .vip-badge.free {
-            background: rgba(136,136,136,0.15);
-            color: #888;
-        }
-        .vip-badge.basic {
-            background: rgba(76,175,80,0.15);
-            color: #4caf50;
-        }
-        .vip-badge.permanent {
-            background: rgba(255,215,0,0.15);
-            color: #ffd700;
-        }
-        .vip-expire {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.5);
-        }
-        .vip-card-body {
-            padding: 0.8rem 1rem;
-        }
-        .vip-progress {
-            height: 6px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 3px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.07), rgba(255,215,0,0.01));
+            border: 1px solid rgba(255,215,0,0.15); border-radius: 14px; padding: 1rem;
             margin-bottom: 0.8rem;
-            overflow: hidden;
+        }
+        .vip-card-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+        .vip-badge { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .vip-expire { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-left: auto; }
+        .vip-progress {
+            height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06);
+            margin-bottom: 0.4rem; overflow: hidden;
         }
         .vip-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #ffd700, #ffed4e);
-            border-radius: 3px;
-            transition: width 0.5s;
+            height: 100%; border-radius: 3px;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            transition: width 0.6s ease;
         }
-        .vip-info-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-        }
-        .vip-info-row span {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.7);
-            flex: 1;
-        }
-        /* 看广告赚时长区域 */
-        .vip-ad-section {
-            margin-top: 0.6rem;
-            padding: 0.5rem;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            border: 1px dashed rgba(255,215,0,0.15);
-        }
-        .vip-ad-area {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.4rem;
-            min-height: 44px;
-        }
+        .vip-info-row { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+        .vip-ad-section { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.6rem; }
+        .vip-ad-area { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
         .vip-ad-slot {
-            width: 100px;
-            height: 36px;
-            min-width: 100px;
-            background: rgba(255,215,0,0.04);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex-shrink: 0;
+            width: 40px; height: 40px; min-width: 40px; border-radius: 8px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,215,0,0.12);
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
-        .vip-ad-placeholder {
-            font-size: 1rem;
-            opacity: 0.25;
-        }
-        .vip-ad-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .vip-ad-countdown {
-            font-size: 0.72rem;
-            color: rgba(255,215,0,0.6);
-            min-height: 1.1rem;
-            line-height: 1.1rem;
-        }
-        .vip-ad-countdown.urgent {
-            color: #ffd700;
-            font-weight: bold;
-            animation: vip-ad-pulse 0.8s ease-in-out infinite;
-        }
-        @keyframes vip-ad-pulse {
-            0%,100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .vip-ad-daily {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.35);
-        }
-        .vip-ad-daily strong { color: rgba(255,215,0,0.7); }
+        .vip-ad-info { flex: 1; min-width: 0; }
+        .vip-ad-countdown { font-size: 0.8rem; color: #ffd700; font-weight: bold; }
+        .vip-ad-daily { font-size: 0.65rem; color: rgba(255,255,255,0.35); margin-top: 0.15rem; }
         .vip-ad-watch-btn {
-            width: 100%;
-            padding: 0.5rem;
-            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,193,7,0.15));
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 8px;
-            color: #ffd700;
-            font-size: 0.78rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
+            padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);
+            background: rgba(255,215,0,0.1); color: #ffd700; font-size: 0.8rem;
+            cursor: pointer; white-space: nowrap; transition: all 0.2s;
         }
-        .vip-ad-watch-btn:hover {
-            background: linear-gradient(135deg, rgba(255,215,0,0.35), rgba(255,193,7,0.25));
-            border-color: rgba(255,215,0,0.6);
-            color: #fff;
+        .vip-ad-watch-btn:hover { background: rgba(255,215,0,0.18); }
+
+        /* ===== 通用区块 ===== */
+        .profile-section { margin-bottom: 0.7rem; }
+        .section-hd {
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+            padding: 0.6rem 0; border-bottom: 1px solid rgba(255,215,0,0.08);
+            margin-bottom: 0.5rem; user-select: none;
         }
-        .vip-ad-watch-btn:disabled {
-            background: rgba(255,255,255,0.06);
-            border-color: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.25);
-            cursor: not-allowed;
+        .section-hd h3 { color: #ffd700; font-size: 0.9rem; font-weight: 600; margin: 0; }
+        .section-arrow { color: rgba(255,255,255,0.3); font-size: 0.7rem; transition: transform 0.3s; }
+        .section-arrow.open { transform: rotate(90deg); }
+        .section-body { overflow: hidden; transition: max-height 0.35s ease; }
+        .section-body.collapsed { max-height: 0 !important; }
+
+        /* 双列网格菜单 */
+        .menu-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
         }
-        .vip-ad-watch-btn.claim-ready {
-            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,193,7,0.4));
-            border-color: rgba(255,215,0,0.7);
-            color: #fff;
-            animation: vip-ad-pulse 0.6s ease-in-out infinite;
+        .menu-grid-item {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 0.7rem;
+            border-radius: 10px; cursor: pointer; transition: all 0.2s;
+            background: rgba(255,215,0,0.03); border: 1px solid rgba(255,215,0,0.06);
         }
-        /* 方案对比 */
-        .vip-plans {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.6rem;
-            margin-bottom: 1.5rem;
+        .menu-grid-item:hover { background: rgba(255,215,0,0.07); border-color: rgba(255,215,0,0.15); }
+        .menu-grid-item .menu-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+        .menu-grid-item .menu-text { color: rgba(255,255,255,0.85); font-size: 0.8rem; flex: 1; }
+        .menu-grid-item .menu-arrow { color: rgba(255,255,255,0.2); font-size: 0.8rem; }
+
+        /* 积分+转盘 并排 */
+        .dual-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .dual-card {
+            border-radius: 12px; padding: 0.8rem; text-align: center;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.08);
         }
-        @media (max-width: 640px) {
-            .vip-plans { grid-template-columns: 1fr; gap: 0.8rem; }
+        .points-value { color: #ffd700; font-size: 1.6rem; font-weight: bold; }
+        .points-label { color: rgba(255,255,255,0.4); font-size: 0.7rem; margin-top: 0.1rem; }
+        .checkin-btn, .redeem-btn, .wheel-spin-btn {
+            width: 100%; margin-top: 0.5rem; padding: 0.45rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,215,0,0.06);
+            color: #ffd700; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
         }
+        .checkin-btn:hover, .redeem-btn:hover, .wheel-spin-btn:hover { background: rgba(255,215,0,0.12); }
+        .streak-badge {
+            display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px;
+            background: rgba(255,215,0,0.1); color: #ffd700; font-size: 0.65rem; margin-top: 0.3rem;
+        }
+        .wheel-container { position: relative; }
+        .wheel-pointer {
+            position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+            color: #ffd700; font-size: 1.2rem; z-index: 2;
+        }
+        .wheel-prizes {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem; margin-top: 0.4rem;
+            font-size: 0.6rem; color: rgba(255,255,255,0.35);
+        }
+
+        /* 会员方案卡片（折叠内） */
+        .vip-plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
         .vip-plan-card {
-            background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(22,33,62,0.9));
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 1rem 0.8rem;
-            text-align: center;
-        }
-        .vip-plan-card.active {
-            border-color: rgba(255,215,0,0.4);
-            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
-        }
-        .vip-plan-card .plan-icon { font-size: 2rem; margin-bottom: 0.3rem; }
-        .vip-plan-card .plan-name { color: #ffd700; font-size: 0.9rem; font-weight: bold; margin-bottom: 0.3rem; }
-        .vip-plan-card .plan-price { color: #fff; font-size: 1.2rem; font-weight: bold; margin-bottom: 0.4rem; }
-        .vip-plan-card .plan-price small { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
-        .vip-plan-card .plan-desc { color: rgba(255,255,255,0.5); font-size: 0.72rem; line-height: 1.5; }
-        .vip-plan-card .plan-badge {
-            display: inline-block;
-            margin-top: 0.4rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
+            text-align: center; padding: 0.7rem 0.3rem; border-radius: 10px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.08);
             font-size: 0.7rem;
-            font-weight: bold;
         }
-        .plan-badge-f { background: rgba(136,136,136,0.15); color: #888; }
-        .plan-badge-b { background: rgba(76,175,80,0.15); color: #4caf50; }
-        .plan-badge-p { background: rgba(255,215,0,0.15); color: #ffd700; }
-        /* 权益 */
-        .vip-benefits {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.6rem;
-            margin-bottom: 1.5rem;
+        .vip-plan-card .plan-icon { font-size: 1.3rem; margin-bottom: 0.2rem; }
+        .vip-plan-card .plan-name { color: #ffd700; font-weight: bold; font-size: 0.75rem; }
+        .vip-plan-card .plan-price { color: rgba(255,255,255,0.5); font-size: 0.65rem; margin: 0.2rem 0; }
+        .vip-plan-card .plan-price small { font-size: 0.55rem; }
+        .vip-plan-card .plan-desc { color: rgba(255,255,255,0.4); font-size: 0.6rem; line-height: 1.4; }
+        .plan-badge {
+            display: inline-block; margin-top: 0.3rem; padding: 0.1rem 0.4rem; border-radius: 8px;
+            font-size: 0.55rem; font-weight: bold;
         }
-        @media (max-width: 640px) {
-            .vip-benefits { grid-template-columns: 1fr; }
-        }
+        .plan-badge-f { background: rgba(255,215,0,0.15); color: #ffd700; }
+        .plan-badge-b { background: rgba(100,200,255,0.15); color: #4dc9ff; }
+        .plan-badge-p { background: rgba(255,100,150,0.15); color: #ff6b6b; }
+
+        /* 权益（折叠内） */
+        .vip-benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
         .vip-benefit-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,215,0,0.08);
-            border-radius: 10px;
-            padding: 0.8rem;
-            display: flex;
-            gap: 0.6rem;
-            align-items: flex-start;
+            display: flex; align-items: flex-start; gap: 0.4rem; padding: 0.5rem;
+            border-radius: 8px; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,215,0,0.05);
         }
-        .vip-benefit-item .b-icon { font-size: 1.3rem; flex-shrink: 0; }
-        .vip-benefit-item .b-text h4 { color: #ffd700; font-size: 0.82rem; margin-bottom: 0.15rem; }
-        .vip-benefit-item .b-text p { color: rgba(255,255,255,0.5); font-size: 0.72rem; }
+        .vip-benefit-item .b-icon { font-size: 1rem; min-width: 22px; text-align: center; }
+        .vip-benefit-item .b-text h4 { color: rgba(255,255,255,0.8); font-size: 0.7rem; margin-bottom: 0.1rem; }
+        .vip-benefit-item .b-text p { color: rgba(255,255,255,0.4); font-size: 0.6rem; line-height: 1.3; }
 
-        /* 广告观看弹窗 */
-        .ad-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        /* 知识卡片（折叠内） */
+        .knowledge-card {
+            padding: 0.6rem 0.8rem; margin-bottom: 0.4rem; border-radius: 8px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.05);
         }
-        .ad-modal.show {
-            display: flex;
+        .knowledge-card h4 { color: #ffd700; font-size: 0.8rem; margin-bottom: 0.3rem; }
+        .knowledge-card p { font-size: 0.7rem; line-height: 1.5; color: rgba(255,255,255,0.55); margin-bottom: 0.2rem; }
+        .knowledge-card p strong { color: rgba(255,215,0,0.7); }
+
+        /* 退出按钮 */
+        .btn-logout {
+            width: 100%; padding: 0.7rem; margin-top: 0.5rem; border-radius: 10px;
+            background: rgba(255,0,0,0.06); border: 1px solid rgba(255,0,0,0.15);
+            color: #ff6b6b; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
         }
-        .ad-modal-content {
-            text-align: center;
-            max-width: 360px;
-            width: 90%;
-        }
-        .ad-container {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0.8rem 0;
-            overflow: hidden;
-        }
-        .ad-container .ad-loading {
-            color: rgba(255,255,255,0.4);
-            font-size: 0.85rem;
-            padding: 2rem;
-        }
-        .ad-container .ad-fallback {
-            text-align: center;
-            padding: 1.5rem;
-            color: rgba(255,255,255,0.5);
-        }
-        .ad-container .ad-fallback .ad-fallback-icon {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        .ad-timer {
-            font-size: 1.8rem;
-            color: #ffd700;
-            margin: 0.4rem 0;
-            font-weight: bold;
-        }
-        .ad-hint {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.78rem;
-            margin-bottom: 0.6rem;
-        }
-        .ad-skip-btn {
-            padding: 0.6rem 1.5rem;
-            background: linear-gradient(135deg,#ffd700,#ffc107);
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-        .ad-skip-btn:hover { transform: scale(1.03); }
-        .ad-skip-btn:disabled {
-            opacity: 0.4; cursor: not-allowed; transform: none;
-            background: rgba(255,255,255,0.1);
-        }
-        .ad-skip-btn.ready {
-            animation: adPulse 1.5s infinite;
-        }
-        @keyframes adPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.4); }
-            50% { box-shadow: 0 0 0 12px rgba(255,215,0,0); }
-        }
-        .ad-close-btn {
-            position: absolute;
-            top: 10px; right: 16px;
-            background: none; border: none;
-            color: rgba(255,255,255,0.5);
-            font-size: 1.5rem; cursor: pointer;
-            z-index: 10;
+        .btn-logout:hover { background: rgba(255,0,0,0.12); }
+
+        /* 桌面端适配 */
+        @media (min-width: 768px) {
+            .profile-container { max-width: 680px; padding: 0 1rem 2rem; }
+            .menu-grid { grid-template-columns: repeat(3, 1fr); }
+            .dual-row { grid-template-columns: 1fr 1fr; }
+            .stats-row { gap: 1rem; }
+            .profile-header { padding: 1.5rem; }
+            .profile-avatar { width: 72px; height: 72px; min-width: 72px; font-size: 2.3rem; }
+            .profile-name { font-size: 1.2rem; }
         }
 
-        /* 签到与积分 */
-        .points-row { display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; }
-        .points-display { text-align:center; min-width:60px; }
-        .points-value { color:#ffd700; font-size:1.6rem; font-weight:bold; display:block; }
-        .points-label { color:rgba(255,255,255,0.5); font-size:0.7rem; }
-        .checkin-area { flex:1; display:flex; align-items:center; gap:0.5rem; }
-        .checkin-btn {
-            padding:0.6rem 1rem; border:none; border-radius:10px;
-            background:linear-gradient(135deg,#ffd700,#ffc107); color:#000;
-            font-size:0.85rem; font-weight:bold; cursor:pointer; white-space:nowrap;
+        .back-btn { background: none; border: none; color: #ffd700; font-size: 1.2rem; cursor: pointer; padding: 0.5rem; }
+        .page-header {
+            display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.12);
         }
-        .checkin-btn:disabled { opacity:0.4; cursor:not-allowed; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); }
-        .checkin-btn.checked { background:rgba(76,175,80,0.3); color:#4caf50; }
-        .streak-badge { color:rgba(255,255,255,0.5); font-size:0.78rem; white-space:nowrap; }
-        .streak-badge.fire { color:#ff6b35; }
-        .redeem-btn {
-            padding:0.6rem 0.9rem; border:1px solid rgba(255,215,0,0.3); border-radius:10px;
-            background:rgba(255,215,0,0.08); color:#ffd700; font-size:0.85rem; cursor:pointer; white-space:nowrap;
-        }
-        .redeem-btn:hover { background:rgba(255,215,0,0.15); }
-
-        /* 幸运转盘 */
-        .wheel-container { display:flex; flex-direction:column; align-items:center; gap:0.8rem; position:relative; }
-        .wheel-pointer { font-size:1.8rem; color:#ffd700; position:absolute; top:-8px; z-index:2; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
-        #wheelCanvas { border-radius:50%; box-shadow:0 0 20px rgba(255,215,0,0.15); }
-        .wheel-spin-btn {
-            padding:0.7rem 1.5rem; border:none; border-radius:12px;
-            background:linear-gradient(135deg,#ff6b35,#ff4500); color:#fff;
-            font-size:0.9rem; font-weight:bold; cursor:pointer; transition:all 0.3s;
-        }
-        .wheel-spin-btn:hover { transform:scale(1.03); box-shadow:0 4px 16px rgba(255,107,53,0.3); }
-        .wheel-spin-btn:disabled { opacity:0.4; cursor:not-allowed; background:rgba(255,255,255,0.1); transform:none; box-shadow:none; }
-        .wheel-prizes { display:grid; grid-template-columns:repeat(4,1fr); gap:0.3rem; width:100%; max-width:320px; }
-        .wheel-prizes span { font-size:0.65rem; color:rgba(255,255,255,0.4); text-align:center; }
-
-        /* 积分兑换弹窗 */
-        .redeem-modal { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.85); z-index:1003; align-items:center; justify-content:center; }
-        .redeem-modal.show { display:flex; }
-        .redeem-content {
-            background:linear-gradient(135deg,#1a1a2e,#16213e); border:1px solid rgba(255,215,0,0.2);
-            border-radius:16px; padding:1.5rem; max-width:380px; width:90%;
-        }
-        .redeem-balance { text-align:center; color:rgba(255,255,255,0.7); margin-bottom:1rem; font-size:0.9rem; }
-        .redeem-balance strong { color:#ffd700; font-size:1.3rem; }
-        .redeem-options { display:flex; flex-direction:column; gap:0.5rem; }
-        .redeem-option {
-            display:flex; align-items:center; padding:0.7rem 1rem;
-            background:rgba(255,255,255,0.03); border:1px solid rgba(255,215,0,0.1);
-            border-radius:10px; cursor:pointer; transition:all 0.2s;
-        }
-        .redeem-option:hover { background:rgba(255,215,0,0.05); border-color:rgba(255,215,0,0.3); }
-        .ro-icon { font-size:1.3rem; margin-right:0.6rem; }
-        .ro-label { flex:1; color:#fff; font-size:0.85rem; }
-        .ro-cost { color:#ffd700; font-size:0.82rem; font-weight:bold; }
-        .btn-close-redeem {
-            width:100%; padding:0.7rem; margin-top:1rem; border:1px solid rgba(255,255,255,0.1);
-            border-radius:10px; background:transparent; color:rgba(255,255,255,0.5); cursor:pointer; font-size:0.85rem;
-        }
-
-        /* 头像选择弹窗 */
-        .avatar-picker-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 1001;
-            align-items: center;
-            justify-content: center;
-        }
-        .avatar-picker-modal.show { display: flex; }
-        .avatar-picker-content {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 16px;
-            padding: 1.5rem;
-            max-width: 380px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        .avatar-picker-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .avatar-picker-title {
-            color: #ffd700;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        .avatar-picker-close {
-            background: none; border: none;
-            color: rgba(255,255,255,0.5); font-size: 1.5rem; cursor: pointer;
-        }
-        .avatar-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.6rem;
-            margin-bottom: 1rem;
-        }
-        .avatar-option {
-            width: 56px; height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            cursor: pointer;
-            border: 2px solid transparent;
-            background: rgba(255,255,255,0.05);
-            transition: all 0.2s;
-            margin: 0 auto;
-        }
-        .avatar-option:hover, .avatar-option.selected {
-            border-color: rgba(255,215,0,0.6);
-            background: rgba(255,215,0,0.1);
-            transform: scale(1.08);
-        }
-        .avatar-section-label {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
-            margin: 0.8rem 0 0.5rem;
-        }
-        .avatar-upload-row {
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-        .avatar-upload-btn {
-            padding: 0.6rem 1.5rem;
-            background: rgba(255,215,0,0.1);
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 10px;
-            color: #ffd700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .avatar-upload-btn:hover {
-            background: rgba(255,215,0,0.2);
-        }
-        
-        .edit-profile-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .edit-profile-modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 400px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .modal-title {
-            color: #ffd700;
-            font-size: 1.2rem;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.5);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        .modal-close:hover {
-            color: #ffffff;
-        }
-        
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-        
-        .form-group label {
-            display: block;
-            color: #ffd700;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            box-sizing: border-box;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: rgba(255,215,0,0.5);
-            background: rgba(255,255,255,0.08);
-        }
-        
-        .form-group input::placeholder {
-            color: rgba(255,255,255,0.3);
-        }
-        
-        .btn-save {
-            width: 100%;
-            padding: 0.9rem;
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            border: none;
-            border-radius: 8px;
-            color: #000;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
-        }
-        
-        /* 桌面端布局 */
-        @media (min-width: 1024px) {
-            .profile-container {
-                max-width: 900px !important;
-                padding: 0 2rem !important;
-            }
-            .profile-header {
-                padding: 3rem 2rem !important;
-            }
-            .profile-stats {
-                gap: 1.5rem !important;
-            }
-            .profile-vip-row {
-                display: flex;
-                gap: 1.5rem;
-                margin: 0 0 1.5rem;
-            }
-            .profile-vip-row .vip-card {
-                flex: 1;
-                margin: 0 !important;
-            }
-            .profile-vip-row .profile-stats {
-                flex: 1;
-                margin: 0 !important;
-            }
-            .menu-list {
-                max-width: 100%;
-            }
-            .btn-logout {
-                max-width: 400px;
-                margin: 1rem auto 0;
-            }
-        }
+        .page-header h1 { font-size: 1rem; color: #ffd700; font-weight: 600; }
     </style>
-<style>
-    .back-btn {
-        background: none;
-        border: none;
-        color: #ffd700;
-        font-size: 1.2rem;
-        cursor: pointer;
-        padding: 0.5rem;
-    }
-    .page-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
-        border-bottom: 1px solid rgba(255,215,0,0.15);
-    }
-    .page-header h1 {
-        font-size: 1.2rem;
-        color: #ffd700;
-        font-weight: 600;
-    }
-</style>
 </head>
 <body class="has-desktop-sidebar">
 
@@ -835,64 +266,28 @@
     
     <div class="app">
         <div class="profile-container">
+
+            <!-- 头像区 + 实名 -->
             <div class="profile-header">
                 <div class="profile-avatar" onclick="openAvatarPicker()">
                     <img id="avatarImg" src="" alt="头像" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
                     <span id="avatarDefault">👤</span>
                 </div>
                 <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar()">
-                <h2 class="profile-name" id="profileName">加载中...</h2>
-                <p class="profile-info" id="profileInfo">请登录</p>
-                <p class="profile-uid" id="profileUid" style="color:rgba(255,255,255,0.35);font-size:0.72rem;margin-top:0.15rem;"></p>
-            </div>
-            
-            <!-- 实名认证卡片 -->
-            <div class="realname-card" id="realnameCard" style="display:none;margin-bottom:16px;">
-                <div class="realname-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,180,255,0.06);border:1px solid rgba(0,180,255,0.15);border-radius:12px;cursor:pointer;transition:all 0.3s;" onclick="openRealnameModal()">
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span style="font-size:1.5rem;">🔒</span>
-                        <div>
-                            <div style="color:rgba(100,200,255,0.9);font-size:0.9rem;font-weight:bold;">实名认证</div>
-                            <div id="realnameStatus" style="color:rgba(255,255,255,0.5);font-size:0.75rem;">未认证</div>
-                        </div>
-                    </div>
-                    <span style="color:rgba(100,200,255,0.6);">→</span>
-                </div>
-            </div>
-            
-            <!-- 会员卡片 + 统计 桌面端并排 -->
-            <div class="profile-vip-row">
-            <div class="vip-card" id="vipCard">
-                <div class="vip-card-header">
-                    <span class="vip-badge" id="vipBadge">免费用户</span>
-                    <span class="vip-expire" id="vipExpire"></span>
-                </div>
-                <div class="vip-card-body">
-                    <div class="vip-progress">
-                        <div class="vip-progress-bar" id="vipProgressBar" style="width:0%"></div>
-                    </div>
-                    <div class="vip-info-row">
-                        <span id="vipRemaining">未开通会员</span>
-                    </div>
-                    <!-- 看广告赚时长 -->
-                    <div class="vip-ad-section" id="vipAdSection">
-                        <div class="vip-ad-area" id="vipAdArea">
-                            <div class="vip-ad-slot" id="vipAdSlot">
-                                <span class="vip-ad-placeholder">📺</span>
-                            </div>
-                            <div class="vip-ad-info">
-                                <div class="vip-ad-countdown" id="vipAdCountdown"></div>
-                                <div class="vip-ad-daily" id="vipAdDaily">今日可观看 <strong>0</strong> 次</div>
-                            </div>
-                        </div>
-                        <button class="vip-ad-watch-btn" id="vipAdWatchBtn" onclick="watchVipAd()">
-                            ▶ 观看广告赚时长
-                        </button>
+                <div class="profile-info-area">
+                    <h2 class="profile-name" id="profileName">加载中...</h2>
+                    <p class="profile-meta" id="profileInfo">请登录</p>
+                    <p class="profile-meta" id="profileUid" style="font-size:0.65rem;"></p>
+                    <div class="profile-tags">
+                        <span class="profile-tag tag-vip" id="tagVip">免费用户</span>
+                        <span class="profile-tag tag-verified" id="tagVerified" style="display:none;" onclick="openRealnameModal()">已认证</span>
+                        <span class="profile-tag tag-idcard" id="tagIdcard" style="display:none;">📷已上传</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="profile-stats">
+
+            <!-- 统计 -->
+            <div class="stats-row">
                 <div class="stat-item">
                     <div class="stat-value" id="divinationCount">0</div>
                     <div class="stat-label">算命次数</div>
@@ -906,182 +301,132 @@
                     <div class="stat-label">使用天数</div>
                 </div>
             </div>
-            </div>
-            
-            <!-- 会员方案对比 -->
-            <div class="profile-section">
-                <h3 class="section-title">💎 会员方案</h3>
-                <div class="vip-plans" id="vipPlans">
-                    <div class="vip-plan-card" id="planFree">
-                        <div class="plan-icon">🆓</div>
-                        <div class="plan-name">免费用户</div>
-                        <div class="plan-price">¥0<small>/永久</small></div>
-                        <div class="plan-desc">基础算命<br>每日3次免费</div>
-                        <span class="plan-badge plan-badge-f">当前</span>
-                    </div>
-                    <div class="vip-plan-card" id="planBasic">
-                        <div class="plan-icon">⭐</div>
-                        <div class="plan-name">基础会员</div>
-                        <div class="plan-price">看广告<small>/免费获取</small></div>
-                        <div class="plan-desc">每日10次算命<br>详细命理报告</div>
-                        <span class="plan-badge plan-badge-b">可升级</span>
-                    </div>
-                    <div class="vip-plan-card" id="planPermanent">
-                        <div class="plan-icon">👑</div>
-                        <div class="plan-name">永久会员</div>
-                        <div class="plan-price">看广告<small>/免费获取</small></div>
-                        <div class="plan-desc" id="permanentPlanDesc">累计观看20次广告<br>触发随机VIP里程碑奖励</div>
-                        <span class="plan-badge plan-badge-p" id="permanentPlanBadge">里程碑</span>
-                    </div>
+
+            <!-- VIP 卡片 -->
+            <div class="vip-card" id="vipCard">
+                <div class="vip-card-top">
+                    <span class="vip-badge tag-vip" id="vipBadge">免费用户</span>
+                    <span class="vip-expire" id="vipExpire"></span>
                 </div>
-            </div>
-            
-            <!-- 积分与签到 -->
-            <div class="profile-section">
-                <h3 class="section-title">🎯 积分与签到</h3>
-                <div class="points-row">
-                    <div class="points-display">
-                        <span class="points-value" id="pointsValue">0</span>
-                        <span class="points-label">积分</span>
+                <div class="vip-progress">
+                    <div class="vip-progress-bar" id="vipProgressBar" style="width:0%"></div>
+                </div>
+                <div class="vip-info-row" id="vipRemaining">未开通会员</div>
+                <div class="vip-ad-section" id="vipAdSection">
+                    <div class="vip-ad-area" id="vipAdArea">
+                        <div class="vip-ad-slot" id="vipAdSlot"><span>📺</span></div>
+                        <div class="vip-ad-info">
+                            <div class="vip-ad-countdown" id="vipAdCountdown"></div>
+                            <div class="vip-ad-daily" id="vipAdDaily">今日可观看 <strong>0</strong> 次</div>
+                        </div>
                     </div>
-                    <div class="checkin-area">
-                        <button class="checkin-btn" id="checkinBtn" onclick="doCheckin()">
-                            ✅ 每日签到
-                        </button>
-                        <span class="streak-badge" id="streakBadge">连续0天</span>
-                    </div>
-                    <button class="redeem-btn" id="redeemBtn" onclick="openRedeem()">
-                        🛒 积分兑换
-                    </button>
+                    <button class="vip-ad-watch-btn" id="vipAdWatchBtn" onclick="watchVipAd()">▶ 看广告赚时长</button>
                 </div>
             </div>
 
-            <!-- 幸运转盘 -->
-            <div class="profile-section">
-                <h3 class="section-title">🎰 幸运转盘 <span style="font-size:0.7rem;color:rgba(255,255,255,0.4);">(每日5次)</span></h3>
-                <div class="wheel-container">
-                    <canvas id="wheelCanvas" width="260" height="260"></canvas>
-                    <div class="wheel-pointer">▼</div>
-                    <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">
-                        🎰 免费转转盘（剩<span id="wheelRemain">5</span>次）
-                    </button>
+            <!-- 积分 + 转盘 并排 -->
+            <div class="dual-row">
+                <div class="dual-card">
+                    <div class="points-value" id="pointsValue">0</div>
+                    <div class="points-label">积分</div>
+                    <button class="checkin-btn" id="checkinBtn" onclick="doCheckin()">✅ 每日签到</button>
+                    <span class="streak-badge" id="streakBadge">连续0天</span>
+                    <button class="redeem-btn" id="redeemBtn" onclick="openRedeem()">🛒 积分兑换</button>
+                </div>
+                <div class="dual-card">
+                    <div class="wheel-container">
+                        <canvas id="wheelCanvas" width="130" height="130" style="width:130px;height:130px;"></canvas>
+                        <div class="wheel-pointer">▼</div>
+                    </div>
+                    <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎰 转转盘（剩<span id="wheelRemain">5</span>次）</button>
                     <div class="wheel-prizes">
-                        <span>🎁 1hVIP</span><span>⏰ 2hVIP</span><span>⭐ 5分</span><span>💎 10分</span>
-                        <span>🎫 免广卡x1</span><span>🎫 免广卡x3</span><span>🏆 24hVIP</span><span>👑 50分</span>
+                        <span>🎁1hVIP</span><span>⏰2hVIP</span><span>⭐5分</span><span>💎10分</span>
+                        <span>🎫免广x1</span><span>🎫免广x3</span><span>🏆24hVIP</span><span>👑50分</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 会员权益 -->
+            <!-- 我的服务 -->
             <div class="profile-section">
-                <h3 class="section-title">🎁 会员权益</h3>
-                <div class="vip-benefits">
-                    <div class="vip-benefit-item">
-                        <div class="b-icon">📊</div>
-                        <div class="b-text"><h4>详细命理报告</h4><p>八字分析、运势预测、五行解读</p></div>
-                    </div>
-                    <div class="vip-benefit-item">
-                        <div class="b-icon">🤖</div>
-                        <div class="b-text"><h4>AI深度分析</h4><p>智能算法解读命盘，个性化建议</p></div>
-                    </div>
-                    <div class="vip-benefit-item">
-                        <div class="b-icon">📈</div>
-                        <div class="b-text"><h4>无限算命次数</h4><p>随时随地，测你想知道的一切</p></div>
-                    </div>
-                    <div class="vip-benefit-item">
-                        <div class="b-icon">💬</div>
-                        <div class="b-text"><h4>优先客服支持</h4><p>会员专属通道，快速响应</p></div>
+                <div class="section-hd"><h3>📋 我的服务</h3></div>
+                <div class="menu-grid">
+                    <div class="menu-grid-item" onclick="location.href='/history.html'"><span class="menu-icon">📜</span><span class="menu-text">算命历史</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/favorites.html'"><span class="menu-icon">⭐</span><span class="menu-text">我的收藏</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/contacts.html'"><span class="menu-icon">👥</span><span class="menu-text">亲友档案</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/shares.html'"><span class="menu-icon">🔗</span><span class="menu-text">分享记录</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/reports.html'"><span class="menu-icon">📊</span><span class="menu-text">我的报告</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/datasets.html'"><span class="menu-icon">📋</span><span class="menu-text">数据表格</span><span class="menu-arrow">›</span></div>
+                </div>
+            </div>
+
+            <!-- 设置 -->
+            <div class="profile-section">
+                <div class="section-hd"><h3>⚙️ 设置</h3></div>
+                <div class="menu-grid">
+                    <div class="menu-grid-item" onclick="location.href='/edit-profile.html'"><span class="menu-icon">✏️</span><span class="menu-text">编辑资料</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/notifications.html'"><span class="menu-icon">🔔</span><span class="menu-text">通知设置</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/privacy.html'"><span class="menu-icon">🔒</span><span class="menu-text">隐私设置</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/help.html'"><span class="menu-icon">❓</span><span class="menu-text">帮助中心</span><span class="menu-arrow">›</span></div>
+                    <div class="menu-grid-item" onclick="location.href='/about.html'"><span class="menu-icon">ℹ️</span><span class="menu-text">关于我们</span><span class="menu-arrow">›</span></div>
+                </div>
+            </div>
+
+            <!-- 会员方案（折叠） -->
+            <div class="profile-section">
+                <div class="section-hd" onclick="toggleSection('sectPlans')">
+                    <h3>💎 会员方案</h3><span class="section-arrow">▶</span>
+                </div>
+                <div class="section-body collapsed" id="sectPlans">
+                    <div class="vip-plans" id="vipPlans">
+                        <div class="vip-plan-card" id="planFree">
+                            <div class="plan-icon">🆓</div><div class="plan-name">免费用户</div>
+                            <div class="plan-price">¥0<small>/永久</small></div>
+                            <div class="plan-desc">每日3次免费</div>
+                            <span class="plan-badge plan-badge-f">当前</span>
+                        </div>
+                        <div class="vip-plan-card" id="planBasic">
+                            <div class="plan-icon">⭐</div><div class="plan-name">基础会员</div>
+                            <div class="plan-price">看广告<small>/免费获取</small></div>
+                            <div class="plan-desc">每日10次</div>
+                            <span class="plan-badge plan-badge-b">可升级</span>
+                        </div>
+                        <div class="vip-plan-card" id="planPermanent">
+                            <div class="plan-icon">👑</div><div class="plan-name">永久会员</div>
+                            <div class="plan-price">看广告<small>/免费获取</small></div>
+                            <div class="plan-desc" id="permanentPlanDesc">累计20次触发奖励</div>
+                            <span class="plan-badge plan-badge-p" id="permanentPlanBadge">里程碑</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
+            <!-- 会员权益（折叠） -->
             <div class="profile-section">
-                <h3 class="section-title">📋 我的服务</h3>
-                <div class="menu-list">
-                    <div class="menu-item" onclick="location.href='/history.html'">
-                        <div class="menu-icon">📜</div>
-                        <div class="menu-text">算命历史</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/favorites.html'">
-                        <div class="menu-icon">⭐</div>
-                        <div class="menu-text">我的收藏</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/shares.html'">
-                        <div class="menu-icon">🔗</div>
-                        <div class="menu-text">分享记录</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/reports.html'">
-                        <div class="menu-icon">📊</div>
-                        <div class="menu-text">我的报告</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/contacts.html'">
-                        <div class="menu-icon">👥</div>
-                        <div class="menu-text">亲友档案</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/datasets.html'">
-                        <div class="menu-icon">📋</div>
-                        <div class="menu-text">数据表格</div>
-                        <div class="menu-arrow">›</div>
+                <div class="section-hd" onclick="toggleSection('sectBenefits')">
+                    <h3>🎁 会员权益</h3><span class="section-arrow">▶</span>
+                </div>
+                <div class="section-body collapsed" id="sectBenefits">
+                    <div class="vip-benefits">
+                        <div class="vip-benefit-item"><div class="b-icon">📊</div><div class="b-text"><h4>详细命理报告</h4><p>八字分析、运势预测</p></div></div>
+                        <div class="vip-benefit-item"><div class="b-icon">🤖</div><div class="b-text"><h4>AI深度分析</h4><p>智能算法解读命盘</p></div></div>
+                        <div class="vip-benefit-item"><div class="b-icon">📈</div><div class="b-text"><h4>无限算命次数</h4><p>随时随地测你想知</p></div></div>
+                        <div class="vip-benefit-item"><div class="b-icon">💬</div><div class="b-text"><h4>优先客服支持</h4><p>会员专属快速响应</p></div></div>
                     </div>
                 </div>
             </div>
-            
+
+            <!-- 知识科普（折叠） -->
             <div class="profile-section">
-                <h3 class="section-title">⚙️ 设置</h3>
-                <div class="menu-list">
-                    <div class="menu-item" onclick="location.href='/edit-profile.html'">
-                        <div class="menu-icon">✏️</div>
-                        <div class="menu-text">编辑资料</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/notifications.html'">
-                        <div class="menu-icon">🔔</div>
-                        <div class="menu-text">通知设置</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/privacy.html'">
-                        <div class="menu-icon">🔒</div>
-                        <div class="menu-text">隐私设置</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/help.html'">
-                        <div class="menu-icon">❓</div>
-                        <div class="menu-text">帮助中心</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
-                    <div class="menu-item" onclick="location.href='/about.html'">
-                        <div class="menu-icon">ℹ️</div>
-                        <div class="menu-text">关于我们</div>
-                        <div class="menu-arrow">›</div>
-                    </div>
+                <div class="section-hd" onclick="toggleSection('sectKnowledge')">
+                    <h3>📚 算命知识科普</h3><span class="section-arrow">▶</span>
+                </div>
+                <div class="section-body collapsed" id="sectKnowledge">
+                    <div class="knowledge-card"><h4>什么是八字？</h4><p>八字，即生辰八字，是一个人出生时的干支历日期。通过天干地支的五行生克制化关系，分析性格、事业、婚姻、健康等运势。</p></div>
+                    <div class="knowledge-card"><h4>紫微斗数的起源</h4><p>紫微斗数起源于道家，相传为陈抟老祖所创。将命运分为12宫位，通过星曜组合和四化飞星推断人生百态。</p></div>
+                    <div class="knowledge-card"><h4>如何正确使用算命工具？</h4><p>1. <strong>心态端正</strong>：仅供参考，非绝对定论。2. <strong>信息准确</strong>：精确出生时间。3. <strong>综合分析</strong>：多维度判断。4. <strong>理性对待</strong>：结合现实理性分析。</p></div>
                 </div>
             </div>
-            
-            <!-- 算命知识科普 -->
-            <div class="profile-section">
-                <h3 class="section-title">📚 算命知识科普</h3>
-                <div class="knowledge-card">
-                    <h4>什么是八字？</h4>
-                    <p>八字，即生辰八字，是一个人出生时的干支历日期。年干和年支组成年柱，月干和月支组成月柱，日干和日支组成日柱，时干和时支组成时柱；一共四柱，四个干和四个支共八个字，所以称为"八字"。八字命理学通过天干地支的五行生克制化关系，分析一个人的性格、事业、婚姻、健康等各方面的运势走向。</p>
-                </div>
-                <div class="knowledge-card">
-                    <h4>紫微斗数的起源</h4>
-                    <p>紫微斗数起源于道家，相传为陈抟老祖（陈希夷）所创。它将人的命运分为12宫位，每宫位有14主星坐守，通过星曜的组合和四化飞星的变化，精准推断人生百态。紫微斗数与八字命理并称为"命理双壁"，前者重星曜组合，后者重五行生克，两者相辅相成。</p>
-                </div>
-                <div class="knowledge-card">
-                    <h4>如何正确使用算命工具？</h4>
-                    <p>1. <strong>心态端正</strong>：算命是为提供参考，而非绝对定论。命运掌握在自己手中。</p>
-                    <p>2. <strong>信息准确</strong>：输入准确的出生时间（最好精确到分钟），确保排盘准确。</p>
-                    <p>3. <strong>综合分析</strong>：不要只看单一指标，要结合八字、紫微、面相、手相等多方面综合判断。</p>
-                    <p>4. <strong>理性对待</strong>：算命结果仅供参考，重大决策还需结合现实情况理性分析。</p>
-                </div>
-            </div>
-            
+
             <button class="btn-logout" id="logoutBtn" onclick="handleLogout()">退出登录</button>
         </div>
     </div>
@@ -1643,6 +988,24 @@
             if (el) el.textContent = text;
         }
 
+        // ========== 折叠面板 ==========
+        function toggleSection(id) {
+            var body = document.getElementById(id);
+            if (!body) return;
+            var hd = body.previousElementSibling;
+            var arrow = hd ? hd.querySelector('.section-arrow') : null;
+            var isCollapsed = body.classList.contains('collapsed');
+            if (isCollapsed) {
+                body.classList.remove('collapsed');
+                body.style.maxHeight = body.scrollHeight + 'px';
+                if (arrow) arrow.textContent = '▼';
+            } else {
+                body.classList.add('collapsed');
+                body.style.maxHeight = '';
+                if (arrow) arrow.textContent = '▶';
+            }
+        }
+
         async function loadVIPStatus() {
             var token = Auth.getToken();
             if (!token) return;
@@ -1663,6 +1026,21 @@
                 // 会员等级徽章
                 safeSet('vipBadge', 'textContent', data.vip_level_name || '');
                 safeClass('vipBadge', 'vip-badge ' + (data.vip_level || 'free'));
+
+                // 更新 header 中的 VIP 标签
+                var tagVip = document.getElementById('tagVip');
+                if (tagVip) {
+                    if (data.vip_level === 'permanent') {
+                        tagVip.textContent = '永久会员';
+                        tagVip.className = 'profile-tag tag-vip tag-vip-perm';
+                    } else if (data.vip_level === 'basic') {
+                        tagVip.textContent = 'VIP会员';
+                        tagVip.className = 'profile-tag tag-vip tag-vip-active';
+                    } else {
+                        tagVip.textContent = '免费用户';
+                        tagVip.className = 'profile-tag tag-vip';
+                    }
+                }
                 
                 // 到期时间
                 var expireEl = document.getElementById('vipExpire');
@@ -2032,17 +1410,24 @@
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 var data = await resp.json();
-                var card = document.getElementById('realnameCard');
-                var status = document.getElementById('realnameStatus');
-                if (card) card.style.display = 'block';
+                var tagV = document.getElementById('tagVerified');
+                var tagI = document.getElementById('tagIdcard');
                 if (data.success && data.verified) {
-                    if (status) {
-                        var extra = data.data.idcard_image ? ' 📷' : '';
-                        status.textContent = '✅ 已认证 · ' + (data.data.region || '') + extra;
-                        status.style.color = 'rgba(100,200,255,0.8)';
+                    if (tagV) {
+                        tagV.style.display = 'inline-block';
+                        tagV.textContent = '✅ ' + (data.data.region || '已认证');
+                        tagV.style.cursor = 'pointer';
+                    }
+                    if (tagI) {
+                        tagI.style.display = data.data.idcard_image ? 'inline-block' : 'none';
                     }
                 } else {
-                    if (status) status.textContent = '未认证 — 立即认证获取精准分析';
+                    if (tagV) {
+                        tagV.style.display = 'inline-block';
+                        tagV.textContent = '未认证';
+                        tagV.style.cursor = 'pointer';
+                    }
+                    if (tagI) tagI.style.display = 'none';
                 }
             } catch (e) {}
         }
@@ -2229,7 +1614,7 @@
         function drawWheel() {
             var canvas = document.getElementById('wheelCanvas');
             var ctx = canvas.getContext('2d');
-            var cx = canvas.width / 2, cy = canvas.height / 2, r = 120;
+            var cx = canvas.width / 2, cy = canvas.height / 2, r = 54;
             var segAngle = (2 * Math.PI) / 8;
 
             for (var i = 0; i < 8; i++) {
@@ -2250,14 +1635,14 @@
                 ctx.rotate(startAngle + segAngle / 2);
                 ctx.textAlign = 'center';
                 ctx.fillStyle = '#fff';
-                ctx.font = 'bold 12px sans-serif';
+                ctx.font = 'bold 9px sans-serif';
                 ctx.fillText(wheelPrizes[i], r * 0.6, 4);
                 ctx.restore();
             }
 
             // Center circle
             ctx.beginPath();
-            ctx.arc(cx, cy, 22, 0, 2 * Math.PI);
+            ctx.arc(cx, cy, 14, 0, 2 * Math.PI);
             ctx.fillStyle = '#1a1a2e';
             ctx.fill();
             ctx.strokeStyle = 'rgba(255,215,0,0.5)';

@@ -1,8 +1,8 @@
 {
-  "version": "1.9.3",
-  "build_time": "2026-05-31T07:52:00Z",
+  "version": "1.9.4",
+  "build_time": "2026-05-31T08:20:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "修复亲友档案+数据表格：localStorage key 'authToken'→'token'",
-  "fix_count": 2
+  "description": "vip.html全面重构：复用VipModule模块+移除BaiduAd+广告自动领取+新版UI",
+  "fix_count": 3
 }

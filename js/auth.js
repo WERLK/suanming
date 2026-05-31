@@ -331,6 +331,7 @@ window.Auth = (function() {
     // ========== 公开 API ==========
 
     return {
+        request: request,
         checkAuth: checkAuth,
         requireAuth: requireAuth,
         redirectIfLoggedIn: redirectIfLoggedIn,

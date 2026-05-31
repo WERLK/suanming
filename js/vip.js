@@ -1,5 +1,5 @@
 /**
- * 玄机算命网 - VIP会员中心模块 (v1.1.0)
+ * 玄机算命网 - VIP会员中心模块 (v1.2.0)
  * 从 profile.js 提取：VIP状态管理 / 广告 / 签到 / 积分兑换 / 幸运转盘
  */
 window.VipModule = (function() {
@@ -15,7 +15,6 @@ window.VipModule = (function() {
         vipAdClaiming: false,
         vipAdTimer: null,
         vipAdSeconds: 0,
-        vipAdTarget: 'countdown',
         // Wheel
         wheelSpinning: false,
         wheelRemaining: 5
@@ -290,7 +289,7 @@ window.VipModule = (function() {
     }
 
     // ═══════════════════════════════════════════
-    //  SECTION: Ad Watching
+    //  SECTION: Ad Watching (v2 — one-click auto-claim)
     // ═══════════════════════════════════════════
     function updateVipAdInfo(todayAds, maxAds) {
         var remaining = Math.max(0, maxAds - todayAds);
@@ -306,7 +305,7 @@ window.VipModule = (function() {
     }
 
     function watchVipAd() {
-        if (state.vipAdWatching) return;
+        if (state.vipAdWatching || state.vipAdClaiming) return;
 
         var todayAds = state.vip ? (state.vip.today_ads || 0) : 0;
         var maxAds = state.vip ? (state.vip.max_daily_ads || 0) : 0;
@@ -316,74 +315,49 @@ window.VipModule = (function() {
         }
 
         state.vipAdWatching = true;
+        state.vipAdSeconds = 8;
+        var total = 8;
 
-        // Try BaiduAd
-        if (typeof BaiduAd !== 'undefined' && BaiduAd.isReady && BaiduAd.isReady()) {
-            state.vipAdTarget = 'baidu';
-            if (dom.vipAdSlot) dom.vipAdSlot.innerHTML = '<span>📺</span><div id="vipAdContainer" style="width:100%;height:100%;"></div>';
-            BaiduAd.show('vipAdContainer', { onComplete: function() {
-                if (!state.vipAdWatching) return;
-                state.vipAdSeconds = 0;
-                claimVipAdReward();
-            }});
-            // Fallback: 30s timeout if BaiduAd never fires callback
-            state.vipAdSeconds = 30;
-            startAdCountdown();
-            return;
-        }
-
-        // Fallback: countdown timer
-        state.vipAdSeconds = 15;
-        state.vipAdTarget = 'countdown';
-        startAdCountdown();
-    }
-
-    function startAdCountdown() {
-        dom.vipAdCountdown.textContent = state.vipAdSeconds > 0 ? ('⏳ ' + state.vipAdSeconds + 's') : '📺 广告观看中...';
+        // Button: show countdown
         dom.vipAdWatchBtn.disabled = true;
-        dom.vipAdWatchBtn.textContent = '观看中...';
-        dom.vipAdSlot.innerHTML = '<span>📺</span>';
+        dom.vipAdWatchBtn.textContent = '⏳ ' + total + 's';
+        dom.vipAdCountdown.textContent = '广告播放中...';
+
+        // Slot: animated progress
+        dom.vipAdSlot.innerHTML = '<div class="ad-progress-ring"><div class="ad-progress-fill"></div><span class="ad-timer-icon">📺</span></div>';
 
         state.vipAdTimer = setInterval(function() {
+            state.vipAdSeconds--;
             if (state.vipAdSeconds > 0) {
-                state.vipAdSeconds--;
-                dom.vipAdCountdown.textContent = '⏳ ' + state.vipAdSeconds + 's';
-            }
-            // Countdown reached 0 — auto-complete
-            if (state.vipAdSeconds <= 0 && state.vipAdWatching) {
+                dom.vipAdWatchBtn.textContent = '⏳ ' + state.vipAdSeconds + 's';
+            } else {
+                // Done — auto claim
                 clearInterval(state.vipAdTimer);
                 state.vipAdTimer = null;
-                if (state.vipAdTarget === 'baidu') {
-                    // BaiduAd callback didn't fire within timeout — treat as completed
-                    state.vipAdWatching = false;
-                    dom.vipAdWatchBtn.textContent = '🎁 领取奖励';
-                    dom.vipAdWatchBtn.disabled = false;
-                    dom.vipAdWatchBtn.setAttribute('data-action', 'claim-ad-reward');
-                } else {
-                    state.vipAdWatching = false;
-                    dom.vipAdWatchBtn.textContent = '🎁 领取奖励';
-                    dom.vipAdWatchBtn.disabled = false;
-                    dom.vipAdWatchBtn.setAttribute('data-action', 'claim-ad-reward');
-                }
+                state.vipAdWatching = false;
+                doClaimReward();
             }
         }, 1000);
     }
 
-    function claimVipAdReward() {
-        if (state.vipAdClaiming) return;
+    function doClaimReward() {
         state.vipAdClaiming = true;
+        dom.vipAdWatchBtn.textContent = '领取中...';
+        dom.vipAdCountdown.textContent = '正在验证...';
+
         api.watchAd().then(function(data) {
             if (data.success) {
-                showToast(data.message || '观看完成！');
-                loadVipStatus();
+                showToast(data.message || '✅ 观看完成！');
+                loadVipStatus();  // refreshes everything including ad info
             } else {
                 showToast('⚠️ ' + (data.message || '领取失败'));
+                resetVipAdUI();
             }
         }).catch(function() {
             showToast('网络错误，请重试');
+            resetVipAdUI();
         }).finally(function() {
             state.vipAdClaiming = false;
-            resetVipAdUI();
         });
     }
 
@@ -395,11 +369,17 @@ window.VipModule = (function() {
         state.vipAdWatching = false;
         state.vipAdClaiming = false;
         state.vipAdSeconds = 0;
-        if (typeof BaiduAd !== 'undefined' && BaiduAd.destroy) BaiduAd.destroy();
         dom.vipAdSlot.innerHTML = '<span>📺</span>';
         dom.vipAdWatchBtn.textContent = '▶ 看广告赚时长';
+        dom.vipAdWatchBtn.disabled = false;
+        dom.vipAdWatchBtn.style.opacity = '1';
         dom.vipAdWatchBtn.setAttribute('data-action', 'watch-ad');
         dom.vipAdCountdown.textContent = '';
+    }
+
+    // Backward compat: claimVipAdReward → doClaimReward (for BaiduAd callbacks if any)
+    function claimVipAdReward() {
+        doClaimReward();
     }
 
     // ═══════════════════════════════════════════

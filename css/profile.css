@@ -94,6 +94,29 @@
     width: 32px; height: 32px; min-width: 32px; border-radius: 6px;
     background: rgba(255,255,255,0.04); border: 1px solid rgba(255,215,0,0.12);
     display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    position: relative; overflow: hidden;
+}
+.ad-progress-ring {
+    width: 100%; height: 100%; position: relative;
+    display: flex; align-items: center; justify-content: center;
+}
+.ad-progress-fill {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,215,0,0.15);
+    animation: adFillUp 8s linear forwards;
+    z-index: 0;
+}
+.ad-timer-icon {
+    position: relative; z-index: 1; font-size: 1rem;
+    animation: adPulse 1s ease-in-out infinite;
+}
+@keyframes adFillUp {
+    0%   { height: 0%; }
+    100% { height: 100%; }
+}
+@keyframes adPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.15); opacity: 0.7; }
 }
 .vip-ad-info { flex: 1; min-width: 0; }
 .vip-ad-countdown { font-size: 0.75rem; color: #ffd700; font-weight: bold; }

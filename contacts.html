@@ -300,7 +300,7 @@
 
     function getToken() {
         if (authToken) return authToken;
-        var t = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        var t = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (t) authToken = t;
         return authToken;
     }

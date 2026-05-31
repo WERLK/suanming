@@ -1,8 +1,8 @@
 {
-  "version": "1.9.2",
-  "build_time": "2026-05-31T07:40:00Z",
+  "version": "1.9.3",
+  "build_time": "2026-05-31T07:52:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "VIP广告按钮加固：添加直接事件监听器兜底+签到/转盘按钮同上",
-  "fix_count": 1
+  "description": "修复亲友档案+数据表格：localStorage key 'authToken'→'token'",
+  "fix_count": 2
 }

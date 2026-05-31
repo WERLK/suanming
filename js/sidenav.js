@@ -18,7 +18,9 @@
         { icon: '🏠', label: '首页', href: '/', match: /^\/(index\.html)?$/ },
         { icon: '🔮', label: '更多模块', href: '/more.html', match: /more\.html/ },
         { icon: '👑', label: '会员中心', href: '/vip.html', match: /vip\.html/ },
-        { icon: '👤', label: '个人中心', href: '/profile.html', match: /profile\.html/ }
+        { icon: '👤', label: '个人中心', href: '/profile.html', match: /profile\.html/ },
+        { icon: '👥', label: '亲友档案', href: '/contacts.html', match: /contacts\.html/ },
+        { icon: '📋', label: '数据表格', href: '/datasets.html', match: /datasets\.html/ }
     ];
 
     function isActive(item) {

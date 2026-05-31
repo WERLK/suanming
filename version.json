@@ -1,8 +1,8 @@
 {
-  "version": "1.7.0",
-  "build_time": "2026-05-31T01:20:00Z",
+  "version": "1.8.0",
+  "build_time": "2026-05-31T01:50:00Z",
   "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "新增实名认证功能（身份证校验+自动解析出生/性别/地区）+分析库地区分布",
+  "description": "新增用户自定义数据库功能：亲友档案库+自定义数据表格+算命结果分类管理",
   "fix_count": 0
 }

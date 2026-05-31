@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="玄机算命">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="msapplication-TileImage" content="/icon-192.png">
+    <meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>数据表格 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .datasets-container { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
+
+        .datasets-header { text-align: center; padding: 1.5rem 1rem; margin-bottom: 1rem; }
+        .datasets-header h2 { color: #ffd700; margin: 0 0 0.3rem; font-size: 1.3rem; }
+        .datasets-header p { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 0; }
+
+        .toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: flex-end; }
+        .btn-primary {
+            padding: 0.6rem 1.2rem; border-radius: 8px; border: none;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e; font-weight: bold; font-size: 0.9rem; cursor: pointer;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-outline {
+            padding: 0.5rem 1rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.3); background: transparent;
+            color: #ffd700; font-size: 0.85rem; cursor: pointer;
+        }
+        .btn-outline:hover { background: rgba(255,215,0,0.1); }
+        .btn-danger {
+            padding: 0.5rem 1rem; border-radius: 8px;
+            border: 1px solid rgba(255,80,80,0.3); background: transparent;
+            color: #ff5555; font-size: 0.85rem; cursor: pointer;
+        }
+        .btn-danger:hover { background: rgba(255,80,80,0.1); }
+
+        /* 数据集卡片 */
+        .dataset-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+        .dataset-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.3s;
+        }
+        .dataset-card:hover { background: rgba(255,215,0,0.08); transform: translateY(-2px); }
+        .dataset-card-name { color: #ffd700; font-size: 1.05rem; font-weight: bold; margin-bottom: 0.3rem; }
+        .dataset-card-desc { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 0.8rem; }
+        .dataset-card-meta { display: flex; gap: 1rem; font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+        .dataset-card-actions { display: flex; gap: 0.3rem; margin-top: 0.8rem; }
+
+        .empty-state { text-align: center; padding: 3rem 1rem; display: none; }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state p { color: rgba(255,255,255,0.4); margin: 0.3rem 0; }
+
+        /* 记录表格视图 */
+        .record-view { display: none; }
+        .record-view-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .record-view-title { color: #ffd700; font-size: 1.1rem; flex: 1; }
+        .record-table-wrap { overflow-x: auto; margin-bottom: 1rem; }
+        .record-table {
+            width: 100%; border-collapse: collapse;
+            background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden;
+        }
+        .record-table th {
+            padding: 0.6rem 0.8rem; text-align: left; color: #ffd700;
+            font-size: 0.8rem; border-bottom: 1px solid rgba(255,215,0,0.15);
+            background: rgba(255,215,0,0.05); white-space: nowrap;
+        }
+        .record-table td {
+            padding: 0.5rem 0.8rem; color: rgba(255,255,255,0.8); font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,215,0,0.05); white-space: nowrap;
+        }
+        .record-table tr:hover td { background: rgba(255,215,0,0.03); }
+        .record-table .actions-col { text-align: center; }
+
+        /* 弹窗 */
+        .modal-body { padding: 1rem 0; }
+        .form-group { margin-bottom: 0.8rem; }
+        .form-group label { display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.3rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.55rem 0.7rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05);
+            color: #fff; font-size: 0.9rem; outline: none; box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #ffd700; }
+        .form-group select option { background: #1a1a2e; color: #fff; }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .field-def-row {
+            display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .field-def-row input, .field-def-row select {
+            padding: 0.45rem 0.5rem; border-radius: 6px;
+            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05);
+            color: #fff; font-size: 0.85rem; outline: none;
+        }
+        .field-def-row .field-name { flex: 1; min-width: 80px; }
+        .field-def-row .field-type { width: 90px; }
+        .field-def-row .field-opts { flex: 2; min-width: 100px; }
+        .field-def-row .field-opts::placeholder { color: rgba(255,255,255,0.3); font-size: 0.75rem; }
+        .field-remove-btn {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 1px solid rgba(255,80,80,0.3); background: transparent;
+            color: #ff5555; cursor: pointer; font-size: 0.8rem; flex-shrink: 0;
+        }
+        .field-remove-btn:hover { background: rgba(255,80,80,0.15); }
+        .add-field-btn {
+            padding: 0.3rem 0.7rem; border-radius: 6px;
+            border: 1px dashed rgba(255,215,0,0.3); background: transparent;
+            color: #ffd700; font-size: 0.8rem; cursor: pointer; margin-top: 0.3rem;
+        }
+        .add-field-btn:hover { background: rgba(255,215,0,0.05); }
+
+        .pagination { display: flex; gap: 0.3rem; justify-content: center; margin-top: 1rem; }
+        .page-btn {
+            padding: 0.4rem 0.7rem; border-radius: 6px;
+            border: 1px solid rgba(255,215,0,0.2); background: transparent;
+            color: rgba(255,255,255,0.6); cursor: pointer; font-size: 0.8rem;
+        }
+        .page-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-color: #ffd700; }
+        .page-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+    <h1 id="pageTitle">数据表格</h1>
+</div>
+
+<div class="content-area">
+    <div class="stars" id="stars"></div>
+    <div class="datasets-container">
+        <!-- 数据集列表视图 -->
+        <div id="listView">
+            <div class="datasets-header">
+                <h2>📊 我的数据表</h2>
+                <p>创建自定义数据表，管理任意类型的数据</p>
+            </div>
+            <div class="toolbar">
+                <button class="btn-primary" onclick="openDatasetModal()">+ 新建数据表</button>
+            </div>
+            <div class="dataset-list" id="datasetList"></div>
+            <div class="empty-state" id="emptyDatasets">
+                <div class="icon">📋</div>
+                <p>还没有数据表</p>
+                <p>点击"+ 新建数据表"开始创建</p>
+            </div>
+        </div>
+
+        <!-- 记录表格视图 -->
+        <div id="recordView" class="record-view">
+            <div class="record-view-header">
+                <div class="record-view-title" id="recordViewTitle"></div>
+                <button class="btn-outline" onclick="openRecordModal()">+ 添加记录</button>
+                <button class="btn-outline" onclick="goBackToList()">← 返回列表</button>
+            </div>
+            <div class="record-table-wrap">
+                <table class="record-table">
+                    <thead id="recordTableHead"></thead>
+                    <tbody id="recordTableBody"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="recordPagination"></div>
+            <div class="empty-state" id="emptyRecords">
+                <div class="icon">📭</div>
+                <p>暂无记录</p>
+                <p>点击"+ 添加记录"添加数据</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 数据集创建/编辑弹窗 -->
+<div class="edit-profile-modal" id="datasetModal">
+    <div class="modal-content" style="max-width:520px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="datasetModalTitle">新建数据表</h3>
+            <button class="modal-close" onclick="closeDatasetModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>数据表名称 *</label>
+                <input type="text" id="dsName" placeholder="例如：客户信息表" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <input type="text" id="dsDesc" placeholder="数据表用途说明（可选）" maxlength="200">
+            </div>
+            <div class="form-group">
+                <label>字段定义</label>
+                <div id="fieldDefs"></div>
+                <button class="add-field-btn" onclick="addFieldDef()">+ 添加字段</button>
+            </div>
+            <button class="btn-primary" id="saveDsBtn" onclick="saveDataset()">创建</button>
+        </div>
+    </div>
+</div>
+
+<!-- 记录添加/编辑弹窗 -->
+<div class="edit-profile-modal" id="recordModal">
+    <div class="modal-content" style="max-width:480px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="recordModalTitle">添加记录</h3>
+            <button class="modal-close" onclick="closeRecordModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="recordFormFields"></div>
+            <button class="btn-primary" id="saveRecordBtn" onclick="saveRecord()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+    var authToken = '';
+    var currentDsId = null;
+    var currentDsFields = [];
+    var currentPage = 1;
+    var editingDsId = null;
+    var editingRecordId = null;
+
+    function getToken() {
+        if (authToken) return authToken;
+        var t = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        if (t) authToken = t;
+        return authToken;
+    }
+
+    function goBack() {
+        if (document.getElementById('recordView').style.display === 'block') {
+            goBackToList();
+        } else {
+            window.location.href = '/profile.html';
+        }
+    }
+
+    // ============ 数据集列表 ============
+    async function loadDatasets() {
+        var token = getToken();
+        if (!token) { window.location.href = '/login.html'; return; }
+
+        try {
+            var resp = await fetch('/api/datasets', { headers: { 'Authorization': 'Bearer ' + token } });
+            var data = await resp.json();
+
+            var list = document.getElementById('datasetList');
+            var empty = document.getElementById('emptyDatasets');
+
+            if (!data.success || !data.datasets || data.datasets.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = data.datasets.map(function(ds) {
+                var fieldNames = (ds.fields || []).map(function(f) { return f.name; }).join(', ');
+                return '<div class="dataset-card" onclick="openDataset(\'' + ds.id + '\')">'
+                    + '<div class="dataset-card-name">📊 ' + escapeHtml(ds.name) + '</div>'
+                    + (ds.description ? '<div class="dataset-card-desc">' + escapeHtml(ds.description) + '</div>' : '')
+                    + '<div class="dataset-card-meta">'
+                    + '<span>' + ds.record_count + ' 条记录</span>'
+                    + '<span>' + (ds.fields || []).length + ' 个字段</span>'
+                    + '</div>'
+                    + '<div class="dataset-card-actions" onclick="event.stopPropagation()">'
+                    + '<button class="btn-outline" onclick="openDatasetModal(\'' + ds.id + '\')">编辑</button>'
+                    + '<button class="btn-danger" onclick="deleteDataset(\'' + ds.id + '\',\'' + escapeHtml(ds.name) + '\')">删除</button>'
+                    + '</div>'
+                    + '</div>';
+            }).join('');
+        } catch (e) {
+            showToast('加载失败: ' + e.message);
+        }
+    }
+
+    function openDatasetModal(dsId) {
+        editingDsId = dsId || null;
+        document.getElementById('datasetModalTitle').textContent = dsId ? '编辑数据表' : '新建数据表';
+        document.getElementById('saveDsBtn').textContent = dsId ? '更新' : '创建';
+        document.getElementById('dsName').value = '';
+        document.getElementById('dsDesc').value = '';
+        document.getElementById('fieldDefs').innerHTML = '';
+
+        if (dsId) {
+            loadDatasetDetail(dsId);
+        } else {
+            addFieldDef(); // 默认一个字段
+        }
+
+        document.getElementById('datasetModal').classList.add('active');
+    }
+
+    function closeDatasetModal() {
+        document.getElementById('datasetModal').classList.remove('active');
+        editingDsId = null;
+    }
+
+    async function loadDatasetDetail(dsId) {
+        // 从列表API中获取数据集信息
+        var token = getToken();
+        try {
+            var resp = await fetch('/api/datasets', { headers: { 'Authorization': 'Bearer ' + token } });
+            var data = await resp.json();
+            var datasets = data.datasets || [];
+            for (var i = 0; i < datasets.length; i++) {
+                if (datasets[i].id === dsId) {
+                    var ds = datasets[i];
+                    document.getElementById('dsName').value = ds.name || '';
+                    document.getElementById('dsDesc').value = ds.description || '';
+                    var fields = ds.fields || [];
+                    fields.forEach(function(f) {
+                        addFieldDef(f.name, f.type, (f.options || []).join(', '));
+                    });
+                    if (fields.length === 0) addFieldDef();
+                    return;
+                }
+            }
+        } catch (e) {}
+    }
+
+    function addFieldDef(name, type, opts) {
+        name = name || '';
+        type = type || 'text';
+        opts = opts || '';
+
+        var container = document.getElementById('fieldDefs');
+        var row = document.createElement('div');
+        row.className = 'field-def-row';
+        row.innerHTML = '<input class="field-name" placeholder="字段名" value="' + escapeHtml(name) + '">'
+            + '<select class="field-type" onchange="toggleFieldOptions(this)">'
+            + '<option value="text"' + (type === 'text' ? ' selected' : '') + '>文本</option>'
+            + '<option value="number"' + (type === 'number' ? ' selected' : '') + '>数字</option>'
+            + '<option value="date"' + (type === 'date' ? ' selected' : '') + '>日期</option>'
+            + '<option value="select"' + (type === 'select' ? ' selected' : '') + '>单选</option>'
+            + '</select>'
+            + '<input class="field-opts" placeholder="选项(逗号分隔)" value="' + escapeHtml(opts) + '" style="display:' + (type === 'select' ? '' : 'none') + '">'
+            + '<button class="field-remove-btn" onclick="this.parentElement.remove()">✕</button>';
+        container.appendChild(row);
+    }
+
+    function toggleFieldOptions(sel) {
+        var row = sel.parentElement;
+        var optsInput = row.querySelector('.field-opts');
+        optsInput.style.display = sel.value === 'select' ? '' : 'none';
+    }
+
+    function collectFieldDefs() {
+        var rows = document.querySelectorAll('#fieldDefs .field-def-row');
+        var fields = [];
+        rows.forEach(function(row) {
+            var name = (row.querySelector('.field-name').value || '').trim();
+            if (!name) return;
+            var type = row.querySelector('.field-type').value;
+            var optsStr = row.querySelector('.field-opts').value || '';
+            var field = { name: name, type: type };
+            if (type === 'select' && optsStr) {
+                field.options = optsStr.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+            }
+            fields.push(field);
+        });
+        return fields;
+    }
+
+    async function saveDataset() {
+        var name = document.getElementById('dsName').value.trim();
+        if (!name) { showToast('请输入数据表名称'); return; }
+
+        var fields = collectFieldDefs();
+        if (fields.length === 0) { showToast('请至少添加一个字段'); return; }
+
+        var token = getToken();
+        var payload = {
+            name: name,
+            description: document.getElementById('dsDesc').value.trim(),
+            fields: fields
+        };
+
+        var btn = document.getElementById('saveDsBtn');
+        btn.disabled = true;
+
+        try {
+            var url = '/api/datasets';
+            var method = 'POST';
+            if (editingDsId) { url += '/' + editingDsId; method = 'PUT'; }
+
+            var resp = await fetch(url, {
+                method: method, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            var data = await resp.json();
+            if (data.success) {
+                closeDatasetModal();
+                loadDatasets();
+                showToast(editingDsId ? '更新成功' : '创建成功');
+            } else {
+                showToast(data.message || '操作失败');
+            }
+        } catch (e) {
+            showToast('操作失败: ' + e.message);
+        } finally { btn.disabled = false; }
+    }
+
+    async function deleteDataset(dsId, name) {
+        if (!confirm('确定要删除数据表 "' + name + '" 吗？所有记录将被清空且不可恢复。')) return;
+        var token = getToken();
+        try {
+            var resp = await fetch('/api/datasets/' + dsId, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+            var data = await resp.json();
+            if (data.success) { loadDatasets(); showToast('删除成功'); }
+            else { showToast(data.message || '删除失败'); }
+        } catch (e) { showToast('删除失败: ' + e.message); }
+    }
+
+    // ============ 记录视图 ============
+    function openDataset(dsId) {
+        currentDsId = dsId;
+        currentPage = 1;
+        document.getElementById('listView').style.display = 'none';
+        document.getElementById('recordView').style.display = 'block';
+        document.getElementById('pageTitle').textContent = '数据表格';
+        loadRecords();
+    }
+
+    function goBackToList() {
+        document.getElementById('recordView').style.display = 'none';
+        document.getElementById('listView').style.display = 'block';
+        document.getElementById('pageTitle').textContent = '数据表格';
+        currentDsId = null;
+        loadDatasets();
+    }
+
+    async function loadRecords(page) {
+        if (page) currentPage = page;
+        var token = getToken();
+
+        try {
+            var resp = await fetch('/api/datasets/' + currentDsId + '/records?page=' + currentPage + '&per_page=20', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+
+            if (!data.success) { showToast(data.message); return; }
+
+            currentDsFields = data.dataset.fields || [];
+            document.getElementById('recordViewTitle').textContent = '📊 ' + escapeHtml(data.dataset.name);
+            document.getElementById('emptyRecords').style.display = data.records.length === 0 ? 'block' : 'none';
+
+            // 表头
+            var thead = document.getElementById('recordTableHead');
+            var thHtml = currentDsFields.map(function(f) { return '<th>' + escapeHtml(f.name) + '</th>'; }).join('');
+            thead.innerHTML = '<tr>' + thHtml + '<th class="actions-col">操作</th></tr>';
+
+            // 表体
+            var tbody = document.getElementById('recordTableBody');
+            tbody.innerHTML = data.records.map(function(rec) {
+                var cells = currentDsFields.map(function(f) {
+                    var val = (rec.data || {})[f.name] || '';
+                    return '<td>' + escapeHtml(String(val)) + '</td>';
+                }).join('');
+                return '<tr>'
+                    + cells
+                    + '<td class="actions-col">'
+                    + '<button class="btn-outline" style="font-size:0.75rem;padding:0.2rem 0.5rem;" onclick="openRecordModal(\'' + rec.id + '\')">编辑</button> '
+                    + '<button class="btn-danger" style="font-size:0.75rem;padding:0.2rem 0.5rem;" onclick="deleteRecord(\'' + rec.id + '\')">删除</button>'
+                    + '</td>'
+                    + '</tr>';
+            }).join('');
+
+            // 分页
+            var totalPages = Math.ceil(data.total / data.per_page) || 1;
+            var pagDiv = document.getElementById('recordPagination');
+            if (totalPages <= 1) { pagDiv.innerHTML = ''; return; }
+            var pagHtml = '';
+            pagHtml += '<button class="page-btn" ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="loadRecords(' + (currentPage-1) + ')">‹</button>';
+            for (var i = 1; i <= Math.min(totalPages, 10); i++) {
+                pagHtml += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="loadRecords(' + i + ')">' + i + '</button>';
+            }
+            pagHtml += '<button class="page-btn" ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="loadRecords(' + (currentPage+1) + ')">›</button>';
+            pagDiv.innerHTML = pagHtml;
+
+        } catch (e) { showToast('加载失败: ' + e.message); }
+    }
+
+    // ============ 记录弹窗 ============
+    function openRecordModal(recordId) {
+        editingRecordId = recordId || null;
+        document.getElementById('recordModalTitle').textContent = recordId ? '编辑记录' : '添加记录';
+        document.getElementById('saveRecordBtn').textContent = recordId ? '更新' : '添加';
+
+        var formHtml = '';
+        currentDsFields.forEach(function(f) {
+            var inputHtml = '';
+            if (f.type === 'select' && f.options && f.options.length > 0) {
+                var opts = f.options.map(function(o) { return '<option value="' + escapeHtml(o) + '">' + escapeHtml(o) + '</option>'; }).join('');
+                inputHtml = '<select id="fld_' + escapeHtml(f.name) + '"><option value="">请选择</option>' + opts + '</select>';
+            } else if (f.type === 'number') {
+                inputHtml = '<input type="number" id="fld_' + escapeHtml(f.name) + '" placeholder="' + escapeHtml(f.name) + '">';
+            } else if (f.type === 'date') {
+                inputHtml = '<input type="date" id="fld_' + escapeHtml(f.name) + '">';
+            } else {
+                inputHtml = '<input type="text" id="fld_' + escapeHtml(f.name) + '" placeholder="' + escapeHtml(f.name) + '">';
+            }
+            formHtml += '<div class="form-group"><label>' + escapeHtml(f.name) + '</label>' + inputHtml + '</div>';
+        });
+
+        document.getElementById('recordFormFields').innerHTML = formHtml;
+        document.getElementById('recordModal').classList.add('active');
+
+        if (recordId) {
+            loadRecordDetail(recordId);
+        }
+    }
+
+    function closeRecordModal() {
+        document.getElementById('recordModal').classList.remove('active');
+        editingRecordId = null;
+    }
+
+    async function loadRecordDetail(recordId) {
+        var token = getToken();
+        try {
+            var resp = await fetch('/api/datasets/' + currentDsId + '/records?page=1&per_page=1000', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+            var records = data.records || [];
+            for (var i = 0; i < records.length; i++) {
+                if (records[i].id === recordId) {
+                    var rdata = records[i].data || {};
+                    currentDsFields.forEach(function(f) {
+                        var el = document.getElementById('fld_' + f.name);
+                        if (el) el.value = rdata[f.name] || '';
+                    });
+                    break;
+                }
+            }
+        } catch (e) {}
+    }
+
+    async function saveRecord() {
+        var recordData = {};
+        currentDsFields.forEach(function(f) {
+            var el = document.getElementById('fld_' + f.name);
+            recordData[f.name] = el ? el.value : '';
+        });
+
+        var token = getToken();
+        var btn = document.getElementById('saveRecordBtn');
+        btn.disabled = true;
+
+        try {
+            var url = '/api/datasets/' + currentDsId + '/records';
+            var method = 'POST';
+            if (editingRecordId) { url += '/' + editingRecordId; method = 'PUT'; }
+
+            var resp = await fetch(url, {
+                method: method, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: recordData })
+            });
+            var data = await resp.json();
+            if (data.success) {
+                closeRecordModal();
+                loadRecords();
+                showToast(editingRecordId ? '更新成功' : '添加成功');
+            } else {
+                showToast(data.message || '操作失败');
+            }
+        } catch (e) {
+            showToast('操作失败: ' + e.message);
+        } finally { btn.disabled = false; }
+    }
+
+    async function deleteRecord(recordId) {
+        if (!confirm('确定要删除这条记录吗？')) return;
+        var token = getToken();
+        try {
+            var resp = await fetch('/api/datasets/' + currentDsId + '/records/' + recordId, {
+                method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+            if (data.success) { loadRecords(); showToast('删除成功'); }
+            else { showToast(data.message || '删除失败'); }
+        } catch (e) { showToast('删除失败: ' + e.message); }
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() { loadDatasets(); });
+</script>
+<script src="/js/sidenav.js"></script>
+<script src="/js/footer.js"></script>
+</body>
+</html>

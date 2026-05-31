@@ -14,464 +14,612 @@
     <title>算命历史 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        /* 算命历史页面特定样式 */
-        .history-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 1rem;
+        .history-container { max-width: 800px; margin: 0 auto; padding: 0 1rem 2rem; }
+
+        .history-header { text-align: center; padding: 1.5rem 1rem; margin-bottom: 1rem; }
+        .history-header h2 { color: #ffd700; margin: 0 0 0.3rem; font-size: 1.3rem; }
+        .history-header p { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 0; }
+
+        /* 筛选栏 */
+        .filter-bar {
+            display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;
         }
-        
-        .history-header {
-            text-align: center;
-            padding: 2rem 1rem;
-            background: linear-gradient(180deg, rgba(255,215,0,0.1), transparent);
-            border-bottom: 1px solid rgba(255,215,0,0.15);
-            margin-bottom: 1.5rem;
+        .filter-bar select, .filter-bar input {
+            padding: 0.5rem 0.7rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05);
+            color: #fff; font-size: 0.85rem; outline: none;
         }
-        
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .filter-bar select { min-width: 100px; cursor: pointer; }
+        .filter-bar select option { background: #1a1a2e; color: #fff; }
+        .filter-bar input { flex: 1; min-width: 120px; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: #ffd700; }
+        .filter-bar input::placeholder { color: rgba(255,255,255,0.3); }
+        .btn-sm {
+            padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);
+            background: transparent; color: #ffd700; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
         }
-        
+        .btn-sm:hover { background: rgba(255,215,0,0.1); }
+        .btn-clear {
+            border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5);
+        }
+
+        .history-list { display: flex; flex-direction: column; gap: 1rem; }
+
         .history-item {
             background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
+            border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 1rem;
+            cursor: pointer; transition: all 0.3s;
         }
-        
-        .history-item:hover {
-            background: rgba(255,215,0,0.08);
-            transform: translateX(5px);
+        .history-item:hover { background: rgba(255,215,0,0.08); transform: translateX(5px); }
+
+        .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+        .history-module-name { color: #ffd700; font-size: 1.1rem; font-weight: bold; }
+        .history-time { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+
+        .history-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .history-cat-tag {
+            display: inline-block; padding: 0.12rem 0.5rem; border-radius: 12px;
+            font-size: 0.7rem; font-weight: bold;
         }
-        
-        .history-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.8rem;
+        .history-tag {
+            display: inline-block; padding: 0.12rem 0.5rem; border-radius: 12px;
+            font-size: 0.7rem; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6);
         }
-        
-        .history-module-name {
-            color: #ffd700;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        
-        .history-time {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
-        }
-        
+
         .history-input {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 6px;
+            color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 0.5rem;
+            padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 6px;
         }
-        
         .history-result {
-            color: rgba(255,255,255,0.9);
-            font-size: 0.85rem;
-            line-height: 1.5;
-            max-height: 60px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
+            color: rgba(255,255,255,0.9); font-size: 0.85rem; line-height: 1.5;
+            max-height: 60px; overflow: hidden; text-overflow: ellipsis;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
         }
-        
-        .history-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-        
+        .history-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
         .history-action-btn {
-            padding: 0.4rem 0.8rem;
-            background: rgba(255,215,0,0.1);
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 6px;
-            color: #ffd700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s;
+            padding: 0.35rem 0.7rem; background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.2); border-radius: 6px;
+            color: #ffd700; font-size: 0.78rem; cursor: pointer; transition: all 0.3s;
         }
-        
-        .history-action-btn:hover {
-            background: rgba(255,215,0,0.2);
-        }
-        
-        .empty-history {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: rgba(255,255,255,0.5);
-        }
-        
-        .empty-history-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        /* 桌面端布局 */
+        .history-action-btn:hover { background: rgba(255,215,0,0.2); }
+
+        .empty-history { text-align: center; padding: 3rem 1rem; color: rgba(255,255,255,0.5); }
+        .empty-history .icon { font-size: 3rem; margin-bottom: 1rem; }
+
         @media (min-width: 1024px) {
-            .history-container {
-                max-width: 900px !important;
-                padding: 0 2rem !important;
-            }
-            
-            .history-header {
-                padding: 3rem 2rem !important;
-            }
-            
-            .history-list {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                gap: 1.5rem;
-            }
+            .history-container { max-width: 900px !important; padding: 0 2rem !important; }
+            .history-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
         }
-    .back-btn {
-        background: none;
-        border: none;
-        color: #ffd700;
-        font-size: 1.2rem;
-        cursor: pointer;
-        padding: 0.5rem;
-    }
-    .page-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
-        border-bottom: 1px solid rgba(255,215,0,0.15);
-    }
-    .page-header h1 {
-        font-size: 1.2rem;
-        color: #ffd700;
-        font-weight: 600;
-    }
+
+        .back-btn { background: none; border: none; color: #ffd700; font-size: 1.2rem; cursor: pointer; padding: 0.5rem; }
+        .page-header {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem;
+            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
+            border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .page-header h1 { font-size: 1.2rem; color: #ffd700; font-weight: 600; }
+
+        /* 弹窗样式 */
+        .modal-body { padding: 1rem 0; }
+        .form-group { margin-bottom: 0.8rem; }
+        .form-group label { display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.3rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.55rem 0.7rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05);
+            color: #fff; font-size: 0.9rem; outline: none; box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #ffd700; }
+        .form-group select option { background: #1a1a2e; color: #fff; }
+
+        .tag-input-wrap { display: flex; gap: 0.3rem; flex-wrap: wrap; align-items: center; }
+        .tag-chip {
+            display: inline-flex; align-items: center; gap: 0.2rem;
+            padding: 0.2rem 0.5rem; border-radius: 12px;
+            background: rgba(255,215,0,0.15); color: #ffd700; font-size: 0.8rem;
+        }
+        .tag-chip .remove-tag { cursor: pointer; font-size: 0.7rem; color: rgba(255,255,255,0.5); }
+        .tag-chip .remove-tag:hover { color: #ff5555; }
+        .tag-input {
+            flex: 1; min-width: 80px; padding: 0.4rem 0.5rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05);
+            color: #fff; font-size: 0.85rem; outline: none;
+        }
+        .tag-input:focus { border-color: #ffd700; }
+
+        .cat-list-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+            padding: 0.6rem 0.8rem; border-radius: 8px;
+            background: rgba(255,255,255,0.03); margin-bottom: 0.4rem;
+        }
+        .cat-list-item .cat-info { display: flex; align-items: center; gap: 0.5rem; flex: 1; }
+        .cat-list-item .cat-icon { font-size: 1.2rem; }
+        .cat-list-item .cat-name { color: #fff; font-size: 0.9rem; }
+        .cat-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
     </style>
 </head>
-<body class="has-desktop-sidebar">
-    
-    <!-- 桌面端侧边栏 -->
-    <aside class="desktop-sidebar" id="desktopSidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🔮</div>
+<body>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>算命历史</h1>
+</div>
+
+<div class="content-area">
+    <div class="stars" id="stars"></div>
+    <div class="app">
+        <div class="history-container">
+            <div class="history-header">
+                <h2>📜 算命历史</h2>
+                <p>查看和管理您的算命记录</p>
+            </div>
+
+            <!-- 筛选栏 -->
+            <div class="filter-bar">
+                <select id="filterCategory" onchange="applyFilter()">
+                    <option value="">全部分类</option>
+                </select>
+                <select id="filterTag" onchange="applyFilter()">
+                    <option value="">全部标签</option>
+                </select>
+                <input type="text" id="filterSearch" placeholder="🔍 搜索..." oninput="applyFilter()">
+                <button class="btn-sm btn-clear" onclick="clearFilter()">清除</button>
+                <button class="btn-sm" onclick="openCatManager()">⚙ 分类管理</button>
+            </div>
+
+            <div class="history-list" id="historyList"></div>
+            <div class="empty-history" id="emptyHistory" style="display: none;">
+                <div class="icon">📜</div>
+                <p>暂无算命记录</p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">去首页试试算命功能吧！</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 历史详情弹窗 -->
+<div class="edit-profile-modal" id="historyDetailModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="detailModuleName">算命详情</h3>
+            <button class="modal-close" onclick="closeHistoryDetail()">×</button>
+        </div>
+        <div style="padding: 1rem 0;">
+            <div style="margin-bottom: 1rem;">
+                <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 0.3rem;">输入信息</div>
+                <div style="color: rgba(255,255,255,0.9); font-size: 0.9rem; padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px;" id="detailInput"></div>
+            </div>
             <div>
-                <span class="logo-text">玄机算命网</span>
-                <span class="logo-sub">传承千年智慧</span>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <div class="sidebar-nav-section">
-                <div class="sidebar-nav-title">主导航</div>
-                <a href="/" class="sidebar-nav-item">
-                    <span class="nav-icon">🏠</span> 首页
-                </a>
-                <a href="/more.html" class="sidebar-nav-item">
-                    <span class="nav-icon">🔮</span> 更多模块
-                </a>
-                <a href="/vip.html" class="sidebar-nav-item">
-                    <span class="nav-icon">👑</span> 会员中心
-                </a>
-                <a href="/profile.html" class="sidebar-nav-item active">
-                    <span class="nav-icon">👤</span> 个人中心
-                </a>
-            </div>
-            <div class="sidebar-nav-section">
-                <div class="sidebar-nav-title">热门功能</div>
-                <a href="/modules/bazi.html" class="sidebar-nav-item">
-                    <span class="nav-icon">🎴</span> 八字排盘
-                </a>
-                <a href="/modules/ziwei.html" class="sidebar-nav-item">
-                    <span class="nav-icon">⭐</span> 紫微斗数
-                </a>
-                <a href="/modules/heyun.html" class="sidebar-nav-item">
-                    <span class="nav-icon">💑</span> 合婚配对
-                </a>
-                <a href="/modules/shengxiao.html" class="sidebar-nav-item">
-                    <span class="nav-icon">🐉</span> 生肖运势
-                </a>
-            </div>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="sidebar-user" id="sidebarUser">
-                <div class="user-avatar">👤</div>
-                <div class="user-info">
-                    <div class="user-name" id="sidebarUserName">加载中...</div>
-                    <div class="user-status">已登录</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-    
-    <div class="page-header">
-        <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
-        <h1>算命历史</h1>
-    </div>
-    
-    <div class="content-area">
-        <div class="stars" id="stars"></div>
-        
-        <div class="app">
-            <div class="history-container">
-                <div class="history-header">
-                    <h2 style="color: #ffd700; margin-bottom: 0.5rem;">📜 算命历史</h2>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">查看您的算命记录</p>
-                </div>
-                
-                <div class="history-list" id="historyList">
-                    <!-- 历史记录会动态加载到这里 -->
-                </div>
-                
-                <div class="empty-history" id="emptyHistory" style="display: none;">
-                    <div class="empty-history-icon">📜</div>
-                    <p>暂无算命记录</p>
-                    <p style="font-size: 0.85rem; margin-top: 0.5rem;">去首页试试算命功能吧！</p>
-                </div>
+                <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 0.3rem;">算命结果</div>
+                <div style="color: rgba(255,255,255,0.9); font-size: 0.9rem; line-height: 1.6; padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px; max-height: 300px; overflow-y: auto;" id="detailResult"></div>
             </div>
         </div>
     </div>
-    
-    <!-- 历史详情弹窗 -->
-    <div class="edit-profile-modal" id="historyDetailModal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h3 class="modal-title" id="detailModuleName">算命详情</h3>
-                <button class="modal-close" onclick="closeHistoryDetail()">×</button>
-            </div>
-            <div style="padding: 1rem 0;">
-                <div style="margin-bottom: 1rem;">
-                    <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 0.3rem;">输入信息</div>
-                    <div style="color: rgba(255,255,255,0.9); font-size: 0.9rem; padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px;" id="detailInput"></div>
-                </div>
-                <div>
-                    <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 0.3rem;">算命结果</div>
-                    <div style="color: rgba(255,255,255,0.9); font-size: 0.9rem; line-height: 1.6; padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px; max-height: 300px; overflow-y: auto;" id="detailResult"></div>
-                </div>
+</div>
+
+<!-- 分类管理弹窗 -->
+<div class="edit-profile-modal" id="catManagerModal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3 class="modal-title">📂 分类管理</h3>
+            <button class="modal-close" onclick="closeCatManager()">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="catList"></div>
+            <div style="display: flex; gap: 0.4rem; margin-top: 0.8rem; flex-wrap: wrap;">
+                <input type="text" id="newCatName" placeholder="新分类名称" style="flex:1;min-width:100px;padding:0.5rem 0.7rem;border-radius:8px;border:1px solid rgba(255,215,0,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:0.85rem;outline:none;">
+                <input type="color" id="newCatColor" value="#ffd700" style="width:40px;height:38px;border-radius:8px;border:1px solid rgba(255,215,0,0.2);background:transparent;cursor:pointer;">
+                <input type="text" id="newCatIcon" value="📋" maxlength="2" style="width:50px;padding:0.5rem;border-radius:8px;border:1px solid rgba(255,215,0,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:1rem;outline:none;text-align:center;">
+                <button class="btn-sm" onclick="addCategory()" style="padding:0.5rem 1rem;">添加</button>
             </div>
         </div>
     </div>
-    
-    <nav class="bottom-nav">
-        <a href="/" class="nav-item">
-            <div class="nav-icon">🏠</div>
-            <span>首页</span>
-        </a>
-        <a href="/more.html" class="nav-item">
-            <div class="nav-icon">🔮</div>
-            <span>更多</span>
-        </a>
-        <a href="/vip.html" class="nav-item">
-            <div class="nav-icon">👑</div>
-            <span>会员</span>
-        </a>
-        <a href="/profile.html" class="nav-item active">
-            <div class="nav-icon">👤</div>
-            <span>我的</span>
-        </a>
-    </nav>
-    
-    <script src="/js/main.js"></script>
-    <script>
-        // 创建星空背景
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!Auth.requireAuth()) return;
-            createStars();
-            loadHistory();
+</div>
+
+<!-- 分类设置弹窗 -->
+<div class="edit-profile-modal" id="classifyModal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3 class="modal-title">🏷 设置分类</h3>
+            <button class="modal-close" onclick="closeClassifyModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>分类</label>
+                <select id="classifyCategory"><option value="">无分类</option></select>
+            </div>
+            <div class="form-group">
+                <label>标签</label>
+                <div class="tag-input-wrap" id="tagChips"></div>
+                <input type="text" class="tag-input" id="newTagInput" placeholder="输入标签后回车添加" onkeydown="addTagOnEnter(event)" style="margin-top:0.4rem;">
+            </div>
+            <button class="history-action-btn" style="width:100%;padding:0.7rem;font-size:0.9rem;" onclick="saveClassify()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+    var allHistories = [];
+    var categories = [];
+    var classifyHistoryId = null;
+    var classifyTags = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!Auth.requireAuth()) return;
+        createStars();
+        loadCategories().then(function() { loadHistory(); });
+    });
+
+    // ============ 分类 ============
+    async function loadCategories() {
+        var token = Auth.getToken();
+        try {
+            var resp = await fetch('/api/categories', { headers: { 'Authorization': 'Bearer ' + token } });
+            var data = await resp.json();
+            categories = data.categories || [];
+            updateCategorySelects();
+        } catch (e) {}
+    }
+
+    function updateCategorySelects() {
+        var opts = categories.map(function(c) {
+            return '<option value="' + c.id + '">' + c.icon + ' ' + escapeHtml(c.name) + '</option>';
+        }).join('');
+
+        document.querySelectorAll('#filterCategory, #classifyCategory').forEach(function(sel) {
+            var val = sel.value;
+            sel.innerHTML = '<option value="">' + (sel.id === 'filterCategory' ? '全部分类' : '无分类') + '</option>' + opts;
+            sel.value = val;
         });
-        
-        // 加载算命历史
-        async function loadHistory() {
-            const token = Auth.getToken();
-            
-            try {
-                const response = await fetch('/api/divination-history', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('获取历史记录失败');
-                }
-                
-                const data = await response.json();
-                const historyList = document.getElementById('historyList');
-                const emptyHistory = document.getElementById('emptyHistory');
-                
-                if (!data.histories || data.histories.length === 0) {
-                    historyList.style.display = 'none';
-                    emptyHistory.style.display = 'block';
-                    return;
-                }
-                
-                historyList.style.display = 'block';
-                emptyHistory.style.display = 'none';
-                
-                historyList.innerHTML = data.histories.map(h => `
-                    <div class="history-item" onclick="showHistoryDetail('${h.id}')">
-                        <div class="history-item-header">
-                            <div class="history-module-name">${h.module_title}</div>
-                            <div class="history-time">${formatTime(h.create_time)}</div>
-                        </div>
-                        ${h.input_data ? `<div class="history-input">${formatInputData(h.input_data)}</div>` : ''}
-                        ${h.result_data ? `<div class="history-result">${truncateText(h.result_data, 100)}</div>` : ''}
-                        <div class="history-actions">
-                            <button class="history-action-btn" onclick="event.stopPropagation(); showHistoryDetail('${h.id}')">查看详情</button>
-                            <button class="history-action-btn" onclick="event.stopPropagation(); deleteHistory('${h.id}')">删除</button>
-                        </div>
-                    </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('加载历史记录失败:', error);
-                showToast('加载历史记录失败，请重试');
+    }
+
+    function getCatById(id) {
+        for (var i = 0; i < categories.length; i++) {
+            if (categories[i].id === id) return categories[i];
+        }
+        return null;
+    }
+
+    // ============ 历史加载 ============
+    async function loadHistory() {
+        var token = Auth.getToken();
+        try {
+            var resp = await fetch('/api/divination-history', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!resp.ok) throw new Error('获取失败');
+            var data = await resp.json();
+            allHistories = data.histories || [];
+            renderHistory(allHistories);
+        } catch (e) {
+            console.error(e);
+            showToast('加载历史记录失败');
+        }
+    }
+
+    function renderHistory(histories) {
+        var list = document.getElementById('historyList');
+        var empty = document.getElementById('emptyHistory');
+
+        if (!histories || histories.length === 0) {
+            list.innerHTML = '';
+            list.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+
+        list.style.display = 'block';
+        empty.style.display = 'none';
+
+        list.innerHTML = histories.map(function(h) {
+            var cat = getCatById(h.category_id);
+            var tagsHtml = '';
+            if (cat) {
+                tagsHtml += '<span class="history-cat-tag" style="background:' + (cat.color || '#ffd700') + '22;color:' + (cat.color || '#ffd700') + ';">' + (cat.icon || '') + ' ' + escapeHtml(cat.name) + '</span>';
             }
-        }
-        
-        // 格式化时间
-        function formatTime(timeStr) {
-            const date = new Date(timeStr);
-            const now = new Date();
-            const diff = now - date;
-            
-            if (diff < 60000) return '刚刚';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
-            if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
-            if (diff < 604800000) return `${Math.floor(diff / 86400000)}天前`;
-            
-            return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        }
-        
-        // 格式化输入数据
-        function formatInputData(inputData) {
-            try {
-                const data = JSON.parse(inputData);
-                return Object.entries(data).map(([key, value]) => `${key}: ${value}`).join(', ');
-            } catch {
-                return inputData || '';
+            if (h.tags && h.tags.length > 0) {
+                tagsHtml += h.tags.map(function(t) {
+                    return '<span class="history-tag">#' + escapeHtml(t) + '</span>';
+                }).join('');
             }
-        }
-        
-        // 截断文本
-        function truncateText(text, maxLen) {
-            try {
-                const data = JSON.parse(text);
-                text = data.result || data.message || text;
-            } catch {}
-            
-            if (text.length <= maxLen) return text;
-            return text.substring(0, maxLen) + '...';
-        }
-        
-        // 显示历史详情
-        async function showHistoryDetail(historyId) {
-            const token = Auth.getToken();
-            
-            try {
-                const response = await fetch('/api/divination-history', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                const data = await response.json();
-                const history = data.histories.find(h => h.id == historyId);
-                
-                if (!history) {
-                    showToast('记录不存在');
-                    return;
-                }
-                
-                document.getElementById('detailModuleName').textContent = history.module_title;
-                
-                // 显示输入数据
-                try {
-                    const inputData = JSON.parse(history.input_data);
-                    document.getElementById('detailInput').innerHTML = Object.entries(inputData).map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`).join('');
-                } catch {
-                    document.getElementById('detailInput').textContent = history.input_data || '无';
-                }
-                
-                // 显示结果数据
-                try {
-                    const resultData = JSON.parse(history.result_data);
-                    document.getElementById('detailResult').innerHTML = formatResultData(resultData);
-                } catch {
-                    document.getElementById('detailResult').textContent = history.result_data || '无';
-                }
-                
-                document.getElementById('historyDetailModal').classList.add('show');
-                
-            } catch (error) {
-                console.error('加载详情失败:', error);
-                showToast('加载详情失败');
-            }
-        }
-        
-        // 格式化结果数据
-        function formatResultData(data) {
-            if (typeof data !== 'object') return data;
-            
-            let html = '';
-            for (const [key, value] of Object.entries(data)) {
-                if (key === 'success') continue;
-                html += `<div style="margin-bottom: 0.5rem;"><strong>${key}:</strong> ${value}</div>`;
-            }
-            return html || JSON.stringify(data, null, 2);
-        }
-        
-        // 关闭历史详情弹窗
-        function closeHistoryDetail() {
-            document.getElementById('historyDetailModal').classList.remove('show');
-        }
-        
-        // 删除历史记录
-        async function deleteHistory(historyId) {
-            if (!confirm('确定要删除这条记录吗？')) return;
-            
-            const token = Auth.getToken();
-            
-            try {
-                const response = await fetch(`/api/divination-history/${historyId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showToast('删除成功');
-                    loadHistory(); // 重新加载
-                } else {
-                    showToast(data.message || '删除失败');
-                }
-                
-            } catch (error) {
-                console.error('删除失败:', error);
-                showToast('删除失败，请重试');
-            }
-        }
-        
-        // 点击弹窗外部关闭弹窗
-        document.getElementById('historyDetailModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeHistoryDetail();
-            }
+
+            return '<div class="history-item" onclick="showHistoryDetail(\'' + h.id + '\')">'
+                + '<div class="history-item-header">'
+                + '<div class="history-module-name">' + escapeHtml(h.module_title || h.module_name || '未知') + '</div>'
+                + '<div class="history-time">' + formatTime(h.create_time) + '</div>'
+                + '</div>'
+                + (tagsHtml ? '<div class="history-tags">' + tagsHtml + '</div>' : '')
+                + (h.input_data ? '<div class="history-input">' + formatInputData(h.input_data) + '</div>' : '')
+                + (h.result_data ? '<div class="history-result">' + truncateText(h.result_data, 100) + '</div>' : '')
+                + '<div class="history-actions">'
+                + '<button class="history-action-btn" onclick="event.stopPropagation(); showHistoryDetail(\'' + h.id + '\')">查看详情</button>'
+                + '<button class="history-action-btn" onclick="event.stopPropagation(); openClassify(\'' + h.id + '\')">🏷 分类</button>'
+                + '<button class="history-action-btn" onclick="event.stopPropagation(); deleteHistory(\'' + h.id + '\')">删除</button>'
+                + '</div>'
+                + '</div>';
+        }).join('');
+
+        // 收集所有标签更新筛选下拉
+        updateTagFilter();
+    }
+
+    function updateTagFilter() {
+        var allTags = new Set();
+        allHistories.forEach(function(h) {
+            if (h.tags) h.tags.forEach(function(t) { allTags.add(t); });
         });
-    </script>
+        var sel = document.getElementById('filterTag');
+        var val = sel.value;
+        sel.innerHTML = '<option value="">全部标签</option>';
+        allTags.forEach(function(t) {
+            sel.innerHTML += '<option value="' + escapeHtml(t) + '">#' + escapeHtml(t) + '</option>';
+        });
+        sel.value = val;
+    }
+
+    function applyFilter() {
+        var catId = document.getElementById('filterCategory').value;
+        var tag = document.getElementById('filterTag').value;
+        var search = document.getElementById('filterSearch').value.trim().toLowerCase();
+
+        var filtered = allHistories;
+        if (catId) filtered = filtered.filter(function(h) { return h.category_id === catId; });
+        if (tag) filtered = filtered.filter(function(h) { return (h.tags || []).indexOf(tag) >= 0; });
+        if (search) {
+            filtered = filtered.filter(function(h) {
+                return ((h.module_title || h.module_name || '').toLowerCase().indexOf(search) >= 0)
+                    || (JSON.stringify(h.input_data || '').toLowerCase().indexOf(search) >= 0)
+                    || (JSON.stringify(h.result_data || '').toLowerCase().indexOf(search) >= 0);
+            });
+        }
+        renderHistory(filtered);
+    }
+
+    function clearFilter() {
+        document.getElementById('filterCategory').value = '';
+        document.getElementById('filterTag').value = '';
+        document.getElementById('filterSearch').value = '';
+        renderHistory(allHistories);
+    }
+
+    // ============ 分类设置弹窗 ============
+    function openClassify(historyId) {
+        classifyHistoryId = historyId;
+        classifyTags = [];
+
+        // 找到当前记录
+        var h = allHistories.find(function(item) { return item.id === historyId; });
+        if (h) {
+            document.getElementById('classifyCategory').value = h.category_id || '';
+            classifyTags = (h.tags || []).slice();
+        }
+
+        renderTagChips();
+        document.getElementById('classifyModal').classList.add('active');
+    }
+
+    function closeClassifyModal() {
+        document.getElementById('classifyModal').classList.remove('active');
+        classifyHistoryId = null;
+        classifyTags = [];
+    }
+
+    function renderTagChips() {
+        var container = document.getElementById('tagChips');
+        container.innerHTML = classifyTags.map(function(t, i) {
+            return '<span class="tag-chip">#' + escapeHtml(t) + '<span class="remove-tag" onclick="removeTag(' + i + ')">×</span></span>';
+        }).join('');
+    }
+
+    function addTagOnEnter(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            var input = document.getElementById('newTagInput');
+            var tag = input.value.trim();
+            if (tag && classifyTags.indexOf(tag) < 0) {
+                classifyTags.push(tag);
+                renderTagChips();
+            }
+            input.value = '';
+        }
+    }
+
+    function removeTag(index) {
+        classifyTags.splice(index, 1);
+        renderTagChips();
+    }
+
+    async function saveClassify() {
+        var token = Auth.getToken();
+        try {
+            var resp = await fetch('/api/divination-history/' + classifyHistoryId + '/classify', {
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category_id: document.getElementById('classifyCategory').value,
+                    tags: classifyTags
+                })
+            });
+            var data = await resp.json();
+            if (data.success) {
+                closeClassifyModal();
+                showToast('分类设置成功');
+                loadHistory();
+            } else {
+                showToast(data.message || '设置失败');
+            }
+        } catch (e) {
+            showToast('设置失败: ' + e.message);
+        }
+    }
+
+    // ============ 分类管理弹窗 ============
+    function openCatManager() {
+        renderCatManagerList();
+        document.getElementById('catManagerModal').classList.add('active');
+    }
+
+    function closeCatManager() {
+        document.getElementById('catManagerModal').classList.remove('active');
+    }
+
+    function renderCatManagerList() {
+        var container = document.getElementById('catList');
+        if (categories.length === 0) {
+            container.innerHTML = '<p style="color:rgba(255,255,255,0.4);text-align:center;padding:1rem;">暂无分类，请添加</p>';
+        } else {
+            container.innerHTML = categories.map(function(c, i) {
+                return '<div class="cat-list-item">'
+                    + '<div class="cat-info">'
+                    + '<span class="cat-color-dot" style="background:' + (c.color || '#ffd700') + ';"></span>'
+                    + '<span class="cat-icon">' + (c.icon || '📋') + '</span>'
+                    + '<span class="cat-name">' + escapeHtml(c.name) + '</span>'
+                    + '</div>'
+                    + '<button class="history-action-btn" style="color:#ff5555;border-color:rgba(255,80,80,0.3);padding:0.25rem 0.5rem;font-size:0.7rem;" onclick="deleteCategory(\'' + c.id + '\')">删除</button>'
+                    + '</div>';
+            }).join('');
+        }
+    }
+
+    async function addCategory() {
+        var name = document.getElementById('newCatName').value.trim();
+        if (!name) { showToast('请输入分类名称'); return; }
+
+        var token = Auth.getToken();
+        try {
+            var resp = await fetch('/api/categories', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    color: document.getElementById('newCatColor').value,
+                    icon: document.getElementById('newCatIcon').value || '📋'
+                })
+            });
+            var data = await resp.json();
+            if (data.success) {
+                document.getElementById('newCatName').value = '';
+                await loadCategories();
+                renderCatManagerList();
+                showToast('分类添加成功');
+            } else {
+                showToast(data.message || '添加失败');
+            }
+        } catch (e) {
+            showToast('添加失败: ' + e.message);
+        }
+    }
+
+    async function deleteCategory(catId) {
+        if (!confirm('确定要删除此分类吗？相关历史记录的该分类将被清除。')) return;
+
+        var token = Auth.getToken();
+        try {
+            var resp = await fetch('/api/categories/' + catId, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+            if (data.success) {
+                await loadCategories();
+                renderCatManagerList();
+                await loadHistory();
+                showToast('分类已删除');
+            } else {
+                showToast(data.message || '删除失败');
+            }
+        } catch (e) {
+            showToast('删除失败: ' + e.message);
+        }
+    }
+
+    // ============ 历史详情的原有功能（保持不变） ============
+    function formatTime(timeStr) {
+        var date = new Date(timeStr);
+        var now = new Date();
+        var diff = now - date;
+        if (diff < 60000) return '刚刚';
+        if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+        if (diff < 604800000) return Math.floor(diff / 86400000) + '天前';
+        return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatInputData(inputData) {
+        try {
+            var data = JSON.parse(inputData);
+            return Object.entries(data).map(function(e) { return e[0] + ': ' + e[1]; }).join(', ');
+        } catch (e) { return inputData || ''; }
+    }
+
+    function truncateText(text, maxLen) {
+        try { var data = JSON.parse(text); text = data.result || data.message || text; } catch (e) {}
+        if (text.length <= maxLen) return text;
+        return text.substring(0, maxLen) + '...';
+    }
+
+    async function showHistoryDetail(historyId) {
+        var token = Auth.getToken();
+        try {
+            var resp = await fetch('/api/divination-history', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+            var history = (data.histories || []).find(function(h) { return h.id == historyId; });
+            if (!history) { showToast('记录不存在'); return; }
+
+            document.getElementById('detailModuleName').textContent = history.module_title || history.module_name || '算命详情';
+            try {
+                var inputData = JSON.parse(history.input_data);
+                document.getElementById('detailInput').innerHTML = Object.entries(inputData).map(function(e) { return '<div><strong>' + e[0] + ':</strong> ' + e[1] + '</div>'; }).join('');
+            } catch (e) { document.getElementById('detailInput').textContent = history.input_data || '无'; }
+
+            try {
+                var resultData = JSON.parse(history.result_data);
+                document.getElementById('detailResult').innerHTML = formatResultData(resultData);
+            } catch (e) { document.getElementById('detailResult').textContent = history.result_data || '无'; }
+
+            document.getElementById('historyDetailModal').classList.add('show');
+        } catch (e) { console.error(e); showToast('加载详情失败'); }
+    }
+
+    function formatResultData(data) {
+        if (typeof data !== 'object') return String(data);
+        var html = '';
+        for (var key in data) {
+            if (key === 'success') continue;
+            html += '<div style="margin-bottom: 0.5rem;"><strong>' + key + ':</strong> ' + JSON.stringify(data[key]) + '</div>';
+        }
+        return html || JSON.stringify(data, null, 2);
+    }
+
+    function closeHistoryDetail() {
+        document.getElementById('historyDetailModal').classList.remove('show');
+    }
+
+    async function deleteHistory(historyId) {
+        if (!confirm('确定要删除这条记录吗？')) return;
+        var token = Auth.getToken();
+        try {
+            var resp = await fetch('/api/divination-history/' + historyId, {
+                method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+            if (data.success) { showToast('删除成功'); loadHistory(); }
+            else { showToast(data.message || '删除失败'); }
+        } catch (e) { console.error(e); showToast('删除失败'); }
+    }
+
+    document.getElementById('historyDetailModal').addEventListener('click', function(e) {
+        if (e.target === this) closeHistoryDetail();
+    });
+
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+</script>
 <script src="/js/sidenav.js"></script>
 <script src="/js/footer.js"></script>
 </body>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="玄机算命">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="msapplication-TileImage" content="/icon-192.png">
+    <meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>亲友档案 - 玄机算命网</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .contacts-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
+        }
+
+        .contacts-header {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            margin-bottom: 1rem;
+        }
+        .contacts-header h2 { color: #ffd700; margin: 0 0 0.3rem; font-size: 1.3rem; }
+        .contacts-header p { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 0; }
+
+        .contacts-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .contacts-search {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .contacts-search:focus { border-color: #ffd700; }
+        .contacts-search::placeholder { color: rgba(255,255,255,0.3); }
+
+        .contacts-filter {
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            min-width: 100px;
+        }
+        .contacts-filter option { background: #1a1a2e; color: #fff; }
+
+        .btn-add-contact {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-add-contact:hover { opacity: 0.9; }
+
+        .contact-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .contact-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .contact-card:hover {
+            background: rgba(255,215,0,0.08);
+            transform: translateX(3px);
+        }
+
+        .contact-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .contact-avatar.male { background: rgba(100,180,255,0.2); }
+        .contact-avatar.female { background: rgba(255,150,200,0.2); }
+
+        .contact-info { flex: 1; min-width: 0; }
+        .contact-name {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+        }
+        .contact-meta {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+        .contact-relation {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: rgba(255,215,0,0.15);
+            color: #ffd700;
+            white-space: nowrap;
+        }
+        .contact-notes {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 0.3rem;
+            flex-shrink: 0;
+        }
+        .contact-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .contact-btn:hover {
+            background: rgba(255,215,0,0.15);
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+
+        .empty-contacts {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .empty-contacts .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-contacts p { color: rgba(255,255,255,0.4); margin: 0.3rem 0; }
+
+        /* 弹窗样式 (复用 edit-profile-modal) */
+        .modal-body { padding: 1rem 0; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #ffd700;
+        }
+        .form-group select option { background: #1a1a2e; color: #fff; }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-row { display: flex; gap: 0.8rem; }
+        .form-row .form-group { flex: 1; }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.7rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <h1>亲友档案</h1>
+</div>
+
+<div class="content-area">
+    <div class="stars" id="stars"></div>
+    <div class="contacts-container">
+        <div class="contacts-header">
+            <h2>👥 亲友档案</h2>
+            <p>保存亲友信息，随时为他们算命</p>
+        </div>
+
+        <div class="contacts-toolbar">
+            <input type="text" class="contacts-search" id="searchInput" placeholder="🔍 搜索姓名..." oninput="loadContacts()">
+            <select class="contacts-filter" id="relationFilter" onchange="loadContacts()">
+                <option value="">全部关系</option>
+                <option value="家人">家人</option>
+                <option value="朋友">朋友</option>
+                <option value="同事">同事</option>
+                <option value="客户">客户</option>
+                <option value="同学">同学</option>
+                <option value="其他">其他</option>
+            </select>
+            <button class="btn-add-contact" onclick="openContactModal()">+ 添加</button>
+        </div>
+
+        <div class="contact-list" id="contactList"></div>
+        <div class="empty-contacts" id="emptyState" style="display:none;">
+            <div class="icon">📇</div>
+            <p>还没有添加亲友</p>
+            <p>点击"+ 添加"保存亲友信息</p>
+        </div>
+    </div>
+</div>
+
+<!-- 添加/编辑弹窗 -->
+<div class="edit-profile-modal" id="contactModal">
+    <div class="modal-content" style="max-width:480px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">添加亲友</h3>
+            <button class="modal-close" onclick="closeContactModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>姓名 *</label>
+                <input type="text" id="contactName" placeholder="请输入姓名" maxlength="50">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>性别</label>
+                    <select id="contactGender">
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>关系</label>
+                    <select id="contactRelation">
+                        <option value="">请选择</option>
+                        <option value="家人">家人</option>
+                        <option value="朋友">朋友</option>
+                        <option value="同事">同事</option>
+                        <option value="客户">客户</option>
+                        <option value="同学">同学</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>生日</label>
+                <input type="date" id="contactBirthday">
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="contactNotes" placeholder="备注信息..." maxlength="200"></textarea>
+            </div>
+            <button class="btn-primary" id="saveContactBtn" onclick="saveContact()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+    var authToken = '';
+    var editingContactId = null;
+
+    function getToken() {
+        if (authToken) return authToken;
+        var t = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        if (t) authToken = t;
+        return authToken;
+    }
+
+    // 加载联系人列表
+    async function loadContacts() {
+        var token = getToken();
+        if (!token) { window.location.href = '/login.html'; return; }
+
+        var search = document.getElementById('searchInput').value.trim();
+        var relation = document.getElementById('relationFilter').value;
+
+        var params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (relation) params.append('relation', relation);
+
+        try {
+            var resp = await fetch('/api/contacts?' + params.toString(), {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+
+            var list = document.getElementById('contactList');
+            var empty = document.getElementById('emptyState');
+
+            if (!data.success || !data.contacts || data.contacts.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = data.contacts.map(function(c) {
+                var avatarEmoji = c.gender === 'male' ? '👨' : c.gender === 'female' ? '👩' : '👤';
+                var avatarClass = c.gender === 'male' ? 'male' : c.gender === 'female' ? 'female' : '';
+                var birthdayText = c.birthday ? '🎂 ' + c.birthday : '';
+                var relationTag = c.relation ? '<span class="contact-relation">' + escapeHtml(c.relation) + '</span>' : '';
+                var notesText = c.notes ? '<div class="contact-notes">' + escapeHtml(c.notes) + '</div>' : '';
+
+                return '<div class="contact-card" onclick="quickFortune(\'' + c.id + '\')">'
+                    + '<div class="contact-avatar ' + avatarClass + '">' + avatarEmoji + '</div>'
+                    + '<div class="contact-info">'
+                    + '<div class="contact-name">' + escapeHtml(c.name) + '</div>'
+                    + '<div class="contact-meta">' + birthdayText + ' ' + relationTag + '</div>'
+                    + notesText
+                    + '</div>'
+                    + '<div class="contact-actions" onclick="event.stopPropagation()">'
+                    + '<button class="contact-btn" title="编辑" onclick="openContactModal(\'' + c.id + '\')">✎</button>'
+                    + '<button class="contact-btn" title="删除" onclick="deleteContact(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">✕</button>'
+                    + '</div>'
+                    + '</div>';
+            }).join('');
+        } catch (e) {
+            showToast('加载失败: ' + e.message);
+        }
+    }
+
+    // 打开弹窗（添加 或 编辑）
+    function openContactModal(contactId) {
+        editingContactId = contactId || null;
+        document.getElementById('modalTitle').textContent = contactId ? '编辑亲友' : '添加亲友';
+        document.getElementById('saveContactBtn').textContent = contactId ? '更新' : '添加';
+        document.getElementById('contactName').value = '';
+        document.getElementById('contactGender').value = '';
+        document.getElementById('contactRelation').value = '';
+        document.getElementById('contactBirthday').value = '';
+        document.getElementById('contactNotes').value = '';
+
+        if (contactId) {
+            loadContactDetail(contactId);
+        }
+
+        document.getElementById('contactModal').classList.add('active');
+    }
+
+    function closeContactModal() {
+        document.getElementById('contactModal').classList.remove('active');
+        editingContactId = null;
+    }
+
+    async function loadContactDetail(contactId) {
+        var token = getToken();
+        try {
+            var resp = await fetch('/api/contacts/' + contactId, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+            if (data.success && data.contact) {
+                var c = data.contact;
+                document.getElementById('contactName').value = c.name || '';
+                document.getElementById('contactGender').value = c.gender || '';
+                document.getElementById('contactRelation').value = c.relation || '';
+                document.getElementById('contactBirthday').value = c.birthday || '';
+                document.getElementById('contactNotes').value = c.notes || '';
+            }
+        } catch (e) {}
+    }
+
+    async function saveContact() {
+        var name = document.getElementById('contactName').value.trim();
+        if (!name) { showToast('请输入姓名'); return; }
+
+        var token = getToken();
+        var payload = {
+            name: name,
+            gender: document.getElementById('contactGender').value,
+            relation: document.getElementById('contactRelation').value,
+            birthday: document.getElementById('contactBirthday').value,
+            notes: document.getElementById('contactNotes').value
+        };
+
+        var btn = document.getElementById('saveContactBtn');
+        btn.disabled = true;
+        btn.textContent = '保存中...';
+
+        try {
+            var url = '/api/contacts';
+            var method = 'POST';
+            if (editingContactId) {
+                url = '/api/contacts/' + editingContactId;
+                method = 'PUT';
+            }
+
+            var resp = await fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            var data = await resp.json();
+
+            if (data.success) {
+                closeContactModal();
+                loadContacts();
+                showToast(editingContactId ? '更新成功' : '添加成功');
+            } else {
+                showToast(data.message || '操作失败');
+            }
+        } catch (e) {
+            showToast('操作失败: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = editingContactId ? '更新' : '保存';
+        }
+    }
+
+    async function deleteContact(contactId, name) {
+        if (!confirm('确定要删除 "' + name + '" 吗？此操作不可撤销。')) return;
+
+        var token = getToken();
+        try {
+            var resp = await fetch('/api/contacts/' + contactId, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            var data = await resp.json();
+            if (data.success) {
+                loadContacts();
+                showToast('删除成功');
+            } else {
+                showToast(data.message || '删除失败');
+            }
+        } catch (e) {
+            showToast('删除失败: ' + e.message);
+        }
+    }
+
+    function quickFortune(contactId) {
+        // 跳转到首页并携带联系人信息用于快速算命
+        window.location.href = '/?contact=' + contactId;
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // 页面加载
+    document.addEventListener('DOMContentLoaded', function() {
+        loadContacts();
+    });
+</script>
+<script src="/js/sidenav.js"></script>
+<script src="/js/footer.js"></script>
+</body>
+</html>

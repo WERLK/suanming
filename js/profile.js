@@ -1,5 +1,5 @@
 /**
- * 玄机算命网 - 个人中心模块 (v1.5.0)
+ * 玄机算命网 - 个人中心模块 (v1.5.1)
  * 重构：VIP 代码已提取到 js/vip.js → window.VipModule
  * 保留：Profile / Avatar / Realname / Edit / Logout
  */

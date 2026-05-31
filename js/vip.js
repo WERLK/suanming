@@ -1,5 +1,5 @@
 /**
- * 玄机算命网 - VIP会员中心模块 (v1.0.0)
+ * 玄机算命网 - VIP会员中心模块 (v1.1.0)
  * 从 profile.js 提取：VIP状态管理 / 广告 / 签到 / 积分兑换 / 幸运转盘
  */
 window.VipModule = (function() {
@@ -57,6 +57,10 @@ window.VipModule = (function() {
         // Plan cards
         dom.permanentPlanDesc  = document.getElementById('permanentPlanDesc');
         dom.permanentPlanBadge = document.getElementById('permanentPlanBadge');
+        dom.basicPlanDesc      = document.getElementById('basicPlanDesc');
+        dom.basicPlanBadge     = document.getElementById('basicPlanBadge');
+        dom.freePlanDesc       = document.getElementById('freePlanDesc');
+        dom.freePlanBadge      = document.getElementById('freePlanBadge');
         dom.planFree           = document.getElementById('planFree');
         dom.planBasic          = document.getElementById('planBasic');
         dom.planPermanent      = document.getElementById('planPermanent');
@@ -182,20 +186,25 @@ window.VipModule = (function() {
         updateVipAdInfo(todayAds, maxAds);
 
         if (v.vip_level === 'permanent') {
-            dom.vipRemaining.textContent = '🎉 永久会员（今日可看广告' + maxAds + '次）';
+            dom.vipRemaining.textContent = '🎉 永久会员 · 今日可看广告 ' + maxAds + ' 次';
             dom.vipProgressBar.style.width = '100%';
+            dom.vipProgressBar.style.background = 'linear-gradient(90deg, #ffd700, #ffed4a)';
         } else if (v.vip_remaining) {
-            dom.vipRemaining.textContent = '剩余: ' + v.vip_remaining + ' | 今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 里程碑 ' + totalAdCount + '/' + threshold;
             var expireDate = new Date(v.vip_expire);
             var now = new Date();
             var total = expireDate - now;
-            var max = 7 * 24 * 3600 * 1000;
-            var pct = Math.min(100, Math.max(0, (total / max) * 100));
-            dom.vipProgressBar.style.width = pct + '%';
+            var vipMax = 7 * 24 * 3600 * 1000; // 7 days as 100%
+            var vipPct = Math.min(100, Math.max(2, (total / vipMax) * 100));
+            dom.vipRemaining.textContent = '⏰ ' + v.vip_remaining + ' · 广告 ' + adRemaining + '/' + maxAds + ' · 里程碑 ' + totalAdCount + '/' + threshold;
+            dom.vipProgressBar.style.width = vipPct + '%';
+            dom.vipProgressBar.style.background = 'linear-gradient(90deg, #4caf50, #81c784)';
         } else {
-            var permPct = Math.min(100, Math.round((totalAdCount / threshold) * 100));
-            dom.vipRemaining.textContent = '今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 里程碑 ' + totalAdCount + '/' + threshold + '（每' + threshold + '次触发随机奖励）';
-            dom.vipProgressBar.style.width = permPct + '%';
+            // Free user: show milestone progress (grey bar)
+            var msPct = Math.min(98, Math.round((totalAdCount % threshold) / threshold * 100));
+            if (totalAdCount === 0) msPct = 2;
+            dom.vipRemaining.textContent = '广告 ' + adRemaining + '/' + maxAds + ' · 里程碑 ' + (totalAdCount % threshold) + '/' + threshold;
+            dom.vipProgressBar.style.width = msPct + '%';
+            dom.vipProgressBar.style.background = 'linear-gradient(90deg, #666, #999)';
         }
 
         // Points
@@ -238,22 +247,40 @@ window.VipModule = (function() {
         var allBadges = document.querySelectorAll('.vip-plan-card .plan-badge');
         for (var j = 0; j < allBadges.length; j++) { allBadges[j].textContent = '—'; }
 
+        var totalAdCount = v.total_ad_count || 0;
+        var threshold = v.bonus_threshold || 20;
+        var maxAds = v.max_daily_ads || 3;
+
         if (v.vip_level === 'permanent') {
+            // Permanent: all plan descriptions show actual values
             if (dom.planPermanent) dom.planPermanent.classList.add('active');
-            if (dom.permanentPlanDesc) dom.permanentPlanDesc.textContent = '已解锁永久会员\n全部功能永久使用';
+            if (dom.permanentPlanDesc) dom.permanentPlanDesc.textContent = '已解锁 · 全部功能永久使用';
             if (dom.permanentPlanBadge) {
                 dom.permanentPlanBadge.textContent = '已解锁';
                 dom.permanentPlanBadge.className = 'plan-badge plan-badge-p';
             }
+            if (dom.freePlanDesc) dom.freePlanDesc.textContent = '每日' + maxAds + '次';
+            if (dom.freePlanBadge) { dom.freePlanBadge.textContent = '解锁'; dom.freePlanBadge.className = 'plan-badge plan-badge-f'; }
+            if (dom.basicPlanDesc) dom.basicPlanDesc.textContent = '每日' + maxAds + '次';
+            if (dom.basicPlanBadge) { dom.basicPlanBadge.textContent = '解锁'; dom.basicPlanBadge.className = 'plan-badge plan-badge-b'; }
         } else {
             if (v.vip_level === 'basic') {
+                // Basic: show actual maxAds (5 for basic, 3 for free)
                 if (dom.planBasic) dom.planBasic.classList.add('active');
+                if (dom.freePlanDesc) dom.freePlanDesc.textContent = '每日3次';
+                if (dom.freePlanBadge) { dom.freePlanBadge.textContent = '已解锁'; dom.freePlanBadge.className = 'plan-badge plan-badge-f'; }
+                if (dom.basicPlanDesc) dom.basicPlanDesc.textContent = '每日' + maxAds + '次';
+                if (dom.basicPlanBadge) { dom.basicPlanBadge.textContent = '当前'; dom.basicPlanBadge.className = 'plan-badge plan-badge-b'; }
             } else {
+                // Free
                 if (dom.planFree) dom.planFree.classList.add('active');
+                if (dom.freePlanDesc) dom.freePlanDesc.textContent = '每日' + maxAds + '次';
+                if (dom.freePlanBadge) { dom.freePlanBadge.textContent = '当前'; dom.freePlanBadge.className = 'plan-badge plan-badge-f'; }
+                if (dom.basicPlanDesc) dom.basicPlanDesc.textContent = '每日5次';
+                if (dom.basicPlanBadge) { dom.basicPlanBadge.textContent = '可升级'; dom.basicPlanBadge.className = 'plan-badge plan-badge-b'; }
             }
-            if (dom.permanentPlanDesc) dom.permanentPlanDesc.textContent = '累计' + (v.bonus_threshold || 20) + '次触发奖励';
-            var totalAdCount = v.total_ad_count || 0;
-            var threshold = v.bonus_threshold || 20;
+            // Permanent plan: milestone progress
+            if (dom.permanentPlanDesc) dom.permanentPlanDesc.textContent = '累计' + threshold + '次触发奖励';
             var nextMilestone = Math.ceil(totalAdCount / threshold) * threshold;
             if (dom.permanentPlanBadge) {
                 dom.permanentPlanBadge.textContent = totalAdCount + '/' + nextMilestone;
@@ -288,6 +315,8 @@ window.VipModule = (function() {
             return;
         }
 
+        state.vipAdWatching = true;
+
         // Try BaiduAd
         if (typeof BaiduAd !== 'undefined' && BaiduAd.isReady && BaiduAd.isReady()) {
             state.vipAdTarget = 'baidu';
@@ -297,13 +326,13 @@ window.VipModule = (function() {
                 state.vipAdSeconds = 0;
                 claimVipAdReward();
             }});
-            state.vipAdWatching = true;
+            // Fallback: 30s timeout if BaiduAd never fires callback
+            state.vipAdSeconds = 30;
             startAdCountdown();
             return;
         }
 
         // Fallback: countdown timer
-        state.vipAdWatching = true;
         state.vipAdSeconds = 15;
         state.vipAdTarget = 'countdown';
         startAdCountdown();
@@ -320,13 +349,22 @@ window.VipModule = (function() {
                 state.vipAdSeconds--;
                 dom.vipAdCountdown.textContent = '⏳ ' + state.vipAdSeconds + 's';
             }
-            if (state.vipAdSeconds <= 0 && state.vipAdTarget === 'countdown') {
+            // Countdown reached 0 — auto-complete
+            if (state.vipAdSeconds <= 0 && state.vipAdWatching) {
                 clearInterval(state.vipAdTimer);
                 state.vipAdTimer = null;
-                state.vipAdWatching = false;
-                dom.vipAdWatchBtn.textContent = '🎁 领取奖励';
-                dom.vipAdWatchBtn.disabled = false;
-                dom.vipAdWatchBtn.setAttribute('data-action', 'claim-ad-reward');
+                if (state.vipAdTarget === 'baidu') {
+                    // BaiduAd callback didn't fire within timeout — treat as completed
+                    state.vipAdWatching = false;
+                    dom.vipAdWatchBtn.textContent = '🎁 领取奖励';
+                    dom.vipAdWatchBtn.disabled = false;
+                    dom.vipAdWatchBtn.setAttribute('data-action', 'claim-ad-reward');
+                } else {
+                    state.vipAdWatching = false;
+                    dom.vipAdWatchBtn.textContent = '🎁 领取奖励';
+                    dom.vipAdWatchBtn.disabled = false;
+                    dom.vipAdWatchBtn.setAttribute('data-action', 'claim-ad-reward');
+                }
             }
         }, 1000);
     }

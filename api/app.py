@@ -876,7 +876,7 @@ except Exception as e:
 
 # 加载分析数据库
 try:
-    from api.analytics_db import init_db, track_session, snapshot_user, track_divination
+    from api.analytics_db import init_db, track_session, snapshot_user, track_divination, track_vip
     init_db()
     print("分析数据库已加载")
 except Exception as e:
@@ -888,9 +888,14 @@ def before_request_track():
     """记录每个请求的页面访问"""
     if request.method == 'GET' and not request.path.startswith('/api/'):
         try:
+            page = request.path
+            event_type = 'page_view'
+            # 识别算命模块页面
+            if page.startswith('/modules/'):
+                event_type = 'module_view'
             track_session(
-                event_type='page_view',
-                page=request.path,
+                event_type=event_type,
+                page=page,
                 referrer=request.referrer or '',
                 client_ip=request.remote_addr or ''
             )
@@ -900,17 +905,25 @@ def before_request_track():
 # ===== 算命事件追踪 =====
 @app.after_request
 def after_request_track(response):
-    """自动追踪所有 fortune API 请求"""
-    if request.path.startswith('/api/fortune/'):
+    """自动追踪 fortune/VIP API 请求"""
+    path = request.path
+
+    # 追踪算命API
+    if path.startswith('/api/fortune/'):
         try:
-            parts = request.path.split('/')
+            parts = path.split('/')
             module_id = parts[3] if len(parts) > 3 else ''
+            # 处理子路径如 /api/fortune/xingzuo/daily → module_id = 'xingzuo'
+            if module_id and len(parts) > 4 and parts[4]:
+                m = parts[3] if parts[3] not in ('tarot',) else parts[3]
+                module_id = m
             module_names = {
                 'bazi': '八字排盘', 'ziwei': '紫微斗数', 'tarot': '塔罗牌',
                 'shengxiao': '生肖运势', 'xingming': '姓名测试', 'xingzuo': '星座运势',
-                'hehun': '合婚配对', 'jiemeng': '周公解梦', 'fengshui': '风水堪舆',
-                'huangli': '黄道吉日', 'qs': '每日运势', 'liuyao': '六爻占卜',
-                'caishen': '财神方位', 'analyze': '智能分析'
+                'heyun': '合婚配对', 'jiemeng': '周公解梦', 'fengshui': '风水堪舆',
+                'huangli': '黄道吉日', 'xingzuo': '星座运势', 'liuyao': '六爻占卜',
+                'caishen': '财神方位', 'analyze': '智能分析',
+                'image-analyze': '智能分析'
             }
             module_name = module_names.get(module_id, module_id)
             token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
@@ -931,6 +944,28 @@ def after_request_track(response):
             )
         except Exception:
             pass
+
+    # 追踪 VIP 行为
+    if path.startswith('/api/vip/'):
+        try:
+            vip_events = {
+                '/api/vip/watch-ad': ('ad_watch', '观看广告'),
+                '/api/vip/bottom-ad': ('bottom_ad', '底部广告'),
+                '/api/vip/checkin': ('checkin', '每日签到'),
+                '/api/vip/wheel': ('wheel', '转盘抽奖'),
+            }
+            for prefix, (evt, label) in vip_events.items():
+                if path == prefix:
+                    token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
+                    if token:
+                        try:
+                            uid = verify_token(token)
+                            if uid: track_vip(uid, evt, label)
+                        except: pass
+                    break
+        except Exception:
+            pass
+
     return response
 
 # 注册分析API蓝图

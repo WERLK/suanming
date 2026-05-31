@@ -72,6 +72,16 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_sess_user ON session_events(user_id, created_at);
         CREATE INDEX IF NOT EXISTS idx_sess_type ON session_events(event_type, created_at);
 
+        CREATE TABLE IF NOT EXISTS vip_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            event_type TEXT NOT NULL,
+            detail TEXT DEFAULT '',
+            created_at TIMESTAMP DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_vip_user ON vip_events(user_id, created_at);
+        CREATE INDEX IF NOT EXISTS idx_vip_type ON vip_events(event_type, created_at);
+
         CREATE TABLE IF NOT EXISTS hourly_stats (
             hour TEXT NOT NULL,
             module_name TEXT NOT NULL,
@@ -155,6 +165,21 @@ def track_session(user_id=None, event_type='page_view', page='',
                 INSERT INTO session_events (user_id, event_type, page, referrer, client_ip)
                 VALUES (?, ?, ?, ?, ?)
             """, (user_id or None, event_type, page or '', referrer or '', client_ip or ''))
+            conn.commit()
+            conn.close()
+    except Exception:
+        pass
+
+
+def track_vip(user_id, event_type, detail=''):
+    """记录 VIP 行为：ad_watch / checkin / wheel / bottom_ad"""
+    try:
+        with _write_lock:
+            conn = get_db()
+            conn.execute("""
+                INSERT INTO vip_events (user_id, event_type, detail)
+                VALUES (?, ?, ?)
+            """, (user_id, event_type, detail or ''))
             conn.commit()
             conn.close()
     except Exception:
@@ -281,6 +306,34 @@ def get_user_profile_stats():
         'vip': [dict(r) for r in vip],
         'age': [{'group': k, 'count': v} for k, v in age_groups.items()]
     }
+
+
+def get_vip_stats(days=30):
+    """VIP 行为统计"""
+    conn = get_db()
+    cutoff = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+    rows = conn.execute("""
+        SELECT event_type, COUNT(*) as cnt, COUNT(DISTINCT user_id) as users
+        FROM vip_events
+        WHERE date(created_at) >= ?
+        GROUP BY event_type ORDER BY cnt DESC
+    """, (cutoff,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_page_stats(days=7):
+    """页面访问排行"""
+    conn = get_db()
+    cutoff = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+    rows = conn.execute("""
+        SELECT page, COUNT(*) as cnt
+        FROM session_events
+        WHERE event_type='page_view' AND date(created_at) >= ?
+        GROUP BY page ORDER BY cnt DESC LIMIT 20
+    """, (cutoff,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 def aggregate_hourly():

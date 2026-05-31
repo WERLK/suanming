@@ -1,8 +1,8 @@
 {
-  "version": "1.9.0",
-  "build_time": "2026-05-31T05:00:52Z",
-  "git_commit": "e9a3f2b",
+  "version": "1.9.1",
+  "build_time": "2026-05-31T05:25:00Z",
+  "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "VIP系统全栈重构：后端VipService+前端VipModule模块化+30s自动更新+6项Bug修复",
+  "description": "VIP广告区域UI改版：左右分栏布局+黄色大按钮+⭐会员横幅+激励文案",
   "fix_count": 0
 }

@@ -26,18 +26,25 @@ window.VipModule = (function() {
     var dom = {};
 
     function cacheDom() {
+        // VIP banner
+        dom.vipCenterBanner = document.getElementById('vipCenterBanner');
+        dom.vipCenterBadge  = document.getElementById('vipCenterBadge');
+
         // VIP card
         dom.vipCard         = document.getElementById('vipCard');
         dom.vipBadge        = document.getElementById('vipBadge');
         dom.vipExpire       = document.getElementById('vipExpire');
         dom.vipProgressBar  = document.getElementById('vipProgressBar');
         dom.vipRemaining    = document.getElementById('vipRemaining');
-        dom.vipAdSection    = document.getElementById('vipAdSection');
-        dom.vipAdArea       = document.getElementById('vipAdArea');
+        dom.vipStatusSub    = document.getElementById('vipStatusSub');
         dom.vipAdSlot       = document.getElementById('vipAdSlot');
         dom.vipAdCountdown  = document.getElementById('vipAdCountdown');
         dom.vipAdDaily      = document.getElementById('vipAdDaily');
         dom.vipAdWatchBtn   = document.getElementById('vipAdWatchBtn');
+        dom.vipAdBtnIcon    = document.getElementById('vipAdBtnIcon');
+        dom.vipAdBtnText    = document.getElementById('vipAdBtnText');
+        dom.vipAdBtnRemain  = document.getElementById('vipAdBtnRemain');
+        dom.vipAdPlayback   = document.getElementById('vipAdPlayback');
 
         // Points & Check-in
         dom.pointsValue     = document.getElementById('pointsValue');
@@ -146,8 +153,14 @@ window.VipModule = (function() {
         if (!v) return;
 
         if (dom.vipCard) dom.vipCard.style.display = 'block';
+        if (dom.vipCenterBanner) dom.vipCenterBanner.style.display = 'block';
 
-        // Badge
+        // Banner badge
+        if (dom.vipCenterBadge) {
+            dom.vipCenterBadge.textContent = '⭐ ' + (v.vip_level_name || '免费用户');
+        }
+
+        // Card badge
         dom.vipBadge.textContent = v.vip_level_name || '';
         dom.vipBadge.className = 'vip-badge ' + (v.vip_level || 'free');
 
@@ -175,7 +188,7 @@ window.VipModule = (function() {
             dom.vipExpire.textContent = '';
         }
 
-        // Progress bar & remaining text
+        // Data
         var totalAdCount = v.total_ad_count || 0;
         var threshold = v.bonus_threshold || 20;
         var todayAds = v.today_ads || 0;
@@ -184,26 +197,30 @@ window.VipModule = (function() {
 
         updateVipAdInfo(todayAds, maxAds);
 
+        // Progress bar & status text (left-right layout)
         if (v.vip_level === 'permanent') {
-            dom.vipRemaining.textContent = '🎉 永久会员 · 今日可看广告 ' + maxAds + ' 次';
             dom.vipProgressBar.style.width = '100%';
             dom.vipProgressBar.style.background = 'linear-gradient(90deg, #ffd700, #ffed4a)';
+            dom.vipRemaining.textContent = '🎉 永久会员';
+            if (dom.vipStatusSub) dom.vipStatusSub.textContent = '今日可看广告 ' + maxAds + ' 次';
         } else if (v.vip_remaining) {
             var expireDate = new Date(v.vip_expire);
             var now = new Date();
             var total = expireDate - now;
             var vipMax = 7 * 24 * 3600 * 1000; // 7 days as 100%
             var vipPct = Math.min(100, Math.max(2, (total / vipMax) * 100));
-            dom.vipRemaining.textContent = '⏰ ' + v.vip_remaining + ' · 广告 ' + adRemaining + '/' + maxAds + ' · 里程碑 ' + totalAdCount + '/' + threshold;
             dom.vipProgressBar.style.width = vipPct + '%';
             dom.vipProgressBar.style.background = 'linear-gradient(90deg, #4caf50, #81c784)';
+            dom.vipRemaining.textContent = '剩余: ' + v.vip_remaining;
+            if (dom.vipStatusSub) dom.vipStatusSub.textContent = '里程碑 ' + totalAdCount + '/' + threshold + ' 次';
         } else {
             // Free user: show milestone progress (grey bar)
             var msPct = Math.min(98, Math.round((totalAdCount % threshold) / threshold * 100));
             if (totalAdCount === 0) msPct = 2;
-            dom.vipRemaining.textContent = '广告 ' + adRemaining + '/' + maxAds + ' · 里程碑 ' + (totalAdCount % threshold) + '/' + threshold;
             dom.vipProgressBar.style.width = msPct + '%';
             dom.vipProgressBar.style.background = 'linear-gradient(90deg, #666, #999)';
+            dom.vipRemaining.textContent = '免费用户';
+            if (dom.vipStatusSub) dom.vipStatusSub.textContent = '里程碑 ' + (totalAdCount % threshold) + '/' + threshold + ' 次';
         }
 
         // Points
@@ -293,14 +310,19 @@ window.VipModule = (function() {
     // ═══════════════════════════════════════════
     function updateVipAdInfo(todayAds, maxAds) {
         var remaining = Math.max(0, maxAds - todayAds);
-        if (dom.vipAdDaily) dom.vipAdDaily.innerHTML = '今日可观看 <strong>' + remaining + '</strong> 次';
+        if (dom.vipAdBtnRemain) dom.vipAdBtnRemain.textContent = '（剩' + remaining + '次）';
         if (maxAds > 0 && remaining <= 0) {
             dom.vipAdWatchBtn.disabled = true;
             dom.vipAdWatchBtn.style.opacity = '0.4';
-            dom.vipAdCountdown.textContent = '今日已用完';
+            if (dom.vipAdBtnIcon) dom.vipAdBtnIcon.textContent = '🚫';
+            if (dom.vipAdBtnText) dom.vipAdBtnText.textContent = '今日已用完';
+            if (dom.vipAdBtnRemain) dom.vipAdBtnRemain.textContent = '';
+            dom.vipAdCountdown.textContent = '';
         } else {
             dom.vipAdWatchBtn.disabled = false;
             dom.vipAdWatchBtn.style.opacity = '1';
+            if (dom.vipAdBtnIcon) dom.vipAdBtnIcon.textContent = '📺';
+            if (dom.vipAdBtnText) dom.vipAdBtnText.textContent = '看广告赚时长';
         }
     }
 
@@ -318,18 +340,23 @@ window.VipModule = (function() {
         state.vipAdSeconds = 8;
         var total = 8;
 
+        // Show playback animation area
+        if (dom.vipAdPlayback) dom.vipAdPlayback.style.display = 'flex';
+        if (dom.vipAdSlot) {
+            dom.vipAdSlot.innerHTML = '<div class="ad-progress-ring"><div class="ad-progress-fill"></div><span class="ad-timer-icon">📺</span></div>';
+        }
+
         // Button: show countdown
         dom.vipAdWatchBtn.disabled = true;
-        dom.vipAdWatchBtn.textContent = '⏳ ' + total + 's';
+        if (dom.vipAdBtnIcon) dom.vipAdBtnIcon.textContent = '⏳';
+        if (dom.vipAdBtnText) dom.vipAdBtnText.textContent = total + 's';
+        if (dom.vipAdBtnRemain) dom.vipAdBtnRemain.textContent = '';
         dom.vipAdCountdown.textContent = '广告播放中...';
-
-        // Slot: animated progress
-        dom.vipAdSlot.innerHTML = '<div class="ad-progress-ring"><div class="ad-progress-fill"></div><span class="ad-timer-icon">📺</span></div>';
 
         state.vipAdTimer = setInterval(function() {
             state.vipAdSeconds--;
             if (state.vipAdSeconds > 0) {
-                dom.vipAdWatchBtn.textContent = '⏳ ' + state.vipAdSeconds + 's';
+                if (dom.vipAdBtnText) dom.vipAdBtnText.textContent = state.vipAdSeconds + 's';
             } else {
                 // Done — auto claim
                 clearInterval(state.vipAdTimer);
@@ -342,7 +369,9 @@ window.VipModule = (function() {
 
     function doClaimReward() {
         state.vipAdClaiming = true;
-        dom.vipAdWatchBtn.textContent = '领取中...';
+        if (dom.vipAdBtnIcon) dom.vipAdBtnIcon.textContent = '⏳';
+        if (dom.vipAdBtnText) dom.vipAdBtnText.textContent = '领取中...';
+        if (dom.vipAdBtnRemain) dom.vipAdBtnRemain.textContent = '';
         dom.vipAdCountdown.textContent = '正在验证...';
 
         api.watchAd().then(function(data) {
@@ -369,8 +398,21 @@ window.VipModule = (function() {
         state.vipAdWatching = false;
         state.vipAdClaiming = false;
         state.vipAdSeconds = 0;
-        dom.vipAdSlot.innerHTML = '<span>📺</span>';
-        dom.vipAdWatchBtn.textContent = '▶ 看广告赚时长';
+
+        if (dom.vipAdPlayback) dom.vipAdPlayback.style.display = 'none';
+        if (dom.vipAdSlot) dom.vipAdSlot.innerHTML = '<span>📺</span>';
+        if (dom.vipAdBtnIcon) dom.vipAdBtnIcon.textContent = '📺';
+        if (dom.vipAdBtnText) dom.vipAdBtnText.textContent = '看广告赚时长';
+
+        // Restore remain count
+        var v = state.vip;
+        if (v) {
+            var todayAds = v.today_ads || 0;
+            var maxAds = v.max_daily_ads || 0;
+            var remaining = Math.max(0, maxAds - todayAds);
+            if (dom.vipAdBtnRemain) dom.vipAdBtnRemain.textContent = '（剩' + remaining + '次）';
+        }
+
         dom.vipAdWatchBtn.disabled = false;
         dom.vipAdWatchBtn.style.opacity = '1';
         dom.vipAdWatchBtn.setAttribute('data-action', 'watch-ad');

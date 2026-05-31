@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>个人中心 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css?v=1.3.0">
-    <link rel="stylesheet" href="/css/profile.css?v=1.5.0">
+    <link rel="stylesheet" href="/css/profile.css?v=1.6.0">
     <link rel="stylesheet" href="/css/profile-compatible.css?v=1.3.0">
     <script src="/js/ads.js?v=1.3.0"></script>
 </head>
@@ -101,26 +101,41 @@
             </div>
         </div>
 
+        <!-- VIP 中心横幅 -->
+        <div class="vip-center-banner" id="vipCenterBanner" style="display:none;">
+            <div class="vip-center-badge" id="vipCenterBadge">⭐ 基础会员</div>
+            <h2 class="vip-center-title">继续看广告积累里程碑奖励</h2>
+            <p class="vip-center-sub">签到、转转盘、积分兑换都能获取会员</p>
+        </div>
+
         <!-- VIP 卡片 -->
         <div class="vip-card" id="vipCard">
             <div class="vip-card-top">
-                <span class="vip-badge tag-vip" id="vipBadge">免费用户</span>
+                <span class="vip-badge" id="vipBadge">免费用户</span>
                 <span class="vip-expire" id="vipExpire"></span>
             </div>
             <div class="vip-progress">
                 <div class="vip-progress-bar" id="vipProgressBar" style="width:0%"></div>
             </div>
-            <div class="vip-info-row skeleton-text" id="vipRemaining">未开通会员</div>
-            <div class="vip-ad-section" id="vipAdSection">
-                <div class="vip-ad-area" id="vipAdArea">
-                    <div class="vip-ad-slot" id="vipAdSlot"><span>📺</span></div>
-                    <div class="vip-ad-info">
-                        <div class="vip-ad-countdown" id="vipAdCountdown"></div>
-                        <div class="vip-ad-daily" id="vipAdDaily">今日可观看 <strong>0</strong> 次</div>
-                    </div>
+            <div class="vip-card-body">
+                <div class="vip-status-col">
+                    <div class="vip-status-main skeleton-text" id="vipRemaining">未开通会员</div>
+                    <div class="vip-status-sub" id="vipStatusSub"></div>
                 </div>
-                <button class="vip-ad-watch-btn" id="vipAdWatchBtn" data-action="watch-ad">▶ 看广告赚时长</button>
+                <div class="vip-ad-col">
+                    <button class="vip-ad-btn" id="vipAdWatchBtn" data-action="watch-ad">
+                        <span class="vip-ad-btn-icon" id="vipAdBtnIcon">📺</span>
+                        <span class="vip-ad-btn-text" id="vipAdBtnText">看广告赚时长</span>
+                        <span class="vip-ad-btn-remain" id="vipAdBtnRemain">（剩0次）</span>
+                    </button>
+                    <div class="vip-ad-countdown" id="vipAdCountdown"></div>
+                </div>
             </div>
+            <!-- 广告播放动画区（隐藏，播放时显示） -->
+            <div class="vip-ad-playback" id="vipAdPlayback" style="display:none;">
+                <div class="vip-ad-slot" id="vipAdSlot"><span>📺</span></div>
+            </div>
+            <div class="vip-ad-daily" id="vipAdDaily" style="display:none;">今日可观看 <strong>0</strong> 次</div>
         </div>
 
         <!-- 积分 + 转盘 并排 -->
@@ -452,8 +467,8 @@
 
 <script src="/js/main.js?v=1.2.0"></script>
 <script src="/js/auth.js?v=1.2.0"></script>
-<script src="/js/vip.js?v=1.2.0"></script>
-<script src="/js/profile.js?v=1.5.1"></script>
+    <script src="/js/vip.js?v=1.3.0"></script>
+    <script src="/js/profile.js?v=1.5.1"></script>
 <script src="/js/sidenav.js"></script>
 <script src="/js/footer.js?v=1.2.0"></script>
 </div>

@@ -68,6 +68,31 @@
     100% { background-position: -200% 0; }
 }
 
+/* ===== VIP Center Banner ===== */
+.vip-center-banner {
+    text-align: center; padding: 1rem 0.8rem 0.6rem;
+    margin-bottom: 0.6rem; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.01));
+    border: 1px solid rgba(255,215,0,0.1);
+    animation: vipBannerFadeIn 0.5s ease;
+}
+@keyframes vipBannerFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.vip-center-badge {
+    display: inline-block; padding: 0.25rem 0.8rem; border-radius: 20px;
+    background: rgba(76,175,80,0.18); color: #81c784; font-size: 0.8rem;
+    font-weight: bold; margin-bottom: 0.5rem; border: 1px solid rgba(76,175,80,0.2);
+}
+.vip-center-title {
+    color: #ffd700; font-size: 1.15rem; font-weight: bold;
+    margin: 0 0 0.25rem; text-shadow: 0 0 12px rgba(255,215,0,0.15);
+}
+.vip-center-sub {
+    color: rgba(255,255,255,0.4); font-size: 0.7rem; margin: 0;
+}
+
 /* ===== VIP Card ===== */
 .vip-card {
     background: linear-gradient(135deg, rgba(255,215,0,0.07), rgba(255,215,0,0.01));
@@ -75,25 +100,64 @@
     margin-bottom: 0.8rem; transition: border-color 0.3s;
 }
 .vip-card:hover { border-color: rgba(255,215,0,0.25); }
-.vip-card-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+.vip-card-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
 .vip-badge { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+.vip-badge.free   { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+.vip-badge.basic  { background: rgba(76,175,80,0.18); color: #81c784; border: 1px solid rgba(76,175,80,0.2); }
+.vip-badge.permanent { background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(255,215,0,0.15)); color: #ffd700; border: 1px solid rgba(255,215,0,0.25); }
 .vip-expire { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-left: auto; }
 .vip-progress {
-    height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06);
-    margin-bottom: 0.4rem; overflow: hidden;
+    height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06);
+    margin-bottom: 0.6rem; overflow: hidden;
 }
 .vip-progress-bar {
-    height: 100%; border-radius: 3px;
+    height: 100%; border-radius: 2px;
     background: linear-gradient(90deg, #ffd700, #ffaa00);
     transition: width 0.6s ease; box-shadow: 0 0 8px rgba(255,215,0,0.15);
 }
-.vip-info-row { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
-.vip-ad-section { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,215,0,0.06); }
-.vip-ad-area { display: flex; align-items: center; gap: 0.4rem; flex: 1; min-width: 0; }
+
+/* ===== VIP Card Body (left-right split) ===== */
+.vip-card-body {
+    display: flex; align-items: center; gap: 0.8rem;
+    min-height: 56px;
+}
+.vip-status-col { flex: 1; min-width: 0; }
+.vip-status-main { font-size: 0.78rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
+.vip-status-sub  { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 0.15rem; }
+.vip-ad-col { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+
+/* ===== Big Yellow Ad Button ===== */
+.vip-ad-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;
+    padding: 0.55rem 0.9rem; border-radius: 10px;
+    border: 1px solid rgba(255,215,0,0.35);
+    background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(255,215,0,0.08));
+    color: #ffd700; font-size: 0.75rem; font-weight: bold;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(255,215,0,0.1);
+}
+.vip-ad-btn:hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,215,0,0.12));
+    box-shadow: 0 2px 12px rgba(255,215,0,0.15); transform: translateY(-1px);
+}
+.vip-ad-btn:disabled {
+    opacity: 0.4; cursor: not-allowed; transform: none;
+    box-shadow: none;
+}
+.vip-ad-btn-icon { font-size: 0.9rem; }
+.vip-ad-btn-text { }
+.vip-ad-btn-remain { color: rgba(255,215,0,0.75); font-weight: normal; }
+
+/* ===== Ad Playback Area ===== */
+.vip-ad-playback {
+    margin-top: 0.5rem; padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,215,0,0.06);
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
 .vip-ad-slot {
-    width: 32px; height: 32px; min-width: 32px; border-radius: 6px;
+    width: 40px; height: 40px; min-width: 40px; border-radius: 8px;
     background: rgba(255,255,255,0.04); border: 1px solid rgba(255,215,0,0.12);
-    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
     position: relative; overflow: hidden;
 }
 .ad-progress-ring {
@@ -118,15 +182,8 @@
     0%, 100% { transform: scale(1); opacity: 1; }
     50%      { transform: scale(1.15); opacity: 0.7; }
 }
-.vip-ad-info { flex: 1; min-width: 0; }
-.vip-ad-countdown { font-size: 0.75rem; color: #ffd700; font-weight: bold; }
+.vip-ad-countdown { font-size: 0.7rem; color: #ffd700; font-weight: bold; }
 .vip-ad-daily { font-size: 0.6rem; color: rgba(255,255,255,0.35); margin-top: 0.1rem; }
-.vip-ad-watch-btn {
-    padding: 0.35rem 0.7rem; border-radius: 6px; border: 1px solid rgba(255,215,0,0.3);
-    background: rgba(255,215,0,0.1); color: #ffd700; font-size: 0.7rem;
-    cursor: pointer; white-space: nowrap; transition: all 0.2s;
-}
-.vip-ad-watch-btn:hover { background: rgba(255,215,0,0.18); }
 
 /* ===== Section: Collapsible ===== */
 .profile-section { margin-bottom: 0.8rem; }

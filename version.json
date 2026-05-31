@@ -1,8 +1,8 @@
 {
-  "version": "1.9.1",
-  "build_time": "2026-05-31T05:25:00Z",
+  "version": "1.9.2",
+  "build_time": "2026-05-31T07:40:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "VIP广告区域UI改版：左右分栏布局+黄色大按钮+⭐会员横幅+激励文案",
-  "fix_count": 0
+  "description": "VIP广告按钮加固：添加直接事件监听器兜底+签到/转盘按钮同上",
+  "fix_count": 1
 }

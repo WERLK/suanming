@@ -110,6 +110,33 @@ window.VipModule = (function() {
     }
 
     function bindEvents() {
+        // ── Direct click handler for watch-ad button (fallback to event delegation) ──
+        if (dom.vipAdWatchBtn) {
+            dom.vipAdWatchBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (dom.vipAdWatchBtn.disabled) return;
+                watchVipAd();
+            });
+        }
+
+        // ── Direct click handler for checkin button ──
+        if (dom.checkinBtn) {
+            dom.checkinBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (dom.checkinBtn.disabled) return;
+                doCheckin();
+            });
+        }
+
+        // ── Direct click handler for wheel spin button ──
+        if (dom.wheelSpinBtn) {
+            dom.wheelSpinBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (dom.wheelSpinBtn.disabled) return;
+                spinWheel();
+            });
+        }
+
         // Redeem modal: close on backdrop click
         if (dom.redeemModal) {
             dom.redeemModal.addEventListener('click', function(e) {

@@ -41,6 +41,8 @@ def init_db():
             birth_day INTEGER,
             vip_level TEXT DEFAULT 'basic',
             is_new_user INTEGER DEFAULT 0,
+            id_region TEXT DEFAULT '',
+            is_verified INTEGER DEFAULT 0,
             snapshot_time TIMESTAMP DEFAULT (datetime('now'))
         );
         CREATE INDEX IF NOT EXISTS idx_snap_user ON user_snapshots(user_id, snapshot_time);
@@ -98,7 +100,7 @@ def init_db():
 # ==================== 写入函数 ====================
 
 def snapshot_user(user_id, username='', gender='', birth_str='',
-                  vip_level='basic', is_new=False):
+                  vip_level='basic', is_new=False, id_region='', is_verified=False):
     """用户快照：登录/注册/更新资料时调用"""
     try:
         birth_year = birth_month = birth_day = None
@@ -118,10 +120,12 @@ def snapshot_user(user_id, username='', gender='', birth_str='',
             conn = get_db()
             conn.execute("""
                 INSERT INTO user_snapshots (user_id, username, gender,
-                    birth_year, birth_month, birth_day, vip_level, is_new_user)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    birth_year, birth_month, birth_day, vip_level, is_new_user,
+                    id_region, is_verified)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (user_id, username, gender, birth_year, birth_month, birth_day,
-                  vip_level, 1 if is_new else 0))
+                  vip_level, 1 if is_new else 0, id_region or '',
+                  1 if is_verified else 0))
             conn.commit()
             conn.close()
     except Exception:
@@ -334,6 +338,30 @@ def get_page_stats(days=7):
     """, (cutoff,)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+def get_region_stats():
+    """地区分布统计（从用户快照）"""
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT id_region as region, COUNT(DISTINCT user_id) as users
+        FROM user_snapshots
+        WHERE id_region != ''
+        GROUP BY id_region ORDER BY users DESC
+    """).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_verified_count():
+    """已认证用户数"""
+    conn = get_db()
+    total = conn.execute(
+        "SELECT COUNT(DISTINCT user_id) FROM user_snapshots").fetchone()[0]
+    verified = conn.execute(
+        "SELECT COUNT(DISTINCT user_id) FROM user_snapshots WHERE is_verified=1").fetchone()[0]
+    conn.close()
+    return {'total': total, 'verified': verified}
 
 
 def aggregate_hourly():

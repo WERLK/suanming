@@ -846,6 +846,20 @@
                 <p class="profile-uid" id="profileUid" style="color:rgba(255,255,255,0.35);font-size:0.72rem;margin-top:0.15rem;"></p>
             </div>
             
+            <!-- 实名认证卡片 -->
+            <div class="realname-card" id="realnameCard" style="display:none;margin-bottom:16px;">
+                <div class="realname-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,180,255,0.06);border:1px solid rgba(0,180,255,0.15);border-radius:12px;cursor:pointer;transition:all 0.3s;" onclick="openRealnameModal()">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:1.5rem;">🔒</span>
+                        <div>
+                            <div style="color:rgba(100,200,255,0.9);font-size:0.9rem;font-weight:bold;">实名认证</div>
+                            <div id="realnameStatus" style="color:rgba(255,255,255,0.5);font-size:0.75rem;">未认证</div>
+                        </div>
+                    </div>
+                    <span style="color:rgba(100,200,255,0.6);">→</span>
+                </div>
+            </div>
+            
             <!-- 会员卡片 + 统计 桌面端并排 -->
             <div class="profile-vip-row">
             <div class="vip-card" id="vipCard">
@@ -1238,6 +1252,51 @@
         </div>
     </div>
 
+    <!-- 实名认证弹窗 -->
+    <div class="edit-profile-modal" id="realnameModal">
+        <div class="modal-content" style="max-width:380px;">
+            <div class="modal-header">
+                <h3 class="modal-title">🔒 实名认证</h3>
+                <button class="modal-close" onclick="closeRealnameModal()">×</button>
+            </div>
+            <div class="modal-body" style="padding:20px;">
+                <div id="realnameVerifiedContent" style="display:none;">
+                    <div style="text-align:center;padding:20px 0;">
+                        <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
+                        <div style="font-size:1rem;color:#ffd700;margin-bottom:8px;">已通过实名认证</div>
+                        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);">
+                            <div>姓名：<span id="rnName" style="color:#ffd700;"></span></div>
+                            <div>号码：<span id="rnId" style="color:rgba(255,255,255,0.5);"></span></div>
+                            <div>地区：<span id="rnRegion" style="color:#4dc9ff;"></span></div>
+                            <div style="margin-top:8px;font-size:0.7rem;color:rgba(255,255,255,0.4);">认证时间：<span id="rnTime"></span></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="realnameFormContent">
+                    <div style="text-align:center;color:rgba(255,215,0,0.7);font-size:0.8rem;margin-bottom:16px;">
+                        ⚡ 认证后可获得精准的八字/紫微分析
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">真实姓名</label>
+                        <input id="rnInputName" type="text" placeholder="请输入真实姓名" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:8px;color:#fff;font-size:0.9rem;" maxlength="20">
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">身份证号码</label>
+                        <input id="rnInputId" type="text" placeholder="请输入18位身份证号" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:8px;color:#fff;font-size:0.9rem;text-security:disc;" maxlength="18" autocomplete="off">
+                    </div>
+                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-bottom:16px;line-height:1.5;">
+                        🔐 身份证号仅用于数据校验，存储为不可逆哈希<br>
+                        ℹ️ 认证后自动解析出生日期、性别、籍贯用于大数据分析
+                    </div>
+                    <button id="rnSubmitBtn" onclick="submitRealname()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(0,180,255,0.3),rgba(0,140,220,0.2));border:1px solid rgba(0,180,255,0.4);border-radius:8px;color:#fff;font-size:0.95rem;cursor:pointer;transition:all 0.3s;">
+                        提交认证
+                    </button>
+                    <div id="rnError" style="color:#f44;font-size:0.75rem;margin-top:8px;text-align:center;display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <a href="/" class="nav-item">
             <div class="nav-icon">🏠</div>
@@ -1335,6 +1394,9 @@
                 
                 // 加载会员状态
                 loadVIPStatus();
+                
+                // 加载实名认证状态
+                loadRealnameStatus();
                 
                 // 加载头像
                 loadAvatar();
@@ -1928,6 +1990,97 @@
                 if (e.target === this) closeRedeem();
             });
         } catch(e) { console.warn('[PROFILE] redeemModal 绑定失败:', e.message); }
+
+        // ========== 实名认证 ==========
+        async function loadRealnameStatus() {
+            var token = Auth.getToken();
+            if (!token) return;
+            try {
+                var resp = await fetch('/api/profile/realname-status', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                var data = await resp.json();
+                var card = document.getElementById('realnameCard');
+                var status = document.getElementById('realnameStatus');
+                if (card) card.style.display = 'block';
+                if (data.success && data.verified) {
+                    if (status) {
+                        status.textContent = '✅ 已认证 · ' + (data.data.region || '');
+                        status.style.color = 'rgba(100,200,255,0.8)';
+                    }
+                } else {
+                    if (status) status.textContent = '未认证 — 立即认证获取精准分析';
+                }
+            } catch (e) {}
+        }
+
+        function openRealnameModal() {
+            var token = Auth.getToken();
+            if (!token) { showToast('请先登录'); return; }
+            fetch('/api/profile/realname-status', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.verified) {
+                    document.getElementById('realnameVerifiedContent').style.display = 'block';
+                    document.getElementById('realnameFormContent').style.display = 'none';
+                    document.getElementById('rnName').textContent = data.data.real_name_masked || '';
+                    document.getElementById('rnId').textContent = data.data.id_masked || '';
+                    document.getElementById('rnRegion').textContent = data.data.region || '';
+                    document.getElementById('rnTime').textContent = (data.data.verify_time || '').slice(0,10);
+                } else {
+                    document.getElementById('realnameVerifiedContent').style.display = 'none';
+                    document.getElementById('realnameFormContent').style.display = 'block';
+                    document.getElementById('rnError').style.display = 'none';
+                }
+                document.getElementById('realnameModal').classList.add('show');
+            }).catch(function() {});
+        }
+
+        function closeRealnameModal() {
+            document.getElementById('realnameModal').classList.remove('show');
+        }
+
+        async function submitRealname() {
+            var token = Auth.getToken();
+            if (!token) { showToast('请先登录'); return; }
+            var name = document.getElementById('rnInputName').value.trim();
+            var id = document.getElementById('rnInputId').value.trim();
+            var errEl = document.getElementById('rnError');
+            var btn = document.getElementById('rnSubmitBtn');
+
+            if (!name || name.length < 2) { errEl.textContent = '请输入真实姓名'; errEl.style.display = 'block'; return; }
+            if (!id || id.length !== 18) { errEl.textContent = '请输入18位身份证号'; errEl.style.display = 'block'; return; }
+
+            btn.disabled = true; btn.textContent = '验证中...'; errEl.style.display = 'none';
+
+            try {
+                var resp = await fetch('/api/profile/verify-realname', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ real_name: name, id_number: id })
+                });
+                var data = await resp.json();
+                if (data.success) {
+                    showToast('✅ 实名认证成功');
+                    closeRealnameModal();
+                    loadRealnameStatus();
+                } else {
+                    errEl.textContent = data.message || '认证失败';
+                    errEl.style.display = 'block';
+                }
+            } catch (e) {
+                errEl.textContent = '网络错误';
+                errEl.style.display = 'block';
+            }
+            btn.disabled = false; btn.textContent = '提交认证';
+        }
+
+        try {
+            var rnModal = document.getElementById('realnameModal');
+            if (rnModal) rnModal.addEventListener('click', function(e) {
+                if (e.target === this) closeRealnameModal();
+            });
+        } catch(e) {}
 
         // ========== 幸运转盘 ==========
         var wheelSpinning = false;

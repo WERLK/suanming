@@ -715,7 +715,13 @@ def get_profile():
             'last_login': user.get('last_login', ''),
             'vip_level': user.get('vip_level', 'free'),
             'vip_expire': user.get('vip_expire', None),
-            'ad_watch_count': user.get('ad_watch_count', 0)
+            'ad_watch_count': user.get('ad_watch_count', 0),
+            # 实名认证
+            'id_verified': user.get('id_verified', False),
+            'id_region': user.get('id_region', ''),
+            'real_name': user.get('real_name', ''),
+            'id_last4': user.get('id_last4', ''),
+            'verify_time': user.get('verify_time', '')
         }
         return jsonify({'success': True, 'user': user_info}), 200
     except Exception as e:
@@ -761,6 +767,132 @@ def update_profile():
         return jsonify({'success': True, 'message': '更新成功', 'user': user_info}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'更新用户信息失败: {str(e)}'}), 500
+
+
+@limiter.limit("3 per minute")
+@app.route('/api/profile/verify-realname', methods=['POST'])
+def verify_realname():
+    """实名认证：提交姓名+身份证号，本地校验并存储"""
+    try:
+        token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user_id = verify_token(token)
+        if not user_id:
+            return jsonify({'success': False, 'message': 'token无效'}), 401
+
+        data = request.get_json()
+        real_name = (data.get('real_name', '') or '').strip()
+        id_number = (data.get('id_number', '') or '').strip()
+
+        if not real_name or len(real_name) < 2:
+            return jsonify({'success': False, 'message': '请输入真实姓名'}), 400
+        if not id_number:
+            return jsonify({'success': False, 'message': '请输入身份证号'}), 400
+
+        # 身份证校验
+        from api.idcard import validate_id_card, mask_name, mask_id_last4
+        import hashlib
+
+        check = validate_id_card(id_number)
+        if not check['valid']:
+            return jsonify({'success': False, 'message': check['error']}), 400
+
+        # 查找用户
+        users = load_users()
+        user = None
+        for i, u in enumerate(users):
+            if u['id'] == user_id:
+                user = u
+                user_idx = i
+                break
+        if not user:
+            return jsonify({'success': False, 'message': '用户不存在'}), 404
+
+        # 检查是否已认证
+        _ensure_realname_fields(user)
+        if user.get('id_verified'):
+            return jsonify({'success': False, 'message': '已完成实名认证，无需重复提交'}), 400
+
+        # 存储认证信息（身份证号只存哈希）
+        id_hash = hashlib.sha256(id_number.encode()).hexdigest()
+        user['real_name'] = real_name
+        user['id_number_hash'] = id_hash
+        user['id_last4'] = id_number[-4:]
+        user['id_verified'] = True
+        user['id_region'] = check['region_name']
+        user['id_region_code'] = check['region_code']
+        user['verify_time'] = datetime.now().isoformat()
+
+        # 如果用户生日/性别为空则自动填充
+        if not user.get('birthday') and check['birth_date']:
+            user['birthday'] = check['birth_date']
+        if not user.get('gender') and check['gender']:
+            user['gender'] = 'male' if check['gender'] == 'male' else 'female'
+
+        users[user_idx] = user
+        save_users(users)
+
+        # 更新分析数据库
+        try:
+            from api.analytics_db import snapshot_user
+            snapshot_user(user_id=user_id, username=user['username'],
+                         gender=user.get('gender', ''), birth_str=user.get('birthday', ''),
+                         vip_level=user.get('vip_level', 'basic'))
+        except: pass
+
+        return jsonify({
+            'success': True,
+            'message': '实名认证成功',
+            'data': {
+                'real_name_masked': mask_name(real_name),
+                'id_masked': mask_id_last4(id_number),
+                'region': check['region_name'],
+                'gender': check['gender'],
+                'birth_date': check['birth_date'],
+                'verified': True
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'认证失败: {str(e)}'}), 500
+
+
+@app.route('/api/profile/realname-status', methods=['GET'])
+def realname_status():
+    """查询实名认证状态"""
+    try:
+        token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user_id = verify_token(token)
+        if not user_id:
+            return jsonify({'success': False, 'message': 'token无效'}), 401
+
+        users = load_users()
+        user = next((u for u in users if u['id'] == user_id), None)
+        if not user:
+            return jsonify({'success': False, 'message': '用户不存在'}), 404
+
+        _ensure_realname_fields(user)
+        from api.idcard import mask_name, mask_id_last4
+
+        if user.get('id_verified'):
+            return jsonify({
+                'success': True,
+                'verified': True,
+                'data': {
+                    'real_name_masked': mask_name(user.get('real_name', '')),
+                    'id_masked': mask_id_last4(user.get('id_last4', '')),
+                    'region': user.get('id_region', ''),
+                    'verify_time': user.get('verify_time', '')
+                }
+            }), 200
+        else:
+            return jsonify({'success': True, 'verified': False, 'message': '未认证'}), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @limiter.limit("3 per minute")  # 忘记密码限制：每分钟 3 次
 @app.route('/api/forgot-password', methods=['POST'])
@@ -1157,6 +1289,23 @@ def _ensure_vip_fields(user):
         'last_login_reward_date': '',
         'bottom_ad_count': 0,
         'bottom_ad_date': ''
+    }
+    for k, v in defaults.items():
+        if k not in user:
+            user[k] = v
+    return user
+
+
+def _ensure_realname_fields(user):
+    """确保用户有实名字段"""
+    defaults = {
+        'real_name': '',
+        'id_number_hash': '',
+        'id_last4': '',
+        'id_verified': False,
+        'id_region': '',
+        'id_region_code': '',
+        'verify_time': ''
     }
     for k, v in defaults.items():
         if k not in user:

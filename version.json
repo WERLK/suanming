@@ -1,8 +1,8 @@
 {
-  "version": "1.6.1",
-  "build_time": "2026-05-31T01:16:00Z",
+  "version": "1.7.0",
+  "build_time": "2026-05-31T01:20:00Z",
   "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "增强分析数据库：VIP行为追踪+页面访问排行+模块页面识别",
+  "description": "新增实名认证功能（身份证校验+自动解析出生/性别/地区）+分析库地区分布",
   "fix_count": 0
 }

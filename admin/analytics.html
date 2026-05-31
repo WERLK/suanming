@@ -77,6 +77,11 @@ h1{color:#ffd700;margin-bottom:24px;font-size:1.5rem}
     <div id="pageStats" style="font-size:0.8rem"><div class="loading">加载中...</div></div>
 </div>
 
+<div class="section">
+    <h2>🗺️ 用户地区分布 <span id="verifiedBadge" style="font-size:0.7rem;color:rgba(255,255,255,0.5)"></span></h2>
+    <div class="chart-bars" id="regionBars"><div class="loading">加载中...</div></div>
+</div>
+
 <script>
 function $(id){return document.getElementById(id)}
 async function fetchJSON(url){
@@ -236,6 +241,11 @@ async function loadAll(){
         const pages=await fetchJSON('/api/admin/analytics/pages')
         renderPages(pages)
     }catch(e){$('pageStats').innerHTML='<div class="error">加载失败</div>'}
+
+    try{
+        const reg=await fetchJSON('/api/admin/analytics/regions')
+        renderRegions(reg)
+    }catch(e){$('regionBars').innerHTML='<div class="error">加载失败</div>'}
 }
 
 function renderVip(data){
@@ -258,6 +268,22 @@ function renderPages(data){
         '<span style="color:rgba(255,255,255,0.7)">'+r.page+'</span>'+
         '<span style="color:rgba(255,215,0,0.6)">'+r.cnt+'次</span></div>'
     ).join('')
+}
+
+function renderRegions(data){
+    const regions=data.data||[],v=data.verified||{}
+    const badge=v.verified?v.verified+'人已认证 / '+v.total+'用户':''
+    $('verifiedBadge').textContent=badge
+
+    if(!regions.length){$('regionBars').innerHTML='<div class="loading">暂无数据</div>';return}
+    const max=Math.max(...regions.map(r=>r.users),1)
+    $('regionBars').innerHTML=regions.map(r=>{
+        const pct=Math.round(r.users/max*100)
+        return '<div class="bar-row">'+
+            '<span class="name">'+r.region+'</span>'+
+            '<div class="bar-wrap"><div class="bar" style="width:'+pct+'%;background:linear-gradient(90deg,rgba(0,200,255,0.4),rgba(100,180,255,0.7))">'+r.users+'人</div></div>'+
+            '</div>'
+    }).join('')
 }
 
 window.onload=loadAll

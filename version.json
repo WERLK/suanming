@@ -1,8 +1,8 @@
 {
-  "version": "1.8.3",
-  "build_time": "2026-05-31T04:26:25Z",
-  "git_commit": "1b98fd3",
+  "version": "1.9.0",
+  "build_time": "2026-05-31T05:00:52Z",
+  "git_commit": "e9a3f2b",
   "author": "玄机算命网",
-  "description": "VIP会员中心全面重构：后端VipService+前端VipModule+Bug修复+UI优化",
-  "fix_count": 6
+  "description": "VIP系统全栈重构：后端VipService+前端VipModule模块化+30s自动更新+6项Bug修复",
+  "fix_count": 0
 }

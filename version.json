@@ -1,8 +1,8 @@
 {
-  "version": "1.8.1",
-  "build_time": "2026-05-31T02:10:00Z",
+  "version": "1.8.2",
+  "build_time": "2026-05-31T03:01:00Z",
   "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "实名认证模块新增身份证照片上传功能，完善大数据联网分析",
+  "description": "个人中心全面重构：JS模块化/事件委托/骨架屏/API优化/7个Bug修复",
   "fix_count": 0
 }

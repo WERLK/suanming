@@ -2098,6 +2098,8 @@
             document.getElementById('rnIdcardPreview').style.display = 'none';
             document.getElementById('rnIdcardFile').value = '';
         }
+
+        function openRealnameModal() {
             var token = Auth.getToken();
             if (!token) { showToast('请先登录'); return; }
             fetch('/api/profile/realname-status', {
@@ -2179,7 +2181,7 @@
             var name = document.getElementById('rnInputName').value.trim();
             var id = document.getElementById('rnInputId').value.trim();
             var errEl = document.getElementById('rnError');
-            var btn = document.getElementById('rnSubmitBtn');
+            btn = document.getElementById('rnSubmitBtn');
 
             if (!name || name.length < 2) { errEl.textContent = '请输入真实姓名'; errEl.style.display = 'block'; return; }
             if (!id || id.length !== 18) { errEl.textContent = '请输入18位身份证号'; errEl.style.display = 'block'; return; }

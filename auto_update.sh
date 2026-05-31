@@ -5,7 +5,7 @@
 PROJECT_DIR="/root/suanming"
 LOG_DIR="$PROJECT_DIR/logs"
 PID_FILE="$LOG_DIR/auto_update.pid"
-CHECK_INTERVAL=300  # check every 5 minutes
+CHECK_INTERVAL=30   # check every 30 seconds
 
 mkdir -p "$LOG_DIR"
 

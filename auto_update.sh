@@ -51,6 +51,17 @@ start_daemon() {
             if [ -n "$LOCAL" ] && [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
                 log "New commits detected: ${LOCAL:0:7} -> ${REMOTE:0:7}"
                 
+                # Auto-update version.json with latest build info
+                VERSION_FILE="$PROJECT_DIR/version.json"
+                if [ -f "$VERSION_FILE" ] && command -v jq >/dev/null 2>&1; then
+                    NEW_COMMIT=$(echo "$REMOTE" | cut -c1-7)
+                    NEW_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+                    jq --arg bt "$NEW_TIME" --arg gc "$NEW_COMMIT" \
+                       '.build_time = $bt | .git_commit = $gc' \
+                       "$VERSION_FILE" > "$VERSION_FILE.tmp" && mv "$VERSION_FILE.tmp" "$VERSION_FILE"
+                    log "version.json updated: commit=$NEW_COMMIT time=$NEW_TIME"
+                fi
+                
                 # Also check if gunicorn is running; if not, force redeploy
                 if pgrep -f gunicorn > /dev/null 2>&1; then
                     log "Gunicorn is running, redeploying..."

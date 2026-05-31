@@ -1,7 +1,7 @@
 #!/bin/bash
 # 版本更新脚本
 
-VERSION_FILE="/workspace/suanming-fix/version.json"
+VERSION_FILE="$(dirname "$0")/version.json"
 
 # 读取当前版本
 CURRENT_VERSION=$(jq -r '.version' "$VERSION_FILE")

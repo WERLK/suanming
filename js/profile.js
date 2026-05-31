@@ -691,7 +691,8 @@ window.Profile = (function() {
     function updateVipAdInfo(todayAds, maxAds) {
         var remaining = Math.max(0, maxAds - todayAds);
         dom.vipAdDaily.innerHTML = '今日可观看 <strong>' + remaining + '</strong> 次';
-        if (remaining <= 0) {
+        // Only disable when we have a valid max (maxAds > 0) and no remaining
+        if (maxAds > 0 && remaining <= 0) {
             dom.vipAdWatchBtn.disabled = true;
             dom.vipAdWatchBtn.style.opacity = '0.4';
             dom.vipAdCountdown.textContent = '今日已用完';
@@ -707,7 +708,8 @@ window.Profile = (function() {
         // Check remaining
         var todayAds = state.vip ? (state.vip.today_ads || 0) : 0;
         var maxAds = state.vip ? (state.vip.max_daily_ads || 0) : 0;
-        if (todayAds >= maxAds) {
+        // maxAds=0 means unlimited/uninitialized, don't block
+        if (maxAds > 0 && todayAds >= maxAds) {
             showToast('⚠️ 今日广告次数已用完');
             return;
         }

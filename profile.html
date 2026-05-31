@@ -1278,6 +1278,10 @@
                             <div>姓名：<span id="rnName" style="color:#ffd700;"></span></div>
                             <div>号码：<span id="rnId" style="color:rgba(255,255,255,0.5);"></span></div>
                             <div>地区：<span id="rnRegion" style="color:#4dc9ff;"></span></div>
+                            <div id="rnIdcardStatus" style="margin-top:6px;font-size:0.75rem;"></div>
+                            <div id="rnIdcardUploadBtn" style="margin-top:8px;display:none;">
+                                <button onclick="event.stopPropagation();startIdcardUploadForVerified()" style="padding:6px 16px;background:rgba(0,180,255,0.2);border:1px solid rgba(0,180,255,0.4);border-radius:6px;color:#4dc9ff;font-size:0.8rem;cursor:pointer;">📷 上传身份证照片</button>
+                            </div>
                             <div style="margin-top:8px;font-size:0.7rem;color:rgba(255,255,255,0.4);">认证时间：<span id="rnTime"></span></div>
                         </div>
                     </div>
@@ -1290,9 +1294,27 @@
                         <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">真实姓名</label>
                         <input id="rnInputName" type="text" placeholder="请输入真实姓名" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:8px;color:#fff;font-size:0.9rem;" maxlength="20">
                     </div>
-                    <div style="margin-bottom:16px;">
+                    <div style="margin-bottom:12px;">
                         <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">身份证号码</label>
                         <input id="rnInputId" type="text" placeholder="请输入18位身份证号" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:8px;color:#fff;font-size:0.9rem;text-security:disc;" maxlength="18" autocomplete="off">
+                    </div>
+                    <!-- 身份证照片上传 -->
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">身份证照片 <span style="color:rgba(255,255,255,0.35);font-size:0.7rem;">(可选，用于完善数据库)</span></label>
+                        <div id="rnIdcardUpload" style="border:2px dashed rgba(0,180,255,0.25);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(0,180,255,0.03);position:relative;overflow:hidden;"
+                             onclick="document.getElementById('rnIdcardFile').click()"
+                             ondrop="handleIdcardDrop(event)" ondragover="handleIdcardDragOver(event)" ondragleave="handleIdcardDragLeave(event)">
+                            <input type="file" id="rnIdcardFile" accept="image/*" style="display:none" onchange="handleIdcardFile(event)">
+                            <div id="rnIdcardPlaceholder">
+                                <div style="font-size:2rem;margin-bottom:4px;">📷</div>
+                                <div style="color:rgba(255,255,255,0.5);font-size:0.8rem;">点击或拖拽上传身份证照片</div>
+                                <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:2px;">JPG/PNG，最大5MB</div>
+                            </div>
+                            <div id="rnIdcardPreview" style="display:none;position:relative;">
+                                <img id="rnIdcardImg" src="" style="max-width:100%;max-height:180px;border-radius:6px;">
+                                <button onclick="event.stopPropagation();clearIdcardImage()" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,0,0,0.5);color:#fff;font-size:0.8rem;cursor:pointer;line-height:1;">×</button>
+                            </div>
+                        </div>
                     </div>
                     <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-bottom:16px;line-height:1.5;">
                         🔐 身份证号仅用于数据校验，存储为不可逆哈希<br>
@@ -2015,7 +2037,8 @@
                 if (card) card.style.display = 'block';
                 if (data.success && data.verified) {
                     if (status) {
-                        status.textContent = '✅ 已认证 · ' + (data.data.region || '');
+                        var extra = data.data.idcard_image ? ' 📷' : '';
+                        status.textContent = '✅ 已认证 · ' + (data.data.region || '') + extra;
                         status.style.color = 'rgba(100,200,255,0.8)';
                     }
                 } else {
@@ -2024,7 +2047,57 @@
             } catch (e) {}
         }
 
-        function openRealnameModal() {
+        var rnIdcardBase64 = '';  // 存储身份证照片 base64 数据
+
+        function handleIdcardFile(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过5MB'); return; }
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                rnIdcardBase64 = ev.target.result;
+                document.getElementById('rnIdcardImg').src = ev.target.result;
+                document.getElementById('rnIdcardPlaceholder').style.display = 'none';
+                document.getElementById('rnIdcardPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleIdcardDrop(e) {
+            e.preventDefault();
+            document.getElementById('rnIdcardUpload').style.borderColor = 'rgba(0,180,255,0.25)';
+            document.getElementById('rnIdcardUpload').style.background = 'rgba(0,180,255,0.03)';
+            var file = e.dataTransfer.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过5MB'); return; }
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                rnIdcardBase64 = ev.target.result;
+                document.getElementById('rnIdcardImg').src = ev.target.result;
+                document.getElementById('rnIdcardPlaceholder').style.display = 'none';
+                document.getElementById('rnIdcardPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleIdcardDragOver(e) {
+            e.preventDefault();
+            document.getElementById('rnIdcardUpload').style.borderColor = 'rgba(0,180,255,0.6)';
+            document.getElementById('rnIdcardUpload').style.background = 'rgba(0,180,255,0.06)';
+        }
+
+        function handleIdcardDragLeave(e) {
+            document.getElementById('rnIdcardUpload').style.borderColor = 'rgba(0,180,255,0.25)';
+            document.getElementById('rnIdcardUpload').style.background = 'rgba(0,180,255,0.03)';
+        }
+
+        function clearIdcardImage() {
+            rnIdcardBase64 = '';
+            document.getElementById('rnIdcardImg').src = '';
+            document.getElementById('rnIdcardPlaceholder').style.display = 'block';
+            document.getElementById('rnIdcardPreview').style.display = 'none';
+            document.getElementById('rnIdcardFile').value = '';
+        }
             var token = Auth.getToken();
             if (!token) { showToast('请先登录'); return; }
             fetch('/api/profile/realname-status', {
@@ -2037,6 +2110,14 @@
                     document.getElementById('rnId').textContent = data.data.id_masked || '';
                     document.getElementById('rnRegion').textContent = data.data.region || '';
                     document.getElementById('rnTime').textContent = (data.data.verify_time || '').slice(0,10);
+                    // 证件照状态
+                    if (data.data.idcard_image) {
+                        document.getElementById('rnIdcardStatus').innerHTML = '<span style="color:#4dc9ff;">📷 证件照已上传</span>';
+                        document.getElementById('rnIdcardUploadBtn').style.display = 'none';
+                    } else {
+                        document.getElementById('rnIdcardStatus').innerHTML = '<span style="color:rgba(255,255,255,0.4);">尚未上传证件照</span>';
+                        document.getElementById('rnIdcardUploadBtn').style.display = 'block';
+                    }
                 } else {
                     document.getElementById('realnameVerifiedContent').style.display = 'none';
                     document.getElementById('realnameFormContent').style.display = 'block';
@@ -2050,9 +2131,51 @@
             document.getElementById('realnameModal').classList.remove('show');
         }
 
+        // 已认证用户补传身份证照片（切换到上传模式）
+        function startIdcardUploadForVerified() {
+            document.getElementById('realnameVerifiedContent').style.display = 'none';
+            document.getElementById('realnameFormContent').style.display = 'block';
+            document.getElementById('rnInputName').parentElement.style.display = 'none';
+            document.getElementById('rnInputId').parentElement.style.display = 'none';
+            document.getElementById('rnSubmitBtn').textContent = '上传证件照';
+            document.getElementById('rnSubmitBtn').setAttribute('data-mode', 'upload-only');
+            // 隐藏提示文字
+            document.querySelector('#realnameFormContent > div:first-child').style.display = 'none';
+            document.querySelector('#realnameFormContent > div:nth-last-child(2)').style.display = 'none';
+        }
+
         async function submitRealname() {
             var token = Auth.getToken();
             if (!token) { showToast('请先登录'); return; }
+
+            var btn = document.getElementById('rnSubmitBtn');
+            var isUploadOnly = btn.getAttribute('data-mode') === 'upload-only';
+
+            if (isUploadOnly) {
+                // 仅上传证件照模式
+                if (!rnIdcardBase64) { showToast('请选择身份证照片'); return; }
+                btn.disabled = true; btn.textContent = '上传中...';
+                try {
+                    var resp = await fetch('/api/profile/upload-idcard', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ idcard_image: rnIdcardBase64 })
+                    });
+                    var data = await resp.json();
+                    if (data.success) {
+                        rnIdcardBase64 = '';
+                        showToast('✅ 证件照上传成功');
+                        closeRealnameModal();
+                        loadRealnameStatus();
+                    } else {
+                        showToast(data.message || '上传失败');
+                    }
+                } catch (e) { showToast('网络错误'); }
+                btn.disabled = false; btn.textContent = '上传证件照';
+                return;
+            }
+
+            // 正常认证流程
             var name = document.getElementById('rnInputName').value.trim();
             var id = document.getElementById('rnInputId').value.trim();
             var errEl = document.getElementById('rnError');
@@ -2064,14 +2187,18 @@
             btn.disabled = true; btn.textContent = '验证中...'; errEl.style.display = 'none';
 
             try {
+                var body = { real_name: name, id_number: id };
+                if (rnIdcardBase64) body.idcard_image = rnIdcardBase64;
+
                 var resp = await fetch('/api/profile/verify-realname', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ real_name: name, id_number: id })
+                    body: JSON.stringify(body)
                 });
                 var data = await resp.json();
                 if (data.success) {
-                    showToast('✅ 实名认证成功');
+                    rnIdcardBase64 = '';
+                    showToast('✅ 实名认证成功' + (data.data && data.data.idcard_uploaded ? '，证件照已上传' : ''));
                     closeRealnameModal();
                     loadRealnameStatus();
                 } else {

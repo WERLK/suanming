@@ -98,8 +98,8 @@ function renderOverview(data){
         '<div class="card"><div class="num">'+t.today+'</div><div class="label">今日算命</div></div>'+
         '<div class="card"><div class="num">'+t.week+'</div><div class="label">近7天</div></div>'+
         '<div class="card"><div class="num">'+t.month+'</div><div class="label">近30天</div></div>'+
-        '<div class="card"><div class="num">'+t.today_logged_in+'</div><div class="label">今日登录用户</div></div>'+
-        '<div class="card"><div class="num">'+t.today_anonymous+'</div><div class="label">今日匿名用户</div></div>'
+        '<div class="card"><div class="num">'+(t.verified_users||0)+'</div><div class="label">已实名认证</div></div>'+
+        '<div class="card"><div class="num">'+(t.idcard_uploaded||0)+'</div><div class="label">已上传证件照</div></div>'
 }
 
 function renderModules(data){
@@ -272,8 +272,11 @@ function renderPages(data){
 
 function renderRegions(data){
     const regions=data.data||[],v=data.verified||{}
-    const badge=v.verified?v.verified+'人已认证 / '+v.total+'用户':''
-    $('verifiedBadge').textContent=badge
+    const badgeParts=[]
+    if(v.verified) badgeParts.push(v.verified+'人已认证')
+    if(v.idcard_uploaded) badgeParts.push(v.idcard_uploaded+'人已上传证件')
+    badgeParts.push(v.total+'用户')
+    $('verifiedBadge').textContent=badgeParts.join(' / ')
 
     if(!regions.length){$('regionBars').innerHTML='<div class="loading">暂无数据</div>';return}
     const max=Math.max(...regions.map(r=>r.users),1)

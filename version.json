@@ -1,8 +1,8 @@
 {
-  "version": "1.8.0",
-  "build_time": "2026-05-31T01:50:00Z",
+  "version": "1.8.1",
+  "build_time": "2026-05-31T02:10:00Z",
   "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "新增用户自定义数据库功能：亲友档案库+自定义数据表格+算命结果分类管理",
+  "description": "实名认证模块新增身份证照片上传功能，完善大数据联网分析",
   "fix_count": 0
 }

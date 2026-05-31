@@ -43,6 +43,7 @@ def init_db():
             is_new_user INTEGER DEFAULT 0,
             id_region TEXT DEFAULT '',
             is_verified INTEGER DEFAULT 0,
+            has_idcard_image INTEGER DEFAULT 0,
             snapshot_time TIMESTAMP DEFAULT (datetime('now'))
         );
         CREATE INDEX IF NOT EXISTS idx_snap_user ON user_snapshots(user_id, snapshot_time);
@@ -100,7 +101,8 @@ def init_db():
 # ==================== 写入函数 ====================
 
 def snapshot_user(user_id, username='', gender='', birth_str='',
-                  vip_level='basic', is_new=False, id_region='', is_verified=False):
+                  vip_level='basic', is_new=False, id_region='', is_verified=False,
+                  has_idcard_image=False):
     """用户快照：登录/注册/更新资料时调用"""
     try:
         birth_year = birth_month = birth_day = None
@@ -121,11 +123,11 @@ def snapshot_user(user_id, username='', gender='', birth_str='',
             conn.execute("""
                 INSERT INTO user_snapshots (user_id, username, gender,
                     birth_year, birth_month, birth_day, vip_level, is_new_user,
-                    id_region, is_verified)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    id_region, is_verified, has_idcard_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (user_id, username, gender, birth_year, birth_month, birth_day,
                   vip_level, 1 if is_new else 0, id_region or '',
-                  1 if is_verified else 0))
+                  1 if is_verified else 0, 1 if has_idcard_image else 0))
             conn.commit()
             conn.close()
     except Exception:
@@ -212,11 +214,16 @@ def get_overview():
         "SELECT COUNT(DISTINCT user_id) FROM divination_events WHERE date(created_at)=? AND is_logged_in=1",
         (today,)).fetchone()[0]
     today_anon = today_div - today_users
+    verified_users = conn.execute(
+        "SELECT COUNT(DISTINCT user_id) FROM user_snapshots WHERE is_verified=1").fetchone()[0]
+    idcard_uploaded = conn.execute(
+        "SELECT COUNT(DISTINCT user_id) FROM user_snapshots WHERE has_idcard_image=1").fetchone()[0]
     conn.close()
     return {
         'total_users': total_users, 'today': today_div,
         'week': week_div, 'month': month_div,
         'today_logged_in': today_users, 'today_anonymous': today_anon,
+        'verified_users': verified_users, 'idcard_uploaded': idcard_uploaded,
         'title': '玄机算命数据分析'
     }
 
@@ -354,14 +361,16 @@ def get_region_stats():
 
 
 def get_verified_count():
-    """已认证用户数"""
+    """已认证用户数 + 身份证上传统计"""
     conn = get_db()
     total = conn.execute(
         "SELECT COUNT(DISTINCT user_id) FROM user_snapshots").fetchone()[0]
     verified = conn.execute(
         "SELECT COUNT(DISTINCT user_id) FROM user_snapshots WHERE is_verified=1").fetchone()[0]
+    idcard_uploaded = conn.execute(
+        "SELECT COUNT(DISTINCT user_id) FROM user_snapshots WHERE has_idcard_image=1").fetchone()[0]
     conn.close()
-    return {'total': total, 'verified': verified}
+    return {'total': total, 'verified': verified, 'idcard_uploaded': idcard_uploaded}
 
 
 def aggregate_hourly():

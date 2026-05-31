@@ -1,0 +1,560 @@
+/**
+ * 玄机算命网 - VIP会员中心模块 (v1.0.0)
+ * 从 profile.js 提取：VIP状态管理 / 广告 / 签到 / 积分兑换 / 幸运转盘
+ */
+window.VipModule = (function() {
+    'use strict';
+
+    // ═══════════════════════════════════════════
+    //  SECTION: State
+    // ═══════════════════════════════════════════
+    var state = {
+        vip: null,
+        // Ad watching
+        vipAdWatching: false,
+        vipAdClaiming: false,
+        vipAdTimer: null,
+        vipAdSeconds: 0,
+        vipAdTarget: 'countdown',
+        // Wheel
+        wheelSpinning: false,
+        wheelRemaining: 5
+    };
+
+    // ═══════════════════════════════════════════
+    //  SECTION: DOM Cache
+    // ═══════════════════════════════════════════
+    var dom = {};
+
+    function cacheDom() {
+        // VIP card
+        dom.vipCard         = document.getElementById('vipCard');
+        dom.vipBadge        = document.getElementById('vipBadge');
+        dom.vipExpire       = document.getElementById('vipExpire');
+        dom.vipProgressBar  = document.getElementById('vipProgressBar');
+        dom.vipRemaining    = document.getElementById('vipRemaining');
+        dom.vipAdSection    = document.getElementById('vipAdSection');
+        dom.vipAdArea       = document.getElementById('vipAdArea');
+        dom.vipAdSlot       = document.getElementById('vipAdSlot');
+        dom.vipAdCountdown  = document.getElementById('vipAdCountdown');
+        dom.vipAdDaily      = document.getElementById('vipAdDaily');
+        dom.vipAdWatchBtn   = document.getElementById('vipAdWatchBtn');
+
+        // Points & Check-in
+        dom.pointsValue     = document.getElementById('pointsValue');
+        dom.checkinBtn      = document.getElementById('checkinBtn');
+        dom.streakBadge     = document.getElementById('streakBadge');
+
+        // Wheel
+        dom.wheelCanvas     = document.getElementById('wheelCanvas');
+        dom.wheelSpinBtn    = document.getElementById('wheelSpinBtn');
+        dom.wheelRemain     = document.getElementById('wheelRemain');
+
+        // Redeem modal
+        dom.redeemModal     = document.getElementById('redeemModal');
+        dom.redeemPoints    = document.getElementById('redeemPoints');
+
+        // Plan cards
+        dom.permanentPlanDesc  = document.getElementById('permanentPlanDesc');
+        dom.permanentPlanBadge = document.getElementById('permanentPlanBadge');
+        dom.planFree           = document.getElementById('planFree');
+        dom.planBasic          = document.getElementById('planBasic');
+        dom.planPermanent      = document.getElementById('planPermanent');
+
+        // Profile header tag (shared with Profile module via DOM)
+        dom.tagVip = document.getElementById('tagVip');
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: API Layer
+    // ═══════════════════════════════════════════
+    var api = {};
+
+    api.getVipStatus = function() {
+        return Auth.request('/api/vip/status', { method: 'GET' });
+    };
+
+    api.watchAd = function() {
+        return Auth.request('/api/vip/watch-ad', { method: 'POST' });
+    };
+
+    api.checkin = function() {
+        return Auth.request('/api/vip/checkin', { method: 'POST' });
+    };
+
+    api.redeem = function(type) {
+        return Auth.request('/api/vip/redeem', { method: 'POST', body: { type: type } });
+    };
+
+    api.spinWheel = function() {
+        return Auth.request('/api/vip/wheel', { method: 'POST' });
+    };
+
+    // ═══════════════════════════════════════════
+    //  SECTION: Init
+    // ═══════════════════════════════════════════
+    function init() {
+        cacheDom();
+        bindEvents();
+        drawWheel();
+    }
+
+    function bindEvents() {
+        // Redeem modal: close on backdrop click
+        if (dom.redeemModal) {
+            dom.redeemModal.addEventListener('click', function(e) {
+                if (e.target === this) closeRedeem();
+            });
+        }
+
+        // Redeem modal delegation (for do-redeem actions)
+        if (dom.redeemModal) {
+            dom.redeemModal.addEventListener('click', function(e) {
+                var opt = e.target.closest('[data-action="do-redeem"]');
+                if (opt) {
+                    doRedeem(opt.getAttribute('data-type'));
+                }
+            });
+        }
+
+        // Close buttons for redeem modal
+        var closeBtns = ['modalCloseRedeem', 'modalCloseRedeemBtn'];
+        closeBtns.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('click', closeRedeem);
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: Set VIP Data (called by Profile)
+    // ═══════════════════════════════════════════
+    function setVipData(vipData) {
+        state.vip = vipData;
+        if (vipData) {
+            renderVIP();
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: Render
+    // ═══════════════════════════════════════════
+    function renderVIP() {
+        var v = state.vip;
+        if (!v) return;
+
+        if (dom.vipCard) dom.vipCard.style.display = 'block';
+
+        // Badge
+        dom.vipBadge.textContent = v.vip_level_name || '';
+        dom.vipBadge.className = 'vip-badge ' + (v.vip_level || 'free');
+
+        // Header VIP tag
+        if (dom.tagVip) {
+            if (v.vip_level === 'permanent') {
+                dom.tagVip.textContent = '永久会员';
+                dom.tagVip.className = 'profile-tag tag-vip tag-vip-perm';
+            } else if (v.vip_level === 'basic') {
+                dom.tagVip.textContent = 'VIP会员';
+                dom.tagVip.className = 'profile-tag tag-vip tag-vip-active';
+            } else {
+                dom.tagVip.textContent = '免费用户';
+                dom.tagVip.className = 'profile-tag tag-vip';
+            }
+        }
+
+        // Expire
+        if (v.vip_level === 'permanent') {
+            dom.vipExpire.textContent = '永久有效';
+        } else if (v.vip_expire) {
+            var d = new Date(v.vip_expire);
+            dom.vipExpire.textContent = '到期: ' + d.toLocaleDateString('zh-CN');
+        } else {
+            dom.vipExpire.textContent = '';
+        }
+
+        // Progress bar & remaining text
+        var totalAdCount = v.total_ad_count || 0;
+        var threshold = v.bonus_threshold || 20;
+        var todayAds = v.today_ads || 0;
+        var maxAds = v.max_daily_ads || 0;
+        var adRemaining = Math.max(0, maxAds - todayAds);
+
+        updateVipAdInfo(todayAds, maxAds);
+
+        if (v.vip_level === 'permanent') {
+            dom.vipRemaining.textContent = '🎉 永久会员（今日可看广告' + maxAds + '次）';
+            dom.vipProgressBar.style.width = '100%';
+        } else if (v.vip_remaining) {
+            dom.vipRemaining.textContent = '剩余: ' + v.vip_remaining + ' | 今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 里程碑 ' + totalAdCount + '/' + threshold;
+            var expireDate = new Date(v.vip_expire);
+            var now = new Date();
+            var total = expireDate - now;
+            var max = 7 * 24 * 3600 * 1000;
+            var pct = Math.min(100, Math.max(0, (total / max) * 100));
+            dom.vipProgressBar.style.width = pct + '%';
+        } else {
+            var permPct = Math.min(100, Math.round((totalAdCount / threshold) * 100));
+            dom.vipRemaining.textContent = '今日广告 ' + adRemaining + '/' + maxAds + ' 次 | 里程碑 ' + totalAdCount + '/' + threshold + '（每' + threshold + '次触发随机奖励）';
+            dom.vipProgressBar.style.width = permPct + '%';
+        }
+
+        // Points
+        if (v.points !== undefined) {
+            dom.pointsValue.textContent = v.points;
+        }
+
+        // Check-in
+        if (v.today_checked_in) {
+            dom.checkinBtn.textContent = '✅ 已签到';
+            dom.checkinBtn.disabled = true;
+            dom.checkinBtn.style.opacity = '0.5';
+        } else {
+            dom.checkinBtn.textContent = '✅ 每日签到';
+            dom.checkinBtn.disabled = false;
+            dom.checkinBtn.style.opacity = '1';
+        }
+
+        // Streak
+        if (v.checkin_streak !== undefined) {
+            dom.streakBadge.textContent = '连续' + v.checkin_streak + '天';
+        }
+
+        // Wheel remaining
+        var remaining = v.wheel_spins_remaining || 0;
+        state.wheelRemaining = remaining;
+        if (dom.wheelRemain) dom.wheelRemain.textContent = remaining;
+        if (dom.wheelSpinBtn) {
+            dom.wheelSpinBtn.disabled = remaining <= 0;
+            dom.wheelSpinBtn.textContent = remaining > 0 ? ('🎰 转转盘（剩' + remaining + '次）') : '🎰 今日次数已用完';
+        }
+
+        // Plan cards
+        updatePlanCards(v);
+    }
+
+    function updatePlanCards(v) {
+        var allCards = document.querySelectorAll('.vip-plan-card');
+        for (var i = 0; i < allCards.length; i++) { allCards[i].classList.remove('active'); }
+        var allBadges = document.querySelectorAll('.vip-plan-card .plan-badge');
+        for (var j = 0; j < allBadges.length; j++) { allBadges[j].textContent = '—'; }
+
+        if (v.vip_level === 'permanent') {
+            if (dom.planPermanent) dom.planPermanent.classList.add('active');
+            if (dom.permanentPlanDesc) dom.permanentPlanDesc.textContent = '已解锁永久会员\n全部功能永久使用';
+            if (dom.permanentPlanBadge) {
+                dom.permanentPlanBadge.textContent = '已解锁';
+                dom.permanentPlanBadge.className = 'plan-badge plan-badge-p';
+            }
+        } else {
+            if (v.vip_level === 'basic') {
+                if (dom.planBasic) dom.planBasic.classList.add('active');
+            } else {
+                if (dom.planFree) dom.planFree.classList.add('active');
+            }
+            if (dom.permanentPlanDesc) dom.permanentPlanDesc.textContent = '累计' + (v.bonus_threshold || 20) + '次触发奖励';
+            var totalAdCount = v.total_ad_count || 0;
+            var threshold = v.bonus_threshold || 20;
+            var nextMilestone = Math.ceil(totalAdCount / threshold) * threshold;
+            if (dom.permanentPlanBadge) {
+                dom.permanentPlanBadge.textContent = totalAdCount + '/' + nextMilestone;
+                dom.permanentPlanBadge.className = 'plan-badge plan-badge-p';
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: Ad Watching
+    // ═══════════════════════════════════════════
+    function updateVipAdInfo(todayAds, maxAds) {
+        var remaining = Math.max(0, maxAds - todayAds);
+        if (dom.vipAdDaily) dom.vipAdDaily.innerHTML = '今日可观看 <strong>' + remaining + '</strong> 次';
+        if (maxAds > 0 && remaining <= 0) {
+            dom.vipAdWatchBtn.disabled = true;
+            dom.vipAdWatchBtn.style.opacity = '0.4';
+            dom.vipAdCountdown.textContent = '今日已用完';
+        } else {
+            dom.vipAdWatchBtn.disabled = false;
+            dom.vipAdWatchBtn.style.opacity = '1';
+        }
+    }
+
+    function watchVipAd() {
+        if (state.vipAdWatching) return;
+
+        var todayAds = state.vip ? (state.vip.today_ads || 0) : 0;
+        var maxAds = state.vip ? (state.vip.max_daily_ads || 0) : 0;
+        if (maxAds > 0 && todayAds >= maxAds) {
+            showToast('⚠️ 今日广告次数已用完');
+            return;
+        }
+
+        // Try BaiduAd
+        if (typeof BaiduAd !== 'undefined' && BaiduAd.isReady && BaiduAd.isReady()) {
+            state.vipAdTarget = 'baidu';
+            if (dom.vipAdSlot) dom.vipAdSlot.innerHTML = '<span>📺</span><div id="vipAdContainer" style="width:100%;height:100%;"></div>';
+            BaiduAd.show('vipAdContainer', { onComplete: function() {
+                if (!state.vipAdWatching) return;
+                state.vipAdSeconds = 0;
+                claimVipAdReward();
+            }});
+            state.vipAdWatching = true;
+            startAdCountdown();
+            return;
+        }
+
+        // Fallback: countdown timer
+        state.vipAdWatching = true;
+        state.vipAdSeconds = 15;
+        state.vipAdTarget = 'countdown';
+        startAdCountdown();
+    }
+
+    function startAdCountdown() {
+        dom.vipAdCountdown.textContent = state.vipAdSeconds > 0 ? ('⏳ ' + state.vipAdSeconds + 's') : '📺 广告观看中...';
+        dom.vipAdWatchBtn.disabled = true;
+        dom.vipAdWatchBtn.textContent = '观看中...';
+        dom.vipAdSlot.innerHTML = '<span>📺</span>';
+
+        state.vipAdTimer = setInterval(function() {
+            if (state.vipAdSeconds > 0) {
+                state.vipAdSeconds--;
+                dom.vipAdCountdown.textContent = '⏳ ' + state.vipAdSeconds + 's';
+            }
+            if (state.vipAdSeconds <= 0 && state.vipAdTarget === 'countdown') {
+                clearInterval(state.vipAdTimer);
+                state.vipAdTimer = null;
+                state.vipAdWatching = false;
+                dom.vipAdWatchBtn.textContent = '🎁 领取奖励';
+                dom.vipAdWatchBtn.disabled = false;
+                dom.vipAdWatchBtn.setAttribute('data-action', 'claim-ad-reward');
+            }
+        }, 1000);
+    }
+
+    function claimVipAdReward() {
+        if (state.vipAdClaiming) return;
+        state.vipAdClaiming = true;
+        api.watchAd().then(function(data) {
+            if (data.success) {
+                showToast(data.message || '观看完成！');
+                loadVipStatus();
+            } else {
+                showToast('⚠️ ' + (data.message || '领取失败'));
+            }
+        }).catch(function() {
+            showToast('网络错误，请重试');
+        }).finally(function() {
+            state.vipAdClaiming = false;
+            resetVipAdUI();
+        });
+    }
+
+    function resetVipAdUI() {
+        if (state.vipAdTimer) {
+            clearInterval(state.vipAdTimer);
+            state.vipAdTimer = null;
+        }
+        state.vipAdWatching = false;
+        state.vipAdClaiming = false;
+        state.vipAdSeconds = 0;
+        if (typeof BaiduAd !== 'undefined' && BaiduAd.destroy) BaiduAd.destroy();
+        dom.vipAdSlot.innerHTML = '<span>📺</span>';
+        dom.vipAdWatchBtn.textContent = '▶ 看广告赚时长';
+        dom.vipAdWatchBtn.setAttribute('data-action', 'watch-ad');
+        dom.vipAdCountdown.textContent = '';
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: Check-in
+    // ═══════════════════════════════════════════
+    function doCheckin() {
+        dom.checkinBtn.disabled = true;
+        dom.checkinBtn.textContent = '签到中...';
+        api.checkin().then(function(data) {
+            if (data.success) {
+                showToast(data.message || '签到成功！');
+                loadVipStatus();
+            } else {
+                showToast('⚠️ ' + (data.message || '签到失败'));
+                dom.checkinBtn.disabled = false;
+                dom.checkinBtn.textContent = '✅ 每日签到';
+            }
+        }).catch(function() {
+            showToast('网络错误，请重试');
+            dom.checkinBtn.disabled = false;
+            dom.checkinBtn.textContent = '✅ 每日签到';
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: Points Redeem
+    // ═══════════════════════════════════════════
+    function openRedeem() {
+        if (state.vip && state.vip.points !== undefined) {
+            dom.redeemPoints.textContent = state.vip.points;
+        }
+        if (dom.redeemModal) dom.redeemModal.classList.add('show');
+    }
+
+    function closeRedeem() {
+        if (dom.redeemModal) dom.redeemModal.classList.remove('show');
+    }
+
+    function doRedeem(type) {
+        api.redeem(type).then(function(data) {
+            if (data.success) {
+                showToast(data.message || '兑换成功！');
+                closeRedeem();
+                loadVipStatus();
+            } else {
+                showToast('⚠️ ' + (data.message || '兑换失败'));
+            }
+        }).catch(function() {
+            showToast('网络错误，请重试');
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: VIP Status Refresh
+    // ═══════════════════════════════════════════
+    function loadVipStatus() {
+        return api.getVipStatus().then(function(data) {
+            if (data.success) {
+                state.vip = data;
+                renderVIP();
+            }
+        }).catch(function(e) {
+            console.error('加载VIP状态失败:', e);
+        });
+    }
+
+    function getVipData() {
+        return state.vip;
+    }
+
+    // For external async use (returns promise)
+    function fetchVipStatus() {
+        return api.getVipStatus();
+    }
+
+    // ═══════════════════════════════════════════
+    //  SECTION: Lucky Wheel
+    // ═══════════════════════════════════════════
+    var wheelColors = ['#ff6b35','#ff9f43','#ffd700','#feca57','#54a0ff','#5f27cd','#00d2d3','#1dd1a1'];
+    var wheelPrizes = ['1hVIP','2hVIP','5分','10分','免广卡x1','免广卡x3','24hVIP','50分'];
+
+    function drawWheel() {
+        var canvas = dom.wheelCanvas;
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var cx = canvas.width / 2, cy = canvas.height / 2, r = 54;
+        var segAngle = (2 * Math.PI) / 8;
+
+        for (var i = 0; i < 8; i++) {
+            var startAngle = i * segAngle;
+            var endAngle = startAngle + segAngle;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, startAngle, endAngle);
+            ctx.fillStyle = wheelColors[i];
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(startAngle + segAngle / 2);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillText(wheelPrizes[i], r * 0.6, 4);
+            ctx.restore();
+        }
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 14, 0, 2 * Math.PI);
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,215,0,0.5)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+
+    function spinWheel() {
+        if (state.wheelSpinning) return;
+        if (state.wheelRemaining <= 0) {
+            showToast('今日次数已用完');
+            return;
+        }
+
+        state.wheelSpinning = true;
+        if (dom.wheelSpinBtn) dom.wheelSpinBtn.disabled = true;
+
+        api.spinWheel().then(function(data) {
+            if (data.success) {
+                var targetSegment = 0;
+                if (typeof data.prize_index === 'number') {
+                    targetSegment = data.prize_index;
+                } else {
+                    targetSegment = wheelPrizes.indexOf(data.prize_name);
+                    if (targetSegment < 0) targetSegment = 0;
+                }
+
+                var totalRotation = (5 * 360) + (targetSegment * 45) + Math.random() * 30;
+                var startTime = Date.now();
+                var spinDuration = 3000;
+                var canvas = dom.wheelCanvas;
+
+                function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+                function animateSpin() {
+                    var elapsed = Date.now() - startTime;
+                    var progress = Math.min(1, elapsed / spinDuration);
+                    var easedProgress = easeOutCubic(progress);
+                    var rotation = totalRotation * easedProgress;
+                    canvas.style.transform = 'rotate(' + rotation + 'deg)';
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animateSpin);
+                    } else {
+                        state.wheelSpinning = false;
+                        showToast(data.message);
+                        loadVipStatus();
+                    }
+                }
+                requestAnimationFrame(animateSpin);
+
+            } else {
+                state.wheelSpinning = false;
+                showToast('⚠️ ' + (data.message || '转盘抽奖失败'));
+                loadVipStatus();
+            }
+        }).catch(function() {
+            state.wheelSpinning = false;
+            if (dom.wheelSpinBtn) dom.wheelSpinBtn.disabled = false;
+            showToast('网络错误，请重试');
+            loadVipStatus();
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  Public API
+    // ═══════════════════════════════════════════
+    return {
+        init: init,
+        setVipData: setVipData,
+        getVipData: getVipData,
+        fetchVipStatus: fetchVipStatus,
+        loadVipStatus: loadVipStatus,
+        watchVipAd: watchVipAd,
+        claimVipAdReward: claimVipAdReward,
+        doCheckin: doCheckin,
+        openRedeem: openRedeem,
+        closeRedeem: closeRedeem,
+        doRedeem: doRedeem,
+        spinWheel: spinWheel,
+        drawWheel: drawWheel
+    };
+
+})();

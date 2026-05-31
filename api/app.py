@@ -27,6 +27,8 @@ import threading
 import time
 import fcntl
 
+from api.vip_service import VipService, VIP_LEVELS, AD_REWARD_HOURS, BONUS_AD_THRESHOLD, BONUS_MIN_HOURS, BONUS_MAX_HOURS
+
 app = Flask(__name__, static_folder='../', static_url_path='')
 app.secret_key = os.environ.get('JWT_SECRET', 'xuanji_fortune_secret_key_2026!!')
 CORS(app)
@@ -1300,18 +1302,7 @@ def auto_update():
     except Exception as e:
         return f'更新失败：{str(e)}', 500
 
-# ========== 会员VIP系统 ==========
-
-VIP_LEVELS = {
-    'free':      {'name': '免费用户', 'color': '#888',    'max_daily_ads': 3},
-    'basic':     {'name': '基础会员', 'color': '#4caf50', 'max_daily_ads': 5},
-    'permanent': {'name': '永久会员', 'color': '#ffd700', 'max_daily_ads': 10},
-}
-
-AD_REWARD_HOURS = 2
-BONUS_AD_THRESHOLD = 20  # 每累计20次广告触发里程碑奖励
-BONUS_MIN_HOURS = 24     # 里程碑奖励最少1天
-BONUS_MAX_HOURS = 168    # 里程碑奖励最多7天
+# ========== 会员VIP系统（常量从 vip_service 导入）==========
 
 
 def _get_today():
@@ -1401,524 +1392,89 @@ def _ensure_realname_fields(user):
     return user
 
 
+# ========== 会员VIP系统（委托给 VipService）==========
+
 @app.route('/api/vip/status', methods=['GET'])
 def vip_status():
-    """获取会员状态"""
     try:
         result = _get_auth_user()
         if not result:
             return jsonify({'success': False, 'message': '未登录'}), 401
         user, users = result
-        _ensure_vip_fields(user)
-
-        vip_expire = user.get('vip_expire')
-        vip_remaining = None
-        if vip_expire:
-            expire_dt = _safe_parse_datetime(vip_expire)
-            if expire_dt is None:
-                user['vip_expire'] = None
-                save_users(users)
-                vip_expire = None
-            else:
-                remaining = expire_dt - datetime.now()
-                if remaining.total_seconds() <= 0:
-                    user['vip_level'] = 'free'
-                    user['vip_expire'] = None
-                    save_users(users)
-                    vip_expire = None
-                else:
-                    hours = remaining.total_seconds() // 3600
-                    minutes = (remaining.total_seconds() % 3600) // 60
-                    vip_remaining = f'{int(hours)}小时{int(minutes)}分钟'
-
-        level_info = VIP_LEVELS.get(user.get('vip_level', 'free'), VIP_LEVELS['free'])
-        today = _get_today()
-        today_ads = user.get('ad_watch_count', 0) if user.get('ad_watch_date') == today else 0
-        max_ads = VIP_LEVELS[user.get('vip_level', 'free')]['max_daily_ads']
-
-        total_ad_count = user.get('total_ad_count', 0)
-
-        # 底部横幅广告独立计数
-        bottom_date = user.get('bottom_ad_date', '')
-        bottom_today = user.get('bottom_ad_count', 0) if bottom_date == today else 0
-
-        today_checked_in = (user.get('last_checkin', '') == today)
-        wheel_date = user.get('wheel_date', '')
-        wheel_spins_today = user.get('wheel_spins_today', 0) if wheel_date == today else 0
-        max_wheel_spins = 5
-        wheel_spins_remaining = max(0, max_wheel_spins - wheel_spins_today)
-
-        return jsonify({
-            'success': True,
-            'vip_level': user.get('vip_level', 'free'),
-            'vip_level_name': level_info['name'],
-            'vip_expire': vip_expire,
-            'vip_remaining': vip_remaining,
-            'ad_watch_count': user.get('ad_watch_count', 0),
-            'ad_watch_date': user.get('ad_watch_date', ''),
-            'today_ads': today_ads,
-            'max_daily_ads': max_ads,
-            'ad_reward_hours': AD_REWARD_HOURS,
-            'total_ad_count': total_ad_count,
-            'bonus_threshold': BONUS_AD_THRESHOLD,
-            'bottom_ad_count': user.get('bottom_ad_count', 0),
-            'bottom_ad_date': user.get('bottom_ad_date', ''),
-            'bottom_today_ads': bottom_today,
-            'points': user.get('points', 0),
-            'checkin_streak': user.get('checkin_streak', 0),
-            'last_checkin': user.get('last_checkin', ''),
-            'today_checked_in': today_checked_in,
-            'wheel_spins_remaining': wheel_spins_remaining
-        }), 200
+        svc = VipService(USERS_FILE)
+        return jsonify(svc.get_status(user, users)), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @app.route('/api/vip/watch-ad', methods=['POST'])
 def vip_watch_ad():
-    """观看广告增加会员时长"""
     try:
         result = _get_auth_user()
         if not result:
             return jsonify({'success': False, 'message': '未登录'}), 401
         user, users = result
-        _ensure_vip_fields(user)
-
-        # 找到用户在列表中的索引
-        user_index = None
-        for i, u in enumerate(users):
-            if u['id'] == user['id']:
-                user_index = i
-                break
-
-        today = _get_today()
-        ad_date = user.get('ad_watch_date', '')
-        today_ads = user.get('ad_watch_count', 0) if ad_date == today else 0
-        max_ads = VIP_LEVELS[user.get('vip_level', 'free')]['max_daily_ads']
-
-        if today_ads >= max_ads:
-            return jsonify({
-                'success': False, 'message': f'今日观看次数已达上限（{max_ads}次），明天再来吧'
-            }), 400
-
-        # 递增累计广告观看次数
-        total_ad_count = user.get('total_ad_count', 0) + 1
-        users[user_index]['total_ad_count'] = total_ad_count
-
-        # 里程碑奖励：每累计20次广告，随机获得1-7天VIP
-        milestone_bonus = False
-        bonus_hours = 0
-        if total_ad_count > 0 and total_ad_count % BONUS_AD_THRESHOLD == 0:
-            milestone_bonus = True
-            bonus_hours = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
-
-        # 计算实际奖励时长
-        reward_hours = bonus_hours if milestone_bonus else AD_REWARD_HOURS
-
-        # 增加会员时长
-        now = datetime.now()
-        vip_expire = user.get('vip_expire')
-        if vip_expire:
-            expire_dt = _safe_parse_datetime(vip_expire)
-            if expire_dt is None:
-                expire_dt = now
-            elif expire_dt < now:
-                expire_dt = now
-        else:
-            expire_dt = now
-
-        new_expire = expire_dt + timedelta(hours=reward_hours)
-        users[user_index]['vip_expire'] = new_expire.isoformat()
-        users[user_index]['vip_level'] = 'basic'
-
-        # 更新每日广告计数
-        if ad_date == today:
-            users[user_index]['ad_watch_count'] = today_ads + 1
-        else:
-            users[user_index]['ad_watch_count'] = 1
-            users[user_index]['ad_watch_date'] = today
-
-        save_users(users)
-
-        remaining = new_expire - datetime.now()
-        hours = int(remaining.total_seconds() // 3600)
-        minutes = int((remaining.total_seconds() % 3600) // 60)
-
-        if milestone_bonus:
-            bonus_days = bonus_hours // 24
-            return jsonify({
-                'success': True,
-                'milestone': True,
-                'message': f'🎉 里程碑奖励！累计观看{total_ad_count}次广告，获得随机{bonus_days}天VIP会员！',
-                'vip_level': 'basic',
-                'vip_level_name': '基础会员',
-                'vip_remaining': f'{hours}小时{minutes}分钟',
-                'vip_expire': new_expire.isoformat(),
-                'today_ads': users[user_index]['ad_watch_count'],
-                'max_daily_ads': max_ads,
-                'total_ad_count': total_ad_count,
-                'bonus_threshold': BONUS_AD_THRESHOLD,
-                'bonus_hours': bonus_hours
-            }), 200
-        else:
-            next_milestone = ((total_ad_count // BONUS_AD_THRESHOLD) + 1) * BONUS_AD_THRESHOLD
-            return jsonify({
-                'success': True,
-                'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时（累计{total_ad_count}次，距里程碑还差{next_milestone - total_ad_count}次）',
-                'vip_level': 'basic',
-                'vip_level_name': '基础会员',
-                'vip_remaining': f'{hours}小时{minutes}分钟',
-                'vip_expire': new_expire.isoformat(),
-                'today_ads': users[user_index]['ad_watch_count'],
-                'max_daily_ads': max_ads,
-                'total_ad_count': total_ad_count,
-                'bonus_threshold': BONUS_AD_THRESHOLD,
-                'next_milestone': next_milestone
-            }), 200
+        svc = VipService(USERS_FILE)
+        data, status = svc.watch_ad(user, users, 'personal')
+        return jsonify(data), status
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @app.route('/api/vip/bottom-ad', methods=['POST'])
 def vip_bottom_ad():
-    """底部横幅广告 - 独立计数，与个人中心广告互不影响"""
     try:
         result = _get_auth_user()
         if not result:
             return jsonify({'success': False, 'message': '未登录'}), 401
         user, users = result
-        _ensure_vip_fields(user)
-
-        user_index = None
-        for i, u in enumerate(users):
-            if u['id'] == user['id']:
-                user_index = i
-                break
-
-        today = _get_today()
-        bottom_date = user.get('bottom_ad_date', '')
-        today_ads = user.get('bottom_ad_count', 0) if bottom_date == today else 0
-        max_ads = VIP_LEVELS[user.get('vip_level', 'free')]['max_daily_ads']
-
-        if today_ads >= max_ads:
-            return jsonify({
-                'success': False, 'message': f'今日底部广告次数已达上限（{max_ads}次），明天再来吧'
-            }), 400
-
-        # 更新每日底部广告计数
-        if bottom_date == today:
-            users[user_index]['bottom_ad_count'] = today_ads + 1
-        else:
-            users[user_index]['bottom_ad_count'] = 1
-            users[user_index]['bottom_ad_date'] = today
-
-        # 累计总广告次数（底部+个人中心合计，用于里程碑奖励）
-        total_ad_count = user.get('total_ad_count', 0) + 1
-        users[user_index]['total_ad_count'] = total_ad_count
-
-        # 里程碑奖励：每累计20次广告，随机获得1-7天VIP
-        milestone_bonus = False
-        bonus_hours = 0
-        if total_ad_count > 0 and total_ad_count % BONUS_AD_THRESHOLD == 0:
-            milestone_bonus = True
-            bonus_hours = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
-
-        reward_hours = bonus_hours if milestone_bonus else AD_REWARD_HOURS
-
-        now = datetime.now()
-        vip_expire = user.get('vip_expire')
-        if vip_expire:
-            expire_dt = _safe_parse_datetime(vip_expire)
-            if expire_dt is None:
-                expire_dt = now
-            elif expire_dt < now:
-                expire_dt = now
-        else:
-            expire_dt = now
-        new_expire = expire_dt + timedelta(hours=reward_hours)
-        users[user_index]['vip_expire'] = new_expire.isoformat()
-        users[user_index]['vip_level'] = 'basic'
-
-        save_users(users)
-
-        remaining = new_expire - datetime.now()
-        hours = int(remaining.total_seconds() // 3600)
-        minutes = int((remaining.total_seconds() % 3600) // 60)
-
-        if milestone_bonus:
-            bonus_days = bonus_hours // 24
-            return jsonify({
-                'success': True,
-                'milestone': True,
-                'message': f'🎉 里程碑奖励！累计观看{total_ad_count}次广告，获得随机{bonus_days}天VIP会员！',
-                'vip_level': 'basic',
-                'vip_remaining': f'{hours}小时{minutes}分钟',
-                'today_ads': users[user_index]['bottom_ad_count'],
-                'max_daily_ads': max_ads,
-                'total_ad_count': total_ad_count,
-                'bonus_threshold': BONUS_AD_THRESHOLD,
-                'bonus_hours': bonus_hours
-            }), 200
-        else:
-            next_milestone = ((total_ad_count // BONUS_AD_THRESHOLD) + 1) * BONUS_AD_THRESHOLD
-            return jsonify({
-                'success': True,
-                'message': f'广告观看完成！会员时长已延长{AD_REWARD_HOURS}小时（累计{total_ad_count}次，距里程碑还差{next_milestone - total_ad_count}次）',
-                'vip_level': 'basic',
-                'vip_remaining': f'{hours}小时{minutes}分钟',
-                'today_ads': users[user_index]['bottom_ad_count'],
-                'max_daily_ads': max_ads,
-                'total_ad_count': total_ad_count,
-                'bonus_threshold': BONUS_AD_THRESHOLD,
-                'next_milestone': next_milestone
-            }), 200
+        svc = VipService(USERS_FILE)
+        data, status = svc.watch_ad(user, users, 'bottom')
+        return jsonify(data), status
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# ========== 签到系统 ==========
 
 @app.route('/api/vip/checkin', methods=['POST'])
 def vip_checkin():
-    """每日签到获取积分和VIP时长"""
     try:
         result = _get_auth_user()
         if not result:
             return jsonify({'success': False, 'message': '未登录'}), 401
         user, users = result
-        _ensure_vip_fields(user)
-        user_index = next(i for i, u in enumerate(users) if u['id'] == user['id'])
-
-        today = _get_today()
-        if user.get('last_checkin', '') == today:
-            return jsonify({'success': False, 'message': '今日已签到，明天再来吧'}), 400
-
-        # 检查连续签到
-        yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
-        if user.get('last_checkin', '') == yesterday:
-            streak = user.get('checkin_streak', 0) + 1
-        else:
-            streak = 1
-        users[user_index]['checkin_streak'] = streak
-        users[user_index]['last_checkin'] = today
-
-        # 计算奖励：10 基础 + streak 加成（上限30）
-        bonus = min(streak - 1, 10) * 2
-        earned_points = 10 + bonus
-        users[user_index]['points'] = user.get('points', 0) + earned_points
-
-        # 赠送 2 小时 basic VIP
-        now = datetime.now()
-        vip_expire = user.get('vip_expire')
-        if vip_expire:
-            expire_dt = _safe_parse_datetime(vip_expire)
-            if expire_dt is None:
-                expire_dt = now
-            elif expire_dt < now:
-                expire_dt = now
-        else:
-            expire_dt = now
-        new_expire = expire_dt + timedelta(hours=AD_REWARD_HOURS)
-        users[user_index]['vip_expire'] = new_expire.isoformat()
-        users[user_index]['vip_level'] = 'basic'
-
-        save_users(users)
-
-        return jsonify({
-            'success': True,
-            'message': f'签到成功！获得 {earned_points} 积分 + {AD_REWARD_HOURS}小时会员',
-            'points_earned': earned_points,
-            'total_points': users[user_index]['points'],
-            'streak': streak,
-            'vip_extended': AD_REWARD_HOURS
-        }), 200
+        svc = VipService(USERS_FILE)
+        data, status = svc.do_checkin(user, users)
+        return jsonify(data), status
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# ========== 积分兑换 ==========
 
 @app.route('/api/vip/redeem', methods=['POST'])
 def vip_redeem():
-    """积分兑换VIP时长/广告次数/永久会员"""
     try:
         result = _get_auth_user()
         if not result:
             return jsonify({'success': False, 'message': '未登录'}), 401
         user, users = result
-        _ensure_vip_fields(user)
-        user_index = next(i for i, u in enumerate(users) if u['id'] == user['id'])
-
-        data = request.get_json() or {}
-        redeem_type = data.get('type', '')
-
-        redeem_options = {
-            'ad1': {'points': 20,   'label': '免广卡x1', 'action': 'add_ad'},
-            'vip3': {'points': 50,  'label': '3小时会员', 'action': 'extend_vip', 'hours': 3},
-            'vip24': {'points': 200, 'label': '24小时会员', 'action': 'extend_vip', 'hours': 24},
-            'permanent': {'points': 500, 'label': '永久会员', 'action': 'unlock_permanent'},
-        }
-
-        if redeem_type not in redeem_options:
-            return jsonify({'success': False, 'message': '无效的兑换类型'}), 400
-
-        opt = redeem_options[redeem_type]
-        if user.get('points', 0) < opt['points']:
-            return jsonify({'success': False, 'message': f'积分不足，需要 {opt["points"]} 积分'}), 400
-
-        users[user_index]['points'] = user['points'] - opt['points']
-        message = ''
-
-        if opt['action'] == 'add_ad':
-            users[user_index]['total_ad_count'] = user.get('total_ad_count', 0) + 1
-            new_total = users[user_index]['total_ad_count']
-            message = f'兑换成功！获得免广卡x1'
-            # 检查是否触发里程碑奖励
-            if new_total > 0 and new_total % BONUS_AD_THRESHOLD == 0:
-                bonus_hours = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
-                bonus_days = bonus_hours // 24
-                now = datetime.now()
-                vip_expire = user.get('vip_expire')
-                expire_dt = _safe_parse_datetime(vip_expire) if vip_expire else None
-                if expire_dt is None or expire_dt < now:
-                    expire_dt = now
-                users[user_index]['vip_expire'] = (expire_dt + timedelta(hours=bonus_hours)).isoformat()
-                users[user_index]['vip_level'] = 'basic'
-                message += f'，并触发里程碑奖励：+{bonus_days}天VIP！'
-
-        elif opt['action'] == 'extend_vip':
-            now = datetime.now()
-            vip_expire = user.get('vip_expire')
-            if vip_expire:
-                expire_dt = datetime.fromisoformat(vip_expire)
-                if expire_dt < now:
-                    expire_dt = now
-            else:
-                expire_dt = now
-            new_expire = expire_dt + timedelta(hours=opt['hours'])
-            users[user_index]['vip_expire'] = new_expire.isoformat()
-            users[user_index]['vip_level'] = 'basic'
-            message = f'兑换成功！获得 {opt["hours"]} 小时会员'
-
-        elif opt['action'] == 'unlock_permanent':
-            users[user_index]['vip_level'] = 'permanent'
-            users[user_index]['vip_expire'] = None
-            message = '兑换成功！已解锁永久会员'
-
-        save_users(users)
-
-        return jsonify({
-            'success': True,
-            'message': message,
-            'remaining_points': users[user_index]['points'],
-            'vip_level': users[user_index]['vip_level']
-        }), 200
+        data_req = request.get_json() or {}
+        redeem_type = data_req.get('type', '')
+        svc = VipService(USERS_FILE)
+        data, status = svc.do_redeem(user, users, redeem_type)
+        return jsonify(data), status
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# ========== 幸运转盘 ==========
 
 @app.route('/api/vip/wheel', methods=['POST'])
 def vip_wheel():
-    """幸运转盘抽奖"""
     try:
         result = _get_auth_user()
         if not result:
             return jsonify({'success': False, 'message': '未登录'}), 401
         user, users = result
-        _ensure_vip_fields(user)
-        user_index = next(i for i, u in enumerate(users) if u['id'] == user['id'])
-
-        today = _get_today()
-        wheel_date = user.get('wheel_date', '')
-        spins_today = user.get('wheel_spins_today', 0) if wheel_date == today else 0
-        max_spins = 5
-
-        if spins_today >= max_spins:
-            return jsonify({'success': False, 'message': f'今日转盘次数已用完（{max_spins}次）'}), 400
-
-        # 更新转盘计数
-        if wheel_date == today:
-            users[user_index]['wheel_spins_today'] = spins_today + 1
-        else:
-            users[user_index]['wheel_spins_today'] = 1
-            users[user_index]['wheel_date'] = today
-
-        # 奖品池（无空奖）
-        import random
-        roll = random.random() * 100
-        # 1. 1小时VIP — 25%
-        # 2. 2小时VIP — 20%
-        # 3. 5积分 — 20%
-        # 4. 10积分 — 15%
-        # 5. 免广卡x1 — 10%
-        # 6. 免广卡x3 — 5%
-        # 7. 24小时VIP — 3%
-        # 8. 50积分 — 2%
-        if roll < 25:
-            prize_type, prize_value, prize_name = 'vip_hours', 1, '1小时VIP会员'
-        elif roll < 45:
-            prize_type, prize_value, prize_name = 'vip_hours', 2, '2小时VIP会员'
-        elif roll < 65:
-            prize_type, prize_value, prize_name = 'points', 5, '5积分'
-        elif roll < 80:
-            prize_type, prize_value, prize_name = 'points', 10, '10积分'
-        elif roll < 90:
-            prize_type, prize_value, prize_name = 'ad_credit', 1, '免广卡x1'
-        elif roll < 95:
-            prize_type, prize_value, prize_name = 'ad_credit', 3, '免广卡x3'
-        elif roll < 98:
-            prize_type, prize_value, prize_name = 'vip_hours', 24, '24小时VIP会员'
-        else:
-            prize_type, prize_value, prize_name = 'points', 50, '50积分'
-
-        # 发放奖品
-        if prize_type == 'points':
-            users[user_index]['points'] = user.get('points', 0) + prize_value
-        elif prize_type == 'vip_hours':
-            now = datetime.now()
-            vip_expire = user.get('vip_expire')
-            if vip_expire:
-                expire_dt = datetime.fromisoformat(vip_expire)
-                if expire_dt < now:
-                    expire_dt = now
-            else:
-                expire_dt = now
-            new_expire = expire_dt + timedelta(hours=prize_value)
-            users[user_index]['vip_expire'] = new_expire.isoformat()
-            users[user_index]['vip_level'] = 'basic'
-        elif prize_type == 'ad_credit':
-            users[user_index]['total_ad_count'] = user.get('total_ad_count', 0) + prize_value
-            new_total = users[user_index]['total_ad_count']
-            # 检查是否触发里程碑奖励
-            if new_total > 0 and new_total % BONUS_AD_THRESHOLD == 0:
-                bonus_hours_w = random.randint(BONUS_MIN_HOURS, BONUS_MAX_HOURS)
-                bonus_days_w = bonus_hours_w // 24
-                now = datetime.now()
-                vip_expire = user.get('vip_expire')
-                expire_dt = _safe_parse_datetime(vip_expire) if vip_expire else None
-                if expire_dt is None or expire_dt < now:
-                    expire_dt = now
-                users[user_index]['vip_expire'] = (expire_dt + timedelta(hours=bonus_hours_w)).isoformat()
-                users[user_index]['vip_level'] = 'basic'
-
-        save_users(users)
-
-        remaining = max_spins - users[user_index]['wheel_spins_today']
-        message = f'🎰 恭喜获得：{prize_name}！'
-        if prize_type == 'ad_credit':
-            nt = users[user_index]['total_ad_count']
-            if nt > 0 and nt % BONUS_AD_THRESHOLD == 0:
-                message += f' 触发里程碑奖励：+{bonus_days_w}天VIP！'
-
-        return jsonify({
-            'success': True,
-            'message': message,
-            'prize_type': prize_type,
-            'prize_value': prize_value,
-            'prize_name': prize_name,
-            'remaining_spins': remaining,
-            'total_points': users[user_index].get('points', 0),
-            'vip_level': users[user_index]['vip_level']
-        }), 200
+        svc = VipService(USERS_FILE)
+        data, status = svc.do_wheel(user, users)
+        return jsonify(data), status
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 

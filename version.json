@@ -1,8 +1,8 @@
 {
   "version": "1.10.4",
-  "build_time": "2026-06-01T02:20:00Z",
+  "build_time": "2026-06-01T02:50:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "全局实时时钟系统：基于服务器generated_at校准偏移量，每秒自动更新页面时间显示，实现真正的每分每秒走动；修改showDataBadge+7个复杂模块+新增LiveClock全局组件",
+  "description": "全局实时时钟：首页添加全格式实时时钟（年-月-日 时:分:秒），通过HTTP Date头校准服务器时间，LiveClock注册+每秒自动刷新",
   "fix_count": 5
 }

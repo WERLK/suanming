@@ -35,7 +35,31 @@
 .hero-subtitle {
     font-size: 0.8rem;
     color: rgba(255,255,255,0.6);
+    margin-bottom: 0.3rem;
+}
+
+.hero-clock {
+    font-size: 1.1rem;
+    color: #ffd700;
     margin-bottom: 0.8rem;
+    font-family: 'Courier New', 'Consolas', monospace;
+    text-shadow: 0 0 10px rgba(255,215,0,0.3);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+.hero-clock .clock-icon {
+    font-size: 0.9rem;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+.hero-clock .live-clock {
+    font-weight: bold;
 }
 
 .hero-buttons {
@@ -286,6 +310,10 @@
     <div class="hero-section">
         <h1 class="hero-title">🔮 玄机算命网</h1>
         <p class="hero-subtitle">传承千年智慧 · 揭秘命运玄机</p>
+        <div class="hero-clock">
+            <span class="clock-icon">🕐</span>
+            <span id="liveServerClock" class="live-clock">--:--:--</span>
+        </div>
         <div class="hero-buttons">
             <button class="btn-primary" onclick="openBazi()">八字排盘</button>
             <button class="btn-secondary" onclick="openMore()">更多功能</button>
@@ -382,6 +410,22 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/fortune-api.js"></script>
+<script>
+// 首页实时时钟 - 每分每秒自动走动
+(function() {
+    var el = document.getElementById('liveServerClock');
+    if (!el) return;
+    // 通过 HTTP Date 头获取服务器当前时间校准
+    fetch('/api/version')
+        .then(function(r) {
+            var serverDate = r.headers.get('Date');
+            if (serverDate) LiveClock.init(serverDate);
+            return r.json();
+        })
+        .catch(function() { /* 无网络时使用客户端时间 */ });
+    LiveClock.register(el, 'full');
+})();
 <script>
 // 页面跳转函数
 function openBazi() { window.location.href = '/modules/bazi.html'; }

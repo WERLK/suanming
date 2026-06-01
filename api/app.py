@@ -692,7 +692,8 @@ def get_profile():
         if not user.get('nickname'):
             user['nickname'] = generate_random_nickname()
             need_save = True
-        if not user.get('avatar_type') or not user.get('avatar_preset'):
+        # 仅在 avatar_type 完全缺失时初始化（自定义头像的 preset 为空字符串，不应被覆盖）
+        if not user.get('avatar_type'):
             user['avatar_type'] = 'emoji'
             user['avatar_preset'] = generate_random_avatar()
             need_save = True

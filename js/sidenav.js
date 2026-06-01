@@ -1,21 +1,18 @@
 /**
- * 玄机算命网 - 导航菜单
- * - 首页: 折叠版侧边栏始终展开, 可折叠
- * - 其他页: FAB按钮 + 滑出菜单
+ * 玄机算命网 - 折叠版导航菜单（全站统一）
+ * - 侧边栏默认展开, 可折叠
+ * - 桌面端内容自动右移, 移动端覆盖显示
  */
 (function() {
     'use strict';
 
     var sidebar = null;
     var overlay = null;
-    var fab = null;
     var collapseBtn = null;
     var expandTab = null;
     var isOpen = false;
-    var isHomepage = false;
 
     var path = window.location.pathname;
-    isHomepage = /^\/(index\.html)?$/.test(path);
 
     var navItems = [
         { icon: '🏠', label: '首页', href: '/', match: /^\/(index\.html)?$/ },
@@ -63,23 +60,21 @@
             + '<div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:3px;">导航菜单</div>'
             + '</div>';
 
-        // 折叠按钮（仅首页显示）
-        if (isHomepage) {
-            collapseBtn = document.createElement('button');
-            collapseBtn.id = '__sideCollapse';
-            collapseBtn.style.cssText =
-                'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);'
-                + 'color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;'
-                + 'width:28px;height:28px;border-radius:6px;'
-                + 'display:flex;align-items:center;justify-content:center;'
-                + 'transition:all 0.2s;flex-shrink:0;';
-            collapseBtn.innerHTML = '◀';
-            collapseBtn.title = '折叠菜单';
-            collapseBtn.onmouseenter = function() { this.style.color = '#ffd700'; this.style.borderColor = 'rgba(255,215,0,0.3)'; };
-            collapseBtn.onmouseleave = function() { this.style.color = 'rgba(255,255,255,0.5)'; this.style.borderColor = 'rgba(255,255,255,0.1)'; };
-            collapseBtn.onclick = function(e) { e.stopPropagation(); closeSidebar(); };
-            header.appendChild(collapseBtn);
-        }
+        // 折叠按钮
+        collapseBtn = document.createElement('button');
+        collapseBtn.id = '__sideCollapse';
+        collapseBtn.style.cssText =
+            'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);'
+            + 'color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;'
+            + 'width:28px;height:28px;border-radius:6px;'
+            + 'display:flex;align-items:center;justify-content:center;'
+            + 'transition:all 0.2s;flex-shrink:0;';
+        collapseBtn.innerHTML = '◀';
+        collapseBtn.title = '折叠菜单';
+        collapseBtn.onmouseenter = function() { this.style.color = '#ffd700'; this.style.borderColor = 'rgba(255,215,0,0.3)'; };
+        collapseBtn.onmouseleave = function() { this.style.color = 'rgba(255,255,255,0.5)'; this.style.borderColor = 'rgba(255,255,255,0.1)'; };
+        collapseBtn.onclick = function(e) { e.stopPropagation(); closeSidebar(); };
+        header.appendChild(collapseBtn);
 
         sidebar.appendChild(header);
 
@@ -125,9 +120,8 @@
         updateUserName();
     }
 
-    // ===== 展开标签（首页侧边栏折叠后显示） =====
+    // ===== 展开标签（侧边栏折叠后显示） =====
     function buildExpandTab() {
-        if (!isHomepage) return;
         expandTab = document.createElement('div');
         expandTab.id = '__sideExpandTab';
         expandTab.style.cssText =
@@ -166,37 +160,6 @@
         } catch(e) {}
     }
 
-    // ===== FAB 按钮（非首页） =====
-    function buildFAB() {
-        if (isHomepage) return;
-        fab = document.createElement('div');
-        fab.id = '__sideFab';
-        fab.style.cssText =
-            'position:fixed;top:40px;left:10px;z-index:9980;'
-            + 'width:40px;height:40px;border-radius:50%;'
-            + 'background:rgba(20,20,35,0.9);'
-            + 'border:1px solid rgba(255,215,0,0.25);'
-            + 'color:#ffd700;font-size:1.2rem;'
-            + 'display:flex;align-items:center;justify-content:center;'
-            + 'cursor:pointer;transition:all 0.3s ease;'
-            + 'box-shadow:0 2px 10px rgba(0,0,0,0.3);'
-            + 'user-select:none;-webkit-tap-highlight-color:transparent;';
-        fab.innerHTML = '☰';
-        fab.title = '导航菜单';
-        fab.onclick = toggleSidebar;
-
-        fab.addEventListener('mouseenter', function() {
-            this.style.background = 'rgba(255,215,0,0.12)';
-            this.style.borderColor = 'rgba(255,215,0,0.5)';
-        });
-        fab.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(20,20,35,0.9)';
-            this.style.borderColor = 'rgba(255,215,0,0.25)';
-        });
-
-        document.body.appendChild(fab);
-    }
-
     // ===== 开/关 =====
     function openSidebar() {
         isOpen = true;
@@ -205,7 +168,6 @@
             overlay.style.opacity = '1';
             overlay.style.pointerEvents = 'auto';
         }
-        if (fab) { fab.style.opacity = '0.4'; fab.style.pointerEvents = 'none'; }
         if (expandTab) expandTab.style.display = 'none';
         if (collapseBtn) { collapseBtn.innerHTML = '◀'; collapseBtn.title = '折叠菜单'; }
         updateBodyLayout();
@@ -218,26 +180,18 @@
             overlay.style.opacity = '0';
             overlay.style.pointerEvents = 'none';
         }
-        if (fab) { fab.style.opacity = '1'; fab.style.pointerEvents = ''; }
         if (expandTab) expandTab.style.display = 'flex';
         if (collapseBtn) { collapseBtn.innerHTML = '▶'; collapseBtn.title = '展开菜单'; }
         updateBodyLayout();
     }
 
-    function toggleSidebar() {
-        if (isOpen) closeSidebar(); else openSidebar();
-    }
-
-    // ===== 首页：根据侧边栏开关调整 body 布局 =====
+    // ===== 根据侧边栏开关调整 body 布局 =====
     function updateBodyLayout() {
-        if (!isHomepage) return;
         var isDesktop = window.innerWidth >= 1024;
         if (isDesktop) {
-            // 桌面端：侧边栏展开时内容右移
             document.body.style.paddingLeft = isOpen ? '220px' : '';
             document.body.style.transition = 'padding-left 0.3s cubic-bezier(0.4,0,0.2,1)';
         } else {
-            // 移动端：侧边栏覆盖内容，锁滚动
             document.body.style.overflow = isOpen ? 'hidden' : '';
             document.body.style.paddingLeft = '';
         }
@@ -258,13 +212,10 @@
     function init() {
         buildSidebar();
         buildExpandTab();
-        buildFAB();
         removeConflictingNavs();
 
-        if (isHomepage) {
-            // 首页：侧边栏默认展开
-            openSidebar();
-        }
+        // 默认展开
+        openSidebar();
 
         // ESC 关闭
         document.addEventListener('keydown', function(e) {
@@ -273,7 +224,7 @@
 
         // 窗口 resize 时更新布局
         window.addEventListener('resize', function() {
-            if (isHomepage) updateBodyLayout();
+            updateBodyLayout();
         });
 
         // 登录状态变化
@@ -290,5 +241,5 @@
         init();
     }
 
-    console.log('[导航] ' + (isHomepage ? '折叠版固定模式' : '滑出模式') + '已加载');
+    console.log('[导航] 折叠版菜单已加载');
 })();

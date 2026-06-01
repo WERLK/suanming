@@ -204,12 +204,15 @@ var LiveClock = (function() {
         for (var i = 0; i < _elements.length; i++) {
             if (_elements[i].el === el) return;
         }
-        _elements.push({el: el, format: format || 'time'});
+        var fmt = format || 'time';
+        _elements.push({el: el, format: fmt});
+        // 立即设置初始时间（此时元素可能还未加入DOM，不能依赖_tick的parentNode检查）
+        var now = new Date(Date.now() + _offset);
+        el.textContent = LiveClock.formatTime(now, fmt);
         // 确保定时器在运行
         if (!_intervalId) {
             _intervalId = setInterval(_tick, 1000);
         }
-        _tick();
     }
 
     function unregister(el) {

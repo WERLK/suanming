@@ -1,21 +1,21 @@
-/ 个人中心页面 - 浏览器兼容性优化 /
-/ 为不支持 grid 的浏览器提供 fallback /
+/* 个人中心页面 - 浏览器兼容性优化 /* **/
+/* 为不支持 grid 的浏览器提供 fallback /* **/
 
-/ ===== 基础布局（所有浏览器） ===== /
+/* ===== 基础布局（所有浏览器） ===== /* **/
 profile-container {
     max-width: 600px;
     margin: 0 auto;
     padding: 0 1rem;
 }
 
-/ 桌面端：使用 flex 代替 grid（兼容性更好） /
+/* 桌面端：使用 flex 代替 grid（兼容性更好） /* **/
 @media (min-width: 1024px) {
     .profile-container {
         max-width: 900px !important;
         padding: 0 2rem !important;
     }
     
-    / 会员卡片 + 统计 并排（使用 table + table-cell） /
+    /* 会员卡片 + 统计 并排（使用 table + table-cell） */
     .profile-vip-row {
         display: table;
         width: 100%;
@@ -30,9 +30,9 @@ profile-container {
         width: 50%;
     }
     
-    / 统计区块：使用 inline-block /
+    /* 统计区块：使用 inline-block */
     .profile-stats {
-        font-size: 0; / 去除 inline-block 间隙 /
+        font-size: 0; /* 去除 inline-block 间隙 */
     }
     
     .stat-item {
@@ -43,9 +43,9 @@ profile-container {
     }
 }
 
-/ ===== 会员卡片样式（兼容性优化） ===== /
+/* ===== 会员卡片样式（兼容性优化） ===== /* **/
 .vip-card {
-    background: rgb(38, 34, 23); / 回退方案：纯色 /
+    background: rgb(38, 34, 23); /* 回退方案：纯色 */
     background: rgba(255, 215, 0, 0.08);
     border: 1px solid rgba(255, 215, 0, 0.2);
     border-radius: 12px;
@@ -53,21 +53,21 @@ profile-container {
     overflow: hidden;
 }
 
-/ 进度条（兼容性优化） /
+/* 进度条（兼容性优化） /* **/
 .vip-progress {
     height: 6px;
     background: rgba(255, 255, 255, 0.08);
     border-radius: 3px;
     margin-bottom: 0.8rem;
     overflow: hidden;
-    / 为不支持 border-radius 的浏览器 /
+    /* 为不支持 border-radius 的浏览器 */
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
 }
 
 .vip-progress-bar {
     height: 100%;
-    background: #ffd700; / 回退方案：纯色 /
+    background: #ffd700; /* 回退方案：纯色 */
     background: -webkit-linear-gradient(left, #ffd700, #ffed4e);
     background: -moz-linear-gradient(left, #ffd700, #ffed4e);
     background: -o-linear-gradient(left, #ffd700, #ffed4e);
@@ -81,18 +81,18 @@ profile-container {
     transition: width 0.5s;
 }
 
-/ ===== 菜单列表（兼容性优化） ===== /
+/* ===== 菜单列表（兼容性优化） ===== /* **/
 .menu-list {
-    background: rgb(38, 34, 23); / 回退方案 /
+    background: rgb(38, 34, 23); /* 回退方案 */
     background: rgba(255, 215, 0, 0.05);
     border: 1px solid rgba(255, 215, 0, 0.1);
     border-radius: 12px;
     overflow: hidden;
-    / 为不支持 border-radius 的浏览器隐藏溢出 /
+    /* 为不支持 border-radius 的浏览器隐藏溢出 */
 }
 
 .menu-item {
-    display: block; / 回退方案 /
+    display: block; /* 回退方案 */
     display: -webkit-box;
     display: -webkit-flex;
     display: -moz-box;
@@ -106,7 +106,7 @@ profile-container {
     padding: 1rem;
     border-bottom: 1px solid rgba(255, 215, 0, 0.05);
     cursor: pointer;
-    / 为不支持 flex 的浏览器 /
+    /* 为不支持 flex 的浏览器 */
     text-decoration: none;
 }
 
@@ -123,7 +123,7 @@ profile-container {
     margin-right: 1rem;
     width: 30px;
     text-align: center;
-    / 为不支持 flex 的浏览器 /
+    /* 为不支持 flex 的浏览器 */
     display: inline-block;
     vertical-align: middle;
 }
@@ -136,7 +136,7 @@ profile-container {
     flex: 1;
     color: #ffffff;
     font-size: 0.95rem;
-    / 为不支持 flex 的浏览器 /
+    /* 为不支持 flex 的浏览器 */
     display: inline-block;
     width: 80%;
 }
@@ -144,13 +144,13 @@ profile-container {
 .menu-arrow {
     color: rgba(255, 255, 255, 0.3);
     font-size: 1.2rem;
-    / 为不支持 flex 的浏览器 /
+    /* 为不支持 flex 的浏览器 */
     display: inline-block;
     vertical-align: middle;
     float: right;
 }
 
-/ ===== 按钮（兼容性优化） ===== /
+/* ===== 按钮（兼容性优化） ===== /* **/
 .btn-save,
 .btn-logout,
 .vip-ad-btn {
@@ -167,11 +167,11 @@ profile-container {
 
 .btn-save:hover,
 .vip-ad-btn:hover {
-    / 为不支持 transform 的浏览器 /
+    /* 为不支持 transform 的浏览器 */
     background: #ffed4e;
 }
 
-/ ===== 弹窗（兼容性优化） ===== /
+/* ===== 弹窗（兼容性优化） ===== /* **/
 .edit-profile-modal,
 .ad-modal {
     position: fixed;
@@ -181,14 +181,14 @@ profile-container {
     height: 100%;
     background: rgba(0, 0, 0, 0.9);
     z-index: 9999;
-    / 为不支持 flex 的浏览器 /
+    /* 为不支持 flex 的浏览器 */
     text-align: center;
     display: none;
 }
 
 .edit-profile-modal.show,
 .ad-modal.show {
-    display: block; / 回退方案 /
+    display: block; /* 回退方案 */
     display: -webkit-box;
     display: -webkit-flex;
     display: -moz-box;
@@ -206,7 +206,7 @@ profile-container {
 }
 
 .modal-content {
-    background: rgb(26, 26, 46); / 回退方案：纯色 /
+    background: rgb(26, 26, 46); /* 回退方案：纯色 */
     background: rgba(15, 12, 41, 0.98);
     border: 1px solid rgba(255, 215, 0, 0.2);
     border-radius: 16px;
@@ -215,15 +215,15 @@ profile-container {
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
-    / 为不支持 border-radius 的浏览器 /
+    /* 为不支持 border-radius 的浏览器 */
     -webkit-border-radius: 16px;
     -moz-border-radius: 16px;
-    / 为不支持 flex 的浏览器居中 /
+    /* 为不支持 flex 的浏览器居中 */
     display: inline-block;
     text-align: left;
 }
 
-/ ===== 表单（兼容性优化） ===== /
+/* ===== 表单（兼容性优化） ===== /* **/
 .form-group input,
 .form-group select {
     width: 100%;
@@ -235,7 +235,7 @@ profile-container {
     font-size: 0.95rem;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box; / 重要：确保宽度包含 padding /
+    box-sizing: border-box; /* 重要：确保宽度包含 padding */
 }
 
 .form-group input:focus,
@@ -245,7 +245,7 @@ profile-container {
     background: rgba(255, 255, 255, 0.08);
 }
 
-/ ===== 星空背景（兼容性优化） ===== /
+/* ===== 星空背景（兼容性优化） ===== /* **/
 .stars {
     position: fixed;
     top: 0;
@@ -254,15 +254,15 @@ profile-container {
     height: 100%;
     pointer-events: none;
     z-index: -1;
-    / 为不支持 CSS 变量的浏览器 /
+    /* 为不支持 CSS 变量的浏览器 */
     background-color: rgb(15, 12, 41);
 }
 
-/ ===== 响应式布局（兼容性优化） ===== /
-/ 大屏幕：并排显示 /
+/* ===== 响应式布局（兼容性优化） ===== /* **/
+/* 大屏幕：并排显示 /* **/
 @media (min-width: 1024px) {
     .profile-vip-row {
-        display: block; / 回退方案：使用 table /
+        display: block; /* 回退方案：使用 table */
     }
     
     .vip-card,
@@ -274,7 +274,7 @@ profile-container {
     }
 }
 
-/ 小屏幕：堆叠显示 /
+/* 小屏幕：堆叠显示 /* **/
 @media (max-width: 1023px) {
     .profile-vip-row {
         display: block;
@@ -287,7 +287,7 @@ profile-container {
     }
 }
 
-/ ===== 打印样式（可选） ===== /
+/* ===== 打印样式（可选） ===== /* **/
 @media print {
     .desktop-sidebar,
     .bottom-nav,

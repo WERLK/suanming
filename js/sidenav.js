@@ -22,7 +22,8 @@
         { icon: '👥', label: '亲友档案', href: '/contacts.html', match: /contacts\.html/ },
         { icon: '📋', label: '数据表格', href: '/datasets.html', match: /datasets\.html/ },
         { icon: '❓', label: '帮助中心', href: '/help.html', match: /help\.html/ },
-        { icon: 'ℹ️', label: '关于我们', href: '/about.html', match: /about\.html/ }
+        { icon: 'ℹ️', label: '关于我们', href: '/about.html', match: /about\.html/ },
+        { icon: '📥', label: '下载客户端', href: '/download.html', match: /download\.html/ }
     ];
 
     function isActive(item) {

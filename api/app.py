@@ -819,6 +819,41 @@ def tutorial_done():
     except Exception as e:
         return jsonify({'success': False, 'message': f'操作失败: {str(e)}'}), 500
 
+@app.route('/api/notify-subscribe', methods=['POST'])
+def notify_subscribe():
+    """App上线通知订阅"""
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip()
+        if not email or '@' not in email:
+            return jsonify({'success': False, 'message': '请输入有效的邮箱地址'}), 400
+
+        source = data.get('source', 'website')
+        subscribers_file = os.path.join(DATA_DIR, 'app_subscribers.json')
+        subscribers = []
+        if os.path.exists(subscribers_file):
+            with open(subscribers_file, 'r', encoding='utf-8') as f:
+                subscribers = json.load(f)
+
+        # 避免重复
+        for s in subscribers:
+            if s.get('email') == email:
+                return jsonify({'success': True, 'message': '您已订阅过，App上线时将通知您'}), 200
+
+        subscribers.append({
+            'email': email,
+            'source': source,
+            'subscribe_time': datetime.now().isoformat(),
+            'notified': False
+        })
+
+        with open(subscribers_file, 'w', encoding='utf-8') as f:
+            json.dump(subscribers, f, ensure_ascii=False, indent=2)
+
+        return jsonify({'success': True, 'message': '订阅成功！App上线时将通知您'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'操作失败: {str(e)}'}), 500
+
 @app.route('/api/profile', methods=['PUT'])
 def update_profile():
     """更新用户信息"""

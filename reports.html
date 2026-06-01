@@ -137,16 +137,31 @@ function displayReports(reports) {
     reports.forEach(report => {
         const item = document.createElement('div');
         item.className = 'report-item';
+        const safeName = escapeHtml(report.module_name);
+        const safeId = escapeHtml(report.id);
         item.innerHTML = `
-            <div class="report-name">${report.module_name}</div>
+            <div class="report-name">${safeName}</div>
             <div class="report-time">保存于 ${new Date(report.save_time).toLocaleString('zh-CN')}</div>
             <div class="report-actions">
-                <button class="btn-view" onclick="viewReport('${report.id}')">查看</button>
-                <button class="btn-delete" onclick="deleteReport('${report.id}', '${report.module_name}')">删除</button>
+                <button class="btn-view" data-id="${safeId}">查看</button>
+                <button class="btn-delete" data-id="${safeId}" data-name="${safeName}">删除</button>
             </div>
         `;
         listEl.appendChild(item);
     });
+    
+    // 事件委托
+    listEl.onclick = function(e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        if (btn.classList.contains('btn-view')) {
+            viewReport(id);
+        } else if (btn.classList.contains('btn-delete')) {
+            const name = btn.dataset.name || '报告';
+            deleteReport(id, name);
+        }
+    };
 }
 
 function viewReport(reportId) {
@@ -161,14 +176,16 @@ function viewReport(reportId) {
             const report = data.reports.find(r => r.id === reportId);
             if (report) {
                 document.getElementById('reportDetailTitle').textContent = report.module_name;
+                const safeInput = escapeHtml(JSON.stringify(report.input_data, null, 2));
+                const safeResult = escapeHtml(report.result_data);
                 document.getElementById('reportDetailContent').innerHTML = `
                     <div style="margin-bottom:1rem;">
                         <strong>输入数据：</strong>
-                        <pre style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; overflow-x:auto;">${JSON.stringify(report.input_data, null, 2)}</pre>
+                        <pre style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; overflow-x:auto;">${safeInput}</pre>
                     </div>
                     <div>
                         <strong>算命结果：</strong>
-                        <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; margin-top:0.5rem; white-space:pre-wrap;">${report.result_data}</div>
+                        <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; margin-top:0.5rem; white-space:pre-wrap;">${safeResult}</div>
                     </div>
                 `;
                 document.getElementById('reportDetailModal').classList.add('show');

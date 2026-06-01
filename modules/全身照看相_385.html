@@ -1,174 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffd700">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="玄机算命">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="msapplication-TileImage" content="/icon-192.png">
-<meta name="msapplication-TileColor" content="#ffd700">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>全身照看相 - 玄机算命网</title>
-<link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/mode-toggle.css">
-<style>
-.back-btn {
-    background: none;
-    border: none;
-    color: #ffd700;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0.5rem;
-}
-.page-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
-    border-bottom: 1px solid rgba(255,215,0,0.15);
-}
-.page-header h1 {
-    font-size: 1.2rem;
-    color: #ffd700;
-    font-weight: 600;
-}
-.content-area {
-    padding: 1rem;
-    padding-bottom: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 80px);
-}
-.dev-card {
-    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.15);
-    border-radius: 16px;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
-}
-.dev-icon {
-    font-size: 4rem;
-    margin-bottom: 1.2rem;
-    display: block;
-}
-.dev-title {
-    color: #ffd700;
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: 0.8rem;
-}
-.dev-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(255,180,0,0.15), rgba(255,140,0,0.1));
-    border: 1px solid rgba(255,180,0,0.3);
-    color: #ffb347;
-    padding: 0.3rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    margin-bottom: 1.2rem;
-}
-.dev-desc {
-    color: rgba(255,255,255,0.7);
-    font-size: 0.9rem;
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-}
-.dev-features {
-    text-align: left;
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    padding: 1.2rem;
-    margin-bottom: 1.5rem;
-}
-.dev-features h3 {
-    color: rgba(255,255,255,0.9);
-    font-size: 0.95rem;
-    margin-bottom: 0.8rem;
-    text-align: center;
-}
-.dev-features li {
-    color: rgba(255,255,255,0.6);
-    font-size: 0.85rem;
-    line-height: 1.7;
-    margin-bottom: 0.3rem;
-    padding-left: 1rem;
-    position: relative;
-}
-.dev-features li::before {
-    content: "🔜";
-    position: absolute;
-    left: -0.2rem;
-}
-.back-home-btn {
-    display: inline-block;
-    padding: 0.8rem 2rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255,215,0,0.3);
-    background: transparent;
-    color: #ffd700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-.back-home-btn:hover {
-    background: rgba(255,215,0,0.1);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全身照看相</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .dev-card { background:linear-gradient(135deg,rgba(26,26,46,0.95),rgba(22,33,62,0.95)); border:1px solid rgba(255,215,0,0.15); border-radius:16px; padding:2rem; text-align:center; }
+        .dev-icon { font-size:4rem; display:block; margin-bottom:1rem; }
+        .dev-title { color:#ffd700; font-size:1.5rem; font-weight:bold; margin-bottom:0.5rem; }
+        .dev-desc { color:rgba(255,255,255,0.7); font-size:0.95rem; margin-bottom:1.5rem; line-height:1.6; }
+        .dev-features { text-align:left; background:rgba(255,215,0,0.04); border-radius:12px; padding:1.2rem 1.5rem; margin-bottom:1.5rem; }
+        .dev-features h3 { color:#ffd700; font-size:1rem; margin-bottom:0.8rem; }
+        .dev-features li { color:rgba(255,255,255,0.6); font-size:0.85rem; margin-bottom:0.3rem; list-style:none; }
+        .dev-features li::before { content:'✦ '; color:#ffd700; }
+        .upload-area { margin:1.5rem 0; }
+        .upload-btn { display:inline-block; padding:1rem 2.5rem; background:linear-gradient(135deg,#ffd700,#ffc107); color:#000; border:none; border-radius:12px; font-size:1.1rem; font-weight:bold; cursor:pointer; transition:all 0.3s; }
+        .upload-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(255,215,0,0.3); }
+        .back-home-btn { margin-top:1rem; padding:0.6rem 1.5rem; background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.6); border:1px solid rgba(255,255,255,0.1); border-radius:8px; font-size:0.85rem; cursor:pointer; }
+        .back-home-btn:hover { background:rgba(255,255,255,0.1); }
+        #resultArea { display:none; margin-top:1.5rem; }
+    </style>
 </head>
 <body>
-
-<div class="stars" id="stars"></div>
-
 <div class="app">
     <div class="page-header">
         <button class="back-btn" onclick="history.back()">←</button>
-        <h1>📸 全身照看相</h1>
+        <h1>全身照看相</h1>
     </div>
 
     <div class="content-area">
+        <div class="stars" id="stars"></div>
         <div class="dev-card">
-            <span class="dev-icon">🚧</span>
+            <span class="dev-icon">🧍</span>
             <div class="dev-title">全身照看相</div>
-            <div class="dev-badge">🔧 开发中</div>
-            <div class="dev-desc">
-                该功能正在紧锣密鼓地开发中，我们的技术团队正在全力优化AI识别算法和图像分析引擎。敬请期待！
-            </div>
+            <div class="dev-desc">上传全身照片，AI综合身形姿态分析整体运势格局</div>
             <div class="dev-features">
-                <h3>✨ 即将上线功能预览</h3>
-                <li>AI智能图像识别与分析</li>
-                <li>深度学习特征提取</li>
-                <li>传统相学与现代AI融合</li>
-                <li>多维度综合运势评估</li>
-                <li>实时拍照即时分析</li>
+                <h3>✨ 功能说明</h3>
+                <li>上传照片即可获得AI智能分析</li>
+                <li>结合传统相学与现代图像识别</li>
+                <li>详细解读各项特征的命理含义</li>
+                <li>提供个性化的改善建议方案</li>
+                <li>支持JPG/PNG/WEBP格式图片</li>
             </div>
+            <div class="upload-area">
+                <button class="upload-btn" onclick="triggerImageUpload('quanshen')">📷 上传照片分析</button>
+            </div>
+            <div id="resultArea"></div>
             <button class="back-home-btn" onclick="history.back()">← 返回功能列表</button>
         </div>
     </div>
 </div>
 
 <script src="/js/main.js"></script>
-    <script src="/js/mode-toggle.js"></script>
+<script src="/js/sidenav.js"></script>
+<script src="/js/footer.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    createStars();
-    // 初始化模式切换组件
-    // 此页面暂无分析功能，跳过模式切换初始化
-    // // 此页面暂无分析功能，跳过模式切换初始化
-    // ModeToggle.injectUI(
-    //     document.querySelector('.dev-card') || document.body,
-    //     { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
-    // );
-
+    if (window.createStars) createStars();
 });
 </script>
-
 </body>
 </html>

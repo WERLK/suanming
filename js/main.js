@@ -1,3 +1,14 @@
+// ===== XSS 防护工具 =====
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // ===== 动态星空背景 =====
 function createStars() {
     const stars = document.getElementById('stars');

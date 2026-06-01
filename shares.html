@@ -67,6 +67,7 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (!Auth.requireAuth()) return;
@@ -100,8 +101,8 @@ function displayShares(shares) {
         const item = document.createElement('div');
         item.className = 'share-item';
         item.innerHTML = `
-            <div class="share-name">${share.module_name}</div>
-            <div class="share-platform">分享到：${share.platform}</div>
+            <div class="share-name">${escapeHtml(share.module_name)}</div>
+            <div class="share-platform">分享到：${escapeHtml(share.platform)}</div>
             <div class="share-time">${new Date(share.share_time).toLocaleString('zh-CN')}</div>
         `;
         listEl.appendChild(item);

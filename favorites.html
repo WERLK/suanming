@@ -156,6 +156,7 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script src="/js/auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (!Auth.requireAuth()) return;
@@ -192,18 +193,33 @@ function displayFavorites(favorites) {
     favorites.forEach(fav => {
         const item = document.createElement('div');
         item.className = 'favorite-item';
+        const safeName = escapeHtml(fav.module_name);
+        const safeId = escapeHtml(fav.module_id);
         item.innerHTML = `
             <div class="favorite-info">
-                <div class="favorite-name">${fav.module_name}</div>
+                <div class="favorite-name">${safeName}</div>
                 <div class="favorite-time">收藏于 ${new Date(fav.add_time).toLocaleDateString('zh-CN')}</div>
             </div>
             <div class="favorite-actions">
-                <button class="btn-enter" onclick="enterModule('${fav.module_id}')">进入</button>
-                <button class="btn-remove" onclick="removeFavorite('${fav.module_id}', '${fav.module_name}')">取消收藏</button>
+                <button class="btn-enter" data-id="${safeId}">进入</button>
+                <button class="btn-remove" data-id="${safeId}" data-name="${safeName}">取消收藏</button>
             </div>
         `;
         listEl.appendChild(item);
     });
+    
+    // 事件委托
+    listEl.onclick = function(e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        if (btn.classList.contains('btn-enter')) {
+            enterModule(id);
+        } else if (btn.classList.contains('btn-remove')) {
+            const name = btn.dataset.name || '';
+            removeFavorite(id, name);
+        }
+    };
 }
 
 function showEmptyState() {

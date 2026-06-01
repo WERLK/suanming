@@ -7,9 +7,11 @@
 window.startGuide = (function() {
     'use strict';
 
-    // 仅在首页运行
+    // 仅首页和帮助中心加载
     var path = window.location.pathname;
-    if (!/^\/(index\.html)?$/.test(path)) return function(){};
+    var isIndex = /^\/(index\.html)?$/.test(path);
+    var isHelp = /help\.html/.test(path);
+    if (!isIndex && !isHelp) return function(){};
 
     var overlay = null;
     var spotlight = null;

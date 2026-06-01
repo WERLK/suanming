@@ -20,7 +20,8 @@
         { icon: '👑', label: '会员中心', href: '/vip.html', match: /vip\.html/ },
         { icon: '👤', label: '个人中心', href: '/profile.html', match: /profile\.html/ },
         { icon: '👥', label: '亲友档案', href: '/contacts.html', match: /contacts\.html/ },
-        { icon: '📋', label: '数据表格', href: '/datasets.html', match: /datasets\.html/ }
+        { icon: '📋', label: '数据表格', href: '/datasets.html', match: /datasets\.html/ },
+        { icon: '❓', label: '帮助中心', href: '/help.html', match: /help\.html/ }
     ];
 
     function isActive(item) {

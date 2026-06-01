@@ -50,6 +50,65 @@
             cursor: pointer;
         }
         .contact-email:hover { text-decoration: underline; }
+
+        /* 教程视频 */
+        .tutorial-section {
+            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .tutorial-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+        .tutorial-title { color: #ffd700; font-size: 1.05rem; font-weight: bold; }
+        .tutorial-badge {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+        .tutorial-desc {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        .tutorial-video-wrap {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            max-width: 100%;
+        }
+        .tutorial-video-wrap video {
+            width: 100%;
+            display: block;
+        }
+        .tutorial-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .btn-replay-tutorial {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.3);
+            background: rgba(255,215,0,0.08);
+            color: #ffd700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-replay-tutorial:hover { background: rgba(255,215,0,0.15); }
     </style>
 </head>
 <body class="has-desktop-sidebar">
@@ -73,6 +132,25 @@
 
 <div class="content-area">
     <div class="page-container">
+        <!-- 新手教程视频 -->
+        <div class="tutorial-section">
+            <div class="tutorial-header">
+                <span class="tutorial-title">🎬 新手教程</span>
+                <span class="tutorial-badge">推荐</span>
+            </div>
+            <div class="tutorial-desc">30秒快速了解玄机算命网的核心功能</div>
+            <div class="tutorial-video-wrap">
+                <video controls playsinline preload="metadata"
+                    poster="/static/videos/guide-poster.jpg">
+                    <source src="/static/videos/guide-intro.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放
+                </video>
+            </div>
+            <div class="tutorial-actions">
+                <button class="btn-replay-tutorial" onclick="window.startGuide()">🔄 重新播放引导教程</button>
+            </div>
+        </div>
+
         <div class="help-list" id="helpList"></div>
         
         <!-- 联系我们 -->
@@ -160,6 +238,7 @@ function toggleHelpItem(item) {
 }
 </script>
 <script src="/js/sidenav.js"></script>
+<script src="/js/guide.js"></script>
 <script src="/js/footer.js"></script>
 </body>
 </html>

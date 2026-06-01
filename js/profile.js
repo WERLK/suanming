@@ -534,18 +534,18 @@ window.Profile = (function() {
             input.value = '';
             return;
         }
-        if (file.size > 2 * 1024 * 1024) {
-            showToast('⚠️ 图片大小不能超过2MB');
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('⚠️ 图片大小不能超过10MB');
             input.value = '';
             return;
         }
 
-        showToast('⏳ 正在上传头像...');
+        showToast('⏳ 正在压缩并上传头像...');
 
-        var reader = new FileReader();
-        reader.onload = async function(e) {
+        // 先用canvas压缩图片（手机照片太大，base64传输极易失败）
+        compressImage(file, 400, 400, 0.75).then(async function(compressedBase64) {
             try {
-                var data = await api.uploadAvatar({ image: e.target.result });
+                var data = await api.uploadAvatar({ image: compressedBase64 });
                 if (data.success) {
                     state.profile.avatar_type = 'custom';
                     state.profile.avatar_preset = '';
@@ -561,9 +561,40 @@ window.Profile = (function() {
                 console.error('头像上传失败:', err);
                 showToast('❌ 上传失败，请重试');
             }
-        };
-        reader.readAsDataURL(file);
+        }).catch(function(err) {
+            console.error('图片压缩失败:', err);
+            showToast('❌ 图片处理失败，请换一张试试');
+        });
         input.value = '';
+    }
+
+    // 图片压缩：canvas缩放+JPEG导出
+    function compressImage(file, maxW, maxH, quality) {
+        return new Promise(function(resolve, reject) {
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function() {
+                URL.revokeObjectURL(url);
+                var w = img.width, h = img.height;
+                // 仅当图片大于目标尺寸时才缩放
+                if (w > maxW || h > maxH) {
+                    var ratio = Math.min(maxW / w, maxH / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                }
+                var canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = function() {
+                URL.revokeObjectURL(url);
+                reject(new Error('图片加载失败'));
+            };
+            img.src = url;
+        });
     }
 
     // ═══════════════════════════════════════════
@@ -860,7 +891,11 @@ window.Profile = (function() {
 
 })();
 
-document.addEventListener('DOMContentLoaded', Profile.init);
+document.addEventListener('DOMContentLoaded', function() {
+    Profile.init();
+    // 暴露给 inline onchange 属性（HTML中的回退触发）
+    window._avatarUpload = Profile.uploadAvatar;
+});
 if (document.readyState !== 'loading') {
     setTimeout(function() {
         if (typeof Profile.init === 'function') Profile.init();

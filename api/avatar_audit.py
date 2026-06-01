@@ -123,7 +123,7 @@ class AvatarAuditor:
             # 审核规则判断
             
             # 规则1：检测大量皮肤色调（可能涉黄）
-            if skin_ratio > 0.6:
+            if skin_ratio > 0.78:
                 return {
                     'result': AUDIT_REVIEW,
                     'reason': '检测到大量皮肤色调，建议人工复审'

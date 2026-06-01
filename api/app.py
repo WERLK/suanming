@@ -1575,6 +1575,8 @@ def upload_avatar():
         return jsonify(response_data), 200
         
     except Exception as e:
+        import traceback
+        print(f'[Avatar Upload Error] {traceback.format_exc()}', flush=True)
         return jsonify({'success': False, 'message': f'头像上传失败：{str(e)}'}), 500
 
 @app.route('/api/avatar/set-preset', methods=['POST'])

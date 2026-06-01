@@ -1,8 +1,8 @@
 {
-  "version": "1.10.0",
-  "build_time": "2026-06-01T01:00:00Z",
+  "version": "1.10.4",
+  "build_time": "2026-06-01T02:20:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "全站256模块新增专业/初学模式切换：ModeToggle共享组件+批量注入+初学模式卡片式简化渲染",
-  "fix_count": 4
+  "description": "全局实时时钟系统：基于服务器generated_at校准偏移量，每秒自动更新页面时间显示，实现真正的每分每秒走动；修改showDataBadge+7个复杂模块+新增LiveClock全局组件",
+  "fix_count": 5
 }

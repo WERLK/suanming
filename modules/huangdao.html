@@ -423,12 +423,11 @@
                 'local_fallback': '&#x1F534; 离线数据'
             };
             var badgeLabel = sourceMap[source] || sourceMap['local'];
-            var now = formatServerTime(meta);
 
             var h = '';
 
-            // Source badge
-            h += '<div class="source-badge ' + esc(source) + '">' + badgeLabel + ' &#xB7; 更新于 ' + esc(now) + '</div>';
+            // Source badge (with live clock placeholder)
+            h += '<div class="source-badge ' + esc(source) + '">' + badgeLabel + ' &#xB7; 更新于 <span class="live-time-placeholder" data-server-time="' + (meta && meta.generated_at ? meta.generated_at : '') + '"></span></div>';
 
             // Main card
             h += '<div class="huangli-card">';
@@ -489,6 +488,7 @@
             h += '</div>'; // end card
 
             resultContainer.innerHTML = h;
+            activateLiveClocks(resultContainer);
         }
 
         function renderJianStars(active) {

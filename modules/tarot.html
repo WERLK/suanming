@@ -860,8 +860,9 @@
         var info = map[STATE.metaSource] || map['local'];
         badge.innerHTML =
             '<span class="badge-dot ' + info.dot + '"></span>' +
-            '<span class="badge-text">' + info.label + ' · ' + formatServerTime(STATE.meta) + '</span>';
+            '<span class="badge-text">' + info.label + ' · <span class="live-time-placeholder" data-server-time="' + (STATE.meta && STATE.meta.generated_at ? STATE.meta.generated_at : '') + '"></span></span>';
         badge.style.display = 'block';
+        activateLiveClocks(badge);
 
         // 同步使用 showDataBadge (fortune-api.js)
         if (window.showDataBadge) {

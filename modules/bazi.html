@@ -786,7 +786,7 @@ async function calculateBazi(){
   document.getElementById('resultArea').classList.remove('hidden');
 
   // 显示数据来源标识
-  showDataBadge(apiSource,'resultArea');
+  showDataBadge(apiSource,'resultArea', apiResult ? apiResult.meta : null);
 
   // 根据模式渲染
   if(mode==='simple'){

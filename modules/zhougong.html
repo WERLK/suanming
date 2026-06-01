@@ -524,9 +524,7 @@
                 'local_fallback': '🔴 本地数据（离线模式）'
             };
             var sourceLabel = sourceLabels[source] || '🔵 服务器计算';
-            if (source !== 'local_fallback') {
-                sourceLabel += ' · 更新于 ' + formatServerTime(meta);
-            }
+            var serverTimeAttr = (source !== 'local_fallback' && meta && meta.generated_at) ? meta.generated_at : '';
 
             var elementsHtml = '';
             if (dreamData.elements) {
@@ -542,7 +540,7 @@
             }
 
             resultCard.innerHTML =
-                '<div class="fortune-data-badge ' + (source === 'local_fallback' ? 'badge-fallback' : 'badge-realtime') + '">' + sourceLabel + '</div>' +
+                '<div class="fortune-data-badge ' + (source === 'local_fallback' ? 'badge-fallback' : 'badge-realtime') + '">' + sourceLabel + (serverTimeAttr ? ' · 更新于 <span class="live-time-placeholder" data-server-time="' + serverTimeAttr + '"></span>' : '') + '</div>' +
                 '<div class="result-section-item">' +
                 '<h4>🔑 梦境关键词</h4>' +
                 '<p style="font-size:1.1rem;font-weight:600;color:#ffd700;">' + escapeHtml(dreamData.keyword || '') + '</p>' +
@@ -555,6 +553,7 @@
                 (dreamData.advice ? '<div class="result-section-item"><h4>💡 建议</h4><p>' + escapeHtml(dreamData.advice) + '</p></div>' : '');
 
             resultDiv.style.display = 'block';
+            activateLiveClocks(resultCard);
             resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 

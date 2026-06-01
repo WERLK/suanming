@@ -760,7 +760,6 @@ body {
         }
 
         var dateStr = data.data.date || '';
-        var updatedTime = formatServerTime(meta);
 
         var html = renderPeriodTabs();
 
@@ -782,10 +781,11 @@ body {
             '</div>';
 
         html += '<div class="fortune-content">' + escapeHTML(horoscope) + '</div>' +
-            '<div class="fortune-updated">更新于 ' + updatedTime + '</div>';
+            '<div class="fortune-updated">更新于 <span class="live-time-placeholder" data-server-time="' + (meta && meta.generated_at ? meta.generated_at : '') + '"></span></div>';
 
         fortuneResult.style.display = 'block';
         fortuneResult.innerHTML = html;
+        activateLiveClocks(fortuneResult);
 
         // 滚动到结果区域
         fortuneResult.scrollIntoView({ behavior: 'smooth', block: 'start' });

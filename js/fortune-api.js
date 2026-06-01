@@ -155,12 +155,134 @@ function hideFortuneLoading() {
     }
 }
 
+// ===== 实时时钟系统 =====
+
+/**
+ * LiveClock - 全局实时时钟
+ * 基于服务器返回的 generated_at 校准偏移量，每秒更新页面上所有时钟元素
+ * 实现真正的"每分每秒走动"，而非用户刷新一次显示一次
+ */
+var LiveClock = (function() {
+    var _offset = 0;        // server_time - client_time (ms)
+    var _elements = [];     // {el, format}
+    var _intervalId = null;
+
+    function _tick() {
+        var now = new Date(Date.now() + _offset);
+        var i, entry, alive = [];
+        for (i = 0; i < _elements.length; i++) {
+            entry = _elements[i];
+            if (entry.el && entry.el.parentNode) {
+                entry.el.textContent = LiveClock.formatTime(now, entry.format);
+                alive.push(entry);
+            }
+        }
+        _elements = alive;
+        // 无活跃元素时自动停止定时器
+        if (_elements.length === 0 && _intervalId) {
+            clearInterval(_intervalId);
+            _intervalId = null;
+        }
+    }
+
+    function init(serverTimeISO) {
+        if (serverTimeISO) {
+            var serverMs = new Date(serverTimeISO).getTime();
+            if (!isNaN(serverMs)) {
+                _offset = serverMs - Date.now();
+            }
+        }
+        if (!_intervalId) {
+            _intervalId = setInterval(_tick, 1000);
+            _tick(); // 立即执行一次
+        }
+    }
+
+    function register(el, format) {
+        if (!el) return;
+        // 去重
+        for (var i = 0; i < _elements.length; i++) {
+            if (_elements[i].el === el) return;
+        }
+        _elements.push({el: el, format: format || 'time'});
+        // 确保定时器在运行
+        if (!_intervalId) {
+            _intervalId = setInterval(_tick, 1000);
+        }
+        _tick();
+    }
+
+    function unregister(el) {
+        _elements = _elements.filter(function(e) { return e.el !== el; });
+    }
+
+    function formatTime(date, format) {
+        format = format || 'time';
+        if (format === 'time') {
+            return date.toLocaleTimeString('zh-CN', { hour12: false });
+        } else if (format === 'datetime') {
+            return date.toLocaleString('zh-CN', { hour12: false });
+        } else if (format === 'full') {
+            var y = date.getFullYear();
+            var M = String(date.getMonth() + 1).padStart(2, '0');
+            var d = String(date.getDate()).padStart(2, '0');
+            var h = String(date.getHours()).padStart(2, '0');
+            var m = String(date.getMinutes()).padStart(2, '0');
+            var s = String(date.getSeconds()).padStart(2, '0');
+            return y + '-' + M + '-' + d + ' ' + h + ':' + m + ':' + s;
+        }
+        return date.toLocaleTimeString('zh-CN', { hour12: false });
+    }
+
+    return {
+        init: init,
+        register: register,
+        unregister: unregister,
+        formatTime: formatTime,
+        getOffset: function() { return _offset; }
+    };
+})();
+
+/**
+ * 创建一个实时走动的 <span> 时间元素
+ * 用于在 HTML 字符串中嵌入实时时钟（适用于复杂模块内联HTML场景）
+ * @param {object} meta - API 返回的 meta 对象（含 generated_at）
+ * @param {string} format - 时间格式: 'time' | 'datetime' | 'full'
+ * @returns {HTMLElement} 实时更新的 span 元素
+ */
+function createLiveTimeElement(meta, format) {
+    LiveClock.init(meta && meta.generated_at);
+    var span = document.createElement('span');
+    span.className = 'live-clock';
+    LiveClock.register(span, format || 'time');
+    return span;
+}
+
+/**
+ * 扫描容器内所有 .live-time-placeholder 占位元素并激活实时时钟
+ * 占位元素格式: <span class="live-time-placeholder" data-server-time="ISO时间"></span>
+ * @param {HTMLElement} container - 要扫描的容器
+ */
+function activateLiveClocks(container) {
+    if (!container) container = document;
+    var placeholders = container.querySelectorAll('.live-time-placeholder');
+    for (var i = 0; i < placeholders.length; i++) {
+        var ph = placeholders[i];
+        var serverTime = ph.getAttribute('data-server-time');
+        LiveClock.init(serverTime);
+        LiveClock.register(ph, 'time');
+        ph.classList.remove('live-time-placeholder');
+        ph.classList.add('live-clock');
+    }
+}
+
 // ===== 数据来源标识 =====
 
 /**
- * 在指定容器内显示数据来源标签
+ * 在指定容器内显示数据来源标签（含实时走动的时钟）
  * @param {string} source - 数据来源: 'realtime' | 'cached' | 'local' | 'local_fallback'
  * @param {string} containerId - 容器元素ID
+ * @param {object} meta - API 返回的 meta 对象
  */
 function showDataBadge(source, containerId, meta) {
     const container = document.getElementById(containerId);
@@ -175,21 +297,20 @@ function showDataBadge(source, containerId, meta) {
 
     const info = badges[source] || badges['local'];
 
-    // 优先使用服务器返回的 generated_at 时间戳，保证刷新不跳变
-    let timeStr;
-    if (meta && meta.generated_at) {
-        timeStr = new Date(meta.generated_at).toLocaleTimeString('zh-CN', { hour12: false });
-    } else {
-        timeStr = new Date().toLocaleTimeString('zh-CN', { hour12: false });
-    }
+    // 初始化实时时钟（基于服务器时间校准）
+    LiveClock.init(meta && meta.generated_at);
 
     // 移除已有的badge
     const existing = container.querySelector('.fortune-data-badge');
     if (existing) existing.remove();
 
+    // 创建实时走动的时钟元素
+    const timeSpan = createLiveTimeElement(meta, 'time');
+
     const badge = document.createElement('div');
     badge.className = 'fortune-data-badge ' + info.cls;
-    badge.innerHTML = `${info.text} · 更新于 ${timeStr}`;
+    badge.appendChild(document.createTextNode(info.text + ' · 更新于 '));
+    badge.appendChild(timeSpan);
     container.insertBefore(badge, container.firstChild);
 }
 
@@ -290,6 +411,8 @@ function triggerImageUploadV2(moduleType) {
  * 显示图片分析结果（升级版）
  */
 function showImageAnalysisResultV2(analysisData, meta) {
+    LiveClock.init(meta && meta.generated_at);
+    
     let html = '<div class="image-analysis-result">';
     html += '<h3>📷 AI智能分析结果</h3>';
     
@@ -298,10 +421,11 @@ function showImageAnalysisResultV2(analysisData, meta) {
             'realtime': '🟢 联网实时分析',
             'local': '🔵 本地智能分析'
         };
-        const timeStr = meta.generated_at 
-            ? new Date(meta.generated_at).toLocaleTimeString('zh-CN', { hour12: false })
-            : new Date().toLocaleTimeString('zh-CN', { hour12: false });
-        html += `<div class="fortune-data-badge badge-${meta.source || 'local'}">${sourceMap[meta.source] || '智能分析'} · ${timeStr}</div>`;
+        // 使用占位元素，后续通过 activateLiveClocks 激活为实时时钟
+        const serverTime = meta.generated_at || new Date().toISOString();
+        html += '<div class="fortune-data-badge badge-' + (meta.source || 'local') + '">' +
+            (sourceMap[meta.source] || '智能分析') +
+            ' · <span class="live-time-placeholder" data-server-time="' + serverTime + '"></span></div>';
     }
     
     html += '<pre class="analysis-text">' + (typeof analysisData === 'string' ? analysisData : JSON.stringify(analysisData, null, 2)) + '</pre>';
@@ -311,12 +435,14 @@ function showImageAnalysisResultV2(analysisData, meta) {
     const resultArea = document.getElementById('resultArea') || document.getElementById('analysisResult') || document.querySelector('.result-area');
     if (resultArea) {
         resultArea.innerHTML = html;
+        activateLiveClocks(resultArea);
         resultArea.style.display = 'block';
     } else {
         const contentArea = document.querySelector('.content-area');
         if (contentArea) {
             const div = document.createElement('div');
             div.innerHTML = html;
+            activateLiveClocks(div);
             contentArea.appendChild(div.firstChild);
         }
     }
@@ -330,13 +456,18 @@ window.hideFortuneLoading = hideFortuneLoading;
 window.showDataBadge = showDataBadge;
 
 // ===== 服务器时间格式化（全局辅助） =====
+// 注意：此函数返回静态字符串，如需实时走动的时钟请使用 createLiveTimeElement()
 function formatServerTime(meta) {
+    LiveClock.init(meta && meta.generated_at);
     if (meta && meta.generated_at) {
         return new Date(meta.generated_at).toLocaleTimeString('zh-CN', { hour12: false });
     }
     return new Date().toLocaleTimeString('zh-CN', { hour12: false });
 }
 window.formatServerTime = formatServerTime;
+window.LiveClock = LiveClock;
+window.createLiveTimeElement = createLiveTimeElement;
+window.activateLiveClocks = activateLiveClocks;
 window.showFortuneError = showFortuneError;
 window.uploadImageFortune = uploadImageFortune;
 window.triggerImageUploadV2 = triggerImageUploadV2;

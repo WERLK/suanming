@@ -1,7 +1,7 @@
 /**
  * 玄机算命网 - 导航菜单
- * - 有桌面侧边栏的页面: 桌面端显示固定侧边栏, 移动端显示底部导航
- * - 无桌面侧边栏的页面: FAB按钮 + 滑出菜单
+ * - 首页: 折叠版侧边栏始终展开, 可折叠
+ * - 其他页: FAB按钮 + 滑出菜单
  */
 (function() {
     'use strict';
@@ -9,12 +9,14 @@
     var sidebar = null;
     var overlay = null;
     var fab = null;
+    var collapseBtn = null;
+    var expandTab = null;
     var isOpen = false;
+    var isHomepage = false;
 
-    // 当前页面路径
     var path = window.location.pathname;
+    isHomepage = /^\/(index\.html)?$/.test(path);
 
-    // 导航项配置
     var navItems = [
         { icon: '🏠', label: '首页', href: '/', match: /^\/(index\.html)?$/ },
         { icon: '🔮', label: '更多模块', href: '/more.html', match: /more\.html/ },
@@ -28,9 +30,9 @@
         return item.match.test(path);
     }
 
-    // ===== 构建滑出侧边栏 DOM =====
-    function buildSlideSidebar() {
-        // 遮罩层
+    // ===== 构建侧边栏 DOM =====
+    function buildSidebar() {
+        // 遮罩层（移动端用）
         overlay = document.createElement('div');
         overlay.id = '__sideOverlay';
         overlay.style.cssText =
@@ -49,14 +51,36 @@
             + 'transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);'
             + 'display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;';
 
-        // 标题
+        // 标题行（含折叠按钮）
         var header = document.createElement('div');
         header.style.cssText =
-            'padding:1rem 1rem 0.6rem;border-bottom:1px solid rgba(255,215,0,0.1);';
+            'padding:1rem 0.8rem 0.6rem;border-bottom:1px solid rgba(255,215,0,0.1);'
+            + 'display:flex;align-items:flex-start;justify-content:space-between;';
         header.innerHTML =
-            '<div style="font-size:1rem;color:#ffd700;font-weight:bold;display:flex;align-items:center;gap:6px;">'
+            '<div>'
+            + '<div style="font-size:1rem;color:#ffd700;font-weight:bold;display:flex;align-items:center;gap:6px;">'
             + '🔮 玄机算命网</div>'
-            + '<div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:3px;">导航菜单</div>';
+            + '<div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:3px;">导航菜单</div>'
+            + '</div>';
+
+        // 折叠按钮（仅首页显示）
+        if (isHomepage) {
+            collapseBtn = document.createElement('button');
+            collapseBtn.id = '__sideCollapse';
+            collapseBtn.style.cssText =
+                'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);'
+                + 'color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;'
+                + 'width:28px;height:28px;border-radius:6px;'
+                + 'display:flex;align-items:center;justify-content:center;'
+                + 'transition:all 0.2s;flex-shrink:0;';
+            collapseBtn.innerHTML = '◀';
+            collapseBtn.title = '折叠菜单';
+            collapseBtn.onmouseenter = function() { this.style.color = '#ffd700'; this.style.borderColor = 'rgba(255,215,0,0.3)'; };
+            collapseBtn.onmouseleave = function() { this.style.color = 'rgba(255,255,255,0.5)'; this.style.borderColor = 'rgba(255,255,255,0.1)'; };
+            collapseBtn.onclick = function(e) { e.stopPropagation(); closeSidebar(); };
+            header.appendChild(collapseBtn);
+        }
+
         sidebar.appendChild(header);
 
         // 导航项
@@ -98,12 +122,35 @@
         document.body.appendChild(overlay);
         document.body.appendChild(sidebar);
 
-        // 更新用户名
-        updateSlideSidebarUser();
+        updateUserName();
     }
 
-    // ===== 更新滑出侧边栏用户名 =====
-    function updateSlideSidebarUser() {
+    // ===== 展开标签（首页侧边栏折叠后显示） =====
+    function buildExpandTab() {
+        if (!isHomepage) return;
+        expandTab = document.createElement('div');
+        expandTab.id = '__sideExpandTab';
+        expandTab.style.cssText =
+            'position:fixed;top:50%;left:0;z-index:9989;'
+            + 'transform:translateY(-50%);'
+            + 'width:24px;height:60px;border-radius:0 8px 8px 0;'
+            + 'background:rgba(20,20,35,0.9);'
+            + 'border:1px solid rgba(255,215,0,0.2);border-left:none;'
+            + 'color:rgba(255,255,255,0.5);font-size:0.8rem;'
+            + 'display:none;align-items:center;justify-content:center;'
+            + 'cursor:pointer;transition:all 0.2s;'
+            + 'writing-mode:vertical-rl;letter-spacing:2px;'
+            + 'box-shadow:2px 0 10px rgba(0,0,0,0.2);';
+        expandTab.innerHTML = '菜 单';
+        expandTab.title = '展开菜单';
+        expandTab.onclick = openSidebar;
+        expandTab.onmouseenter = function() { this.style.color = '#ffd700'; };
+        expandTab.onmouseleave = function() { this.style.color = 'rgba(255,255,255,0.5)'; };
+        document.body.appendChild(expandTab);
+    }
+
+    // ===== 更新用户名 =====
+    function updateUserName() {
         var el = document.getElementById('__sideUserName');
         if (!el) return;
         try {
@@ -119,25 +166,9 @@
         } catch(e) {}
     }
 
-    // ===== 更新桌面侧边栏用户信息 =====
-    function updateDesktopSidebarUser() {
-        var nameEl = document.getElementById('sidebarUserName');
-        if (!nameEl) return;
-        try {
-            var raw = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-            if (raw) {
-                var user = JSON.parse(raw);
-                if (user && user.username) {
-                    nameEl.textContent = user.username;
-                    var statusEl = nameEl.parentElement.querySelector('.user-status');
-                    if (statusEl) statusEl.textContent = '已登录';
-                }
-            }
-        } catch(e) {}
-    }
-
-    // ===== FAB 按钮 =====
+    // ===== FAB 按钮（非首页） =====
     function buildFAB() {
+        if (isHomepage) return;
         fab = document.createElement('div');
         fab.id = '__sideFab';
         fab.style.cssText =
@@ -170,68 +201,85 @@
     function openSidebar() {
         isOpen = true;
         sidebar.style.transform = 'translateX(0)';
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        fab.style.opacity = '0.4';
-        fab.style.pointerEvents = 'none';
-        document.body.style.overflow = 'hidden';
+        if (overlay) {
+            overlay.style.opacity = '1';
+            overlay.style.pointerEvents = 'auto';
+        }
+        if (fab) { fab.style.opacity = '0.4'; fab.style.pointerEvents = 'none'; }
+        if (expandTab) expandTab.style.display = 'none';
+        if (collapseBtn) { collapseBtn.innerHTML = '◀'; collapseBtn.title = '折叠菜单'; }
+        updateBodyLayout();
     }
 
     function closeSidebar() {
         isOpen = false;
         sidebar.style.transform = 'translateX(-100%)';
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
-        fab.style.opacity = '1';
-        fab.style.pointerEvents = '';
-        document.body.style.overflow = '';
+        if (overlay) {
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+        }
+        if (fab) { fab.style.opacity = '1'; fab.style.pointerEvents = ''; }
+        if (expandTab) expandTab.style.display = 'flex';
+        if (collapseBtn) { collapseBtn.innerHTML = '▶'; collapseBtn.title = '展开菜单'; }
+        updateBodyLayout();
     }
 
     function toggleSidebar() {
         if (isOpen) closeSidebar(); else openSidebar();
     }
 
-    // ===== 隐藏底部导航 =====
-    function removeBottomNav() {
+    // ===== 首页：根据侧边栏开关调整 body 布局 =====
+    function updateBodyLayout() {
+        if (!isHomepage) return;
+        var isDesktop = window.innerWidth >= 1024;
+        if (isDesktop) {
+            // 桌面端：侧边栏展开时内容右移
+            document.body.style.paddingLeft = isOpen ? '220px' : '';
+            document.body.style.transition = 'padding-left 0.3s cubic-bezier(0.4,0,0.2,1)';
+        } else {
+            // 移动端：侧边栏覆盖内容，锁滚动
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+            document.body.style.paddingLeft = '';
+        }
+    }
+
+    // ===== 隐藏底部导航和桌面侧边栏 =====
+    function removeConflictingNavs() {
+        // 隐藏原始 bottom-nav
         var navs = document.querySelectorAll('.bottom-nav');
-        navs.forEach(function(nav) {
-            nav.style.display = 'none';
-        });
+        navs.forEach(function(nav) { nav.style.display = 'none'; });
+
+        // 隐藏原始 desktop-sidebar（sidenav 接管）
+        var ds = document.getElementById('desktopSidebar');
+        if (ds) ds.style.display = 'none';
     }
 
     // ===== 初始化 =====
     function init() {
-        var hasDesktopSidebar = !!document.getElementById('desktopSidebar');
-        var isDesktop = window.innerWidth >= 1024;
+        buildSidebar();
+        buildExpandTab();
+        buildFAB();
+        removeConflictingNavs();
 
-        if (hasDesktopSidebar) {
-            // 页面已有桌面侧边栏（如首页、会员中心等）
-            if (isDesktop) {
-                // 桌面端：侧边栏始终可见（CSS 处理），隐藏底部导航
-                removeBottomNav();
-            }
-            // 移动端：底部导航自然显示（桌面侧边栏被 CSS 隐藏），不创建 FAB
-
-            // 更新桌面侧边栏用户信息
-            updateDesktopSidebarUser();
-        } else {
-            // 无桌面侧边栏（如 contacts、login 等）
-            // 使用 FAB + 滑出菜单
-            buildSlideSidebar();
-            buildFAB();
-            removeBottomNav();
+        if (isHomepage) {
+            // 首页：侧边栏默认展开
+            openSidebar();
         }
 
-        // ESC 关闭（仅滑出菜单模式）
+        // ESC 关闭
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && isOpen && sidebar) closeSidebar();
         });
 
-        // 登录状态变化 → 更新所有侧边栏
+        // 窗口 resize 时更新布局
+        window.addEventListener('resize', function() {
+            if (isHomepage) updateBodyLayout();
+        });
+
+        // 登录状态变化
         window.addEventListener('storage', function(e) {
             if (e.key === 'currentUser' || e.key === 'token') {
-                updateSlideSidebarUser();
-                updateDesktopSidebarUser();
+                updateUserName();
             }
         });
     }
@@ -242,5 +290,5 @@
         init();
     }
 
-    console.log('[导航] 菜单已加载' + (document.getElementById('desktopSidebar') ? '(桌面固定模式)' : '(滑出模式)'));
+    console.log('[导航] ' + (isHomepage ? '折叠版固定模式' : '滑出模式') + '已加载');
 })();

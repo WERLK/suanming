@@ -1063,6 +1063,27 @@ function closeDetail(){document.getElementById('detailModal').classList.remove('
 document.addEventListener('DOMContentLoaded',function(){
   // 默认选中男性
   document.querySelector('.gender-btn[data-value="male"]')?.classList.add('active');
+
+  // 从亲友档案跳转来时，自动预填姓名/生日/性别
+  var params = new URLSearchParams(window.location.search);
+  var contactName = params.get('name');
+  var contactBirthday = params.get('birthday');
+  var contactGender = params.get('gender');
+
+  if (contactName) {
+    var nameEl = document.getElementById('baziName');
+    if (nameEl) nameEl.value = contactName;
+  }
+  if (contactBirthday) {
+    var dateEl = document.getElementById('baziDate');
+    if (dateEl) dateEl.value = contactBirthday;
+  }
+  if (contactGender && (contactGender === 'male' || contactGender === 'female')) {
+    // 切换性别按钮
+    document.querySelectorAll('.gender-btn').forEach(function(b) { b.classList.remove('active'); });
+    var targetBtn = document.querySelector('.gender-btn[data-value="' + contactGender + '"]');
+    if (targetBtn) targetBtn.classList.add('active');
+  }
 });
 </script>
 </body>

@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>亲友档案 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/profile-compatible.css">
     <style>
         .contacts-container {
             max-width: 800px;
@@ -339,8 +340,12 @@
                 var birthdayText = c.birthday ? '🎂 ' + c.birthday : '';
                 var relationTag = c.relation ? '<span class="contact-relation">' + escapeHtml(c.relation) + '</span>' : '';
                 var notesText = c.notes ? '<div class="contact-notes">' + escapeHtml(c.notes) + '</div>' : '';
+                // 编码联系人数据用于快速算命
+                var fortuneParams = 'name=' + encodeURIComponent(c.name) +
+                    '&birthday=' + encodeURIComponent(c.birthday || '') +
+                    '&gender=' + encodeURIComponent(c.gender || '');
 
-                return '<div class="contact-card" onclick="quickFortune(\'' + c.id + '\')">'
+                return '<div class="contact-card" onclick="quickFortune(\'' + fortuneParams + '\')">'
                     + '<div class="contact-avatar ' + avatarClass + '">' + avatarEmoji + '</div>'
                     + '<div class="contact-info">'
                     + '<div class="contact-name">' + escapeHtml(c.name) + '</div>'
@@ -373,11 +378,11 @@
             loadContactDetail(contactId);
         }
 
-        document.getElementById('contactModal').classList.add('active');
+        document.getElementById('contactModal').classList.add('show');
     }
 
     function closeContactModal() {
-        document.getElementById('contactModal').classList.remove('active');
+        document.getElementById('contactModal').classList.remove('show');
         editingContactId = null;
     }
 
@@ -470,9 +475,9 @@
         }
     }
 
-    function quickFortune(contactId) {
-        // 跳转到首页并携带联系人信息用于快速算命
-        window.location.href = '/?contact=' + contactId;
+    function quickFortune(params) {
+        // 跳转到八字排盘并携带联系人信息
+        window.location.href = '/modules/bazi.html?' + params;
     }
 
     function escapeHtml(str) {
@@ -484,6 +489,14 @@
     // 页面加载
     document.addEventListener('DOMContentLoaded', function() {
         loadContacts();
+
+        // 点击弹窗遮罩层关闭
+        var modal = document.getElementById('contactModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeContactModal();
+            });
+        }
     });
 </script>
 <script src="/js/sidenav.js"></script>

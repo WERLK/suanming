@@ -186,7 +186,7 @@
                 <img id="avatarImg" src="" alt="头像" style="display:none;">
                 <span id="avatarDefault">👤</span>
             </div>
-            <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar()">
+            <input type="file" id="avatarInput" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;" onchange="uploadAvatar()">
             <button class="btn-upload" onclick="document.getElementById('avatarInput').click()">📷 更换头像</button>
         </div>
         

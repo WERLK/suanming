@@ -495,7 +495,7 @@ function showResult(data, meta) {
             'local_fallback': '🔴 离线数据'
         };
         const sourceText = sourceMap[meta.source] || '🔵 服务器计算';
-        html += `<div class="fortune-data-badge" style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:0.8rem;">${sourceText} · ${new Date().toLocaleTimeString('zh-CN')}</div>`;
+        html += `<div class="fortune-data-badge" style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:0.8rem;">${sourceText} · ${formatServerTime(meta)}</div>`;
     }
     
     html += `

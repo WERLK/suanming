@@ -692,7 +692,7 @@ body {
                     var source = data.meta ? data.meta.source : 'realtime';
                     // 缓存到 localStorage
                     cacheFortune(signName, data);
-                    showFortuneResult(signName, emoji, data, source);
+                    showFortuneResult(signName, emoji, data, source, data.meta);
                 } else {
                     // API失败，尝试fallback
                     handleFortuneError(signName, emoji, data ? data.message : '获取数据失败');
@@ -743,7 +743,7 @@ body {
     }
 
     // ===== 显示运势结果 =====
-    function showFortuneResult(signName, emoji, data, source) {
+    function showFortuneResult(signName, emoji, data, source, meta) {
         var mode = ModeToggle.getMode();
         var periodLabel = PERIOD_MAP[currentPeriod].label;
         var horoscope = data.data.horoscope || '';
@@ -760,7 +760,7 @@ body {
         }
 
         var dateStr = data.data.date || '';
-        var updatedTime = new Date().toLocaleTimeString('zh-CN');
+        var updatedTime = formatServerTime(meta);
 
         var html = renderPeriodTabs();
 
@@ -796,7 +796,7 @@ body {
         var cached = getCachedFortune(signName);
         if (cached) {
             // 使用缓存数据
-            showFortuneResult(signName, emoji, cached, 'cached');
+            showFortuneResult(signName, emoji, cached, 'cached', null);
             if (window.showToast) showToast('网络不可用，已加载本地缓存数据');
         } else {
             // 显示错误状态

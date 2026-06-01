@@ -484,7 +484,7 @@
             }
 
             // --- Result 状态 ---
-            renderResult(data.data, (data.meta && data.meta.source) || 'realtime');
+            renderResult(data.data, (data.meta && data.meta.source) || 'realtime', data.meta);
         }
 
         // ===== 降级：本地梦境库查找 =====
@@ -502,7 +502,7 @@
         }
 
         // ===== 渲染结果 =====
-        function renderResult(dreamData, source) {
+        function renderResult(dreamData, source, meta) {
             var mode = ModeToggle.getMode();
             if (mode === 'simple') {
                 var simpleHtml = '<div class="beginner-result">';
@@ -525,7 +525,7 @@
             };
             var sourceLabel = sourceLabels[source] || '🔵 服务器计算';
             if (source !== 'local_fallback') {
-                sourceLabel += ' · 更新于 ' + new Date().toLocaleTimeString('zh-CN');
+                sourceLabel += ' · 更新于 ' + formatServerTime(meta);
             }
 
             var elementsHtml = '';

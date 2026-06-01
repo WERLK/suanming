@@ -298,7 +298,10 @@ function showImageAnalysisResultV2(analysisData, meta) {
             'realtime': '🟢 联网实时分析',
             'local': '🔵 本地智能分析'
         };
-        html += `<div class="fortune-data-badge badge-${meta.source || 'local'}">${sourceMap[meta.source] || '智能分析'} · ${new Date().toLocaleTimeString('zh-CN')}</div>`;
+        const timeStr = meta.generated_at 
+            ? new Date(meta.generated_at).toLocaleTimeString('zh-CN', { hour12: false })
+            : new Date().toLocaleTimeString('zh-CN', { hour12: false });
+        html += `<div class="fortune-data-badge badge-${meta.source || 'local'}">${sourceMap[meta.source] || '智能分析'} · ${timeStr}</div>`;
     }
     
     html += '<pre class="analysis-text">' + (typeof analysisData === 'string' ? analysisData : JSON.stringify(analysisData, null, 2)) + '</pre>';
@@ -325,6 +328,15 @@ window.fortuneGetAPI = fortuneGetAPI;
 window.showFortuneLoading = showFortuneLoading;
 window.hideFortuneLoading = hideFortuneLoading;
 window.showDataBadge = showDataBadge;
+
+// ===== 服务器时间格式化（全局辅助） =====
+function formatServerTime(meta) {
+    if (meta && meta.generated_at) {
+        return new Date(meta.generated_at).toLocaleTimeString('zh-CN', { hour12: false });
+    }
+    return new Date().toLocaleTimeString('zh-CN', { hour12: false });
+}
+window.formatServerTime = formatServerTime;
 window.showFortuneError = showFortuneError;
 window.uploadImageFortune = uploadImageFortune;
 window.triggerImageUploadV2 = triggerImageUploadV2;

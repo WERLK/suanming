@@ -655,6 +655,7 @@
             Math.random() > 0.5 ? 1 : -1
         ];
         STATE.metaSource = (data.meta && data.meta.source) ? data.meta.source : 'local';
+        STATE.meta = data.meta || null;
         STATE.loading = false;
 
         // 延迟一点让用户看到洗牌效果结束
@@ -859,7 +860,7 @@
         var info = map[STATE.metaSource] || map['local'];
         badge.innerHTML =
             '<span class="badge-dot ' + info.dot + '"></span>' +
-            '<span class="badge-text">' + info.label + ' · ' + new Date().toLocaleTimeString('zh-CN') + '</span>';
+            '<span class="badge-text">' + info.label + ' · ' + formatServerTime(STATE.meta) + '</span>';
         badge.style.display = 'block';
 
         // 同步使用 showDataBadge (fortune-api.js)

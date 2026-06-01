@@ -423,7 +423,7 @@
                 'local_fallback': '&#x1F534; 离线数据'
             };
             var badgeLabel = sourceMap[source] || sourceMap['local'];
-            var now = new Date().toLocaleTimeString('zh-CN');
+            var now = formatServerTime(meta);
 
             var h = '';
 

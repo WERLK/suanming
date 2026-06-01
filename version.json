@@ -1,13 +1,14 @@
 {
-  "version": "1.11.3",
-  "build_time": "2026-06-01T03:26:00Z",
+  "version": "1.11.4",
+  "build_time": "2026-06-01T03:32:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "v1.11.0 → LiveClock全局实时时钟系统 | v1.11.1 → register/首页时钟修复 | v1.11.2 → 头像上传压缩+审核优化 | v1.11.3 → input[type=file] display:none移动端兼容",
+  "description": "v1.11.0 → LiveClock全局实时时钟系统 | v1.11.1 → register/首页时钟修复 | v1.11.2 → 头像上传压缩+审核优化 | v1.11.3 → input移动端兼容 | v1.11.4 → 移除头像上传重复触发(三重→单路径)",
   "changelog": {
     "1.11.0": "feat: 全局实时时钟系统(LiveClock) + 首页全格式时钟",
     "1.11.1": "fix: LiveClock.register初始化bug + 首页</script>缺失",
     "1.11.2": "fix: 头像上传增加canvas压缩+审核阈值优化",
-    "1.11.3": "fix: input[type=file] display:none改opacity:0兼容移动端"
+    "1.11.3": "fix: input[type=file] display:none改opacity:0兼容移动端",
+    "1.11.4": "fix: 移除头像上传重复触发(label for+JS click+inline onchange→仅保留for)"
   }
 }

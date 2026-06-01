@@ -264,13 +264,7 @@ window.Profile = (function() {
             });
         }
 
-        // ── Avatar upload label ──
-        var uploadLabel = document.getElementById('avatarUploadLabel');
-        if (uploadLabel) {
-            uploadLabel.addEventListener('click', function() {
-                if (dom.avatarInput) dom.avatarInput.click();
-            });
-        }
+        // ── Avatar upload label（for属性已原生绑定，无需JS click）──
 
         // ── Avatar input change ──
         if (dom.avatarInput) {
@@ -891,11 +885,7 @@ window.Profile = (function() {
 
 })();
 
-document.addEventListener('DOMContentLoaded', function() {
-    Profile.init();
-    // 暴露给 inline onchange 属性（HTML中的回退触发）
-    window._avatarUpload = Profile.uploadAvatar;
-});
+document.addEventListener('DOMContentLoaded', Profile.init);
 if (document.readyState !== 'loading') {
     setTimeout(function() {
         if (typeof Profile.init === 'function') Profile.init();

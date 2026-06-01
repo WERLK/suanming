@@ -337,10 +337,13 @@
 }
 .avatar-picker-title { color: #ffd700; font-size: 1rem; font-weight: bold; }
 .avatar-picker-close {
-    background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.3rem;
-    cursor: pointer; transition: color 0.2s;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6); font-size: 1.5rem; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
 }
-.avatar-picker-close:hover { color: #ffd700; }
+.avatar-picker-close:hover { color: #ffd700; border-color: #ffd700; background: rgba(255,215,0,0.1); }
 .avatar-section-label {
     color: rgba(255,255,255,0.5); font-size: 0.75rem; margin: 0.8rem 0 0.4rem;
     padding-bottom: 0.2rem; border-bottom: 1px solid rgba(255,215,0,0.08);
@@ -439,11 +442,11 @@
 .redeem-option .ro-label { flex: 1; color: rgba(255,255,255,0.85); font-size: 0.85rem; }
 .redeem-option .ro-cost { color: #ffd700; font-weight: bold; font-size: 0.8rem; }
 .btn-close-redeem {
-    width: 100%; margin-top: 0.6rem; padding: 0.5rem; border-radius: 8px;
+    width: 100%; margin-top: 0.6rem; padding: 0.7rem; border-radius: 8px;
     background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.5); font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+    color: rgba(255,255,255,0.5); font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
 }
-.btn-close-redeem:hover { color: #fff; border-color: rgba(255,255,255,0.15); }
+.btn-close-redeem:hover { color: #fff; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); }
 
 /* ===== Desktop Adaptations ===== */
 @media (min-width: 768px) {

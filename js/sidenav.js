@@ -1,6 +1,7 @@
 /**
- * 玄机算命网 - 侧边导航菜单
- * 替代底部导航栏，右侧滑出，可折叠
+ * 玄机算命网 - 导航菜单
+ * - 有桌面侧边栏的页面: 桌面端显示固定侧边栏, 移动端显示底部导航
+ * - 无桌面侧边栏的页面: FAB按钮 + 滑出菜单
  */
 (function() {
     'use strict';
@@ -27,8 +28,8 @@
         return item.match.test(path);
     }
 
-    // ===== 构建 DOM =====
-    function buildSidebar() {
+    // ===== 构建滑出侧边栏 DOM =====
+    function buildSlideSidebar() {
         // 遮罩层
         overlay = document.createElement('div');
         overlay.id = '__sideOverlay';
@@ -98,10 +99,11 @@
         document.body.appendChild(sidebar);
 
         // 更新用户名
-        updateUserName();
+        updateSlideSidebarUser();
     }
 
-    function updateUserName() {
+    // ===== 更新滑出侧边栏用户名 =====
+    function updateSlideSidebarUser() {
         var el = document.getElementById('__sideUserName');
         if (!el) return;
         try {
@@ -117,16 +119,33 @@
         } catch(e) {}
     }
 
+    // ===== 更新桌面侧边栏用户信息 =====
+    function updateDesktopSidebarUser() {
+        var nameEl = document.getElementById('sidebarUserName');
+        if (!nameEl) return;
+        try {
+            var raw = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (raw) {
+                var user = JSON.parse(raw);
+                if (user && user.username) {
+                    nameEl.textContent = user.username;
+                    var statusEl = nameEl.parentElement.querySelector('.user-status');
+                    if (statusEl) statusEl.textContent = '已登录';
+                }
+            }
+        } catch(e) {}
+    }
+
     // ===== FAB 按钮 =====
     function buildFAB() {
         fab = document.createElement('div');
         fab.id = '__sideFab';
         fab.style.cssText =
             'position:fixed;top:40px;left:10px;z-index:9980;'
-            + 'width:36px;height:36px;border-radius:8px;'
+            + 'width:40px;height:40px;border-radius:50%;'
             + 'background:rgba(20,20,35,0.9);'
             + 'border:1px solid rgba(255,215,0,0.25);'
-            + 'color:#ffd700;font-size:1.1rem;'
+            + 'color:#ffd700;font-size:1.2rem;'
             + 'display:flex;align-items:center;justify-content:center;'
             + 'cursor:pointer;transition:all 0.3s ease;'
             + 'box-shadow:0 2px 10px rgba(0,0,0,0.3);'
@@ -172,7 +191,7 @@
         if (isOpen) closeSidebar(); else openSidebar();
     }
 
-    // ===== 替换 bottom-nav =====
+    // ===== 隐藏底部导航 =====
     function removeBottomNav() {
         var navs = document.querySelectorAll('.bottom-nav');
         navs.forEach(function(nav) {
@@ -182,19 +201,37 @@
 
     // ===== 初始化 =====
     function init() {
-        buildSidebar();
-        buildFAB();
-        removeBottomNav();
+        var hasDesktopSidebar = !!document.getElementById('desktopSidebar');
+        var isDesktop = window.innerWidth >= 1024;
 
-        // ESC 关闭
+        if (hasDesktopSidebar) {
+            // 页面已有桌面侧边栏（如首页、会员中心等）
+            if (isDesktop) {
+                // 桌面端：侧边栏始终可见（CSS 处理），隐藏底部导航
+                removeBottomNav();
+            }
+            // 移动端：底部导航自然显示（桌面侧边栏被 CSS 隐藏），不创建 FAB
+
+            // 更新桌面侧边栏用户信息
+            updateDesktopSidebarUser();
+        } else {
+            // 无桌面侧边栏（如 contacts、login 等）
+            // 使用 FAB + 滑出菜单
+            buildSlideSidebar();
+            buildFAB();
+            removeBottomNav();
+        }
+
+        // ESC 关闭（仅滑出菜单模式）
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && isOpen) closeSidebar();
+            if (e.key === 'Escape' && isOpen && sidebar) closeSidebar();
         });
 
-        // 登录状态变化
+        // 登录状态变化 → 更新所有侧边栏
         window.addEventListener('storage', function(e) {
             if (e.key === 'currentUser' || e.key === 'token') {
-                updateUserName();
+                updateSlideSidebarUser();
+                updateDesktopSidebarUser();
             }
         });
     }
@@ -205,5 +242,5 @@
         init();
     }
 
-    console.log('[导航] 侧边菜单已加载');
+    console.log('[导航] 菜单已加载' + (document.getElementById('desktopSidebar') ? '(桌面固定模式)' : '(滑出模式)'));
 })();

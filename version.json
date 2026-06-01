@@ -1,8 +1,13 @@
 {
-  "version": "1.11.0",
-  "build_time": "2026-06-01T03:00:00Z",
+  "version": "1.11.3",
+  "build_time": "2026-06-01T03:26:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "v1.11.0: 全局实时时钟系统(LiveClock) - 首页全格式实时时钟 + 全站模块时间每分每秒自动走动 + 基于服务器时间校准偏移量",
-  "fix_count": 0
+  "description": "v1.11.0 → LiveClock全局实时时钟系统 | v1.11.1 → register/首页时钟修复 | v1.11.2 → 头像上传压缩+审核优化 | v1.11.3 → input[type=file] display:none移动端兼容",
+  "changelog": {
+    "1.11.0": "feat: 全局实时时钟系统(LiveClock) + 首页全格式时钟",
+    "1.11.1": "fix: LiveClock.register初始化bug + 首页</script>缺失",
+    "1.11.2": "fix: 头像上传增加canvas压缩+审核阈值优化",
+    "1.11.3": "fix: input[type=file] display:none改opacity:0兼容移动端"
+  }
 }

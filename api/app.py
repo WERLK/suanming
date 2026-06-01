@@ -508,13 +508,17 @@ def verify_sms():
 @limiter.limit("5 per minute")  # 注册限制：每分钟 5 次
 @app.route('/api/register', methods=['POST'])
 def register():
-    """用户注册"""
+    """用户注册（支持头像选择：预设emoji 或 自定义上传）"""
     try:
         data = request.get_json()
         username = data.get('username', '').strip()
         password = data.get('password', '')
         email = data.get('email', '').strip()
         phone = data.get('phone', '').strip()
+        avatar_type = data.get('avatar_type', 'emoji')  # emoji | custom
+        avatar_preset = data.get('avatar_preset', '')    # emoji字符
+        avatar_data = data.get('avatar_data', '')        # base64 custom image
+
         if not username or len(username) < 3 or len(username) > 20:
             return jsonify({'success': False, 'message': '用户名长度应为3-20个字符'}), 400
         if not password or len(password) < 6:
@@ -528,6 +532,20 @@ def register():
             return jsonify({'success': False, 'message': '邮箱已注册'}), 400
         if phone and any(u.get('phone') == phone for u in users):
             return jsonify({'success': False, 'message': '手机号已注册'}), 400
+
+        # 处理头像
+        if avatar_type == 'custom' and avatar_data:
+            # 自定义头像：先创建用户获取ID，再保存头像文件
+            pass  # 延迟处理，需要先有 user_id
+            avatar_preset = ''  # 自定义头像时清空预设
+        elif avatar_type == 'emoji' and avatar_preset:
+            # 用户选择了特定emoji
+            pass
+        else:
+            # 未选择，随机分配
+            avatar_type = 'emoji'
+            avatar_preset = generate_random_avatar()
+
         new_user = {
             'id': 'user_' + ''.join(random.choices(string.ascii_letters + string.digits, k=32)),
             'username': username,
@@ -536,8 +554,8 @@ def register():
             'email': email,
             'phone': phone,
             'avatar': '',
-            'avatar_type': 'emoji',
-            'avatar_preset': generate_random_avatar(),
+            'avatar_type': avatar_type,
+            'avatar_preset': avatar_preset,
             'birthday': '',
             'gender': '',
             'create_time': datetime.now().isoformat(),
@@ -548,6 +566,41 @@ def register():
             'ad_watch_count': 0,
             'ad_watch_date': ''
         }
+
+        # 处理自定义头像上传
+        if avatar_type == 'custom' and avatar_data:
+            try:
+                from api.avatar_audit import AvatarAuditor
+                audit_result = AvatarAuditor.audit_avatar(avatar_data)
+
+                if audit_result['result'] == 'block':
+                    return jsonify({
+                        'success': False, 'message': f'头像审核未通过：{audit_result["reason"]}'
+                    }), 400
+
+                # 解码并保存头像
+                clean_data = avatar_data
+                if 'base64,' in clean_data:
+                    clean_data = clean_data.split('base64,')[1]
+
+                image_bytes = base64.b64decode(clean_data)
+                avatar_bytes = AvatarAuditor.resize_avatar(image_bytes, size=(200, 200))
+
+                avatar_filename = f"{new_user['id']}_{int(datetime.now().timestamp())}.jpg"
+                avatar_path = os.path.join(AVATAR_SAVE_DIR, avatar_filename)
+
+                with open(avatar_path, 'wb') as f:
+                    f.write(avatar_bytes)
+
+                new_user['avatar'] = f'/static/avatars/{avatar_filename}'
+            except Exception as ave:
+                import traceback
+                print(f'[Register Avatar Error] {traceback.format_exc()}', flush=True)
+                # 头像保存失败不影响注册，使用随机emoji兜底
+                new_user['avatar_type'] = 'emoji'
+                new_user['avatar_preset'] = generate_random_avatar()
+                new_user['avatar'] = ''
+
         users.append(new_user)
         save_users(users)
 
@@ -569,7 +622,8 @@ def register():
                 'username': new_user['username'],
                 'nickname': new_user['nickname'],
                 'avatar_type': new_user['avatar_type'],
-                'avatar_preset': new_user['avatar_preset']
+                'avatar_preset': new_user['avatar_preset'],
+                'avatar': new_user.get('avatar', '')
             }
         }), 200
     except Exception as e:

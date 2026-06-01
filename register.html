@@ -26,6 +26,69 @@
         .auth-links { text-align:center; margin-top:1rem; font-size:0.9rem; }
         .auth-links a { color:#ffd700; text-decoration:none; }
         .strength-bar { height:4px; border-radius:2px; margin-top:0.3rem; transition:width 0.3s,background 0.3s; }
+
+        /* ── Avatar Section ── */
+        .avatar-section { text-align:center; margin-bottom:1rem; }
+        .avatar-section-label-main { display:block; color:rgba(255,255,255,0.7); font-size:0.85rem; margin-bottom:0.5rem; text-align:left; }
+        .avatar-preview-wrap { display:inline-block; position:relative; cursor:pointer; }
+        .avatar-preview {
+            width:72px; height:72px; border-radius:50%;
+            border:2px solid rgba(255,215,0,0.3);
+            background:rgba(255,255,255,0.05);
+            display:flex; align-items:center; justify-content:center;
+            font-size:2.2rem; transition:all 0.3s;
+            overflow:hidden; position:relative;
+        }
+        .avatar-preview:hover { border-color:rgba(255,215,0,0.6); box-shadow:0 0 15px rgba(255,215,0,0.15); }
+        .avatar-preview img { width:100%; height:100%; object-fit:cover; }
+        .avatar-preview-hint {
+            position:absolute; bottom:-2px; left:-2px; right:-2px;
+            background:rgba(0,0,0,0.6); color:rgba(255,255,255,0.6);
+            font-size:0.6rem; padding:2px 0; text-align:center;
+            border-radius:0 0 36px 36px; pointer-events:none;
+        }
+        .avatar-actions { display:flex; gap:0.5rem; justify-content:center; margin-top:0.5rem; }
+        .avatar-btn-sm {
+            padding:0.3rem 0.8rem; border-radius:14px; font-size:0.75rem; cursor:pointer;
+            border:1px solid rgba(255,215,0,0.2); background:rgba(255,215,0,0.06); color:#ffd700;
+            transition:all 0.2s;
+        }
+        .avatar-btn-sm:hover { background:rgba(255,215,0,0.14); }
+        .avatar-btn-sm.active { background:rgba(255,215,0,0.2); border-color:rgba(255,215,0,0.4); }
+
+        /* ── Avatar Picker Panel (expandable) ── */
+        .avatar-picker-panel {
+            max-height:0; overflow:hidden; transition:max-height 0.35s ease;
+            margin-top:0;
+        }
+        .avatar-picker-panel.open { max-height:420px; margin-top:0.5rem; }
+        .avatar-picker-inner {
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,215,0,0.1);
+            border-radius:10px; padding:0.7rem;
+        }
+        .avatar-cat-tabs { display:flex; gap:0.3rem; margin-bottom:0.5rem; flex-wrap:wrap; }
+        .avatar-cat-tab {
+            padding:0.2rem 0.6rem; border-radius:12px; font-size:0.7rem; cursor:pointer;
+            border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03);
+            color:rgba(255,255,255,0.5); transition:all 0.2s;
+        }
+        .avatar-cat-tab.active { background:rgba(255,215,0,0.12); border-color:rgba(255,215,0,0.3); color:#ffd700; }
+        .avatar-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:0.35rem; max-height:160px; overflow-y:auto; }
+        .avatar-opt {
+            padding:0.4rem; text-align:center; cursor:pointer; border-radius:8px;
+            font-size:1.4rem; transition:all 0.15s;
+            background:rgba(255,255,255,0.02); border:1px solid transparent;
+        }
+        .avatar-opt:hover { background:rgba(255,215,0,0.08); border-color:rgba(255,215,0,0.15); }
+        .avatar-opt.selected { background:rgba(255,215,0,0.15); border-color:rgba(255,215,0,0.35); }
+        .avatar-upload-row { text-align:center; margin-top:0.5rem; }
+        .avatar-upload-btn-sm {
+            display:inline-block; padding:0.3rem 1rem; border-radius:14px; font-size:0.75rem; cursor:pointer;
+            border:1px dashed rgba(255,215,0,0.25); background:rgba(255,215,0,0.04); color:#ffd700;
+            transition:all 0.2s;
+        }
+        .avatar-upload-btn-sm:hover { background:rgba(255,215,0,0.1); border-style:solid; }
+        .avatar-upload-btn-sm.uploading { opacity:0.6; pointer-events:none; }
     </style>
 </head>
 <body>
@@ -68,6 +131,40 @@
                 <input type="password" class="form-input" id="confirmPassword" placeholder="请再次输入密码" autocomplete="new-password" required>
             </div>
 
+            <!-- ══════ 头像选择 ══════ -->
+            <div class="avatar-section">
+                <span class="avatar-section-label-main">选择头像</span>
+                <div class="avatar-preview-wrap" id="avatarPreviewWrap" title="点击展开头像选择">
+                    <div class="avatar-preview" id="avatarPreview">
+                        <span id="avatarPreviewEmoji">🔮</span>
+                        <img id="avatarPreviewImg" src="" alt="" style="display:none;">
+                    </div>
+                    <div class="avatar-preview-hint">点击选择</div>
+                </div>
+
+                <div class="avatar-actions">
+                    <button type="button" class="avatar-btn-sm" id="btnRandomAvatar">🎲 随机</button>
+                    <button type="button" class="avatar-btn-sm" id="btnTogglePicker">🎨 选择头像</button>
+                </div>
+
+                <!-- 头像选择面板（可展开） -->
+                <div class="avatar-picker-panel" id="avatarPickerPanel">
+                    <div class="avatar-picker-inner">
+                        <div class="avatar-cat-tabs">
+                            <span class="avatar-cat-tab active" data-cat="mystic">🐉 玄学</span>
+                            <span class="avatar-cat-tab" data-cat="people">👤 人物</span>
+                            <span class="avatar-cat-tab" data-cat="animal">🐾 动物</span>
+                            <span class="avatar-cat-tab" data-cat="other">✨ 其他</span>
+                        </div>
+                        <div class="avatar-grid" id="avatarGrid"></div>
+                        <div class="avatar-upload-row">
+                            <label class="avatar-upload-btn-sm" id="avatarUploadLabel" for="avatarFileInput">📷 自定义上传</label>
+                            <input type="file" id="avatarFileInput" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary" id="registerBtn">注册</button>
         </form>
 
@@ -81,11 +178,33 @@
 <script src="/js/auth.js"></script>
 <script>
 (function() {
+    'use strict';
     var $ = function(id) { return document.getElementById(id); };
 
+    // ── Avatar state ──
+    var avatarType = 'emoji';    // 'emoji' | 'custom'
+    var avatarPreset = '🔮';     // emoji character
+    var avatarData = '';         // base64 for custom
+    var pickerOpen = false;
+    var currentCat = 'mystic';
+
+    // Avatar presets organized by category
+    var AVATARS = {
+        mystic:  ['🔮','🎴','☯️','🐉','⭐','🌙','🀄','🧙','🦊','🌸'],
+        people:  ['👤','👨','👩','🧑','🤵','👸','🧚','🧛','🧝','🧞'],
+        animal:  ['🐱','🐶','🐼','🐨','🐰','🐯','🐸','🐵','🐤','🦁'],
+        other:   ['💎','🎯','🍀','🌞','🕊️','🔥','💜','🏆','🎭','🌈']
+    };
+    var ALL_AVATARS = [].concat(AVATARS.mystic, AVATARS.people, AVATARS.animal, AVATARS.other);
+
+    // ── Init ──
     document.addEventListener('DOMContentLoaded', function() {
         if (window.createStars) createStars();
-        // 密码强度检测
+
+        // Random initial avatar
+        randomAvatar();
+
+        // Password strength
         $('password').addEventListener('input', function() {
             var v = this.value, l = v.length, bar = $('strengthBar');
             if (l === 0) bar.style.cssText = 'width:0';
@@ -94,8 +213,181 @@
             else if (l < 8) bar.style.cssText = 'width:75%;background:#ffd700';
             else bar.style.cssText = 'width:100%;background:#4cd964';
         });
+
+        // Avatar preview click → toggle picker
+        $('avatarPreviewWrap').addEventListener('click', togglePicker);
+
+        // Toggle picker button
+        $('btnTogglePicker').addEventListener('click', function(e) {
+            e.stopPropagation();
+            togglePicker();
+        });
+
+        // Random button
+        $('btnRandomAvatar').addEventListener('click', function(e) {
+            e.stopPropagation();
+            randomAvatar();
+        });
+
+        // Category tabs
+        var tabs = document.querySelectorAll('.avatar-cat-tab');
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function(e) {
+                e.stopPropagation();
+                switchCat(this.dataset.cat);
+            });
+        });
+
+        // Render initial grid
+        renderGrid(currentCat);
+
+        // File upload
+        $('avatarFileInput').addEventListener('change', handleFileUpload);
     });
 
+    // ── Toggle picker panel ──
+    function togglePicker() {
+        pickerOpen = !pickerOpen;
+        var panel = $('avatarPickerPanel');
+        if (pickerOpen) {
+            panel.classList.add('open');
+            $('btnTogglePicker').classList.add('active');
+            $('btnTogglePicker').textContent = '🎨 收起';
+        } else {
+            panel.classList.remove('open');
+            $('btnTogglePicker').classList.remove('active');
+            $('btnTogglePicker').textContent = '🎨 选择头像';
+        }
+    }
+
+    // ── Switch category ──
+    function switchCat(cat) {
+        currentCat = cat;
+        document.querySelectorAll('.avatar-cat-tab').forEach(function(t) {
+            t.classList.toggle('active', t.dataset.cat === cat);
+        });
+        renderGrid(cat);
+    }
+
+    // ── Render emoji grid ──
+    function renderGrid(cat) {
+        var grid = $('avatarGrid');
+        var list = AVATARS[cat] || AVATARS.mystic;
+        var html = '';
+        list.forEach(function(emoji) {
+            var sel = (avatarType === 'emoji' && avatarPreset === emoji) ? ' selected' : '';
+            html += '<div class="avatar-opt' + sel + '" data-emoji="' + emoji + '">' + emoji + '</div>';
+        });
+        grid.innerHTML = html;
+
+        // Bind clicks
+        grid.querySelectorAll('.avatar-opt').forEach(function(opt) {
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation();
+                selectEmoji(this.dataset.emoji);
+            });
+        });
+    }
+
+    // ── Select emoji preset ──
+    function selectEmoji(emoji) {
+        avatarType = 'emoji';
+        avatarPreset = emoji;
+        avatarData = '';
+        updatePreview();
+        renderGrid(currentCat);
+    }
+
+    // ── Random avatar ──
+    function randomAvatar() {
+        avatarType = 'emoji';
+        avatarPreset = ALL_AVATARS[Math.floor(Math.random() * ALL_AVATARS.length)];
+        avatarData = '';
+        updatePreview();
+        if (pickerOpen) renderGrid(currentCat);
+    }
+
+    // ── Update preview display ──
+    function updatePreview() {
+        var emojiEl = $('avatarPreviewEmoji');
+        var imgEl = $('avatarPreviewImg');
+
+        if (avatarType === 'custom' && avatarData) {
+            emojiEl.style.display = 'none';
+            imgEl.style.display = 'block';
+            imgEl.src = avatarData;
+        } else {
+            emojiEl.style.display = 'block';
+            emojiEl.textContent = avatarPreset || '🔮';
+            imgEl.style.display = 'none';
+            imgEl.src = '';
+        }
+    }
+
+    // ── Compress image (same as profile.js) ──
+    function compressImage(file, maxW, maxH, quality) {
+        return new Promise(function(resolve, reject) {
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function() {
+                URL.revokeObjectURL(url);
+                var w = img.width, h = img.height;
+                if (w > maxW || h > maxH) {
+                    var ratio = Math.min(maxW / w, maxH / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                }
+                var canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = function() {
+                URL.revokeObjectURL(url);
+                reject(new Error('图片加载失败'));
+            };
+            img.src = url;
+        });
+    }
+
+    // ── Handle file upload ──
+    async function handleFileUpload(e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 10 * 1024 * 1024) {
+            Auth.showMsg('authMsg', '图片大小不能超过10MB', true);
+            e.target.value = '';
+            return;
+        }
+
+        var label = $('avatarUploadLabel');
+        label.textContent = '⏳ 压缩中...';
+        label.classList.add('uploading');
+
+        try {
+            var compressed = await compressImage(file, 400, 400, 0.75);
+            avatarType = 'custom';
+            avatarPreset = '';
+            avatarData = compressed;
+            updatePreview();
+
+            // Auto-open picker if closed to show the result
+            if (!pickerOpen) togglePicker();
+            renderGrid(currentCat);
+
+            Auth.showMsg('authMsg', '头像已选择，注册时将一同上传', false, 2000);
+        } catch (err) {
+            Auth.showMsg('authMsg', '图片处理失败，请重试', true);
+        }
+
+        label.textContent = '📷 自定义上传';
+        label.classList.remove('uploading');
+        e.target.value = '';
+    }
+
+    // ── Form submit ──
     $('registerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         var btn = $('registerBtn');
@@ -106,7 +398,7 @@
         var phone = $('phone').value.trim();
         var email = $('email').value.trim();
 
-        // 校验
+        // Validation
         if (!username || username.length < 3) {
             Auth.showMsg('authMsg', '用户名至少3个字符', true); return;
         }
@@ -130,7 +422,10 @@
         btn.textContent = '注册中...';
 
         try {
-            var result = await Auth.register(username, password, email, phone);
+            var result = await Auth.register(
+                username, password, email, phone,
+                avatarType, avatarPreset, avatarData
+            );
             if (result.success) {
                 Auth.showMsg('authMsg', '注册成功！正在跳转...', false);
                 setTimeout(function() { window.location.replace('/'); }, 800);

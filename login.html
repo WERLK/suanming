@@ -258,6 +258,23 @@
             color: rgba(255,255,255,0.6);
             font-size: 0.85rem;
         }
+
+        /* ── Avatar Preview on Login ── */
+        .login-avatar-area {
+            text-align: center; margin-bottom: 0.5rem;
+        }
+        .login-avatar {
+            width: 60px; height: 60px; border-radius: 50%;
+            border: 2px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.04);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .login-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .login-avatar-username {
+            color: rgba(255,255,255,0.5); font-size: 0.75rem; margin-top: 0.3rem;
+        }
     </style>
 </head>
 <body>
@@ -272,6 +289,15 @@
     <div class="auth-card">
         <h1 class="auth-title">🔮 玄机算命网</h1>
         <p class="auth-subtitle">欢迎回来，请登录你的账号</p>
+
+        <!-- 头像预览（记住的用户） -->
+        <div class="login-avatar-area" id="loginAvatarArea" style="display:none;">
+            <div class="login-avatar" id="loginAvatar">
+                <span id="loginAvatarEmoji">👤</span>
+                <img id="loginAvatarImg" src="" alt="" style="display:none;">
+            </div>
+            <div class="login-avatar-username" id="loginAvatarUsername"></div>
+        </div>
 
         <div class="auth-msg" id="authMsg"></div>
 
@@ -372,8 +398,44 @@
         }
     });
 
-    // 自动登录检查
+    // 自动登录检查 + 头像预览
     async function checkAutoLogin() {
+        // 尝试读取记住的用户信息（即使 token 已过期也展示头像）
+        var cachedUser = null;
+        try {
+            var raw = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (raw) cachedUser = JSON.parse(raw);
+        } catch(e) {}
+
+        // 显示记住的用户头像
+        if (cachedUser && cachedUser.username) {
+            var avatarArea = $('loginAvatarArea');
+            var avatarEmoji = $('loginAvatarEmoji');
+            var avatarImg = $('loginAvatarImg');
+            var avatarUsername = $('loginAvatarUsername');
+
+            avatarArea.style.display = 'block';
+            avatarUsername.textContent = cachedUser.username;
+            $('username').value = cachedUser.username;
+
+            if (cachedUser.avatar_type === 'custom' && cachedUser.avatar) {
+                // 自定义头像
+                avatarEmoji.style.display = 'none';
+                avatarImg.style.display = 'block';
+                avatarImg.src = cachedUser.avatar;
+            } else if (cachedUser.avatar_preset) {
+                // 预设emoji头像
+                avatarEmoji.style.display = 'block';
+                avatarEmoji.textContent = cachedUser.avatar_preset;
+                avatarImg.style.display = 'none';
+            } else {
+                avatarEmoji.style.display = 'block';
+                avatarEmoji.textContent = '👤';
+                avatarImg.style.display = 'none';
+            }
+        }
+
+        // Token 有效则直接跳转
         var token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) return;
         try {

@@ -1,15 +1,16 @@
 {
-  "version": "1.11.5",
-  "build_time": "2026-06-01T03:36:00Z",
+  "version": "1.12.0",
+  "build_time": "2026-06-01T03:37:56Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "v1.11.0 → LiveClock实时时钟 | v1.11.1 → 时钟修复 | v1.11.2 → 头像压缩 | v1.11.3 → input移动端 | v1.11.4 → 去重触发 | v1.11.5 → 头像持久化",
+  "description": "v1.12.0 → 注册/登录页头像选择",
   "changelog": {
     "1.11.0": "feat: 全局实时时钟系统(LiveClock) + 首页全格式时钟",
     "1.11.1": "fix: register初始化bug + 首页</script>缺失",
     "1.11.2": "fix: 头像上传canvas压缩+审核阈值",
     "1.11.3": "fix: input[type=file] display:none→opacity:0",
     "1.11.4": "fix: 移除头像上传三重触发",
-    "1.11.5": "fix: 退出重进头像丢失 - avatar_preset空字符串被误判为未设置"
+    "1.11.5": "fix: 退出重进头像丢失 - avatar_preset空字符串被误判为未设置",
+    "1.12.0": "feat: 注册页头像选择器(预设emoji/自定义上传) + 登录页记住用户头像预览 + 后端注册接口支持头像参数"
   }
 }

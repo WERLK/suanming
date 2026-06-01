@@ -185,10 +185,18 @@ window.Auth = (function() {
         return { success: data.success, message: data.message || (data.success ? '' : '登录失败') };
     }
 
-    async function register(username, password, email, phone) {
+    async function register(username, password, email, phone, avatarType, avatarPreset, avatarData) {
         var data = await request('/api/register', {
             method: 'POST',
-            body: { username: username, password: password, email: email || '', phone: phone || '' }
+            body: {
+                username: username,
+                password: password,
+                email: email || '',
+                phone: phone || '',
+                avatar_type: avatarType || 'emoji',
+                avatar_preset: avatarPreset || '',
+                avatar_data: avatarData || ''
+            }
         });
         if (data.success && data.token) {
             // 注册后默认"记住我"，写入 localStorage

@@ -12,6 +12,7 @@
     <title>登录 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/profile-compatible.css">
+    <link rel="stylesheet" href="/css/oauth-buttons.css">
     <style>
         .auth-body {
             min-height: calc(100vh - 56px);
@@ -301,6 +302,26 @@
 
         <div class="auth-msg" id="authMsg"></div>
 
+        <!-- OAuth 社交登录 -->
+        <div class="oauth-buttons" id="oauthButtons">
+            <button class="btn-oauth btn-oauth-github" id="btnOauthGithub" onclick="Auth.oauthLogin('github')">
+                <span class="btn-oauth-icon">🐙</span>
+                <span class="btn-oauth-text">GitHub 登录</span>
+            </button>
+            <button class="btn-oauth btn-oauth-wechat btn-oauth-disabled" id="btnOauthWechat" disabled>
+                <span class="btn-oauth-icon">💬</span>
+                <span class="btn-oauth-text">微信登录</span>
+                <span class="btn-oauth-badge">即将上线</span>
+            </button>
+            <button class="btn-oauth btn-oauth-qq btn-oauth-disabled" id="btnOauthQq" disabled>
+                <span class="btn-oauth-icon">🐧</span>
+                <span class="btn-oauth-text">QQ 登录</span>
+                <span class="btn-oauth-badge">即将上线</span>
+            </button>
+        </div>
+
+        <div class="oauth-divider"><span>或使用账号密码</span></div>
+
         <form id="loginForm" novalidate>
             <div class="form-group">
                 <label>用户名 / 手机号 / 邮箱</label>
@@ -386,6 +407,7 @@
     // Init
     document.addEventListener('DOMContentLoaded', function() {
         if (window.createStars) createStars();
+        updateOAuthButtons();  /* 查询并更新 OAuth 按钮状态 */
         checkAutoLogin();
         loadImageCaptcha();
         initSlider();
@@ -605,6 +627,41 @@
             btn.textContent = '发送验证码';
         }
     };
+
+    // OAuth 按钮状态更新
+    async function updateOAuthButtons() {
+        try {
+            var status = await Auth.getOAuthStatus();
+            var providers = status.providers || {};
+
+            // GitHub
+            var ghBtn = $('btnOauthGithub');
+            if (providers.github) {
+                ghBtn.classList.remove('btn-oauth-disabled');
+                ghBtn.disabled = false;
+            }
+
+            // 微信
+            var wxBtn = $('btnOauthWechat');
+            var wxBadge = wxBtn.querySelector('.btn-oauth-badge');
+            if (providers.wechat) {
+                wxBtn.classList.remove('btn-oauth-disabled');
+                wxBtn.disabled = false;
+                if (wxBadge) wxBadge.style.display = 'none';
+            }
+
+            // QQ
+            var qqBtn = $('btnOauthQq');
+            var qqBadge = qqBtn.querySelector('.btn-oauth-badge');
+            if (providers.qq) {
+                qqBtn.classList.remove('btn-oauth-disabled');
+                qqBtn.disabled = false;
+                if (qqBadge) qqBadge.style.display = 'none';
+            }
+        } catch(e) {
+            /* 默认状态已正确（全部禁用），忽略错误 */
+        }
+    }
 
     // 登录表单提交
     $('loginForm').addEventListener('submit', async function(e) {

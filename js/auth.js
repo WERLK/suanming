@@ -274,6 +274,29 @@ window.Auth = (function() {
         });
     }
 
+    // ========== OAuth 第三方登录 ==========
+
+    /**
+     * 跳转到第三方平台 OAuth 授权页面
+     * @param {string} provider - github | wechat | qq
+     */
+    function oauthLogin(provider) {
+        window.location.href = '/api/oauth/' + provider;
+    }
+
+    /**
+     * 查询哪些 OAuth 平台已配置并可用
+     * @returns {Promise<{success: boolean, providers: {github: boolean, wechat: boolean, qq: boolean}}>}
+     */
+    async function getOAuthStatus() {
+        try {
+            var resp = await fetch(API_BASE + '/api/oauth/status');
+            return await resp.json();
+        } catch (e) {
+            return { success: false, providers: {} };
+        }
+    }
+
     // ========== UI 辅助 ==========
 
     function showMsg(elementId, message, isError, duration) {
@@ -361,7 +384,9 @@ window.Auth = (function() {
         onAuthChange: onAuthChange,
         syncTokenToBoth: syncTokenToBoth,
         handleAuthError: handleAuthError,
-        verifyToken: verifyToken
+        verifyToken: verifyToken,
+        oauthLogin: oauthLogin,
+        getOAuthStatus: getOAuthStatus
     };
 })();
 

@@ -8,6 +8,7 @@
     <title>注册 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/profile-compatible.css">
+    <link rel="stylesheet" href="/css/oauth-buttons.css">
     <style>
         .auth-body { min-height:calc(100vh - 56px); display:flex; align-items:center; justify-content:center; padding:1rem; }
         .auth-card { width:100%; max-width:400px; background:linear-gradient(135deg,rgba(26,26,46,0.95),rgba(22,33,62,0.95)); border:1px solid rgba(255,215,0,0.2); border-radius:16px; padding:2rem; }
@@ -168,6 +169,25 @@
             <button type="submit" class="btn btn-primary" id="registerBtn">注册</button>
         </form>
 
+        <!-- OAuth 第三方注册 -->
+        <div class="oauth-divider"><span>或使用第三方账号注册</span></div>
+        <div class="oauth-buttons" id="oauthButtons">
+            <button class="btn-oauth btn-oauth-github" id="btnOauthGithub" onclick="Auth.oauthLogin('github')">
+                <span class="btn-oauth-icon">🐙</span>
+                <span class="btn-oauth-text">GitHub 注册</span>
+            </button>
+            <button class="btn-oauth btn-oauth-wechat btn-oauth-disabled" id="btnOauthWechat" disabled>
+                <span class="btn-oauth-icon">💬</span>
+                <span class="btn-oauth-text">微信注册</span>
+                <span class="btn-oauth-badge">即将上线</span>
+            </button>
+            <button class="btn-oauth btn-oauth-qq btn-oauth-disabled" id="btnOauthQq" disabled>
+                <span class="btn-oauth-icon">🐧</span>
+                <span class="btn-oauth-text">QQ 注册</span>
+                <span class="btn-oauth-badge">即将上线</span>
+            </button>
+        </div>
+
         <div class="auth-links">
             已有账号？<a href="/login.html">立即登录</a> | <a href="/">返回首页</a>
         </div>
@@ -200,6 +220,7 @@
     // ── Init ──
     document.addEventListener('DOMContentLoaded', function() {
         if (window.createStars) createStars();
+        updateOAuthButtons();
 
         // Random initial avatar
         randomAvatar();
@@ -440,6 +461,36 @@
             btn.textContent = '注册';
         }
     });
+
+    // OAuth 按钮状态更新
+    async function updateOAuthButtons() {
+        try {
+            var status = await Auth.getOAuthStatus();
+            var providers = status.providers || {};
+
+            var ghBtn = $('btnOauthGithub');
+            if (providers.github) {
+                ghBtn.classList.remove('btn-oauth-disabled');
+                ghBtn.disabled = false;
+            }
+
+            var wxBtn = $('btnOauthWechat');
+            var wxBadge = wxBtn.querySelector('.btn-oauth-badge');
+            if (providers.wechat) {
+                wxBtn.classList.remove('btn-oauth-disabled');
+                wxBtn.disabled = false;
+                if (wxBadge) wxBadge.style.display = 'none';
+            }
+
+            var qqBtn = $('btnOauthQq');
+            var qqBadge = qqBtn.querySelector('.btn-oauth-badge');
+            if (providers.qq) {
+                qqBtn.classList.remove('btn-oauth-disabled');
+                qqBtn.disabled = false;
+                if (qqBadge) qqBadge.style.display = 'none';
+            }
+        } catch(e) {}
+    }
 })();
 </script>
 </div>

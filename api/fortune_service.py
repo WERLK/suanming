@@ -1725,6 +1725,7 @@ class UniversalAnalyzer:
         'xuexing': 'xuexing', '血型': 'xuexing',
         'zeji': 'zeji', '择吉': 'zeji', '择日': 'zeji',
         'data_analysis': 'data_analysis', '数据分析': 'data_analysis',
+        'caishen': 'caishen', '财神': 'caishen', '财神方位': 'caishen',
     }
 
     @classmethod
@@ -1901,6 +1902,110 @@ class UniversalAnalyzer:
         return bazi_data
 
     @classmethod
+    def get_caishen(cls, date_str):
+        """
+        获取指定日期的财神方位
+        根据传统干支推算：日干决定财神方位
+        :param date_str: 日期字符串 YYYY-MM-DD
+        :return: 财神方位详细信息
+        """
+        try:
+            from datetime import date as date_type
+            dt = date_type.fromisoformat(date_str)
+
+            # 计算日柱天干（与 BaziCalculator 算法一致）
+            ref_date = date_type(1900, 1, 31)  # 甲子日
+            diff = (dt - ref_date).days
+            tg_idx = (0 + diff) % 10  # 1900-01-31 = 甲子, index 0
+            tian_gan = BaziCalculator.TIANGAN[tg_idx]
+
+            # 财神方位根据日干确定
+            direction_map = {
+                '甲': ('东北方', '甲日财神在东北，宜向东北方求财'),
+                '乙': ('东北方', '乙日财神在东北，宜向东北方求财'),
+                '丙': ('正东方', '丙日财神在正东，宜向正东方求财'),
+                '丁': ('正东方', '丁日财神在正东，宜向正东方求财'),
+                '戊': ('正北方', '戊日财神在正北，宜向正北方求财'),
+                '己': ('正北方', '己日财神在正北，宜向正北方求财'),
+                '庚': ('正西方', '庚日财神在正西，宜向正西方求财'),
+                '辛': ('正西方', '辛日财神在正西，宜向正西方求财'),
+                '壬': ('正南方', '壬日财神在正南，宜向正南方求财'),
+                '癸': ('正南方', '癸日财神在正南，宜向正南方求财'),
+            }
+            direction, direction_desc = direction_map.get(
+                tian_gan, ('正东方', '财神方位正东')
+            )
+
+            # 喜神方位
+            xishen_map = {
+                '甲': '东北方', '乙': '西北方', '丙': '西南方',
+                '丁': '正南方', '戊': '东南方', '己': '正东方',
+                '庚': '西北方', '辛': '西南方', '壬': '正南方', '癸': '东南方',
+            }
+            # 福神方位
+            fushen_map = {
+                '甲': '东南方', '乙': '正东方', '丙': '正北方',
+                '丁': '正东方', '戊': '正北方', '己': '正南方',
+                '庚': '西南方', '辛': '正西方', '壬': '西北方', '癸': '正西方',
+            }
+
+            xishen = xishen_map.get(tian_gan, '东南方')
+            fushen = fushen_map.get(tian_gan, '正东方')
+
+            # 最佳时段（巳时、午时）
+            best_time = '巳时(09:00-11:00)、午时(11:00-13:00)'
+
+            # 宜忌
+            yi_list = ['求财', '交易', '开市', '签约', '纳财', '投资']
+            ji_list = ['破土', '安葬', '词讼', '争执']
+
+            # 供品
+            supplies = '香三支、红烛一对、时令水果三样、糕点三盘、清茶一杯'
+
+            # 供香指南
+            incense_guide = (
+                '1. 面向%s摆放供桌，保持整洁\n'
+                '2. 点燃香烛，虔诚默念心愿\n'
+                '3. 摆放供品，水果以苹果、橘子、葡萄为佳\n'
+                '4. 最佳祭拜时间：%s\n'
+                '5. 祭拜完毕后，供品可分食，寓意分享福气\n'
+                '6. 心诚则灵，不可心存不敬'
+            ) % (direction, best_time)
+
+            return {
+                'direction': direction,
+                'wealth_direction': direction,
+                'day_gan': tian_gan,
+                'xishen': xishen,
+                'fushen': fushen,
+                'best_time': best_time,
+                'time': best_time,
+                '时辰': best_time,
+                'yi': '、'.join(yi_list),
+                'suitable': '、'.join(yi_list),
+                '宜': '、'.join(yi_list),
+                'ji': '、'.join(ji_list),
+                'taboo': '、'.join(ji_list),
+                '忌': '、'.join(ji_list),
+                'supplies': supplies,
+                '供品': supplies,
+                'incense_guide': incense_guide,
+                '供香指南': incense_guide,
+                'tips': '今日财神位于%s，喜神在%s，福神在%s。最佳求财时段为巳时和午时。' % (direction, xishen, fushen),
+                'advice': '建议在%s放置招财物件或进行商务活动，可提升财运。' % direction,
+                '建议': '建议在%s放置招财物件或进行商务活动，可提升财运。' % direction,
+                'summary': '%s（%s日）财神方位：%s。%s。' % (date_str, tian_gan, direction, direction_desc),
+                'date': date_str,
+            }
+        except Exception as e:
+            return {
+                'direction': '正东方',
+                'summary': '财神方位查询出错：%s' % str(e),
+                'date': date_str,
+                'error': str(e),
+            }
+
+    @classmethod
     def _smart_fallback(cls, normalized, params):
         """
         智能仿真分析：为暂无专用计算器的模块类型生成有意义的分析结果。
@@ -1931,6 +2036,7 @@ class UniversalAnalyzer:
             'xuexing': {'综合': (55, 88), '性格': (50, 90), '运势': (48, 85), '健康': (52, 88), '事业': (50, 90), '爱情': (48, 88)},
             'zeji': {'综合': (60, 95), '天时': (55, 92), '地利': (50, 90), '人和': (52, 92), '吉时': (48, 88), '冲煞': (45, 85)},
             'data_analysis': {'综合': (60, 95), '模型': (55, 92), '数据': (52, 90), '算法': (50, 88), '趋势': (55, 93), '精准度': (58, 95)},
+            'caishen': {'综合': (58, 95), '财神': (55, 92), '财运': (55, 95), '吉时': (52, 90), '方位': (50, 88)},
         }
 
         cat = categories.get(normalized, {'综合': (55, 90), '运势': (50, 88), '财运': (48, 85), '事业': (50, 88), '健康': (52, 90), '感情': (48, 85)})

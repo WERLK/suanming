@@ -564,7 +564,8 @@ def register():
             'vip_level': 'basic',
             'vip_expire': None,
             'ad_watch_count': 0,
-            'ad_watch_date': ''
+            'ad_watch_date': '',
+            'tutorial_shown': False
         }
 
         # 处理自定义头像上传
@@ -623,7 +624,8 @@ def register():
                 'nickname': new_user['nickname'],
                 'avatar_type': new_user['avatar_type'],
                 'avatar_preset': new_user['avatar_preset'],
-                'avatar': new_user.get('avatar', '')
+                'avatar': new_user.get('avatar', ''),
+                'tutorial_shown': False
             }
         }), 200
     except Exception as e:
@@ -655,6 +657,7 @@ def login():
 
         # 每日登录自动发放随机 VIP 时长
         _ensure_vip_fields(user)
+        _ensure_tutorial_field(user)
         today = _get_today()
         login_reward_given = False
         login_reward_hours = 0
@@ -705,7 +708,8 @@ def login():
                 'username': user['username'],
                 'nickname': user.get('nickname', user['username']),
                 'avatar_type': user.get('avatar_type', ''),
-                'avatar_preset': user.get('avatar_preset', '')
+                'avatar_preset': user.get('avatar_preset', ''),
+                'tutorial_shown': user.get('tutorial_shown', False)
             }
         })
         if remember:
@@ -751,6 +755,7 @@ def get_profile():
             user['avatar_type'] = 'emoji'
             user['avatar_preset'] = generate_random_avatar()
             need_save = True
+        _ensure_tutorial_field(user)
         if need_save:
             for i, u in enumerate(users):
                 if u['id'] == user['id']:
@@ -782,11 +787,37 @@ def get_profile():
             'idcard_image': user.get('idcard_image', ''),  # 兼容旧字段
             'idcard_image_front': user.get('idcard_image_front', ''),
             'idcard_image_back': user.get('idcard_image_back', ''),
-            'idcard_upload_time': user.get('idcard_upload_time', '')
+            'idcard_upload_time': user.get('idcard_upload_time', ''),
+            'tutorial_shown': user.get('tutorial_shown', True)
         }
         return jsonify({'success': True, 'user': user_info}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'获取用户信息失败: {str(e)}'}), 500
+
+@app.route('/api/profile/tutorial-done', methods=['POST'])
+def tutorial_done():
+    """标记新手教程已完成（服务端记录，清除浏览器数据也不重复显示）"""
+    try:
+        token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'success': False, 'message': '未登录'}), 401
+        user_id = verify_token(token)
+        if not user_id:
+            return jsonify({'success': False, 'message': 'token无效或已过期'}), 401
+        users = load_users()
+        updated = False
+        for i, u in enumerate(users):
+            if u['id'] == user_id:
+                u['tutorial_shown'] = True
+                users[i] = u
+                updated = True
+                break
+        if not updated:
+            return jsonify({'success': False, 'message': '用户不存在'}), 404
+        save_users(users)
+        return jsonify({'success': True, 'message': '已标记'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'操作失败: {str(e)}'}), 500
 
 @app.route('/api/profile', methods=['PUT'])
 def update_profile():
@@ -1491,6 +1522,13 @@ def _ensure_realname_fields(user):
     for k, v in defaults.items():
         if k not in user:
             user[k] = v
+    return user
+
+
+def _ensure_tutorial_field(user):
+    """确保用户有新手教程标记字段"""
+    if 'tutorial_shown' not in user:
+        user['tutorial_shown'] = False
     return user
 
 

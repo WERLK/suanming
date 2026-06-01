@@ -13,7 +13,8 @@ window.Profile = (function() {
         profile: null,    // GET /api/profile 返回的完整用户对象
         realname: null,   // GET /api/profile/realname-status 返回的实名状态
         loading: false,
-        rnIdcardBase64: '',  // 身份证照片临时存储
+        rnIdcardFrontBase64: '',  // 身份证正面 base64
+        rnIdcardBackBase64: '',   // 身份证反面 base64
         rnUploadOnly: false  // 已认证用户补传模式
     };
 
@@ -54,7 +55,7 @@ window.Profile = (function() {
         dom.avatarDefault   = document.getElementById('avatarDefault');
         dom.avatarInput     = document.getElementById('avatarInput');
 
-        // Realname
+        // Realname (正反面上传)
         dom.realnameModal       = document.getElementById('realnameModal');
         dom.rnVerifiedContent   = document.getElementById('realnameVerifiedContent');
         dom.rnFormContent       = document.getElementById('realnameFormContent');
@@ -68,6 +69,19 @@ window.Profile = (function() {
         dom.rnInputId           = document.getElementById('rnInputId');
         dom.rnSubmitBtn         = document.getElementById('rnSubmitBtn');
         dom.rnError             = document.getElementById('rnError');
+        // 正面
+        dom.rnIdcardUploadFront     = document.getElementById('rnIdcardUploadFront');
+        dom.rnIdcardFileFront       = document.getElementById('rnIdcardFileFront');
+        dom.rnIdcardImgFront        = document.getElementById('rnIdcardImgFront');
+        dom.rnIdcardPlaceholderFront = document.getElementById('rnIdcardPlaceholderFront');
+        dom.rnIdcardPreviewFront    = document.getElementById('rnIdcardPreviewFront');
+        // 反面
+        dom.rnIdcardUploadBack      = document.getElementById('rnIdcardUploadBack');
+        dom.rnIdcardFileBack        = document.getElementById('rnIdcardFileBack');
+        dom.rnIdcardImgBack         = document.getElementById('rnIdcardImgBack');
+        dom.rnIdcardPlaceholderBack  = document.getElementById('rnIdcardPlaceholderBack');
+        dom.rnIdcardPreviewBack     = document.getElementById('rnIdcardPreviewBack');
+        // 兼容旧 DOM（可能不存在）
         dom.rnIdcardUpload      = document.getElementById('rnIdcardUpload');
         dom.rnIdcardFile        = document.getElementById('rnIdcardFile');
         dom.rnIdcardImg         = document.getElementById('rnIdcardImg');
@@ -271,11 +285,17 @@ window.Profile = (function() {
             dom.avatarInput.addEventListener('change', uploadAvatar);
         }
 
-        // ── Realname modal: idcard upload area click → trigger file input ──
-        if (dom.rnIdcardUpload) {
-            dom.rnIdcardUpload.addEventListener('click', function(e) {
-                if (e.target.closest('#rnIdcardClearBtn')) return;
-                if (dom.rnIdcardFile) dom.rnIdcardFile.click();
+        // ── Realname: upload area click → trigger file input ──
+        if (dom.rnIdcardUploadFront) {
+            dom.rnIdcardUploadFront.addEventListener('click', function(e) {
+                if (e.target.closest('#rnIdcardClearBtnFront')) return;
+                if (dom.rnIdcardFileFront) dom.rnIdcardFileFront.click();
+            });
+        }
+        if (dom.rnIdcardUploadBack) {
+            dom.rnIdcardUploadBack.addEventListener('click', function(e) {
+                if (e.target.closest('#rnIdcardClearBtnBack')) return;
+                if (dom.rnIdcardFileBack) dom.rnIdcardFileBack.click();
             });
         }
 
@@ -288,12 +308,19 @@ window.Profile = (function() {
             });
         }
 
-        // ── Realname: clear idcard image ──
-        var rnClearBtn = document.getElementById('rnIdcardClearBtn');
-        if (rnClearBtn) {
-            rnClearBtn.addEventListener('click', function(e) {
+        // ── Realname: clear idcard image (front/back) ──
+        var rnClearBtnFront = document.getElementById('rnIdcardClearBtnFront');
+        if (rnClearBtnFront) {
+            rnClearBtnFront.addEventListener('click', function(e) {
                 e.stopPropagation();
-                clearIdcardImage();
+                clearIdcardImage('front');
+            });
+        }
+        var rnClearBtnBack = document.getElementById('rnIdcardClearBtnBack');
+        if (rnClearBtnBack) {
+            rnClearBtnBack.addEventListener('click', function(e) {
+                e.stopPropagation();
+                clearIdcardImage('back');
             });
         }
 
@@ -302,16 +329,32 @@ window.Profile = (function() {
             dom.rnSubmitBtn.addEventListener('click', submitRealname);
         }
 
-        // ── ID card file input ──
-        if (dom.rnIdcardFile) {
-            dom.rnIdcardFile.addEventListener('change', handleIdcardFile);
+        // ── ID card file input (正反面) ──
+        if (dom.rnIdcardFileFront) {
+            dom.rnIdcardFileFront.addEventListener('change', function(e) {
+                handleIdcardFile(e, 'front');
+            });
+        }
+        if (dom.rnIdcardFileBack) {
+            dom.rnIdcardFileBack.addEventListener('change', function(e) {
+                handleIdcardFile(e, 'back');
+            });
         }
 
-        // ── ID card drag & drop ──
-        if (dom.rnIdcardUpload) {
-            dom.rnIdcardUpload.addEventListener('drop', handleIdcardDrop);
-            dom.rnIdcardUpload.addEventListener('dragover', handleIdcardDragOver);
-            dom.rnIdcardUpload.addEventListener('dragleave', handleIdcardDragLeave);
+        // ── ID card drag & drop (正反面) ──
+        if (dom.rnIdcardUploadFront) {
+            dom.rnIdcardUploadFront.addEventListener('drop', function(e) {
+                handleIdcardDrop(e, 'front');
+            });
+            dom.rnIdcardUploadFront.addEventListener('dragover', handleIdcardDragOver);
+            dom.rnIdcardUploadFront.addEventListener('dragleave', handleIdcardDragLeave);
+        }
+        if (dom.rnIdcardUploadBack) {
+            dom.rnIdcardUploadBack.addEventListener('drop', function(e) {
+                handleIdcardDrop(e, 'back');
+            });
+            dom.rnIdcardUploadBack.addEventListener('dragover', handleIdcardDragOver);
+            dom.rnIdcardUploadBack.addEventListener('dragleave', handleIdcardDragLeave);
         }
 
         // ── Edit profile form submit ──
@@ -408,7 +451,9 @@ window.Profile = (function() {
                 dom.tagVerified.style.cursor = 'pointer';
             }
             if (dom.tagIdcard) {
-                dom.tagIdcard.style.display = (rn.data && rn.data.idcard_image) ? 'inline-block' : 'none';
+                var hasFront = rn.data && rn.data.idcard_image_front;
+                var hasBack = rn.data && rn.data.idcard_image_back;
+                dom.tagIdcard.style.display = (hasFront || hasBack) ? 'inline-block' : 'none';
             }
         } else {
             if (dom.tagVerified) {
@@ -630,10 +675,13 @@ window.Profile = (function() {
                 if (dom.rnRegion) dom.rnRegion.textContent = (data.data && data.data.region) || '未知';
                 if (dom.rnTime) dom.rnTime.textContent = (data.data && data.data.verify_time) || '';
                 if (dom.rnIdcardStatus) {
-                    dom.rnIdcardStatus.textContent = (data.data && data.data.idcard_image) ? '📷 已上传证件照' : '📷 未上传证件照';
+                    var front = (data.data && data.data.idcard_image_front) ? '✅' : '❌';
+                    var back = (data.data && data.data.idcard_image_back) ? '✅' : '❌';
+                    dom.rnIdcardStatus.textContent = '📷 正面' + front + ' 反面' + back;
                 }
                 if (dom.rnIdcardUploadBtn) {
-                    dom.rnIdcardUploadBtn.style.display = (data.data && data.data.idcard_image) ? 'none' : 'block';
+                    var hasBoth = (data.data && data.data.idcard_image_front && data.data.idcard_image_back);
+                    dom.rnIdcardUploadBtn.style.display = hasBoth ? 'none' : 'block';
                 }
             }
         } catch(e) {
@@ -659,60 +707,104 @@ window.Profile = (function() {
         state.rnUploadOnly = true;
     }
 
-    function handleIdcardFile(e) {
+    function handleIdcardFile(e, side) {
         var file = e.target.files[0];
         if (!file) return;
-        if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过5MB'); return; }
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-            state.rnIdcardBase64 = ev.target.result;
-            if (dom.rnIdcardImg) dom.rnIdcardImg.src = ev.target.result;
-            if (dom.rnIdcardPlaceholder) dom.rnIdcardPlaceholder.style.display = 'none';
-            if (dom.rnIdcardPreview) dom.rnIdcardPreview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+        if (file.size > 10 * 1024 * 1024) { showToast('图片大小不能超过10MB'); return; }
+
+        var placeholder, preview, imgEl;
+        if (side === 'back') {
+            placeholder = dom.rnIdcardPlaceholderBack;
+            preview = dom.rnIdcardPreviewBack;
+            imgEl = dom.rnIdcardImgBack;
+        } else {
+            placeholder = dom.rnIdcardPlaceholderFront;
+            preview = dom.rnIdcardPreviewFront;
+            imgEl = dom.rnIdcardImgFront;
+        }
+
+        // Canvas 压缩后再读取 base64（防止手机照片过大）
+        compressImage(file, 1200, 800, 0.85).then(function(base64) {
+            if (side === 'back') {
+                state.rnIdcardBackBase64 = base64;
+            } else {
+                state.rnIdcardFrontBase64 = base64;
+            }
+            if (imgEl) imgEl.src = base64;
+            if (placeholder) placeholder.style.display = 'none';
+            if (preview) preview.style.display = 'block';
+        }).catch(function() {
+            showToast('图片处理失败，请重试');
+        });
     }
 
-    function handleIdcardDrop(e) {
+    function handleIdcardDrop(e, side) {
         e.preventDefault();
-        if (dom.rnIdcardUpload) {
-            dom.rnIdcardUpload.style.borderColor = 'rgba(0,180,255,0.25)';
-            dom.rnIdcardUpload.style.background = 'rgba(0,180,255,0.03)';
+        var uploadEl = (side === 'back') ? dom.rnIdcardUploadBack : dom.rnIdcardUploadFront;
+        if (uploadEl) {
+            uploadEl.style.borderColor = 'rgba(0,180,255,0.25)';
+            uploadEl.style.background = 'rgba(0,180,255,0.03)';
         }
         var file = e.dataTransfer.files[0];
         if (!file) return;
-        if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过5MB'); return; }
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-            state.rnIdcardBase64 = ev.target.result;
-            if (dom.rnIdcardImg) dom.rnIdcardImg.src = ev.target.result;
-            if (dom.rnIdcardPlaceholder) dom.rnIdcardPlaceholder.style.display = 'none';
-            if (dom.rnIdcardPreview) dom.rnIdcardPreview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+        if (file.size > 10 * 1024 * 1024) { showToast('图片大小不能超过10MB'); return; }
+
+        var placeholder, preview, imgEl;
+        if (side === 'back') {
+            placeholder = dom.rnIdcardPlaceholderBack;
+            preview = dom.rnIdcardPreviewBack;
+            imgEl = dom.rnIdcardImgBack;
+        } else {
+            placeholder = dom.rnIdcardPlaceholderFront;
+            preview = dom.rnIdcardPreviewFront;
+            imgEl = dom.rnIdcardImgFront;
+        }
+
+        compressImage(file, 1200, 800, 0.85).then(function(base64) {
+            if (side === 'back') {
+                state.rnIdcardBackBase64 = base64;
+            } else {
+                state.rnIdcardFrontBase64 = base64;
+            }
+            if (imgEl) imgEl.src = base64;
+            if (placeholder) placeholder.style.display = 'none';
+            if (preview) preview.style.display = 'block';
+        }).catch(function() {
+            showToast('图片处理失败，请重试');
+        });
     }
 
     function handleIdcardDragOver(e) {
         e.preventDefault();
-        if (dom.rnIdcardUpload) {
-            dom.rnIdcardUpload.style.borderColor = 'rgba(0,180,255,0.6)';
-            dom.rnIdcardUpload.style.background = 'rgba(0,180,255,0.06)';
+        var el = e.currentTarget;
+        if (el) {
+            el.style.borderColor = 'rgba(0,180,255,0.6)';
+            el.style.background = 'rgba(0,180,255,0.06)';
         }
     }
 
     function handleIdcardDragLeave(e) {
-        if (dom.rnIdcardUpload) {
-            dom.rnIdcardUpload.style.borderColor = 'rgba(0,180,255,0.25)';
-            dom.rnIdcardUpload.style.background = 'rgba(0,180,255,0.03)';
+        var el = e.currentTarget;
+        if (el) {
+            el.style.borderColor = 'rgba(0,180,255,0.25)';
+            el.style.background = 'rgba(0,180,255,0.03)';
         }
     }
 
-    function clearIdcardImage() {
-        state.rnIdcardBase64 = '';
-        if (dom.rnIdcardImg) dom.rnIdcardImg.src = '';
-        if (dom.rnIdcardPlaceholder) dom.rnIdcardPlaceholder.style.display = 'block';
-        if (dom.rnIdcardPreview) dom.rnIdcardPreview.style.display = 'none';
-        if (dom.rnIdcardFile) dom.rnIdcardFile.value = '';
+    function clearIdcardImage(side) {
+        if (side === 'back') {
+            state.rnIdcardBackBase64 = '';
+            if (dom.rnIdcardImgBack) dom.rnIdcardImgBack.src = '';
+            if (dom.rnIdcardPlaceholderBack) dom.rnIdcardPlaceholderBack.style.display = 'block';
+            if (dom.rnIdcardPreviewBack) dom.rnIdcardPreviewBack.style.display = 'none';
+            if (dom.rnIdcardFileBack) dom.rnIdcardFileBack.value = '';
+        } else {
+            state.rnIdcardFrontBase64 = '';
+            if (dom.rnIdcardImgFront) dom.rnIdcardImgFront.src = '';
+            if (dom.rnIdcardPlaceholderFront) dom.rnIdcardPlaceholderFront.style.display = 'block';
+            if (dom.rnIdcardPreviewFront) dom.rnIdcardPreviewFront.style.display = 'none';
+            if (dom.rnIdcardFileFront) dom.rnIdcardFileFront.value = '';
+        }
     }
 
     async function submitRealname() {
@@ -720,14 +812,17 @@ window.Profile = (function() {
         var isUploadOnly = btn.getAttribute('data-mode') === 'upload-only' || state.rnUploadOnly;
 
         if (isUploadOnly) {
-            if (!state.rnIdcardBase64) {
-                showToast('⚠️ 请先选择身份证照片');
+            if (!state.rnIdcardFrontBase64 && !state.rnIdcardBackBase64) {
+                showToast('⚠️ 请至少上传一张身份证照片');
                 return;
             }
             btn.disabled = true;
             btn.textContent = '上传中...';
             try {
-                var upData = await api.uploadIdcard({ idcard_image: state.rnIdcardBase64 });
+                var upBody = {};
+                if (state.rnIdcardFrontBase64) upBody.idcard_image_front = state.rnIdcardFrontBase64;
+                if (state.rnIdcardBackBase64) upBody.idcard_image_back = state.rnIdcardBackBase64;
+                var upData = await api.uploadIdcard(upBody);
                 if (upData.success) {
                     showToast('✅ 证件照上传成功');
                     closeRealnameModal();
@@ -766,7 +861,8 @@ window.Profile = (function() {
         btn.textContent = '验证中...';
 
         var body = { real_name: name, id_number: idNumber };
-        if (state.rnIdcardBase64) body.idcard_image = state.rnIdcardBase64;
+        if (state.rnIdcardFrontBase64) body.idcard_image_front = state.rnIdcardFrontBase64;
+        if (state.rnIdcardBackBase64) body.idcard_image_back = state.rnIdcardBackBase64;
 
         try {
             var data = await api.verifyRealname(body);

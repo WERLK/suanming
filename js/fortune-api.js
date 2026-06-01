@@ -362,32 +362,62 @@ function showFortuneError(containerId, message, onRetry, onFallback) {
 // ===== 图片上传分析（升级版） =====
 
 /**
- * 上传图片进行AI分析
+ * 压缩图片（canvas缩放+JPEG导出），避免大图base64传输失败
+ * @param {File} file
+ * @param {number} maxW
+ * @param {number} maxH
+ * @param {number} quality
+ * @returns {Promise<string>} base64
+ */
+function compressImageFortune(file, maxW, maxH, quality) {
+    return new Promise(function(resolve, reject) {
+        var img = new Image();
+        var url = URL.createObjectURL(file);
+        img.onload = function() {
+            URL.revokeObjectURL(url);
+            var w = img.width, h = img.height;
+            if (w > maxW || h > maxH) {
+                var ratio = Math.min(maxW / w, maxH / h);
+                w = Math.round(w * ratio);
+                h = Math.round(h * ratio);
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = function() {
+            URL.revokeObjectURL(url);
+            reject(new Error('图片加载失败'));
+        };
+        img.src = url;
+    });
+}
+
+/**
+ * 上传图片进行AI分析（带压缩）
  * @param {File} file - 图片文件
  * @param {string} moduleType - 模块类型 (bazi/ziwei/fengshui/mianxiang/shouxiang)
  * @returns {Promise<object|null>}
  */
 async function uploadImageFortune(file, moduleType) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            const base64 = e.target.result;
-            const result = await fortuneAPI('image-analyze', {
-                image: base64,
-                module_type: moduleType
-            }, { 
-                loadingMsg: '正在AI智能分析图片...',
-                apiBase: API_BASE  // 传递 API 基础地址
-            });
-            resolve(result);
-        };
-        reader.onerror = function() {
-            hideFortuneLoading();
-            showToast('图片读取失败');
-            resolve(null);
-        };
-        reader.readAsDataURL(file);
-    });
+    try {
+        // 先压缩图片，避免大图base64传输失败
+        var base64 = await compressImageFortune(file, 800, 800, 0.8);
+        var result = await fortuneAPI('image-analyze', {
+            image: base64,
+            module_type: moduleType
+        }, {
+            loadingMsg: '正在AI智能分析图片...',
+            apiBase: API_BASE
+        });
+        return result;
+    } catch (e) {
+        hideFortuneLoading();
+        showToast('图片读取失败');
+        return null;
+    }
 }
 
 /**
@@ -471,6 +501,7 @@ window.formatServerTime = formatServerTime;
 window.LiveClock = LiveClock;
 window.createLiveTimeElement = createLiveTimeElement;
 window.activateLiveClocks = activateLiveClocks;
+window.compressImageFortune = compressImageFortune;
 window.showFortuneError = showFortuneError;
 window.uploadImageFortune = uploadImageFortune;
 window.triggerImageUploadV2 = triggerImageUploadV2;

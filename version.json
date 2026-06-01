@@ -1,9 +1,9 @@
 {
-  "version": "1.12.0",
-  "build_time": "2026-06-01T03:37:56Z",
+  "version": "1.12.1",
+  "build_time": "2026-06-01T03:49:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "v1.12.0 → 注册/登录页头像选择",
+  "description": "v1.12.1 → 身份证正反面上传+图片压缩全站统一",
   "changelog": {
     "1.11.0": "feat: 全局实时时钟系统(LiveClock) + 首页全格式时钟",
     "1.11.1": "fix: register初始化bug + 首页</script>缺失",
@@ -11,6 +11,7 @@
     "1.11.3": "fix: input[type=file] display:none→opacity:0",
     "1.11.4": "fix: 移除头像上传三重触发",
     "1.11.5": "fix: 退出重进头像丢失 - avatar_preset空字符串被误判为未设置",
-    "1.12.0": "feat: 注册页头像选择器(预设emoji/自定义上传) + 登录页记住用户头像预览 + 后端注册接口支持头像参数"
+    "1.12.0": "feat: 注册页头像选择器(预设emoji/自定义上传) + 登录页记住用户头像预览 + 后端注册接口支持头像参数",
+    "1.12.1": "fix: 身份证上传正反面+PIL缩放+compressImage | 模块图片分析compressImage全站统一 | _save_idcard_image重构"
   }
 }

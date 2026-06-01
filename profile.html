@@ -421,19 +421,37 @@
                     <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">身份证号码</label>
                     <input id="rnInputId" type="text" placeholder="请输入18位身份证号" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:8px;color:#fff;font-size:0.9rem;text-security:disc;" maxlength="18" autocomplete="off">
                 </div>
-                <!-- 身份证照片上传 -->
+                <!-- 身份证照片上传（正反面） -->
                 <div style="margin-bottom:16px;">
-                    <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">身份证照片 <span style="color:rgba(255,255,255,0.35);font-size:0.7rem;">(可选，用于完善数据库)</span></label>
-                    <div id="rnIdcardUpload" style="border:2px dashed rgba(0,180,255,0.25);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(0,180,255,0.03);position:relative;overflow:hidden;">
-                        <input type="file" id="rnIdcardFile" accept="image/*" style="display:none">
-                        <div id="rnIdcardPlaceholder">
-                            <div style="font-size:2rem;margin-bottom:4px;">📷</div>
-                            <div style="color:rgba(255,255,255,0.5);font-size:0.8rem;">点击或拖拽上传身份证照片</div>
-                            <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:2px;">JPG/PNG，最大5MB</div>
+                    <label style="display:block;color:rgba(255,255,255,0.6);font-size:0.8rem;margin-bottom:4px;">身份证照片 <span style="color:rgba(255,255,255,0.35);font-size:0.7rem;">(可选，支持正反面上传)</span></label>
+                    <!-- 正面 -->
+                    <div style="margin-bottom:8px;">
+                        <div style="color:rgba(255,255,255,0.45);font-size:0.7rem;margin-bottom:2px;">📷 正面（人像面）</div>
+                        <div id="rnIdcardUploadFront" style="border:2px dashed rgba(0,180,255,0.25);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(0,180,255,0.03);position:relative;overflow:hidden;">
+                            <input type="file" id="rnIdcardFileFront" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
+                            <div id="rnIdcardPlaceholderFront">
+                                <div style="font-size:1.5rem;margin-bottom:2px;">📷</div>
+                                <div style="color:rgba(255,255,255,0.5);font-size:0.75rem;">点击上传身份证正面</div>
+                            </div>
+                            <div id="rnIdcardPreviewFront" style="display:none;position:relative;">
+                                <img id="rnIdcardImgFront" src="" style="max-width:100%;max-height:140px;border-radius:6px;">
+                                <button id="rnIdcardClearBtnFront" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,0,0,0.5);color:#fff;font-size:0.8rem;cursor:pointer;line-height:1;">×</button>
+                            </div>
                         </div>
-                        <div id="rnIdcardPreview" style="display:none;position:relative;">
-                            <img id="rnIdcardImg" src="" style="max-width:100%;max-height:180px;border-radius:6px;">
-                            <button id="rnIdcardClearBtn" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,0,0,0.5);color:#fff;font-size:0.8rem;cursor:pointer;line-height:1;">×</button>
+                    </div>
+                    <!-- 反面 -->
+                    <div>
+                        <div style="color:rgba(255,255,255,0.45);font-size:0.7rem;margin-bottom:2px;">📷 反面（国徽面）</div>
+                        <div id="rnIdcardUploadBack" style="border:2px dashed rgba(0,180,255,0.25);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(0,180,255,0.03);position:relative;overflow:hidden;">
+                            <input type="file" id="rnIdcardFileBack" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
+                            <div id="rnIdcardPlaceholderBack">
+                                <div style="font-size:1.5rem;margin-bottom:2px;">📷</div>
+                                <div style="color:rgba(255,255,255,0.5);font-size:0.75rem;">点击上传身份证反面</div>
+                            </div>
+                            <div id="rnIdcardPreviewBack" style="display:none;position:relative;">
+                                <img id="rnIdcardImgBack" src="" style="max-width:100%;max-height:140px;border-radius:6px;">
+                                <button id="rnIdcardClearBtnBack" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,0,0,0.5);color:#fff;font-size:0.8rem;cursor:pointer;line-height:1;">×</button>
+                            </div>
                         </div>
                     </div>
                 </div>

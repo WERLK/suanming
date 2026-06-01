@@ -779,7 +779,9 @@ def get_profile():
             'real_name': user.get('real_name', ''),
             'id_last4': user.get('id_last4', ''),
             'verify_time': user.get('verify_time', ''),
-            'idcard_image': user.get('idcard_image', ''),
+            'idcard_image': user.get('idcard_image', ''),  # 兼容旧字段
+            'idcard_image_front': user.get('idcard_image_front', ''),
+            'idcard_image_back': user.get('idcard_image_back', ''),
             'idcard_upload_time': user.get('idcard_upload_time', '')
         }
         return jsonify({'success': True, 'user': user_info}), 200
@@ -843,7 +845,8 @@ def verify_realname():
         data = request.get_json()
         real_name = (data.get('real_name', '') or '').strip()
         id_number = (data.get('id_number', '') or '').strip()
-        idcard_image = (data.get('idcard_image', '') or '').strip()  # base64 图片（可选）
+        idcard_image_front = (data.get('idcard_image_front', '') or data.get('idcard_image', '') or '').strip()  # 正面
+        idcard_image_back = (data.get('idcard_image_back', '') or '').strip()   # 反面
 
         if not real_name or len(real_name) < 2:
             return jsonify({'success': False, 'message': '请输入真实姓名'}), 400
@@ -873,27 +876,38 @@ def verify_realname():
         _ensure_realname_fields(user)
         if user.get('id_verified'):
             # 已认证用户仍可补充上传身份证照片
-            if idcard_image and not user.get('idcard_image'):
-                saved_url = _save_idcard_image(user_id, idcard_image)
+            updated = False
+            if idcard_image_front and not user.get('idcard_image_front'):
+                saved_url = _save_idcard_image(user_id, idcard_image_front, 'front')
                 if saved_url:
-                    user['idcard_image'] = saved_url
+                    user['idcard_image_front'] = saved_url
                     user['idcard_upload_time'] = datetime.now().isoformat()
-                    users[user_idx] = user
-                    save_users(users)
-                    return jsonify({
-                        'success': True,
-                        'message': '身份证照片上传成功',
-                        'data': {
-                            'real_name_masked': mask_name(user.get('real_name', '')),
-                            'id_masked': mask_id_last4(user.get('id_last4', '')),
-                            'region': user.get('id_region', ''),
-                            'verified': True,
-                            'idcard_uploaded': True
-                        }
-                    }), 200
-                else:
-                    return jsonify({'success': False, 'message': '图片格式无效'}), 400
-            return jsonify({'success': False, 'message': '已完成实名认证，无需重复提交'}), 400
+                    updated = True
+            if idcard_image_back and not user.get('idcard_image_back'):
+                saved_url = _save_idcard_image(user_id, idcard_image_back, 'back')
+                if saved_url:
+                    user['idcard_image_back'] = saved_url
+                    user['idcard_upload_time'] = datetime.now().isoformat()
+                    updated = True
+            if updated:
+                users[user_idx] = user
+                save_users(users)
+                front_ok = bool(user.get('idcard_image_front'))
+                back_ok = bool(user.get('idcard_image_back'))
+                return jsonify({
+                    'success': True,
+                    'message': f'身份证照片上传成功（正面{"✅" if front_ok else "❌"} 反面{"✅" if back_ok else "❌"}）',
+                    'data': {
+                        'real_name_masked': mask_name(user.get('real_name', '')),
+                        'id_masked': mask_id_last4(user.get('id_last4', '')),
+                        'region': user.get('id_region', ''),
+                        'verified': True,
+                        'idcard_uploaded': front_ok or back_ok,
+                        'idcard_image_front': user.get('idcard_image_front', ''),
+                        'idcard_image_back': user.get('idcard_image_back', '')
+                    }
+                }), 200
+            return jsonify({'success': False, 'message': '已完成实名认证，无需重复提交或图片格式无效'}), 400
 
         # 存储认证信息（身份证号只存哈希）
         id_hash = hashlib.sha256(id_number.encode()).hexdigest()
@@ -906,14 +920,21 @@ def verify_realname():
         user['id_region_code'] = check['region_code']
         user['verify_time'] = now
 
-        # 处理身份证图片
-        idcard_uploaded = False
-        if idcard_image:
-            saved_url = _save_idcard_image(user_id, idcard_image)
+        # 处理身份证图片（正反面）
+        idcard_uploaded_front = False
+        idcard_uploaded_back = False
+        if idcard_image_front:
+            saved_url = _save_idcard_image(user_id, idcard_image_front, 'front')
             if saved_url:
-                user['idcard_image'] = saved_url
+                user['idcard_image_front'] = saved_url
                 user['idcard_upload_time'] = now
-                idcard_uploaded = True
+                idcard_uploaded_front = True
+        if idcard_image_back:
+            saved_url = _save_idcard_image(user_id, idcard_image_back, 'back')
+            if saved_url:
+                user['idcard_image_back'] = saved_url
+                user['idcard_upload_time'] = now
+                idcard_uploaded_back = True
 
         # 如果用户生日/性别为空则自动填充
         if not user.get('birthday') and check['birth_date']:
@@ -931,12 +952,17 @@ def verify_realname():
                          gender=user.get('gender', ''), birth_str=user.get('birthday', ''),
                          vip_level=user.get('vip_level', 'basic'),
                          id_region=user.get('id_region', ''), is_verified=True,
-                         has_idcard_image=idcard_uploaded)
+                         has_idcard_image=(idcard_uploaded_front or idcard_uploaded_back))
         except: pass
+
+        parts = []
+        if idcard_uploaded_front: parts.append('正面已上传')
+        if idcard_uploaded_back: parts.append('反面已上传')
+        upload_msg = '，'.join(parts) if parts else ''
 
         return jsonify({
             'success': True,
-            'message': '实名认证成功' + ('，身份证照片已上传' if idcard_uploaded else ''),
+            'message': '实名认证成功' + ('（' + upload_msg + '）' if upload_msg else ''),
             'data': {
                 'real_name_masked': mask_name(real_name),
                 'id_masked': mask_id_last4(id_number),
@@ -944,7 +970,9 @@ def verify_realname():
                 'gender': check['gender'],
                 'birth_date': check['birth_date'],
                 'verified': True,
-                'idcard_uploaded': idcard_uploaded
+                'idcard_uploaded': (idcard_uploaded_front or idcard_uploaded_back),
+                'idcard_image_front': user.get('idcard_image_front', ''),
+                'idcard_image_back': user.get('idcard_image_back', '')
             }
         }), 200
 
@@ -980,7 +1008,8 @@ def realname_status():
                     'id_masked': mask_id_last4(user.get('id_last4', '')),
                     'region': user.get('id_region', ''),
                     'verify_time': user.get('verify_time', ''),
-                    'idcard_image': user.get('idcard_image', ''),
+                    'idcard_image_front': user.get('idcard_image_front', ''),
+                    'idcard_image_back': user.get('idcard_image_back', ''),
                     'idcard_upload_time': user.get('idcard_upload_time', '')
                 }
             }), 200
@@ -993,7 +1022,7 @@ def realname_status():
 
 @app.route('/api/profile/upload-idcard', methods=['POST'])
 def upload_idcard():
-    """单独上传身份证照片（已认证用户补充上传）"""
+    """单独上传身份证照片（已认证用户补充上传，支持正反面）"""
     try:
         token = request.cookies.get('token') or request.headers.get('Authorization', '').replace('Bearer ', '')
         if not token:
@@ -1003,9 +1032,11 @@ def upload_idcard():
             return jsonify({'success': False, 'message': 'token无效'}), 401
 
         data = request.get_json()
-        idcard_image = (data.get('idcard_image', '') or '').strip()
-        if not idcard_image:
-            return jsonify({'success': False, 'message': '请上传身份证照片'}), 400
+        idcard_image_front = (data.get('idcard_image_front', '') or data.get('idcard_image', '') or '').strip()
+        idcard_image_back = (data.get('idcard_image_back', '') or '').strip()
+
+        if not idcard_image_front and not idcard_image_back:
+            return jsonify({'success': False, 'message': '请上传身份证照片（正面或反面）'}), 400
 
         users = load_users()
         user_idx = None
@@ -1019,19 +1050,33 @@ def upload_idcard():
 
         _ensure_realname_fields(user)
 
-        saved_url = _save_idcard_image(user_id, idcard_image)
-        if not saved_url:
-            return jsonify({'success': False, 'message': '图片格式无效或超过5MB'}), 400
+        saved_front = None
+        saved_back = None
+        if idcard_image_front:
+            saved_front = _save_idcard_image(user_id, idcard_image_front, 'front')
+        if idcard_image_back:
+            saved_back = _save_idcard_image(user_id, idcard_image_back, 'back')
 
-        user['idcard_image'] = saved_url
-        user['idcard_upload_time'] = datetime.now().isoformat()
+        if not saved_front and not saved_back:
+            return jsonify({'success': False, 'message': '图片格式无效或超过10MB'}), 400
+
+        now = datetime.now().isoformat()
+        if saved_front:
+            user['idcard_image_front'] = saved_front
+        if saved_back:
+            user['idcard_image_back'] = saved_back
+        user['idcard_upload_time'] = now
         users[user_idx] = user
         save_users(users)
 
         return jsonify({
             'success': True,
             'message': '身份证照片上传成功',
-            'data': {'idcard_image': saved_url, 'idcard_upload_time': user['idcard_upload_time']}
+            'data': {
+                'idcard_image_front': user.get('idcard_image_front', ''),
+                'idcard_image_back': user.get('idcard_image_back', ''),
+                'idcard_upload_time': now
+            }
         }), 200
 
     except Exception as e:
@@ -1438,7 +1483,9 @@ def _ensure_realname_fields(user):
         'id_region': '',
         'id_region_code': '',
         'verify_time': '',
-        'idcard_image': '',
+        'idcard_image': '',      # 兼容旧字段
+        'idcard_image_front': '',
+        'idcard_image_back': '',
         'idcard_upload_time': ''
     }
     for k, v in defaults.items():
@@ -1544,20 +1591,53 @@ IDCARD_SAVE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
 os.makedirs(IDCARD_SAVE_DIR, exist_ok=True)
 
 
-def _save_idcard_image(user_id, image_data):
-    """保存身份证图片，返回URL或None"""
+def _save_idcard_image(user_id, image_data, suffix=''):
+    """保存身份证图片（自动缩放），返回URL或None
+    
+    Args:
+        user_id: 用户ID
+        image_data: base64图片数据
+        suffix: 文件名后缀，如 '_front' / '_back'，用于区分正反面
+    """
     try:
         # 移除 base64 前缀
         if 'base64,' in image_data:
             image_data = image_data.split('base64,')[1]
         image_bytes = base64.b64decode(image_data)
 
-        # 限制大小：最大 5MB
-        if len(image_bytes) > 5 * 1024 * 1024:
+        # 限制解码后大小：最大 10MB（压缩前，后续会缩放）
+        if len(image_bytes) > 10 * 1024 * 1024:
             return None
 
+        # 用 PIL 缩放身份证图片（保留文字细节，最大宽度 1200px）
+        try:
+            from PIL import Image
+            import io
+            img = Image.open(io.BytesIO(image_bytes))
+            w, h = img.size
+            if w > 1200:
+                ratio = 1200.0 / w
+                new_w = 1200
+                new_h = int(h * ratio)
+                img = img.resize((new_w, new_h), Image.LANCZOS)
+            # 转 JPEG 保存
+            buf = io.BytesIO()
+            img_format = img.format or 'JPEG'
+            if img_format.upper() == 'PNG' and img.mode in ('RGBA', 'LA', 'P'):
+                # PNG 透明通道转白色背景
+                rgb_img = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                rgb_img.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                img = rgb_img
+            img.save(buf, format='JPEG', quality=85)
+            image_bytes = buf.getvalue()
+        except Exception:
+            pass  # PIL 处理失败则使用原始 bytes
+
         # 保存图片
-        filename = f"{user_id}_{int(datetime.now().timestamp())}.jpg"
+        suffix_str = f'_{suffix}' if suffix else ''
+        filename = f"{user_id}{suffix_str}_{int(datetime.now().timestamp())}.jpg"
         filepath = os.path.join(IDCARD_SAVE_DIR, filename)
         with open(filepath, 'wb') as f:
             f.write(image_bytes)

@@ -400,9 +400,7 @@ function triggerImageUpload(moduleType) {
         const file = this.files[0];
         if (!file) return;
         window.showToast('正在分析图片...');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
+        window.compressImageFortune(file, 800, 800, 0.8).then(function(base64) {
             fetch('/api/image-analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -424,8 +422,9 @@ function triggerImageUpload(moduleType) {
                 window.showToast('分析失败，请检查网络');
                 console.error('图片分析错误：', err);
             });
-        };
-        reader.readAsDataURL(file);
+        }).catch(function(err) {
+            window.showToast('图片处理失败');
+        });
     };
     input.click();
 }

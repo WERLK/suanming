@@ -710,7 +710,7 @@
                 renderFortuneAPI(result.data, zodiac);
                 // 显示数据来源标识
                 const source = (result.meta && result.meta.source) ? result.meta.source : 'realtime';
-                showDataBadge(source, 'fortuneResult');
+                showDataBadge(source, 'fortuneResult', meta);
             } else {
                 // API失败，显示错误和降级选项
                 const errMsg = result ? '分析失败，请重试' : '网络连接失败，请检查网络后重试';

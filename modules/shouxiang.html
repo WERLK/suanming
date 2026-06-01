@@ -589,7 +589,7 @@ function showResult(result, meta) {
         resultArea.innerHTML = simpleHtml;
         resultArea.style.display = 'block';
         document.querySelector('.analysis-form').style.display = 'none';
-        if (meta) showDataBadge(meta.source || 'local', 'resultArea');
+        if (meta) showDataBadge(meta.source || 'local', 'resultArea', meta);
         return;
     }
     let html = '';
@@ -678,7 +678,7 @@ function showResult(result, meta) {
     
     // 显示数据来源标识
     if (meta) {
-        showDataBadge(meta.source || 'local', 'resultArea');
+        showDataBadge(meta.source || 'local', 'resultArea', meta);
     }
 }
 

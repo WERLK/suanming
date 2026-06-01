@@ -554,7 +554,7 @@ function showResult(result, meta) {
     document.querySelector('.divination-form').style.display = 'none';
     
     if (meta) {
-        showDataBadge(meta.source || 'local', 'resultArea');
+        showDataBadge(meta.source || 'local', 'resultArea', meta);
     }
 }
 

@@ -420,7 +420,7 @@ function renderFengshuiAPIResult(data, meta) {
         simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (data.overview || data.summary || '分析完成，切换到专业模式可查看完整详情。') + '</p></div>';
         simpleHtml += '</div>';
         document.getElementById('fengshuiResultContainer').innerHTML = simpleHtml;
-        showDataBadge(meta && meta.source ? meta.source : 'realtime', 'fengshuiResultContainer');
+        showDataBadge(meta && meta.source ? meta.source : 'realtime', 'fengshuiResultContainer', meta);
         document.getElementById('fengshuiResultContainer').scrollIntoView({ behavior: 'smooth' });
         return;
     }
@@ -485,7 +485,7 @@ function renderFengshuiAPIResult(data, meta) {
     container.innerHTML = html;
     
     const source = (meta && meta.source) ? meta.source : 'realtime';
-    showDataBadge(source, 'fengshuiResultContainer');
+    showDataBadge(source, 'fengshuiResultContainer', meta);
     container.scrollIntoView({ behavior: 'smooth' });
 }
 

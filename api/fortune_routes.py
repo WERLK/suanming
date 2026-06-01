@@ -11,7 +11,7 @@
 
 import json
 import time
-from datetime import date
+from datetime import date, datetime
 from functools import wraps
 from flask import Blueprint, request, jsonify, g
 
@@ -112,6 +112,12 @@ def _get_rate_limit_info():
 
 def success_response(data, source='realtime', message='', module_type=None):
     """Return a success JSON response."""
+    # 优先使用 data 中自带的 generated_at，否则用当前服务器时间
+    generated_at = None
+    if isinstance(data, dict) and 'generated_at' in data:
+        generated_at = data['generated_at']
+    if not generated_at:
+        generated_at = datetime.now().isoformat()
     payload = {
         'success': True,
         'message': message,
@@ -119,6 +125,7 @@ def success_response(data, source='realtime', message='', module_type=None):
         'meta': {
             'source': source,
             'module_type': module_type if module_type else request.path.split('/')[-1],
+            'generated_at': generated_at,
         },
     }
     log_info(f"API成功: {request.path} (source={source})")

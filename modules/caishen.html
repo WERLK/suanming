@@ -681,7 +681,7 @@ function renderCaishenAPIResult(data, meta) {
     setTimeout(() => updateCompassPosition('apiDirFlag', direction), 100);
     
     const source = (meta && meta.source) ? meta.source : 'realtime';
-    showDataBadge(source, 'caishenResultContainer');
+    showDataBadge(source, 'caishenResultContainer', meta);
 }
 
 // ===== 本地计算降级渲染 =====

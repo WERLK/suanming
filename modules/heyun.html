@@ -348,7 +348,7 @@ function calculateHeyun() {
             var html = generateHeyunResultFromApi(apiResult.data);
             document.getElementById('resultContainer').innerHTML = html;
             switchTab('result', document.querySelector('[data-tab="result"]'));
-            showDataBadge(apiResult.meta ? apiResult.meta.source : 'realtime', 'resultContainer');
+            showDataBadge(apiResult.meta ? apiResult.meta.source : 'realtime', 'resultContainer', apiResult.meta);
             if (window.showToast) window.showToast('合婚配对分析完成！');
         } else {
             // API 失败 - 降级到本地算法

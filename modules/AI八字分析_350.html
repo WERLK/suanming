@@ -245,7 +245,7 @@ async function runAnalysis() {
     
     if (result && result.data) {
         resultArea.classList.add('show');
-        showDataBadge(result.meta.source || 'realtime', 'apiResult');
+        showDataBadge(result.meta.source || 'realtime', 'apiResult', result.meta);
         
         var data = result.data;
         

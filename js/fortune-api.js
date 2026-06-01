@@ -162,27 +162,34 @@ function hideFortuneLoading() {
  * @param {string} source - 数据来源: 'realtime' | 'cached' | 'local' | 'local_fallback'
  * @param {string} containerId - 容器元素ID
  */
-function showDataBadge(source, containerId) {
+function showDataBadge(source, containerId, meta) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
+
     const badges = {
         'realtime': { text: '🟢 实时联网数据', cls: 'badge-realtime' },
         'cached': { text: '🟡 缓存数据', cls: 'badge-cached' },
         'local': { text: '🔵 服务器计算', cls: 'badge-local' },
         'local_fallback': { text: '🔴 离线数据（网络不可用）', cls: 'badge-fallback' }
     };
-    
+
     const info = badges[source] || badges['local'];
-    const now = new Date().toLocaleTimeString('zh-CN');
-    
+
+    // 优先使用服务器返回的 generated_at 时间戳，保证刷新不跳变
+    let timeStr;
+    if (meta && meta.generated_at) {
+        timeStr = new Date(meta.generated_at).toLocaleTimeString('zh-CN', { hour12: false });
+    } else {
+        timeStr = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+    }
+
     // 移除已有的badge
     const existing = container.querySelector('.fortune-data-badge');
     if (existing) existing.remove();
-    
+
     const badge = document.createElement('div');
     badge.className = 'fortune-data-badge ' + info.cls;
-    badge.innerHTML = `${info.text} · 更新于 ${now}`;
+    badge.innerHTML = `${info.text} · 更新于 ${timeStr}`;
     container.insertBefore(badge, container.firstChild);
 }
 

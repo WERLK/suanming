@@ -731,7 +731,7 @@ function renderZiweiAPIResult(data, meta) {
     
     // 显示数据来源标识
     const source = (meta && meta.source) ? meta.source : 'realtime';
-    showDataBadge(source, 'resultContainer');
+    showDataBadge(source, 'resultContainer', meta);
 }
 
 // ===== 显示知识详情 =====

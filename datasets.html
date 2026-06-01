@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>数据表格 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/profile-compatible.css">
     <style>
         .datasets-container { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
 
@@ -295,11 +296,11 @@
             addFieldDef(); // 默认一个字段
         }
 
-        document.getElementById('datasetModal').classList.add('active');
+        document.getElementById('datasetModal').classList.add('show');
     }
 
     function closeDatasetModal() {
-        document.getElementById('datasetModal').classList.remove('active');
+        document.getElementById('datasetModal').classList.remove('show');
         editingDsId = null;
     }
 
@@ -512,7 +513,7 @@
         });
 
         document.getElementById('recordFormFields').innerHTML = formHtml;
-        document.getElementById('recordModal').classList.add('active');
+        document.getElementById('recordModal').classList.add('show');
 
         if (recordId) {
             loadRecordDetail(recordId);
@@ -520,7 +521,7 @@
     }
 
     function closeRecordModal() {
-        document.getElementById('recordModal').classList.remove('active');
+        document.getElementById('recordModal').classList.remove('show');
         editingRecordId = null;
     }
 
@@ -597,7 +598,22 @@
         return div.innerHTML;
     }
 
-    document.addEventListener('DOMContentLoaded', function() { loadDatasets(); });
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDatasets();
+
+        // 点击弹窗遮罩层关闭
+        ['datasetModal', 'recordModal'].forEach(function(id) {
+            var modal = document.getElementById(id);
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        if (id === 'datasetModal') closeDatasetModal();
+                        else closeRecordModal();
+                    }
+                });
+            }
+        });
+    });
 </script>
 <script src="/js/sidenav.js"></script>
 <script src="/js/footer.js"></script>

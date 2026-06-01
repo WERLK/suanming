@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>合婚配对 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 .page-header {
     display: flex;
@@ -255,6 +256,14 @@
                         <option value="亥">亥时 (21:00-23:00)</option>
                     </select>
                 </div>
+                <!-- 专业/初学模式切换 -->
+                <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+                    <span class="mode-toggle-label">排盘模式</span>
+                    <div class="mode-toggle-pill">
+                        <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                        <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+                    </div>
+                </div>
                 <button type="button" class="submit-btn" onclick="calculateHeyun()">💕 开始配对</button>
             </div>
         </div>
@@ -292,6 +301,7 @@
 
 <script src="/js/main.js"></script>
 <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
 <script>
 // ===== 标签页切换 =====
 function switchTab(tabName, btnElement) {
@@ -306,6 +316,7 @@ function switchTab(tabName, btnElement) {
 
 // ===== 合婚计算（API优先 + 本地降级） =====
 function calculateHeyun() {
+    var mode = ModeToggle.getMode();
     var name1 = document.getElementById('name1Input').value.trim();
     var name2 = document.getElementById('name2Input').value.trim();
     var date1 = document.getElementById('date1Input').value;
@@ -424,6 +435,13 @@ function calcHeyunCore(name1, gender1, date1, name2, gender2, date2) {
 
 // ===== 生成合婚结果 =====
 function generateHeyunResult(data) {
+    var mode = ModeToggle.getMode();
+    if (mode === 'simple') {
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (data.grade || '分析完成，切换到专业模式可查看完整详情。') + '</p></div>';
+        simpleHtml += '</div>';
+        return simpleHtml;
+    }
     var html = '';
     html += '<div class="result-section"><h3>💕 合婚配对结果</h3>';
     html += '<table class="result-table">';
@@ -490,6 +508,13 @@ function generateHeyunResult(data) {
 
 // ===== 从API数据生成合婚结果视图 =====
 function generateHeyunResultFromApi(data) {
+    var mode = ModeToggle.getMode();
+    if (mode === 'simple') {
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (data.compatibility || data.analysis || '分析完成，切换到专业模式可查看完整详情。') + '</p></div>';
+        simpleHtml += '</div>';
+        return simpleHtml;
+    }
     var html = '';
     var score = data.score || 0;
     var grade = data.compatibility || '';
@@ -621,6 +646,10 @@ function triggerImageUpload(moduleType) {
 // ===== 初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     if (window.createStars) window.createStars();
+    ModeToggle.injectUI(
+        document.querySelector('.mode-toggle-wrapper') || document.body,
+        { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+    );
 });
 </script>
 

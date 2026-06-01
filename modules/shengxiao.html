@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>生肖运势 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mode-toggle.css">
     <style>
         .page-header {
             display: flex;
@@ -269,6 +270,14 @@
 
             <!-- 生肖选择 -->
             <div class="section">
+                <!-- 专业/初学模式切换 -->
+                <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+                    <span class="mode-toggle-label">排盘模式</span>
+                    <div class="mode-toggle-pill">
+                        <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                        <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+                    </div>
+                </div>
                 <h2>选择你的生肖</h2>
                 <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem;" id="queryHint">
                     选择生肖后查看运势详解
@@ -334,6 +343,7 @@
 
     <script src="/js/main.js"></script>
     <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
     <script>
         // ===== 天干地支数据 =====
         const tiangan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
@@ -568,6 +578,17 @@
 
         // 渲染本地算法生成的数据（原有渲染逻辑）
         function renderLocalFortune(data, zodiac) {
+            var mode = ModeToggle.getMode();
+
+            if (mode === 'simple') {
+                var simpleHtml = '<div class="beginner-result">';
+                simpleHtml += '<div class="beginner-card"><h3>' + zodiac + '运势分析</h3><p>' + (data.summary || '生肖运势分析完成') + '</p></div>';
+                simpleHtml += '</div>';
+                document.getElementById('fortuneResult').innerHTML = simpleHtml;
+                document.getElementById('fortuneResult').style.display = 'block';
+                return;
+            }
+
             let html = '<div class="fortune-year">📅 ' + data.yearName + '（' + data.yearZodiac + '年）' + zodiac + '运势</div>';
             html += '<div class="fortune-rank ' + data.rankClass + '">排名：第' + data.rank + '名 | ' + data.rankText + ' | ' + data.relationType + '</div>';
             
@@ -595,7 +616,18 @@
 
         // 渲染API返回的数据
         function renderFortuneAPI(apiData, zodiac) {
+            var mode = ModeToggle.getMode();
             const d = apiData;
+
+            if (mode === 'simple') {
+                var simpleHtml = '<div class="beginner-result">';
+                simpleHtml += '<div class="beginner-card"><h3>' + zodiac + '运势分析</h3><p>' + (d.description || d.summary || '生肖运势分析完成') + '</p></div>';
+                simpleHtml += '</div>';
+                document.getElementById('fortuneResult').innerHTML = simpleHtml;
+                document.getElementById('fortuneResult').style.display = 'block';
+                return;
+            }
+
             const yearName = d.year_ganzhi || (d.year + '年');
             const scores = d.scores || {};
             const relation = d.relation || {};
@@ -694,6 +726,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
             initDateSelectors();
+            ModeToggle.injectUI(
+                document.querySelector('.mode-toggle-wrapper') || document.body,
+                { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+            );
         });
     </script>
 </body>

@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>塔罗牌 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mode-toggle.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -552,6 +553,14 @@
         </div>
 
         <!-- ===== 抽牌按钮 ===== -->
+        <!-- 专业/初学模式切换 -->
+        <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+            <span class="mode-toggle-label">排盘模式</span>
+            <div class="mode-toggle-pill">
+                <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+            </div>
+        </div>
         <div class="draw-section" id="drawSection">
             <button class="btn-draw" id="btnDraw" onclick="handleDraw()">🔮 开始抽牌</button>
         </div>
@@ -590,6 +599,7 @@
     <!-- ===== Scripts ===== -->
     <script src="/js/main.js"></script>
     <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
     <script>
     'use strict';
 
@@ -607,6 +617,10 @@
     // ===== 初始化 =====
     document.addEventListener('DOMContentLoaded', function() {
         if (window.createStars) window.createStars();
+        ModeToggle.injectUI(
+            document.querySelector('.mode-toggle-wrapper') || document.body,
+            { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+        );
     });
 
     // ===== 抽牌入口 =====
@@ -728,7 +742,19 @@
 
     // ===== 渲染解读区 =====
     function renderReading() {
+        var mode = ModeToggle.getMode();
         var section = document.getElementById('readingSection');
+
+        if (mode === 'simple') {
+            var simpleHtml = '<div class="beginner-result">';
+            simpleHtml += '<div class="beginner-card"><h3>塔罗牌占卜结果</h3><p>您抽取了三张塔罗牌：' + STATE.cards.map(function(c) { return c.name; }).join('、') + '</p>';
+            simpleHtml += '<p>请切换到专业模式查看详细牌义解读。</p>';
+            simpleHtml += '</div></div>';
+            section.innerHTML = simpleHtml;
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
         var html = '<div class="reading-cards fade-in">';
 
         for (var i = 0; i < STATE.cards.length; i++) {

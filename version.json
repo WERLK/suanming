@@ -1,8 +1,8 @@
 {
-  "version": "1.9.4",
-  "build_time": "2026-05-31T08:20:00Z",
+  "version": "1.10.0",
+  "build_time": "2026-06-01T01:00:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "vip.html全面重构：复用VipModule模块+移除BaiduAd+广告自动领取+新版UI",
-  "fix_count": 3
+  "description": "全站256模块新增专业/初学模式切换：ModeToggle共享组件+批量注入+初学模式卡片式简化渲染",
+  "fix_count": 4
 }

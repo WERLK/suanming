@@ -13,6 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>照片命理 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 .back-btn {
     background: none;
@@ -154,9 +155,18 @@
 </div>
 
 <script src="/js/main.js"></script>
+    <script src="/js/mode-toggle.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     createStars();
+    // 初始化模式切换组件
+    // 此页面暂无分析功能，跳过模式切换初始化
+    // // 此页面暂无分析功能，跳过模式切换初始化
+    // ModeToggle.injectUI(
+    //     document.querySelector('.dev-card') || document.body,
+    //     { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+    // );
+
 });
 </script>
 

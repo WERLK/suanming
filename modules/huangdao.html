@@ -280,6 +280,7 @@
             .page-header { padding: 1rem 2rem; }
         }
     </style>
+    <link rel="stylesheet" href="/css/mode-toggle.css">
 </head>
 <body>
     <div class="stars" id="stars"></div>
@@ -292,6 +293,15 @@
 
     <!-- content-area -->
     <div class="content-area" id="contentArea">
+        <!-- 专业/初学模式切换 -->
+        <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+            <span class="mode-toggle-label">排盘模式</span>
+            <div class="mode-toggle-pill">
+                <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+            </div>
+        </div>
+
         <!-- 日期选择区域 -->
         <div class="date-controls">
             <input type="date" id="datePicker" title="选择日期查询黄历" />
@@ -316,6 +326,7 @@
 
     <script src="/js/main.js"></script>
     <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
     <script>
     (function() {
         'use strict';
@@ -388,6 +399,15 @@
         // ===== Render: Result =====
         function showResult(data, meta) {
             if (!data) { showError('返回数据为空'); return; }
+
+            var mode = ModeToggle.getMode();
+            if (mode === 'simple') {
+                var simpleHtml = '<div class="beginner-result">';
+                simpleHtml += '<div class="beginner-card"><h3>黄历分析结果</h3><p>' + (data.summary || data.prediction || '黄历查询完成，切换到专业模式可查看完整详情。') + '</p></div>';
+                simpleHtml += '</div>';
+                resultContainer.innerHTML = simpleHtml;
+                return;
+            }
 
             var yi = data.yi || [];
             var ji = data.ji || [];
@@ -612,6 +632,11 @@
             });
 
             load(currentDate);
+
+            ModeToggle.injectUI(
+                document.querySelector('.mode-toggle-wrapper') || document.body,
+                { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+            );
         }
 
         if (document.readyState === 'loading') {

@@ -13,6 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>星座运势 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 /* ===== 页面基础 ===== */
 body {
@@ -446,6 +447,15 @@ body {
             <button type="button" class="submit-btn" style="width:auto;padding:0.8rem 1.5rem;font-size:0.9rem;" onclick="triggerImageUpload('xingzuo')">📷 上传图片分析</button>
         </div>
 
+        <!-- 专业/初学模式切换 -->
+        <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+            <span class="mode-toggle-label">排盘模式</span>
+            <div class="mode-toggle-pill">
+                <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+            </div>
+        </div>
+
         <div class="section">
             <h2>选择你的星座</h2>
             <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 1rem;">
@@ -543,6 +553,7 @@ body {
 
 <script src="/js/main.js"></script>
 <script src="/js/fortune-api.js"></script>
+<script src="/js/mode-toggle.js"></script>
 <script>
 (function() {
     'use strict';
@@ -733,8 +744,21 @@ body {
 
     // ===== 显示运势结果 =====
     function showFortuneResult(signName, emoji, data, source) {
+        var mode = ModeToggle.getMode();
         var periodLabel = PERIOD_MAP[currentPeriod].label;
         var horoscope = data.data.horoscope || '';
+
+        if (mode === 'simple') {
+            var simpleHtml = renderPeriodTabs();
+            simpleHtml += '<div class="beginner-result">';
+            simpleHtml += '<div class="beginner-card"><h3>' + emoji + ' ' + signName + ' ' + periodLabel + '运势</h3><p>' + (horoscope.substring(0, 200) || '星座运势分析完成') + '</p></div>';
+            simpleHtml += '</div>';
+            fortuneResult.style.display = 'block';
+            fortuneResult.innerHTML = simpleHtml;
+            fortuneResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
         var dateStr = data.data.date || '';
         var updatedTime = new Date().toLocaleTimeString('zh-CN');
 
@@ -816,6 +840,10 @@ body {
     document.addEventListener('DOMContentLoaded', function() {
         if (window.createStars) createStars();
         renderZodiacGrid();
+        ModeToggle.injectUI(
+            document.querySelector('.mode-toggle-wrapper') || document.body,
+            { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+        );
     });
 
 })();

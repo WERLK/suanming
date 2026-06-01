@@ -13,6 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>流年解星 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 /* 流年解星页面特定样式 */
 .back-btn {
@@ -358,6 +359,15 @@
                     </select>
                 </div>
                 
+                <!-- 专业/初学模式切换 -->
+                <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+                    <span class="mode-toggle-label">排盘模式</span>
+                    <div class="mode-toggle-pill">
+                        <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                        <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+                    </div>
+                </div>
+
                 <button type="button" class="submit-btn" onclick="analyzeNian()">开始分析</button>
             </div>
             
@@ -513,6 +523,7 @@ function triggerImageUpload(moduleType) {
 }
 </script>
 <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
 <script>
 async function analyzeNian() {
     const birth = document.getElementById('birthInput').value;
@@ -561,6 +572,16 @@ async function analyzeNian() {
 }
 
 function showResult(data, meta) {
+    var mode = ModeToggle.getMode();
+    if (mode === 'simple') {
+        var resultArea = document.getElementById('resultArea');
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (data.summary || data.prediction || data.advice || '分析完成，切换到专业模式可查看完整详情。') + '</p></div>';
+        simpleHtml += '</div>';
+        resultArea.innerHTML = simpleHtml;
+        resultArea.style.display = 'block';
+        return;
+    }
     let html = `
         <div class="result-card fade-in">
             <h3>🔯 流年分析结果</h3>
@@ -641,6 +662,10 @@ function resetForm() {
 
 document.addEventListener('DOMContentLoaded', function() {
     createStars();
+    ModeToggle.injectUI(
+        document.querySelector('.mode-toggle-wrapper') || document.body,
+        { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+    );
 });
 </script>
 

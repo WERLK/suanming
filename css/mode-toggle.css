@@ -1,0 +1,139 @@
+/* ===== 专业/初学模式切换 ===== */
+.mode-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.8rem 0;
+    padding: 0.6rem 0.8rem;
+    background: rgba(255, 215, 0, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.12);
+    border-radius: 10px;
+}
+
+.mode-toggle-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.mode-toggle-pill {
+    display: flex;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 2px;
+    flex: 1;
+    max-width: 260px;
+}
+
+.mode-toggle-option {
+    flex: 1;
+    text-align: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: 18px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: rgba(255, 255, 255, 0.5);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.mode-toggle-option.active {
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    color: #000;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.mode-toggle-option:hover:not(.active) {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 215, 0, 0.08);
+}
+
+/* ===== 初学模式简化结果 ===== */
+.beginner-result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.beginner-card {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02));
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+}
+
+.beginner-card h3 {
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.12);
+}
+
+.beginner-card p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin-bottom: 0.3rem;
+}
+
+.beginner-card .highlight {
+    color: #ffd700;
+    font-weight: 600;
+}
+
+/* ===== 初学模式：简化的评分卡片 ===== */
+.beginner-score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5rem;
+}
+
+.beginner-score-item {
+    text-align: center;
+    background: rgba(255, 215, 0, 0.06);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.beginner-score-item .score-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.2rem;
+}
+
+.beginner-score-item .score-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffd700;
+}
+
+/* ===== 专业模式专属元素（初学模式隐藏） ===== */
+.pro-only {
+    /* 默认显示，由JS控制 */
+}
+
+body.mode-simple .pro-only {
+    display: none !important;
+}
+
+body.mode-simple .simple-hidden {
+    display: none !important;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 480px) {
+    .mode-toggle-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+    .mode-toggle-pill {
+        max-width: 100%;
+        width: 100%;
+    }
+}

@@ -13,6 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>血型分析 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 /* 血型分析页面特定样式 */
 .back-btn {
@@ -377,6 +378,15 @@
                     <input type="number" class="form-input" id="ageInput" placeholder="请输入年龄" min="1" max="120">
                 </div>
                 
+                <!-- 专业/初学模式切换 -->
+                <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+                    <span class="mode-toggle-label">排盘模式</span>
+                    <div class="mode-toggle-pill">
+                        <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                        <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+                    </div>
+                </div>
+                
                 <button type="button" class="submit-btn" onclick="analyzeBlood()">开始分析</button>
             </div>
             
@@ -403,6 +413,7 @@
 
 <script src="/js/main.js"></script>
 <script src="/js/fortune-api.js"></script>
+<script src="/js/mode-toggle.js"></script>
 <script>
 // 血型图片快捷上传
 function triggerImageUpload(moduleType) {
@@ -483,6 +494,17 @@ function analyzeBloodLocal(bloodType, gender, age) {
 
 // 显示分析结果（兼容API和本地两种格式）
 function showResult(result, meta) {
+    var mode = ModeToggle.getMode();
+    if (mode === 'simple') {
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (result.summary || result.prediction || '分析完成，切换到专业模式可查看完整详情。') + '</p></div>';
+        simpleHtml += '</div>';
+        var resultArea = document.getElementById('resultArea');
+        resultArea.innerHTML = simpleHtml;
+        resultArea.style.display = 'block';
+        document.querySelector('.analysis-form').style.display = 'none';
+        return;
+    }
     const isAPIResult = meta && meta.source !== 'local_fallback';
     const bloodNames = { 'A': 'A型血', 'B': 'B型血', 'O': 'O型血', 'AB': 'AB型血' };
     const bloodName = bloodNames[result.bloodType] || result.bloodType;
@@ -587,6 +609,10 @@ function resetForm() {
 
 document.addEventListener('DOMContentLoaded', function() {
     createStars();
+    ModeToggle.injectUI(
+        document.querySelector('.mode-toggle-wrapper') || document.body,
+        { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+    );
 });
 </script>
 

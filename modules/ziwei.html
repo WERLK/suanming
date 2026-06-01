@@ -12,6 +12,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>紫微斗数 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 .page-header {
     display: flex;
@@ -302,6 +303,14 @@
                         <option value="亥时(21-23)">亥时 (21:00-23:00)</option>
                     </select>
                 </div>
+                <!-- 专业/初学模式切换 -->
+                <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+                    <span class="mode-toggle-label">排盘模式</span>
+                    <div class="mode-toggle-pill">
+                        <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                        <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+                    </div>
+                </div>
                 <button type="button" class="submit-btn" onclick="calculateZiwei()">开始排盘</button>
             </div>
 
@@ -366,6 +375,7 @@
 
 <script src="/js/main.js"></script>
 <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
 <script>
 // ===== 标签页切换 =====
 function switchTab(tabName, btnElement) {
@@ -631,7 +641,17 @@ async function calculateZiwei() {
 
 // ===== 渲染API返回的紫微斗数结果 =====
 function renderZiweiAPIResult(data, meta) {
+    var mode = ModeToggle.getMode();
     const container = document.getElementById('resultContainer');
+
+    if (mode === 'simple') {
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (data.summary || data.overview || '紫微斗数排盘分析完成') + '</p></div>';
+        simpleHtml += '</div>';
+        container.innerHTML = simpleHtml;
+        return;
+    }
+
     let html = '';
 
     // 命盘总览
@@ -821,6 +841,10 @@ function showKnowledgeDetail(topic) {
 // ===== 页面初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof createStars === 'function') createStars();
+    ModeToggle.injectUI(
+        document.querySelector('.mode-toggle-wrapper') || document.body,
+        { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+    );
 });
 </script>
 

@@ -13,6 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>财神方位 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 /* 财神方位页面特定样式 */
 .back-btn {
@@ -341,6 +342,15 @@
                 <label class="form-label">选择日期</label>
                 <input type="date" class="form-input" id="caishenDateInput">
             </div>
+            <!-- 专业/初学模式切换 -->
+            <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+                <span class="mode-toggle-label">排盘模式</span>
+                <div class="mode-toggle-pill">
+                    <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                    <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+                </div>
+            </div>
+
             <button type="button" class="submit-btn" onclick="queryCaishenDirection()">查询财神方位</button>
         </div>
 
@@ -538,6 +548,7 @@
 
 <script src="/js/main.js"></script>
 <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
 <script>
 // ===== 图片上传 =====
 function triggerImageUpload(moduleType) {
@@ -592,6 +603,16 @@ async function queryCaishenDirection() {
 
 // ===== 渲染API返回的财神方位结果 =====
 function renderCaishenAPIResult(data, meta) {
+    var mode = ModeToggle.getMode();
+    if (mode === 'simple') {
+        const container = document.getElementById('caishenResultContainer');
+        const direction = data.direction || data.wealth_direction || data.方位 || '东方';
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>财神方位查询结果</h3><p>' + (data.summary || data.prediction || '今日财神方位：' + direction + '。切换到专业模式可查看完整详情。') + '</p></div>';
+        simpleHtml += '</div>';
+        container.innerHTML = simpleHtml;
+        return;
+    }
     const container = document.getElementById('caishenResultContainer');
     let html = '';
 
@@ -665,6 +686,15 @@ function renderCaishenAPIResult(data, meta) {
 
 // ===== 本地计算降级渲染 =====
 function renderLocalCaishenResult(data) {
+    var mode = ModeToggle.getMode();
+    if (mode === 'simple') {
+        const container = document.getElementById('caishenResultContainer');
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>财神方位（本地计算）</h3><p>' + (data.summary || data.prediction || '今日财神方位：' + data.direction + '。切换到专业模式可查看完整详情。') + '</p></div>';
+        simpleHtml += '</div>';
+        container.innerHTML = simpleHtml;
+        return;
+    }
     const container = document.getElementById('caishenResultContainer');
     let html = '<div class="result-section fade-in"><h3>💰 财神方位（本地计算）</h3>';
     html += '<div class="compass-container"><div class="compass">';
@@ -702,6 +732,10 @@ function updateCompassPosition(elementId, direction) {
 // ===== 页面初始化 =====
 document.addEventListener('DOMContentLoaded', function() {
     createStars();
+    ModeToggle.injectUI(
+        document.querySelector('.mode-toggle-wrapper') || document.body,
+        { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+    );
     // 设置默认日期为今天
     var dateInput = document.getElementById('caishenDateInput');
     if (dateInput) {

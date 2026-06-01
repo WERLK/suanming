@@ -13,6 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>面相分析 - 玄机算命网</title>
 <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/mode-toggle.css">
 <style>
 /* 面相分析页面特定样式 */
 .back-btn {
@@ -352,6 +353,14 @@
                     <input type="number" class="form-input" id="ageInput" placeholder="请输入年龄" min="1" max="120">
                 </div>
                 
+                <!-- 专业/初学模式切换 -->
+                <div class="mode-toggle-wrapper" style="max-width:500px;margin:0.8rem auto;">
+                    <span class="mode-toggle-label">排盘模式</span>
+                    <div class="mode-toggle-pill">
+                        <div class="mode-toggle-option active" data-mode="pro">专业模式</div>
+                        <div class="mode-toggle-option" data-mode="simple">新手模式</div>
+                    </div>
+                </div>
                 <button type="button" class="submit-btn" onclick="analyzeFace()">开始分析</button>
             </div>
             
@@ -434,6 +443,7 @@ function triggerImageUpload(moduleType) {
 }
 </script>
 <script src="/js/fortune-api.js"></script>
+    <script src="/js/mode-toggle.js"></script>
 <script>
 async function analyzeFace() {
     const photo = document.getElementById('photoInput').files[0];
@@ -495,6 +505,15 @@ async function analyzeFace() {
 }
 
 function showResult(data, meta) {
+    var mode = ModeToggle.getMode();
+    if (mode === 'simple') {
+        var simpleHtml = '<div class="beginner-result">';
+        simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (data.advice || data.features ? '面相分析完成，切换到专业模式可查看完整详情。' : '分析完成，切换到专业模式可查看完整详情。') + '</p></div>';
+        simpleHtml += '</div>';
+        document.getElementById('resultArea').innerHTML = simpleHtml;
+        document.getElementById('resultArea').style.display = 'block';
+        return;
+    }
     const score = data.score || 0;
     const scoreLabel = score >= 90 ? '大吉相' : score >= 80 ? '吉相' : score >= 70 ? '中吉相' : '平相';
     
@@ -580,6 +599,10 @@ function resetForm() {
 
 document.addEventListener('DOMContentLoaded', function() {
     createStars();
+    ModeToggle.injectUI(
+        document.querySelector('.mode-toggle-wrapper') || document.body,
+        { label: '排盘模式', proLabel: '专业模式', simpleLabel: '新手模式' }
+    );
 });
 </script>
 

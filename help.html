@@ -2,131 +2,130 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ffd700">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <title>帮助中心 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        .page-container { max-width: 600px; margin: 0 auto; padding: 1rem; }
-        .help-item {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .help-item:hover {
-            background: rgba(255,215,0,0.08);
-            transform: translateX(5px);
-        }
-        .help-question { color: #ffd700; font-weight: bold; margin-bottom: 0.5rem; }
-        .help-answer {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        .help-item.expanded .help-answer {
-            max-height: 500px;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid rgba(255,215,0,0.1);
-        }
-        .contact-box {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            text-align: center;
-        }
-        .contact-title { color: #ffd700; font-size: 1rem; margin-bottom: 0.5rem; }
-        .contact-email {
-            color: #4fc3f7;
-            font-size: 0.95rem;
-            cursor: pointer;
-        }
-        .contact-email:hover { text-decoration: underline; }
+        .page-container { max-width: 700px; margin: 0 auto; padding: 0 1rem 2rem; }
 
         /* 教程视频 */
         .tutorial-section {
             background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));
             border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 16px;
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
+            border-radius: 16px; padding: 1.2rem; margin-bottom: 1.5rem; text-align: center;
         }
-        .tutorial-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 0.8rem;
-        }
+        .tutorial-header { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; }
         .tutorial-title { color: #ffd700; font-size: 1.05rem; font-weight: bold; }
         .tutorial-badge {
             background: linear-gradient(135deg, #ffd700, #ffaa00);
-            color: #1a1a2e;
-            font-size: 0.7rem;
-            font-weight: bold;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
+            color: #1a1a2e; font-size: 0.7rem; font-weight: bold;
+            padding: 0.2rem 0.6rem; border-radius: 20px;
         }
-        .tutorial-desc {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
-            margin-bottom: 0.8rem;
-        }
-        .tutorial-video-wrap {
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-            max-width: 100%;
-        }
-        .tutorial-video-wrap video {
-            width: 100%;
-            display: block;
-        }
-        .tutorial-actions {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-top: 0.8rem;
-            flex-wrap: wrap;
-        }
+        .tutorial-desc { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 0.8rem; }
+        .tutorial-video-wrap { border-radius: 12px; overflow: hidden; background: #000; max-width: 100%; }
+        .tutorial-video-wrap video { width: 100%; display: block; }
+        .tutorial-actions { display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.8rem; flex-wrap: wrap; }
         .btn-replay-tutorial {
-            padding: 0.5rem 1.2rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.3);
-            background: rgba(255,215,0,0.08);
-            color: #ffd700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
+            padding: 0.5rem 1.2rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.3); background: rgba(255,215,0,0.08);
+            color: #ffd700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
         }
         .btn-replay-tutorial:hover { background: rgba(255,215,0,0.15); }
+
+        /* 搜索框 */
+        .help-search-wrap { position: relative; margin-bottom: 1.2rem; }
+        .help-search {
+            width: 100%; padding: 0.7rem 1rem 0.7rem 2.6rem;
+            border-radius: 12px; border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,255,255,0.04); color: #fff; font-size: 0.9rem;
+            outline: none; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .help-search:focus { border-color: #ffd700; }
+        .help-search::placeholder { color: rgba(255,255,255,0.3); }
+        .help-search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); font-size: 1rem; }
+
+        /* 分类标签 */
+        .help-categories { display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .help-cat {
+            padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer;
+            border: 1px solid rgba(255,215,0,0.15); background: transparent;
+            color: rgba(255,255,255,0.5); transition: all 0.2s; white-space: nowrap;
+        }
+        .help-cat:hover { color: #ffd700; border-color: rgba(255,215,0,0.3); }
+        .help-cat.active { background: rgba(255,215,0,0.12); color: #ffd700; border-color: #ffd700; }
+        .help-cat .count { font-size: 0.65rem; opacity: 0.5; margin-left: 0.2rem; }
+
+        /* FAQ 分类标题 */
+        .help-category-title {
+            color: #ffd700; font-size: 0.95rem; font-weight: bold;
+            margin: 1.2rem 0 0.6rem; padding-left: 0.4rem;
+            border-left: 3px solid #ffd700;
+        }
+        .help-category-title:first-child { margin-top: 0; }
+
+        /* FAQ 项目 */
+        .help-item {
+            background: linear-gradient(135deg, rgba(255,215,0,0.04), rgba(255,215,0,0.01));
+            border: 1px solid rgba(255,215,0,0.08);
+            border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.5rem;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .help-item:hover { background: rgba(255,215,0,0.06); border-color: rgba(255,215,0,0.15); }
+        .help-question {
+            color: rgba(255,255,255,0.85); font-size: 0.9rem; font-weight: 500;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .help-q-icon { color: #ffd700; font-size: 0.85rem; flex-shrink: 0; }
+        .help-arrow {
+            margin-left: auto; font-size: 0.7rem; color: rgba(255,255,255,0.3);
+            transition: transform 0.2s;
+        }
+        .help-item.expanded .help-arrow { transform: rotate(180deg); }
+        .help-answer {
+            color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.7;
+            max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+        }
+        .help-item.expanded .help-answer {
+            max-height: 600px; margin-top: 0.6rem; padding-top: 0.6rem;
+            border-top: 1px solid rgba(255,215,0,0.06);
+        }
+        .help-highlight { color: #ffd700; }
+
+        /* 无结果 */
+        .help-no-result { text-align: center; padding: 2rem; color: rgba(255,255,255,0.3); display: none; }
+        .help-no-result .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+        /* 联系我们 */
+        .contact-box {
+            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
+            border: 1px solid rgba(255,215,0,0.2); border-radius: 16px; padding: 1.5rem;
+            margin-top: 2rem; text-align: center;
+        }
+        .contact-title { color: #ffd700; font-size: 1rem; margin-bottom: 0.3rem; }
+        .contact-sub { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 0.8rem; }
+        .contact-links { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+        .contact-link {
+            display: flex; align-items: center; gap: 0.3rem;
+            padding: 0.5rem 1rem; border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.15); background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.7); font-size: 0.85rem;
+            text-decoration: none; cursor: pointer; transition: all 0.2s;
+        }
+        .contact-link:hover { border-color: #ffd700; color: #ffd700; }
+
+        @media (max-width: 480px) {
+            .help-categories { gap: 0.3rem; }
+            .help-cat { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+        }
     </style>
 </head>
-<body class="has-desktop-sidebar">
-<!-- 桌面端侧边栏 -->
-<aside class="desktop-sidebar" id="desktopSidebar">
-    <div class="sidebar-logo">
-        <div class="logo-icon">🔮</div>
-        <div><span class="logo-text">玄机算命网</span></div>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/" class="sidebar-nav-item">🏠 首页</a>
-        <a href="/vip.html" class="sidebar-nav-item">👑 会员中心</a>
-        <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
-    </nav>
-</aside>
+<body>
 
 <div class="page-header">
-    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <button class="back-btn" onclick="history.back()">←</button>
     <h1>帮助中心</h1>
 </div>
 
@@ -140,24 +139,40 @@
             </div>
             <div class="tutorial-desc">30秒快速了解玄机算命网的核心功能</div>
             <div class="tutorial-video-wrap">
-                <video controls playsinline preload="metadata"
-                    poster="/static/videos/guide-poster.jpg">
+                <video controls playsinline preload="metadata" poster="/static/videos/guide-poster.jpg">
                     <source src="/static/videos/guide-intro.mp4" type="video/mp4">
                     您的浏览器不支持视频播放
                 </video>
             </div>
             <div class="tutorial-actions">
-                <button class="btn-replay-tutorial" onclick="window.startGuide()">🔄 重新播放引导教程</button>
+                <button class="btn-replay-tutorial" onclick="if(window.startGuide)window.startGuide()">🔄 重新播放引导教程</button>
             </div>
         </div>
 
+        <!-- 搜索 -->
+        <div class="help-search-wrap">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search" id="helpSearch" placeholder="搜索问题，如「如何注册」「八字排盘」「VIP」..." oninput="filterHelp()">
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="help-categories" id="helpCats"></div>
+
+        <!-- FAQ 列表 -->
         <div class="help-list" id="helpList"></div>
-        
+        <div class="help-no-result" id="helpNoResult">
+            <div class="icon">🔍</div>
+            <p>未找到相关问题</p>
+            <p style="font-size:0.8rem;">试试其他关键词，或联系客服获取帮助</p>
+        </div>
+
         <!-- 联系我们 -->
         <div class="contact-box">
             <div class="contact-title">📧 没有找到答案？</div>
-            <div class="contact-email" onclick="location.href='mailto:support@xuanji.com'">
-                📮 support@xuanji.com
+            <div class="contact-sub">我们随时为您提供帮助</div>
+            <div class="contact-links">
+                <a class="contact-link" href="mailto:support@xuanjisuanming.top">📮 发送邮件</a>
+                <a class="contact-link" href="/about.html">ℹ️ 关于我们</a>
             </div>
         </div>
     </div>
@@ -165,76 +180,155 @@
 
 <script src="/js/main.js"></script>
 <script>
-const helpTopics = [
-    {
-        id: 'register',
-        question: '如何注册账号？',
-        answer: '点击首页"注册"按钮，输入用户名、密码、邮箱或手机号，完成验证后即可注册成功。注册后您可以使用所有免费功能。'
-    },
-    {
-        id: 'login',
-        question: '如何登录账号？',
-        answer: '点击首页"登录"按钮，输入用户名/邮箱/手机号和密码即可登录。支持"记住我"功能，下次自动登录。'
-    },
-    {
-        id: 'fortune',
-        question: '算命结果准确吗？',
-        answer: '算命结果仅供参考，不可全信。命运掌握在自己手中，算命只是提供一种思路和方向。我们的算命工具基于传统命理学，结合现代算法，提供相对准确的结果。'
-    },
-    {
-        id: 'vip',
-        question: '如何获得VIP会员？',
-        answer: '您可以通过观看广告赚取VIP时长，每次观看广告可获得2小时会员时长。VIP会员可以解锁更多高级功能。'
-    },
-    {
-        id: 'avatar',
-        question: '如何上传头像？',
-        answer: '进入个人中心，点击头像区域，选择图片上传即可。系统会自动审核头像内容，审核通过后头像立即生效。支持JPG、PNG格式，图片大小需小于2MB。'
-    },
-    {
-        id: 'password',
-        question: '忘记密码怎么办？',
-        answer: '在登录页面点击"忘记密码"，输入注册时使用的邮箱，系统会发送密码重置链接到您的邮箱。点击链接后即可设置新密码。'
-    },
-    {
-        id: 'data',
-        question: '我的算命记录会保存吗？',
-        answer: '是的，您的算命记录会自动保存。登录后可以在"个人中心"-"算命历史"中查看所有历史记录。未登录状态下，记录仅保存在当前浏览器中。'
-    },
-    {
-        id: 'privacy',
-        question: '我的个人信息安全吗？',
-        answer: '我们非常重视用户隐私。您可以在"隐私设置"中控制个人资料的可见性。我们不会将您的个人信息出售或分享给第三方。详细信息请查看我们的隐私政策。'
-    },
-    {
-        id: 'contact',
-        question: '如何联系客服？',
-        answer: '发送邮件至 support@xuanji.com，我们的客服团队会在24小时内回复您。您也可以在帮助中心查找常见问题的答案。'
-    }
+// ============ 完整 FAQ 数据库 ============
+var helpCategories = [
+    { id: 'all', label: '全部' },
+    { id: 'account', label: '账户相关' },
+    { id: 'fortune', label: '算命功能' },
+    { id: 'vip', label: '会员VIP' },
+    { id: 'feature', label: '功能使用' },
+    { id: 'privacy', label: '隐私安全' },
+    { id: 'other', label: '其他' }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadHelpTopics();
+var helpTopics = [
+    // 账户相关
+    { category: 'account', q: '如何注册账号？', a: '在首页点击右上角"登录"按钮，切换到"注册"标签页，输入<b class="help-highlight">用户名（3-20个字符）</b>、密码（至少6位）和邮箱或手机号，选择头像后点击注册即可。注册成功后可立即使用所有免费功能。' },
+    { category: 'account', q: '如何登录账号？', a: '点击首页"登录"按钮，输入<b class="help-highlight">用户名/邮箱/手机号</b>和密码即可登录。勾选"记住我"后下次自动登录，无需重复输入。' },
+    { category: 'account', q: '忘记密码怎么办？', a: '在登录页面点击"忘记密码"，输入注册时使用的邮箱，系统会发送<b class="help-highlight">密码重置链接</b>到您的邮箱。点击链接设置新密码即可。如未收到邮件，请检查垃圾邮件箱。' },
+    { category: 'account', q: '如何修改个人资料？', a: '进入<b class="help-highlight">个人中心</b>，点击"编辑资料"可修改昵称、生日、性别等信息。点击头像区域可以更换头像，支持<b class="help-highlight">预设Emoji头像</b>或<b class="help-highlight">自定义上传图片</b>。' },
+    { category: 'account', q: '如何上传/更换头像？', a: '进入个人中心→编辑资料，在头像区域点击"更换头像"。可以选择<b class="help-highlight">分类Emoji预设</b>（玄学/人物/动物/其他）或<b class="help-highlight">上传自定义图片</b>。上传图片会自动审核并压缩，支持JPG/PNG格式。' },
+    { category: 'account', q: '如何注销账号？', a: '如需注销账号，请联系客服 <b class="help-highlight">support@xuanjisuanming.top</b>，提供您的用户名和注册邮箱。我们将在3个工作日内处理。注意：注销后所有数据将被永久删除且不可恢复。' },
+
+    // 算命功能
+    { category: 'fortune', q: '八字排盘是什么？如何使用？', a: '八字排盘是本站<b class="help-highlight">核心功能</b>。输入出生日期（年月日时），系统根据天干地支排出<b class="help-highlight">年柱、月柱、日柱、时柱</b>四柱八字，分析五行旺衰、十神关系、大运流年。主页点击"八字排盘"即可使用。' },
+    { category: 'fortune', q: '算命结果准确吗？', a: '算命结果<b class="help-highlight">仅供参考</b>，不可全信。命运掌握在自己手中，算命只是提供一种思路和方向。我们的算法基于传统命理学经典理论，结合现代计算技术，尽力提供有价值的参考分析。' },
+    { category: 'fortune', q: '有哪些算命模块可用？', a: '本站目前提供以下算命模块：<b class="help-highlight">八字排盘、紫微斗数、合婚配对、生肖运势、姓名测试、塔罗牌、风水堪舆、周公解梦、黄道吉日、流年解星、财神方位、手相分析、面相分析、六爻占卜</b>等。' },
+    { category: 'fortune', q: '各模块需要上传图片怎么办？', a: '手相分析、面相分析等模块需要上传图片。选择图片后系统会自动<b class="help-highlight">压缩至合适大小</b>再上传，支持手机拍照和大尺寸图片。请确保图片清晰、光线充足，以获得更准确的分析结果。' },
+    { category: 'fortune', q: '为什么有些功能提示需要登录？', a: '为保护用户隐私和数据安全，<b class="help-highlight">算命记录保存、亲友档案、实名认证</b>等功能需要登录后才能使用。免费注册账号即可解锁全部功能。' },
+
+    // 会员VIP
+    { category: 'vip', q: '如何获得VIP会员？', a: '进入<b class="help-highlight">会员中心</b>，点击"观看广告赚时长"，每次观看完整广告可获得<b class="help-highlight">2小时VIP时长</b>。也可通过每日登录自动获得随机VIP奖励。VIP会员可解锁更多高级分析功能。' },
+    { category: 'vip', q: 'VIP会员有什么特权？', a: 'VIP会员享有以下特权：<b class="help-highlight">①解锁所有高级算命模块 ②查看详细命理分析报告 ③无限次算命 ④优先客服响应 ⑤专属数据导出功能</b>。不同VIP等级权限不同，详见会员中心。' },
+    { category: 'vip', q: 'VIP时长过期了怎么办？', a: 'VIP时长过期后，高级功能将自动恢复为免费版限制。您可以随时<b class="help-highlight">重新观看广告</b>获取新的VIP时长。已产生的算命记录和历史数据<b class="help-highlight">不会丢失</b>。' },
+    { category: 'vip', q: '广告看不了或加载失败？', a: '广告加载依赖网络环境。如遇广告无法播放：①检查网络连接 ②刷新页面重试 ③清除浏览器缓存 ④尝试切换WiFi/移动网络。如持续失败，请联系客服。' },
+
+    // 功能使用
+    { category: 'feature', q: '亲友档案怎么用？', a: '进入<b class="help-highlight">亲友档案</b>页面，点击"+ 添加"按钮，在弹窗中填入亲友的<b class="help-highlight">姓名、性别、关系、生日</b>等信息即可保存。之后点击亲友卡片可直接跳转到八字排盘，自动填入该亲友的信息进行算命。' },
+    { category: 'feature', q: '数据表格是什么？怎么用？', a: '数据表格是一个<b class="help-highlight">自定义数据管理工具</b>。您可以创建自定义字段（文本/数字/日期/单选），批量添加记录，适合管理客户信息、研究数据等。数据表支持添加、编辑、删除和分页浏览。' },
+    { category: 'feature', q: '如何查看历史算命记录？', a: '登录后进入<b class="help-highlight">个人中心→算命历史</b>，可按模块分类查看所有历史算命记录。支持搜索、筛选、查看详情。未登录状态下的记录仅保存在当前浏览器中。' },
+    { category: 'feature', q: '如何导出/分享算命结果？', a: '在算命结果页面，可点击<b class="help-highlight">"分享"</b>按钮生成分享链接或截图。VIP会员支持导出PDF报告。部分模块支持复制结果文本。' },
+    { category: 'feature', q: '侧边菜单怎么使用？', a: '页面左侧有<b class="help-highlight">折叠式导航菜单</b>，默认展开显示。可通过<b class="help-highlight">◀ 按钮折叠</b>，折叠后左侧出现"菜单"标签点击重新展开。菜单包含首页、更多模块、会员中心、个人中心、亲友档案、数据表格、帮助中心等入口。' },
+    { category: 'feature', q: '各页面的返回按钮怎么用？', a: '页面顶部左上角的<b class="help-highlight">← 返回按钮</b>可以回到上一级页面。在数据表格等嵌套页面中，返回按钮会优先返回上一级视图。也可通过侧边菜单直接跳转到目标页面。' },
+
+    // 隐私安全
+    { category: 'privacy', q: '我的个人信息安全吗？', a: '我们非常重视用户隐私。您的<b class="help-highlight">密码使用哈希加密存储</b>，身份证号使用脱敏处理。我们不会将您的个人信息出售或分享给第三方。您可以在隐私设置中控制个人资料的可见性。' },
+    { category: 'privacy', q: '实名认证怎么操作？安全吗？', a: '进入个人中心→实名认证，上传<b class="help-highlight">身份证正反面照片</b>，系统自动识别并加密存储。上传的身份证图片会经过<b class="help-highlight">压缩和脱敏处理</b>，仅保存必要信息。认证通过后可享更全面的服务。' },
+    { category: 'privacy', q: '算命记录会被别人看到吗？', a: '您的算命记录<b class="help-highlight">仅自己可见</b>。我们不会公开或分享任何算命数据。系统仅用于统计分析（匿名化处理后）以改进服务质量。' },
+    { category: 'privacy', q: '如何删除我的数据？', a: '您可以在个人中心删除历史算命记录。如需<b class="help-highlight">彻底删除账户和所有数据</b>，请联系客服。根据相关法规，我们会在验证身份后30天内完成数据清除。' },
+
+    // 其他
+    { category: 'other', q: '网站支持哪些浏览器？', a: '本站支持所有主流浏览器：<b class="help-highlight">Chrome、Safari、Firefox、Edge</b>及移动端浏览器。推荐使用最新版Chrome或Safari以获得最佳体验。支持手机、平板、电脑全平台访问。' },
+    { category: 'other', q: '如何联系客服？', a: '发送邮件至 <b class="help-highlight">support@xuanjisuanming.top</b>，我们的客服团队会在<b class="help-highlight">24小时内</b>回复您。也可通过"关于我们"页面查看更多联系方式。' },
+    { category: 'other', q: '网站有手机App吗？', a: '目前暂未发布独立App。但本站已适配<b class="help-highlight">移动端浏览器</b>，可在手机上直接访问使用。支持添加到手机主屏幕（PWA模式），使用体验接近原生App。' },
+    { category: 'other', q: '如何反馈问题或建议？', a: '欢迎通过客服邮箱反馈问题和建议。如遇到功能Bug，请<b class="help-highlight">附上截图和操作步骤</b>，方便我们快速定位和修复。您的每一条反馈我们都会认真对待。' },
+];
+
+// ============ 初始化 ============
+var currentCat = 'all';
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderCategories();
+    renderHelp();
 });
 
-function loadHelpTopics() {
-    const listEl = document.getElementById('helpList');
-    listEl.innerHTML = '';
-    
-    helpTopics.forEach(topic => {
-        const item = document.createElement('div');
-        item.className = 'help-item';
-        item.onclick = () => toggleHelpItem(item);
-        item.innerHTML = `
-            <div class="help-question">❓ ${topic.question}</div>
-            <div class="help-answer">${topic.answer}</div>
-        `;
-        listEl.appendChild(item);
-    });
+function renderCategories() {
+    var el = document.getElementById('helpCats');
+    el.innerHTML = helpCategories.map(function(cat) {
+        var count = cat.id === 'all' ? helpTopics.length :
+            helpTopics.filter(function(t) { return t.category === cat.id; }).length;
+        return '<span class="help-cat' + (cat.id === currentCat ? ' active' : '') +
+            '" data-cat="' + cat.id + '" onclick="switchCat(\'' + cat.id + '\')">' +
+            cat.label + '<span class="count">' + count + '</span></span>';
+    }).join('');
 }
 
-function toggleHelpItem(item) {
+function switchCat(catId) {
+    currentCat = catId;
+    document.getElementById('helpSearch').value = '';
+    renderCategories();
+    renderHelp();
+}
+
+function renderHelp(filteredTopics) {
+    var topics = filteredTopics || helpTopics;
+    if (!filteredTopics && currentCat !== 'all') {
+        topics = helpTopics.filter(function(t) { return t.category === cat.id; });
+    }
+
+    // 按分类分组
+    if (currentCat === 'all' && !filteredTopics) {
+        var html = '';
+        helpCategories.forEach(function(cat) {
+            if (cat.id === 'all') return;
+            var items = helpTopics.filter(function(t) { return t.category === cat.id; });
+            if (items.length === 0) return;
+            html += '<div class="help-category-title">' + cat.label + '</div>';
+            html += items.map(renderItem).join('');
+        });
+        document.getElementById('helpList').innerHTML = html;
+    } else {
+        document.getElementById('helpList').innerHTML = topics.map(renderItem).join('');
+    }
+
+    // 无结果
+    document.getElementById('helpNoResult').style.display = topics.length === 0 ? 'block' : 'none';
+}
+
+function renderItem(topic) {
+    return '<div class="help-item" onclick="toggleItem(this)">'
+        + '<div class="help-question"><span class="help-q-icon">Q</span>'
+        + highlightSearch(topic.q)
+        + '<span class="help-arrow">▾</span></div>'
+        + '<div class="help-answer">' + topic.a + '</div>'
+        + '</div>';
+}
+
+function highlightSearch(text) {
+    var q = (document.getElementById('helpSearch') || {}).value;
+    if (!q || !q.trim()) return text;
+    var escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp('(' + escaped + ')', 'gi'), '<b class="help-highlight">$1</b>');
+}
+
+function toggleItem(item) {
+    // 手风琴：关闭其他
+    var all = document.querySelectorAll('.help-item.expanded');
+    all.forEach(function(i) { if (i !== item) i.classList.remove('expanded'); });
     item.classList.toggle('expanded');
+}
+
+function filterHelp() {
+    var q = document.getElementById('helpSearch').value.trim().toLowerCase();
+    if (!q) {
+        currentCat = 'all';
+        renderCategories();
+        renderHelp();
+        return;
+    }
+
+    var filtered = helpTopics.filter(function(t) {
+        return t.q.toLowerCase().indexOf(q) !== -1 ||
+               t.a.replace(/<[^>]*>/g, '').toLowerCase().indexOf(q) !== -1;
+    });
+
+    document.getElementById('helpList').innerHTML = filtered.map(function(t) {
+        // 显示分类
+        var catName = (helpCategories.find(function(c) { return c.id === t.category; }) || {}).label || '';
+        return '<span style="font-size:0.7rem;color:rgba(255,215,0,0.5);">' + catName + '</span>' + renderItem(t);
+    }).join('');
+
+    document.getElementById('helpNoResult').style.display = filtered.length === 0 ? 'block' : 'none';
 }
 </script>
 <script src="/js/sidenav.js"></script>

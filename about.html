@@ -2,187 +2,169 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ffd700">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <title>关于我们 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        .page-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        
-        .about-header {
-            text-align: center;
-            padding: 2rem 1rem;
-            background: linear-gradient(180deg, rgba(255,215,0,0.1), transparent);
-            border-bottom: 1px solid rgba(255,215,0,0.15);
-            margin-bottom: 2rem;
-        }
-        
-        .about-logo {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        
-        .about-site-name {
-            color: #ffd700;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
+        .page-container { max-width: 700px; margin: 0 auto; padding: 0 1rem 2rem; }
+
+        /* 头部 */
+        .about-hero { text-align: center; padding: 2rem 1rem 1.5rem; }
+        .about-logo { font-size: 4.5rem; margin-bottom: 0.5rem; }
+        .about-site-name { color: #ffd700; font-size: 1.8rem; font-weight: bold; margin-bottom: 0.3rem;
+            text-shadow: 0 0 20px rgba(255,215,0,0.2); }
+        .about-slogan { color: rgba(255,255,255,0.45); font-size: 0.9rem; margin-bottom: 0.8rem; }
         .about-version {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
+            display: inline-block; padding: 0.25rem 0.8rem; border-radius: 20px;
+            background: rgba(255,215,0,0.1); color: #ffd700; font-size: 0.8rem;
+            border: 1px solid rgba(255,215,0,0.15);
         }
-        
-        .about-desc {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            max-width: 400px;
-            margin: 0 auto;
+
+        /* 通用卡片 */
+        .about-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.04), rgba(255,215,0,0.01));
+            border: 1px solid rgba(255,215,0,0.08);
+            border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1rem;
         }
-        
-        .about-section {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+        .about-card-title {
+            color: #ffd700; font-size: 0.95rem; font-weight: bold;
+            margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.4rem;
         }
-        
-        .section-title {
-            color: #ffd700;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255,215,0,0.1);
+        .about-card-body { color: rgba(255,255,255,0.65); font-size: 0.88rem; line-height: 1.75; }
+
+        /* 功能模块网格 */
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.5rem;
         }
-        
-        .section-content {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            line-height: 1.6;
+        .feature-tag {
+            padding: 0.5rem 0.6rem; border-radius: 8px; text-align: center;
+            background: rgba(255,215,0,0.04); border: 1px solid rgba(255,215,0,0.08);
+            color: rgba(255,255,255,0.65); font-size: 0.8rem;
         }
-        
-        .contact-list {
-            list-style: none;
-            padding: 0;
+        .feature-tag .fi { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
+
+        /* 技术栈 */
+        .tech-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .tech-badge {
+            padding: 0.3rem 0.7rem; border-radius: 20px; font-size: 0.75rem;
+            background: rgba(255,215,0,0.06); color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,215,0,0.08);
         }
-        
-        .contact-list li {
-            padding: 0.5rem 0;
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
+
+        /* 链接列表 */
+        .link-list { list-style: none; padding: 0; margin: 0; }
+        .link-list li { padding: 0.45rem 0; }
+        .link-list a {
+            color: #4fc3f7; text-decoration: none; font-size: 0.88rem;
+            display: flex; align-items: center; gap: 0.4rem;
         }
-        
-        .contact-list a {
-            color: #4fc3f7;
-            text-decoration: none;
-        }
-        
-        .contact-list a:hover {
-            text-decoration: underline;
-        }
-        
+        .link-list a:hover { text-decoration: underline; color: #ffd700; }
+
+        /* 统计数字 */
+        .stats-row { display: flex; gap: 0.8rem; justify-content: center; margin: 0.5rem 0; flex-wrap: wrap; }
+        .stat-item { text-align: center; padding: 0.5rem 1rem; }
+        .stat-num { color: #ffd700; font-size: 1.3rem; font-weight: bold; }
+        .stat-label { color: rgba(255,255,255,0.35); font-size: 0.7rem; margin-top: 0.2rem; }
+
+        /* ICP */
         .icp-info {
-            text-align: center;
-            padding: 1.5rem 1rem;
-            color: rgba(255,255,255,0.4);
-            font-size: 0.75rem;
-            line-height: 1.8;
+            text-align: center; padding: 1.5rem 1rem; margin-top: 1rem;
+            color: rgba(255,255,255,0.3); font-size: 0.72rem; line-height: 1.8;
+            border-top: 1px solid rgba(255,215,0,0.06);
         }
-        
-        .icp-info a {
-            color: rgba(255,255,255,0.5);
-            text-decoration: none;
-        }
-        
-        .icp-info a:hover {
-            color: #ffd700;
-        }
+        .icp-info a { color: rgba(255,255,255,0.35); text-decoration: none; }
+        .icp-info a:hover { color: #ffd700; }
     </style>
 </head>
-<body class="has-desktop-sidebar">
-<!-- 桌面端侧边栏 -->
-<aside class="desktop-sidebar" id="desktopSidebar">
-    <div class="sidebar-logo">
-        <div class="logo-icon">🔮</div>
-        <div>
-            <span class="logo-text">玄机算命网</span>
-            <span class="logo-sub">传承千年智慧</span>
-        </div>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/" class="sidebar-nav-item">🏠 首页</a>
-        <a href="/vip.html" class="sidebar-nav-item">👑 会员中心</a>
-        <a href="/profile.html" class="sidebar-nav-item active">👤 个人中心</a>
-    </nav>
-</aside>
+<body>
 
 <div class="page-header">
-    <button class="back-btn" onclick="window.location.href='/profile.html'">←</button>
+    <button class="back-btn" onclick="history.back()">←</button>
     <h1>关于我们</h1>
 </div>
 
 <div class="content-area">
     <div class="page-container">
-        <!-- 网站信息 -->
-        <div class="about-header">
+        <!-- 头部 -->
+        <div class="about-hero">
             <div class="about-logo">🔮</div>
             <div class="about-site-name">玄机算命网</div>
-            <div class="about-version">版本 1.0.0</div>
-            <div class="about-desc">
-                传承千年智慧，揭秘命运玄机。我们致力于为用户提供专业、准确的算命服务。
+            <div class="about-slogan">传承千年智慧 · 揭秘命运玄机</div>
+            <span class="about-version" id="versionDisplay">加载中...</span>
+        </div>
+
+        <!-- 统计 -->
+        <div class="about-card">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-num">30+</div><div class="stat-label">算命模块</div></div>
+                <div class="stat-item"><div class="stat-num">247</div><div class="stat-label">全天在线</div></div>
+                <div class="stat-item"><div class="stat-num">SSL</div><div class="stat-label">加密传输</div></div>
+                <div class="stat-item"><div class="stat-num">PWA</div><div class="stat-label">手机支持</div></div>
             </div>
         </div>
-        
-        <!-- 网站简介 -->
-        <div class="about-section">
-            <div class="section-title">📖 关于我们</div>
-            <div class="section-content">
-                <p>玄机算命网成立于2024年，是一个结合传统命理学与现代互联网技术的在线算命平台。</p>
-                <br>
-                <p>我们提供八字排盘、紫微斗数、生肖运势、姓名测试、塔罗占卜等多种算命服务，帮助用户了解自己的命运走势，做出更好的人生决策。</p>
-                <br>
-                <p>我们的使命是：让每个人都能便捷地获取命运指引，掌握自己的人生方向。</p>
+
+        <!-- 关于 -->
+        <div class="about-card">
+            <div class="about-card-title">📖 关于本站</div>
+            <div class="about-card-body">
+                <p>玄机算命网是一个<b style="color:#ffd700">结合传统命理学与现代互联网技术</b>的在线命理分析平台。我们汇聚八字排盘、紫微斗数、塔罗占卜、风水堪舆、姓名测试等多种算命工具，为现代人提供便捷、专业的命运参考服务。</p>
             </div>
         </div>
-        
-        <!-- 联系方式 -->
-        <div class="about-section">
-            <div class="section-title">📞 联系我们</div>
-            <div class="section-content">
-                <ul class="contact-list">
-                    <li>📧 客服邮箱：<a href="mailto:support@xuanji.com">support@xuanji.com</a></li>
-                    <li>📱 客服微信：xuanji666</li>
-                    <li>📠 客服电话：400-888-8888（工作日 9:00-18:00）</li>
-                    <li>🏢 公司地址：北京市朝阳区xxx路xx号</li>
+
+        <!-- 功能模块 -->
+        <div class="about-card">
+            <div class="about-card-title">🔮 功能模块</div>
+            <div class="feature-grid" id="featureGrid"></div>
+        </div>
+
+        <!-- 使命 -->
+        <div class="about-card">
+            <div class="about-card-title">🎯 我们的使命</div>
+            <div class="about-card-body">
+                <p>让每个人都能便捷地获取命运指引，在迷茫时找到方向，在困惑时获得启发。</p>
+                <p style="margin-top:0.6rem;">我们相信：<b style="color:#ffd700">命运虽然天定，但选择在于人心</b>。算命的目的不是让人消极认命，而是帮助人们看清趋势、做出更明智的人生决策。</p>
+            </div>
+        </div>
+
+        <!-- 技术栈 -->
+        <div class="about-card">
+            <div class="about-card-title">🛠 技术栈</div>
+            <div class="about-card-body">
+                <p style="margin-bottom:0.6rem;">本站采用现代Web技术构建，追求高性能与良好体验：</p>
+                <div class="tech-row" id="techRow"></div>
+            </div>
+        </div>
+
+        <!-- 链接 -->
+        <div class="about-card">
+            <div class="about-card-title">📎 相关链接</div>
+            <div class="about-card-body">
+                <ul class="link-list">
+                    <li>📧 <a href="mailto:support@xuanjisuanming.top">客服邮箱：support@xuanjisuanming.top</a></li>
+                    <li>🌐 <a href="https://xuanjisuanming.top" target="_blank">官方网站：xuanjisuanming.top</a></li>
+                    <li>📂 <a href="https://github.com/WERLK/suanming" target="_blank">开源仓库：GitHub @WERLK/suanming</a></li>
+                    <li>❓ <a href="/help.html">帮助中心 →</a></li>
+                    <li>📜 <a href="/privacy.html">隐私政策 →</a></li>
                 </ul>
             </div>
         </div>
-        
-        <!-- 法律信息 -->
-        <div class="about-section">
-            <div class="section-title">⚖️ 法律信息</div>
-            <div class="section-content">
-                <ul class="contact-list">
-                    <li>📜 <a href="/privacy-policy.html">隐私政策</a></li>
-                    <li>📄 <a href="/terms-of-service.html">服务条款</a></li>
-                    <li>💰 <a href="/refund-policy.html">退款政策</a></li>
-                </ul>
+
+        <!-- 免责声明 -->
+        <div class="about-card">
+            <div class="about-card-title">⚠️ 免责声明</div>
+            <div class="about-card-body" style="font-size:0.8rem;">
+                <p>本站提供的所有算命分析结果<b style="color:#ffd700">仅供娱乐参考</b>，不构成任何人生决策建议。用户因依赖本站内容所产生的任何后果，本站不承担法律责任。我们强烈建议用户在重要决策时咨询专业人士，结合实际情况做出理性判断。</p>
             </div>
         </div>
-        
-        <!-- ICP 信息 -->
+
+        <!-- ICP -->
         <div class="icp-info">
-            <div>© 2026 玄机算命网 版权所有</div>
-            <div>京ICP备XXXXXXXX号-1</div>
-            <div>京公网安备 XXXXXXXXXXXXXX号</div>
+            <div>© 2026 玄机算命网 xuanjisuanming.top 版权所有</div>
+            <div>本站内容仅供娱乐 · 请理性看待命理分析</div>
         </div>
     </div>
 </div>
@@ -190,16 +172,34 @@
 <script src="/js/main.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 加载版本信息
-    fetch('/api/version')
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                const version = data.version.version;
-                document.querySelector('.about-version').textContent = `版本 ${version}`;
-            }
-        })
-        .catch(e => console.error('加载版本信息失败:', e));
+    // 版本号
+    fetch('/api/version').then(function(r) { return r.json(); }).then(function(data) {
+        if (data.success && data.version) {
+            document.getElementById('versionDisplay').textContent = 'v' + data.version.version;
+        }
+    }).catch(function() {
+        document.getElementById('versionDisplay').textContent = 'v1.x';
+    });
+
+    // 功能模块
+    var modules = [
+        { icon: '🎴', name: '八字排盘' }, { icon: '⭐', name: '紫微斗数' },
+        { icon: '💑', name: '合婚配对' }, { icon: '🐉', name: '生肖运势' },
+        { icon: '📝', name: '姓名测试' }, { icon: '🎴', name: '塔罗牌' },
+        { icon: '🏠', name: '风水堪舆' }, { icon: '😴', name: '周公解梦' },
+        { icon: '📅', name: '黄道吉日' }, { icon: '🔯', name: '流年解星' },
+        { icon: '💰', name: '财神方位' }, { icon: '👐', name: '手相分析' },
+        { icon: '😊', name: '面相分析' }, { icon: '🕯️', name: '六爻占卜' }
+    ];
+    document.getElementById('featureGrid').innerHTML = modules.map(function(m) {
+        return '<div class="feature-tag"><span class="fi">' + m.icon + '</span>' + m.name + '</div>';
+    }).join('');
+
+    // 技术栈
+    document.getElementById('techRow').innerHTML = [
+        'Python/Flask', 'Gunicorn', 'Nginx', 'JavaScript ES6', 'HTML5 Canvas',
+        'PWA/ServiceWorker', 'PIL/Pillow', 'SQLite', 'GitHub Actions', '阿里云ECS'
+    ].map(function(t) { return '<span class="tech-badge">' + t + '</span>'; }).join('');
 });
 </script>
 <script src="/js/sidenav.js"></script>

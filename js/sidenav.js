@@ -21,7 +21,8 @@
         { icon: '👤', label: '个人中心', href: '/profile.html', match: /profile\.html/ },
         { icon: '👥', label: '亲友档案', href: '/contacts.html', match: /contacts\.html/ },
         { icon: '📋', label: '数据表格', href: '/datasets.html', match: /datasets\.html/ },
-        { icon: '❓', label: '帮助中心', href: '/help.html', match: /help\.html/ }
+        { icon: '❓', label: '帮助中心', href: '/help.html', match: /help\.html/ },
+        { icon: 'ℹ️', label: '关于我们', href: '/about.html', match: /about\.html/ }
     ];
 
     function isActive(item) {

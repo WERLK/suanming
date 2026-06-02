@@ -1,0 +1,90 @@
+name: Build Desktop and Mobile Apps
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+      env:
+        ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
+        NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
+    
+    - name: Build Windows .exe
+      run: npm run build:win
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload Windows artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-exe
+        path: dist/*.exe
+        retention-days: 30
+
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+    
+    - name: Create simple Android app
+      run: |
+        mkdir -p android-app/app/src/main/java/top/xuanjisuanming/app
+        mkdir -p android-app/app/src/main/res/layout
+        
+        # 创建 MainActivity.java
+        echo 'package top.xuanjisuanming.app;' > android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo 'import android.app.Activity;' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo 'import android.os.Bundle;' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo 'import android.webkit.WebView;' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo 'public class MainActivity extends Activity {' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '    @Override' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '    protected void onCreate(Bundle savedInstanceState) {' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '        super.onCreate(savedInstanceState);' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '        WebView webView = new WebView(this);' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '        webView.loadUrl("https://xuanjisuanming.top");' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '        setContentView(webView);' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '    }' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        echo '}' >> android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java
+        
+        # 使用 Gradle 构建（简化版，实际需要完整 Android 项目结构）
+        echo "Android build script created (simplified)"
+    
+    - name: Upload Android artifacts (placeholder)
+      uses: actions/upload-artifact@v3
+      with:
+        name: android-apk
+        path: android-app/
+        retention-days: 30

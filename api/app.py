@@ -1669,6 +1669,40 @@ _DOWNLOAD_FILES = {
 _DOWNLOAD_CACHE_DIR = os.path.join(PROJECT_ROOT, 'downloads')
 _CACHE_MAX_AGE = 24 * 3600  # 缓存24小时
 
+# ========== 柠盟广告健康检查 ==========
+# 服务器在国内，可准确检测柠盟链接是否可用
+_AD_HEALTH_CACHE = {'alive': None, 'ts': 0}
+_AD_HEALTH_TTL = 300  # 缓存 5 分钟
+_AD_CHECK_LINKS = [
+    'http://www.huyis.com/link?1185',
+    'http://www.huyis.com/link?1186'
+]
+
+@app.route('/api/ad-health')
+def ad_health_check():
+    """检测柠盟广告链接是否可用（由前端 ads.js 调用）"""
+    now = time.time()
+    if now - _AD_HEALTH_CACHE['ts'] < _AD_HEALTH_TTL:
+        return jsonify({'success': True, 'alive': _AD_HEALTH_CACHE['alive']})
+
+    # 检测链接
+    alive = False
+    for url in _AD_CHECK_LINKS:
+        try:
+            r = requests.head(url, timeout=5, allow_redirects=True,
+                            headers={'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36'})
+            # 200-399 视为活着（含重定向）
+            if 200 <= r.status_code < 400:
+                alive = True
+                break
+            # 有些广告服务返回 302 也是正常的
+        except Exception:
+            pass
+
+    _AD_HEALTH_CACHE['alive'] = alive
+    _AD_HEALTH_CACHE['ts'] = now
+    return jsonify({'success': True, 'alive': alive})
+
 @app.route('/api/download/<platform>')
 def download_proxy(platform):
     """代理下载：从 GitHub Release 拉取文件，缓存后返回用户"""

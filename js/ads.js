@@ -1,121 +1,130 @@
 /**
- * 玄机算命网 - 自建广告管理系统
+ * 玄机算命网 - 混合广告系统 v2.0
  * 
- * 设计理念：不依赖任何第三方广告联盟审核。
- * 支持三种广告类型：
- *   1. 嵌入代码（AdSense / 任何联盟的 JS 代码）
- *   2. 图片广告（直接放图片+链接，适合自营/直投）
- *   3. 文字链接广告
+ * 双轨策略：柠盟广告优先，无广告时自动降级为自建招租广告。
+ * 通过后端 /api/ad-health 检测柠盟链接是否可用。
  * 
- * 配置方式：修改下方 AD_CONFIG 对象即可，无需改 HTML。
  * 广告位：首页 hero 下方、模块列表中间、详情页底部。
  */
 
 var AD_CONFIG = {
-    // ========== 广告位 1：首页 Hero 横幅（柠盟 1185） ==========
+    // ========== 全局开关 ==========
+    // useNingmeng: true  → 优先使用柠盟（需后端验证链接可用）
+    // useNingmeng: false → 始终使用自建招租广告
+    useNingmeng: false,
+
+    // 柠盟健康检查结果（由后端设置）
+    _ningmengAlive: false,
+    _lastCheck: 0,
+
+    // ========== 广告位 1：首页 Hero 横幅 ==========
     heroBanner: {
         enabled: true,
-        type: 'text',        // 'image' | 'code' | 'text'
-        // 图片模式
-        imageUrl: '',
-        imageLink: '',
-        imageAlt: '广告合作：support@xuanjisuanming.top',
-        // 代码模式（粘贴 AdSense 或其他联盟的代码）
-        codeHtml: '',
-        // 文字模式 → 柠盟直链广告 (CPA)
-        textContent: '🌟 热门推荐 · 点击了解更多',
-        textLink: 'http://www.huyis.com/link?1185'
+        // ── 柠盟广告（CPA 直链 #1185）──
+        ningmengLink: 'http://www.huyis.com/link?1185',
+        ningmengText: '🌟 热门推荐 · 点击了解更多',
+        // ── 自建招租广告 ──
+        selfText: '🌟 广告位招租 · 精准命理流量',
+        selfLink: 'mailto:support@xuanjisuanming.top?subject=首页横幅广告合作'
     },
 
-    // ========== 广告位 2：模块列表中间（柠盟 1185 复用） ==========
+    // ========== 广告位 2：模块列表中间 ==========
     listMiddle: {
         enabled: true,
-        type: 'text',
-        imageUrl: '',
-        imageLink: '',
-        imageAlt: '广告合作',
-        codeHtml: '',
-        textContent: '📢 命理测算 · 传统文化 · 点击查看更多精彩',
-        textLink: 'http://www.huyis.com/link?1185'
+        // ── 柠盟广告（CPA 直链 #1185 复用）──
+        ningmengLink: 'http://www.huyis.com/link?1185',
+        ningmengText: '📢 命理测算 · 传统文化 · 点击查看更多',
+        // ── 自建招租广告 ──
+        selfText: '📢 广告位招租 · 日活精准用户',
+        selfLink: 'mailto:support@xuanjisuanming.top?subject=列表中间广告合作'
     },
 
-    // ========== 广告位 3：详情页底部（柠盟 1186） ==========
+    // ========== 广告位 3：详情页底部 ==========
     detailFooter: {
         enabled: true,
-        type: 'text',
-        imageUrl: '',
-        imageLink: '',
-        imageAlt: '广告合作',
-        codeHtml: '',
-        textContent: '🔮 精准命理流量 · 点击查看详情',
-        textLink: 'http://www.huyis.com/link?1186'
+        // ── 柠盟广告（CPA 直链 #1186）──
+        ningmengLink: 'http://www.huyis.com/link?1186',
+        ningmengText: '🔮 精准命理流量 · 点击查看详情',
+        // ── 自建招租广告 ──
+        selfText: '🔮 广告位招租 · 详情页底部曝光位',
+        selfLink: 'mailto:support@xuanjisuanming.top?subject=详情页广告合作'
     }
 };
 
-// ===== 渲染广告 =====
+// ===== 健康检查 + 渲染 =====
 (function() {
     'use strict';
+
+    var CHECK_INTERVAL = 5 * 60 * 1000;  // 5 分钟检查一次
 
     function renderAd(config) {
         if (!config || !config.enabled) return '';
 
-        switch (config.type) {
-            case 'image':
-                if (!config.imageUrl) return renderTextAd(config);
-                var imgHtml = '<a href="' + (config.imageLink || '#') + '" target="_blank" rel="noopener sponsored" ' +
-                    'style="display:block;text-align:center;">' +
-                    '<img src="' + config.imageUrl + '" alt="' + (config.imageAlt || '广告') + '" ' +
-                    'style="max-width:100%;height:auto;border-radius:8px;" ' +
-                    'onerror="this.parentElement.style.display=\'none\'">' +
-                    '</a>';
-                return imgHtml;
+        var useNingmeng = AD_CONFIG.useNingmeng && AD_CONFIG._ningmengAlive;
 
-            case 'code':
-                if (!config.codeHtml) return renderTextAd(config);
-                return config.codeHtml;
-
-            case 'text':
-            default:
-                return renderTextAd(config);
+        // 柠盟可用 → 柠盟链接
+        if (useNingmeng && config.ningmengLink) {
+            return renderTextLink(config.ningmengText || '点击查看', config.ningmengLink, true);
         }
+
+        // 降级 → 自建招租广告
+        return renderTextLink(config.selfText || '广告位招租', config.selfLink || '#', false);
     }
 
-    function renderTextAd(config) {
-        var content = config.textContent || '广告位招租';
-        var link = config.textLink || '#';
+    function renderTextLink(text, link, isNingmeng) {
+        var bgColor = isNingmeng
+            ? 'rgba(255,215,0,0.06)'
+            : 'rgba(255,215,0,0.03)';
+        var borderColor = isNingmeng
+            ? 'rgba(255,215,0,0.2)'
+            : 'rgba(255,215,0,0.08)';
+        var textColor = isNingmeng
+            ? 'rgba(255,215,0,0.6)'
+            : 'rgba(255,215,0,0.35)';
+
         return '<div style="text-align:center;padding:0.8rem 1rem;margin:0.8rem 0;' +
-            'background:rgba(255,215,0,0.04);border:1px dashed rgba(255,215,0,0.15);border-radius:10px;">' +
+            'background:' + bgColor + ';border:1px dashed ' + borderColor + ';border-radius:10px;">' +
             '<a href="' + link + '" target="_blank" rel="noopener sponsored" ' +
-            'style="color:rgba(255,215,0,0.55);text-decoration:none;font-size:0.82rem;' +
+            'style="color:' + textColor + ';text-decoration:none;font-size:0.82rem;' +
             'transition:color 0.2s;" ' +
             'onmouseover="this.style.color=\'rgba(255,215,0,0.85)\'" ' +
-            'onmouseout="this.style.color=\'rgba(255,215,0,0.55)\'">' +
-            content + '</a></div>';
+            'onmouseout="this.style.color=\'' + textColor + '\'">' +
+            text + '</a></div>';
     }
 
-    function injectAd(selector, config) {
-        var container = document.querySelector(selector);
-        if (!container) return;
-        var adHtml = renderAd(config);
-        if (!adHtml) return;
+    // 从后端检查柠盟健康状态（利用服务器在国内的优势）
+    function checkNingmengHealth() {
+        var now = Date.now();
+        if (now - AD_CONFIG._lastCheck < CHECK_INTERVAL) return;
 
-        var adWrap = document.createElement('div');
-        adWrap.className = '__siteAd';
-        adWrap.style.cssText = 'margin:0.5rem 0;';
-        adWrap.innerHTML = adHtml;
-        container.appendChild(adWrap);
+        fetch('/api/ad-health', { method: 'GET', cache: 'no-store' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    var wasAlive = AD_CONFIG._ningmengAlive;
+                    AD_CONFIG._ningmengAlive = data.alive === true;
+                    AD_CONFIG._lastCheck = now;
+                    // 状态变化时刷新广告
+                    if (wasAlive !== AD_CONFIG._ningmengAlive) {
+                        window.SiteAd && window.SiteAd.refresh();
+                    }
+                }
+            })
+            .catch(function() {
+                // 检查失败，保持当前状态
+                AD_CONFIG._lastCheck = now;
+            });
     }
 
     // 页面加载后注入广告
     function injectAll() {
         var path = window.location.pathname;
 
-        // 首页 hero 广告
+        // 首页广告
         if (/^\/(index\.html)?$/.test(path)) {
-            // hero 区域后
+            // hero 下方
             var heroArea = document.querySelector('.hero, .hero-section, .page-hero');
             if (heroArea) {
-                injectAd.__target = heroArea;
                 var adHtml = renderAd(AD_CONFIG.heroBanner);
                 if (adHtml) {
                     var wrap = document.createElement('div');
@@ -125,8 +134,7 @@ var AD_CONFIG = {
                     heroArea.insertAdjacentElement('afterend', wrap);
                 }
             }
-
-            // 模块列表中间广告
+            // 模块列表中间
             var featSection = document.querySelector('.featured-section, .quick-access');
             if (featSection) {
                 var listAd = renderAd(AD_CONFIG.listMiddle);
@@ -156,24 +164,26 @@ var AD_CONFIG = {
         }
     }
 
-    // 延迟注入（等页面渲染完）
+    // 延迟注入
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(injectAll, 800);
+            setTimeout(injectAll, 600);
+            setTimeout(checkNingmengHealth, 1000);
         });
     } else {
-        setTimeout(injectAll, 800);
+        setTimeout(injectAll, 600);
+        setTimeout(checkNingmengHealth, 1000);
     }
 
-    // 暴露 API 供外部使用
+    // 暴露 API
     window.SiteAd = {
         config: AD_CONFIG,
         render: renderAd,
-        updateConfig: function(newConfig) {
-            Object.assign(AD_CONFIG, newConfig);
+        toggleNingmeng: function(on) {
+            AD_CONFIG.useNingmeng = !!on;
+            this.refresh();
         },
         refresh: function() {
-            // 移除已有广告
             var ads = document.querySelectorAll('.__siteAd');
             for (var i = 0; i < ads.length; i++) ads[i].remove();
             injectAll();

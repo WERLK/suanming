@@ -1718,7 +1718,7 @@ def ad_health_check():
 
 @app.route('/api/download/<platform>')
 def download_proxy(platform):
-    """代理下载：从 GitHub Release 拉取文件，缓存后返回用户"""
+    """下载代理：优先从服务器本地提供文件，本地不存在时尝试从 GitHub 拉取"""
     info = _DOWNLOAD_FILES.get(platform)
     if not info:
         return jsonify({'success': False, 'message': f'不支持的平台: {platform}'}), 404
@@ -1726,13 +1726,11 @@ def download_proxy(platform):
     os.makedirs(_DOWNLOAD_CACHE_DIR, exist_ok=True)
     cache_path = os.path.join(_DOWNLOAD_CACHE_DIR, info['filename'])
 
-    # 1. 尝试从缓存返回（未过期）
+    # 1. 优先从本地直接返回（服务器本地已构建好的安装包）
     if os.path.exists(cache_path):
-        age = time.time() - os.path.getmtime(cache_path)
-        if age < _CACHE_MAX_AGE:
-            return _send_file_response(cache_path, info['filename'], info['mime'])
+        return _send_file_response(cache_path, info['filename'], info['mime'])
 
-    # 2. 从 GitHub 流式下载（同时写缓存 + 返回用户）
+    # 2. 本地没有，尝试从 GitHub Release 流式下载并缓存
     try:
         resp = requests.get(info['url'], stream=True, timeout=60,
                            headers={'User-Agent': 'XuanjiDownloadProxy/1.0'})
@@ -1744,7 +1742,6 @@ def download_proxy(platform):
         total_size = resp.headers.get('Content-Length')
 
         def generate():
-            # 边下载边缓存边返回
             with open(cache_path, 'wb') as f:
                 for chunk in resp.iter_content(chunk_size=8192):
                     if chunk:
@@ -1760,9 +1757,6 @@ def download_proxy(platform):
 
         return Response(generate(), headers=headers, status=200)
     except requests.RequestException as e:
-        # GitHub 下载失败，尝试用缓存（即使过期）
-        if os.path.exists(cache_path):
-            return _send_file_response(cache_path, info['filename'], info['mime'])
         return jsonify({'success': False, 'message': f'下载服务暂不可用: {str(e)}'}), 502
 
 

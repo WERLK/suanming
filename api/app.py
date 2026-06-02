@@ -308,15 +308,56 @@ def index():
 
 @app.route('/<path:filename>')
 def serve_static(filename):
-    # 安全过滤：解析真实路径防路径穿越
+    """通用静态文件服务，捕获所有异常防止 500"""
     import os.path
     safe_path = os.path.realpath(os.path.join(PROJECT_ROOT, filename))
-    if not safe_path.startswith(os.path.realpath(PROJECT_ROOT) + os.sep):
+    real_root = os.path.realpath(PROJECT_ROOT)
+    if not safe_path.startswith(real_root + os.sep) and safe_path != real_root:
         return 'Forbidden', 403
     try:
         return send_from_directory(PROJECT_ROOT, filename)
     except FileNotFoundError:
         return 'Not Found', 404
+    except PermissionError:
+        return 'Permission Denied', 403
+    except Exception as e:
+        app.logger.error(f'静态文件服务错误: {filename} - {str(e)}')
+        return f'Internal Server Error: {str(e)}', 500
+
+# 专用视频服务端点（绕过静态文件路由的潜在问题）
+@app.route('/video/guide-intro.mp4')
+def serve_guide_video():
+    """直接服务教程视频，设置正确的流媒体头"""
+    import os.path
+    video_path = os.path.join(PROJECT_ROOT, 'static', 'videos', 'guide-intro.mp4')
+    if not os.path.isfile(video_path):
+        return 'Video not found', 404
+    try:
+        response = make_response(send_from_directory(
+            os.path.dirname(video_path),
+            os.path.basename(video_path),
+            mimetype='video/mp4',
+            as_attachment=False
+        ))
+        response.headers['Accept-Ranges'] = 'bytes'
+        response.headers['Content-Length'] = str(os.path.getsize(video_path))
+        return response
+    except Exception as e:
+        app.logger.error(f'视频服务错误: {str(e)}')
+        return f'Video serve error: {str(e)}', 500
+
+@app.route('/video/guide-poster.jpg')
+def serve_guide_poster():
+    """服务教程视频封面"""
+    import os.path
+    poster_path = os.path.join(PROJECT_ROOT, 'static', 'videos', 'guide-poster.jpg')
+    if not os.path.isfile(poster_path):
+        return 'Poster not found', 404
+    try:
+        return send_from_directory(os.path.dirname(poster_path), os.path.basename(poster_path), mimetype='image/jpeg')
+    except Exception as e:
+        app.logger.error(f'封面服务错误: {str(e)}')
+        return f'Poster serve error: {str(e)}', 500
 
 # ========== API路由 ==========
 
@@ -1423,6 +1464,11 @@ except Exception as e:
 @app.before_request
 def before_request_track():
     """记录每个请求的页面访问"""
+    # 跳过静态资源和视频请求
+    path = request.path
+    skip_prefixes = ('/static/', '/video/', '/css/', '/js/', '/icon-', '/manifest', '/favicon')
+    if any(path.startswith(p) for p in skip_prefixes):
+        return
     if request.method == 'GET' and not request.path.startswith('/api/'):
         try:
             page = request.path

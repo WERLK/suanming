@@ -62,9 +62,9 @@
         container.appendChild(div.firstElementChild);
     }
 
-    // 加载广告模块（如果尚未加载）
+    // 加载自建广告模块
     function loadAdModule() {
-        if (window.BaiduAd) return;
+        if (window.SiteAd) return;
         if (document.querySelector('script[src*="ads.js"]')) return;
         var s = document.createElement('script');
         s.src = '/js/ads.js?v=' + encodeURIComponent(FALLBACK_VERSION);

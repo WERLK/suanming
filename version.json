@@ -1,7 +1,7 @@
 {
   "version": "1.14.4",
   "build_time": "2026-06-02T13:50:00Z",
-  "git_commit": "pending",
+  "git_commit": "7e826f5",
   "author": "玄机算命网",
   "description": "v1.14.4 → 修复桌面/移动端CI结构并添加Electron客户端文件",
   "changelog": {

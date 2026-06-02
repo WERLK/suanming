@@ -1258,3 +1258,138 @@ body {
 .fortune-status-dot.offline {
     background: #f44336;
 }
+
+/* ============================================================
+   桌面端 App 推荐横幅
+   ============================================================ */
+.desktop-app-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+    background: linear-gradient(135deg, rgba(15,12,41,0.95), rgba(26,26,46,0.95));
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    backdrop-filter: blur(10px);
+    animation: bannerSlideDown 0.4s ease;
+}
+@keyframes bannerSlideDown {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(0); }
+}
+.desktop-app-banner-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.6rem 1.5rem;
+    gap: 1rem;
+}
+.desktop-app-banner-text {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+.desktop-app-banner-text strong {
+    color: #ffd700;
+    font-size: 0.9rem;
+}
+.desktop-app-banner-text span {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.78rem;
+}
+.desktop-app-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+.desktop-app-banner-btn {
+    padding: 0.4rem 1rem;
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    border: none;
+    border-radius: 6px;
+    color: #1a1a2e;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.desktop-app-banner-btn:hover { opacity: 0.85; }
+.desktop-app-banner-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.3);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem;
+}
+.desktop-app-banner-close:hover { color: rgba(255,255,255,0.6); }
+
+/* 有 banner 时 body 顶部偏移 */
+body.has-desktop-banner {
+    padding-top: 52px !important;
+}
+
+/* ============================================================
+   桌面端子页面表单布局修复
+   ============================================================ */
+@media (min-width: 1024px) {
+    /* 侧边栏注入后的主内容区 */
+    body.has-desktop-sidebar .app {
+        margin-left: 240px;
+        width: calc(100% - 240px);
+    }
+
+    /* 模块页面表单居中 */
+    body.has-desktop-sidebar .page-container,
+    body.has-desktop-sidebar .content-area {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* 表单字段双列布局 */
+    body.has-desktop-sidebar .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    /* 按钮组 */
+    body.has-desktop-sidebar .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    body.has-desktop-sidebar .btn-group .btn-primary,
+    body.has-desktop-sidebar .btn-group .btn-secondary {
+        flex: 0 0 auto;
+        min-width: 200px;
+    }
+
+    /* 结果页面 */
+    body.has-desktop-sidebar .result-page {
+        left: 240px;
+        width: calc(100% - 240px);
+    }
+
+    /* 下载横幅在桌面侧边栏存在时调整 */
+    body.has-desktop-sidebar .dl-banner {
+        margin: 0.5rem 2rem 0.5rem;
+    }
+}
+
+/* ============================================================
+   data-device 属性基础适配
+   ============================================================ */
+html[data-device="desktop"] body {
+    font-size: 15px;
+}
+html[data-device="mobile"] body {
+    font-size: 14px;
+}
+html[data-device="tablet"] body {
+    font-size: 15px;
+}

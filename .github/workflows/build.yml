@@ -15,13 +15,16 @@ on:
 
 jobs:
   build-windows:
+    name: Build Windows Installer (.exe)
     runs-on: windows-latest
     defaults:
       run:
         working-directory: desktop-app
+        shell: pwsh
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -31,31 +34,33 @@ jobs:
         cache-dependency-path: desktop-app/package-lock.json
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
       env:
         ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
         NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
 
-    - name: Build Windows .exe
+    - name: Build Windows Installer
       run: npm run build:win
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Upload Windows artifacts
+    - name: Upload Windows Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: windows-exe
-        path: desktop-app/dist/*.exe
+        name: windows-xuanji-installer
+        path: desktop-app/dist/*.{exe,msi}
         retention-days: 30
 
   build-android:
+    name: Build Android App (.apk)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: desktop-app
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -64,39 +69,50 @@ jobs:
         cache: 'npm'
         cache-dependency-path: desktop-app/package-lock.json
 
-    - name: Setup Java
+    - name: Setup JDK
       uses: actions/setup-java@v4
       with:
-        distribution: 'zulu'
+        distribution: 'temurin'
         java-version: '17'
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Build Android APK
+    - name: Install Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.5'
+
+    - name: Create Android Project
       run: |
-        mkdir -p android-app/app/src/main/java/top/xuanjisuanming/app
-        mkdir -p android-app/app/src/main/res/layout
-        mkdir -p android-app/app/src/main/res/values
-        mkdir -p android-app/gradle/wrapper
+        mkdir -p android/app/src/main/java/top/xuanjisuanming/app
+        mkdir -p android/app/src/main/res/layout
+        mkdir -p android/app/src/main/res/values
+        mkdir -p android/app/src/main/res/drawable
+        mkdir -p android/app/src/main/res/mipmap-hdpi
+        mkdir -p android/gradle/wrapper
+
+        # Copy icon to Android resources
+        cp assets/icon.png android/app/src/main/res/drawable/
 
         # AndroidManifest.xml
-        cat > android-app/app/src/main/AndroidManifest.xml << 'MANIFEST'
+        cat > android/app/src/main/AndroidManifest.xml << 'MANIFEST'
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android"
             package="top.xuanjisuanming.app">
-
             <uses-permission android:name="android.permission.INTERNET" />
-
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
             <application
                 android:allowBackup="true"
-                android:label="玄机算命"
+                android:label="@string/app_name"
+                android:roundIcon="@drawable/icon"
+                android:icon="@drawable/icon"
                 android:supportsRtl="true"
-                android:theme="@android:style/Theme.NoTitleBar"
+                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                 android:usesCleartextTraffic="true">
                 <activity
                     android:name=".MainActivity"
-                    android:configChanges="orientation|screenSize"
+                    android:configChanges="orientation|screenSize|smallestScreenSize|keyboardHidden"
                     android:exported="true">
                     <intent-filter>
                         <action android:name="android.intent.action.MAIN" />
@@ -108,41 +124,61 @@ jobs:
         MANIFEST
 
         # MainActivity.java
-        cat > android-app/app/src/main/java/top/xuanjisuanming/app/MainActivity.java << 'JAVA'
+        cat > android/app/src/main/java/top/xuanjisuanming/app/MainActivity.java << 'JAVA'
         package top.xuanjisuanming.app;
 
         import android.app.Activity;
         import android.os.Bundle;
+        import android.view.Window;
+        import android.view.WindowManager;
         import android.webkit.WebSettings;
         import android.webkit.WebView;
         import android.webkit.WebViewClient;
+        import android.webkit.WebChromeClient;
 
         public class MainActivity extends Activity {
+            private WebView webView;
+
             @Override
             protected void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
-                WebView webView = new WebView(this);
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                webView = new WebView(this);
                 WebSettings settings = webView.getSettings();
                 settings.setJavaScriptEnabled(true);
                 settings.setDomStorageEnabled(true);
+                settings.setDatabaseEnabled(true);
                 settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+                settings.setUserAgentString(settings.getUserAgentString() + " XuanjiApp/1.0");
                 webView.setWebViewClient(new WebViewClient());
+                webView.setWebChromeClient(new WebChromeClient());
                 webView.loadUrl("https://xuanjisuanming.top");
                 setContentView(webView);
+            }
+
+            @Override
+            public void onBackPressed() {
+                if (webView != null && webView.canGoBack()) {
+                    webView.goBack();
+                } else {
+                    super.onBackPressed();
+                }
             }
         }
         JAVA
 
         # strings.xml
-        cat > android-app/app/src/main/res/values/strings.xml << 'XML'
+        cat > android/app/src/main/res/values/strings.xml << 'XML'
         <?xml version="1.0" encoding="utf-8"?>
         <resources>
             <string name="app_name">玄机算命</string>
         </resources>
         XML
 
-        # build.gradle (project)
-        cat > android-app/build.gradle << 'GRADLE'
+        # build.gradle (root project)
+        cat > android/build.gradle << 'GRADLE'
         buildscript {
             repositories {
                 google()
@@ -152,7 +188,6 @@ jobs:
                 classpath 'com.android.tools.build:gradle:8.2.0'
             }
         }
-
         allprojects {
             repositories {
                 google()
@@ -161,8 +196,8 @@ jobs:
         }
         GRADLE
 
-        # build.gradle (app)
-        cat > android-app/app/build.gradle << 'GRADLE'
+        # build.gradle (app module)
+        cat > android/app/build.gradle << 'GRADLE'
         apply plugin: 'com.android.application'
 
         android {
@@ -179,8 +214,12 @@ jobs:
 
             buildTypes {
                 release {
-                    minifyEnabled true
-                    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+                    minifyEnabled false
+                    shrinkResources false
+                    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+                }
+                debug {
+                    debuggable true
                 }
             }
 
@@ -191,22 +230,61 @@ jobs:
         }
         GRADLE
 
+        # proguard-rules.pro
+        cat > android/app/proguard-rules.pro << 'PROGUARD'
+        # ProGuard rules
+        -keep public class top.xuanjisuanming.app.MainActivity
+        PROGUARD
+
         # settings.gradle
-        cat > android-app/settings.gradle << 'GRADLE'
-        rootProject.name = "玄机算命"
+        cat > android/settings.gradle << 'GRADLE'
+        rootProject.name = "xuanji-android"
         include ':app'
         GRADLE
 
         # gradle.properties
-        cat > android-app/gradle.properties << 'PROPS'
+        cat > android/gradle.properties << 'PROPS'
         android.useAndroidX=true
+        android.nonTransitiveRClass=true
         PROPS
 
-        echo "Android project structure created. Run ./gradlew assembleRelease to build."
+        # Gradle wrapper
+        mkdir -p android/gradle/wrapper
+        cat > android/gradle/wrapper/gradle-wrapper.properties << 'WRAPPER'
+        distributionBase=GRADLE_USER_HOME
+        distributionPath=wrapper/dists
+        distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+        networkTimeout=10000
+        validateDistributionUrl=true
+        zipStoreBase=GRADLE_USER_HOME
+        zipStorePath=wrapper/dists
+        WRAPPER
 
-    - name: Upload Android artifacts
+        # Download gradle wrapper jar
+        curl -sL -o android/gradle/wrapper/gradle-wrapper.jar \
+          https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradle/wrapper/gradle-wrapper.jar
+        echo "#!/bin/bash" > android/gradlew
+        echo 'exec "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"' >> android/gradlew
+        chmod +x android/gradlew
+
+        # Alternative: use system gradle
+        gradle wrapper --project-dir android --gradle-version 8.5 || true
+
+    - name: Build Android APK
+      working-directory: desktop-app/android
+      run: |
+        # Use system gradle if wrapper failed
+        if [ -f ./gradlew ]; then
+          ./gradlew assembleDebug
+        else
+          gradle assembleDebug
+        fi
+        echo "Build output:"
+        find . -name "*.apk" -type f
+
+    - name: Upload Android APK
       uses: actions/upload-artifact@v4
       with:
-        name: android-apk-src
-        path: desktop-app/android-app/
+        name: android-xuanji-apk
+        path: desktop-app/android/app/build/outputs/apk/**/*.apk
         retention-days: 30

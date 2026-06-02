@@ -1,7 +1,7 @@
 {
   "version": "1.14.7",
   "build_time": "2026-06-02T14:04:00Z",
-  "git_commit": "pending",
+  "git_commit": "073bf62",
   "author": "玄机算命网",
   "description": "v1.14.7 → 首页新增下载横幅 + 侧边栏下载入口",
   "changelog": {

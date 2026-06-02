@@ -35,8 +35,8 @@ var AD_CONFIG = {
         imageLink: '',
         imageAlt: '广告合作',
         codeHtml: '',
-        textContent: '📢 此处广告位出租 · 精准命理流量 · 日UV 1000+',
-        textLink: 'mailto:support@xuanjisuanming.top'
+        textContent: '📢 命理测算 · 传统文化 · 点击查看更多精彩',
+        textLink: 'http://www.huyis.com/link?1185'
     },
 
     // ========== 广告位 3：详情页底部（小尺寸） ==========

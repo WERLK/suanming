@@ -284,9 +284,26 @@ async function runAnalysis() {
             simpleHtml += '</div>';
             resultArea.innerHTML = simpleHtml;
         } else {
-            // 专业模式：渲染完整结果（保留原逻辑）
+            // 专业模式：渲染完整结果
             var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
             html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+            
+            // 评分显示
+            if (data.score) {
+                var sl = data.score >= 90 ? '大吉' : data.score >= 80 ? '吉' : data.score >= 65 ? '中吉' : data.score >= 50 ? '一般' : '较差';
+                html += '<div style="text-align:center;margin:0.8rem 0;"><span style="font-size:2rem;font-weight:bold;color:#ffd700;">' + data.score + '</span><span style="color:rgba(255,255,255,0.5);font-size:0.9rem;"> 分 · ' + sl + '</span></div>';
+            }
+            
+            if (data.summary) {
+                html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;margin-bottom:0.8rem;">' + data.summary + '</p>';
+            }
+            
+            // 三才配置
+            if (data.sancai && data.sancai.config) {
+                html += '<div style="margin:0.8rem 0;padding:0.6rem;background:rgba(255,215,0,0.04);border-radius:8px;">';
+                html += '<span style="color:#ffd700;font-size:0.85rem;">⚖️ 三才：' + data.sancai.config + '（' + (data.sancai.result || '—') + '）</span>';
+                html += '</div>';
+            }
             
             if (data.scores) {
                 html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
@@ -296,8 +313,11 @@ async function runAnalysis() {
                 html += '</div>';
             }
             
-            if (data.summary) {
-                html += '<p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + data.summary + '</p>';
+            // 详细分析
+            if (data.analysis) {
+                html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+                html += '<pre style="white-space:pre-wrap;font-family:inherit;font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.9;margin:0;">' + data.analysis + '</pre>';
+                html += '</div>';
             }
             
             if (data.lucky_elements) {

@@ -1,15 +1,16 @@
 {
-  "version": "1.13.0",
-  "build_time": "2026-06-01T16:40:00Z",
+  "version": "1.13.1",
+  "build_time": "2026-06-02T00:10:00Z",
   "git_commit": "HEAD",
   "author": "玄机算命网",
-  "description": "v1.13.0 → 多平台OAuth登录 + 教程视频修复",
+  "description": "v1.13.1 → 姓名分析极大丰富 + 教程视频加载容错",
   "changelog": {
     "1.11.5": "fix: 退出重进头像丢失 - avatar_preset空字符串被误判为未设置",
     "1.12.0": "feat: 注册页头像选择器(预设emoji/自定义上传) + 登录页记住用户头像预览 + 后端注册接口支持头像参数",
     "1.12.1": "fix: 身份证上传正反面+PIL缩放+compressImage | 模块图片分析compressImage全站统一 | _save_idcard_image重构",
     "1.12.2": "fix: 亲友档案弹窗不显示(class active→show+缺CSS) + 快速算命跳转bazi并预填姓名/生日/性别 + 弹窗遮罩层关闭",
     "1.12.3": "fix: profile-compatible.css中所有//注释改为/* */，CSS文件不再被浏览器丢弃，弹窗样式恢复正常",
-    "1.13.0": "feat: GitHub/微信/QQ OAuth第三方登录 + fix: Remotion教程视频黑屏修复(Sequence裁剪+emoji字体缺失)"
+    "1.13.0": "feat: GitHub/微信/QQ OAuth第三方登录 + fix: Remotion教程视频黑屏修复(Sequence裁剪+emoji字体缺失)",
+    "1.13.1": "feat: 姓名分析后端极大丰富(81组三才×100字义+阶段运势+健康五行+改运建议) + fix: 前后端grids字段对齐 + feat: 教程视频加载容错(超时检测+下载回退) + enhance: 9个姓名子模块专业模式显示增强"
   }
 }

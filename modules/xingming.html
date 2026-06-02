@@ -230,29 +230,40 @@ function triggerImageUpload(moduleType) {
     <script>
         // ===== 本地降级算法 =====
         function localAnalyzeName(name) {
-            const strokes = [];
-            for (let i = 0; i < name.length; i++) {
+            var strokes = [];
+            for (var i = 0; i < name.length; i++) {
                 strokes.push((name.charCodeAt(i) % 30) + 1);
             }
             
-            const tiange = strokes.length > 0 ? strokes[0] + 1 : 1;
-            const renge = strokes.length > 1 ? strokes[0] + strokes[1] : strokes[0] || 1;
-            const dige = strokes.length > 1 ? strokes[1] + 1 : strokes[0] || 1;
-            const waige = strokes.length > 1 ? strokes[strokes.length - 1] + 1 : strokes[0] || 1;
-            const zongge = strokes.reduce((a, b) => a + b, 0);
+            var tiange = strokes.length > 0 ? strokes[0] + 1 : 1;
+            var renge = strokes.length > 1 ? strokes[0] + strokes[1] : strokes[0] || 1;
+            var dige = strokes.length > 1 ? strokes[1] + 1 : strokes[0] || 1;
+            var waige = strokes.length > 1 ? strokes[strokes.length - 1] + 1 : strokes[0] || 1;
+            var zongge = strokes.reduce(function(a, b) { return a + b; }, 0);
             
-            const total = tiange + renge + dige + waige + zongge;
-            const score = Math.min(95, Math.max(50, Math.floor((total / 5) * 2)));
-            const label = score >= 90 ? '大吉' : score >= 80 ? '吉' : score >= 70 ? '中吉' : '一般';
+            var total = tiange + renge + dige + waige + zongge;
+            var score = Math.min(95, Math.max(50, Math.floor((total / 5) * 2)));
+            var label = score >= 90 ? '大吉' : score >= 80 ? '吉' : score >= 70 ? '中吉' : '一般';
             
             return {
                 data: {
                     name: name,
-                    strokes: strokes,
-                    grids: { tiange, renge, dige, waige, zongge },
+                    strokes: {},
+                    grids: {},
+                    tiange: tiange, renge: renge, dige: dige, waige: waige, zongge: zongge,
+                    tiange_jx: '平', renge_jx: '平', dige_jx: '平', waige_jx: '平', zongge_jx: '平',
+                    tiange_wx: '—', renge_wx: '—', dige_wx: '—', waige_wx: '—', zongge_wx: '—',
                     score: score,
-                    summary: '三才配置' + label + '（本地简化计算）',
-                    analysis: '此结果为本地简化算法通过五格剖象法计算，仅供参考。如需精确分析，请检查网络后重试联网版本。'
+                    score_label: label,
+                    summary: '此结果为本地简化算法计算结果，仅供参考。',
+                    analysis: '（本地离线模式）\n五格笔画分别为：天格' + tiange + '、人格' + renge + '、地格' + dige + '、外格' + waige + '、总格' + zongge + '。\n\n此为本地降级算法的粗略估算，准确度有限。如需精确姓名分析，请连接网络后重试。',
+                    sancai: {},
+                    wuxing_balance: [],
+                    name_meanings: [],
+                    career: '（本地模式无法提供详细事业分析，请联网重试）',
+                    relationships: '（本地模式无法提供详细人际分析，请联网重试）',
+                    health: '（本地模式无法提供详细健康分析，请联网重试）',
+                    advice: '如需精确分析，请确保网络连接后重试联网版本。'
                 },
                 meta: { source: 'local_fallback' }
             };
@@ -304,81 +315,159 @@ function triggerImageUpload(moduleType) {
             var mode = ModeToggle.getMode();
             if (mode === 'simple') {
                 var simpleHtml = '<div class="beginner-result">';
-                simpleHtml += '<div class="beginner-card"><h3>分析结果</h3><p>' + (data.summary || data.prediction || '分析完成，切换到专业模式可查看完整详情。') + '</p></div>';
-                simpleHtml += '</div>';
+                simpleHtml += '<div class="beginner-card"><h3>📝 ' + data.name + ' 分析结果</h3>';
+                simpleHtml += '<p style="font-size:2rem;font-weight:bold;color:#ffd700;margin:0.5rem 0;">' + (data.score || '--') + '分</p>';
+                simpleHtml += '<p>' + (data.summary || '分析完成，切换到专业模式可查看完整详情。') + '</p>';
+                simpleHtml += '</div></div>';
                 document.getElementById('formArea').style.display = 'none';
                 document.getElementById('resultArea').innerHTML = simpleHtml;
                 document.getElementById('resultArea').style.display = 'block';
+                if (meta && meta.source) showDataBadge(meta.source, 'resultArea', meta);
                 return;
             }
-            const score = data.score || 0;
-            const scoreLabel = score >= 90 ? '大吉' : score >= 80 ? '吉' : score >= 70 ? '中吉' : '一般';
-            const grids = data.grids || {};
-            
-            let html = `
-                <div class="section fade-in">
-                    <h3>📝 姓名：${data.name}</h3>
-                </div>
 
-                <div class="score-display fade-in">
-                    <div class="score-number">${score}分</div>
-                    <div class="score-text">${scoreLabel}</div>
-                </div>
+            var score = data.score || 0;
+            var scoreLabel = data.score_label || (score >= 90 ? '大吉' : score >= 80 ? '吉' : score >= 70 ? '中吉' : '一般');
+            var grids = data.grids || {};
+            var sancai = data.sancai || {};
 
-                <div class="section fade-in">
-                    <h3>📊 五格数理</h3>
-                    <table class="wuge-table">
-                        <tr>
-                            <th>格局</th>
-                            <th>数理</th>
-                            <th>吉凶</th>
-                        </tr>
-                        <tr>
-                            <td>天格</td>
-                            <td>${grids.tiange || '—'}</td>
-                            <td>${getJixiong(grids.tiange)}</td>
-                        </tr>
-                        <tr>
-                            <td>人格</td>
-                            <td>${grids.renge || '—'}</td>
-                            <td>${getJixiong(grids.renge)}</td>
-                        </tr>
-                        <tr>
-                            <td>地格</td>
-                            <td>${grids.dige || '—'}</td>
-                            <td>${getJixiong(grids.dige)}</td>
-                        </tr>
-                        <tr>
-                            <td>外格</td>
-                            <td>${grids.waige || '—'}</td>
-                            <td>${getJixiong(grids.waige)}</td>
-                        </tr>
-                        <tr>
-                            <td>总格</td>
-                            <td>${grids.zongge || '—'}</td>
-                            <td>${getJixiong(grids.zongge)}</td>
-                        </tr>
-                    </table>
-                </div>
+            // 五格数据：优先使用扁平字段，其次从grids中提取
+            var getGridNum = function(gname) {
+                if (grids[gname] && grids[gname].num) return grids[gname].num;
+                return data[gname.toLowerCase().replace('格','ge')] || '—';
+            };
+            var getGridJX = function(gname) {
+                if (grids[gname] && grids[gname].jixiong) return grids[gname].jixiong[0];
+                return data[gname.toLowerCase().replace('格','ge') + '_jx'] || '—';
+            };
+            var getGridWX = function(gname) {
+                if (grids[gname] && grids[gname].wuxing) return grids[gname].wuxing;
+                return data[gname.toLowerCase().replace('格','ge') + '_wx'] || '—';
+            };
 
-                <div class="section fade-in">
-                    <h3>⚖️ 三才配置</h3>
-                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
-                        ${data.summary || '暂无三才配置信息'}
-                    </p>
-                </div>
+            var jxColor = function(jx) {
+                if (jx === '大吉') return '#00e676';
+                if (jx === '吉') return '#76ff03';
+                if (jx === '凶') return '#ff5252';
+                if (jx === '大凶') return '#ff1744';
+                return '#ffd740';
+            };
 
-                <div class="section fade-in">
-                    <h3>💡 综合分析</h3>
-                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.8;">
-                        ${data.analysis || '暂无分析结果'}
-                    </p>
-                </div>
+            var html = '<div class="section fade-in" style="text-align:center;"><h3 style="font-size:1.5rem;color:#ffd700;">📝 ' + data.name + '</h3></div>';
 
-                <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
-                    <button type="button" class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">重新测试</button>
-                </div>
-            `;
+            // 综合评分
+            html += '<div class="score-display fade-in">';
+            html += '<div class="score-number" style="color:' + (score >= 80 ? '#ffd700' : score >= 60 ? '#ffd740' : '#ff5252') + ';">' + score + '分</div>';
+            html += '<div class="score-text" style="color:' + jxColor(scoreLabel) + ';">' + scoreLabel + '</div>';
+            if (data.summary) {
+                html += '<p style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-top:0.5rem;">' + data.summary + '</p>';
+            }
+            html += '</div>';
+
+            // 五格数理表
+            html += '<div class="section fade-in">';
+            html += '<h3>📊 五格数理</h3>';
+            html += '<table class="wuge-table">';
+            html += '<tr><th>格局</th><th>数理</th><th>五行</th><th>吉凶</th><th>含义</th></tr>';
+
+            var gridOrder = ['天格', '人格', '地格', '外格', '总格'];
+            for (var i = 0; i < gridOrder.length; i++) {
+                var gn = gridOrder[i];
+                var num = getGridNum(gn);
+                var wx = getGridWX(gn);
+                var jx = getGridJX(gn);
+                var gd = grids[gn];
+                var desc = (gd && gd.desc) ? gd.desc : '';
+                html += '<tr>';
+                html += '<td style="color:#ffd700;font-weight:600;">' + gn + '</td>';
+                html += '<td>' + num + '</td>';
+                html += '<td style="color:rgba(255,255,255,0.7);">' + wx + '</td>';
+                html += '<td style="color:' + jxColor(jx) + ';font-weight:600;">' + jx + '</td>';
+                html += '<td style="font-size:0.75rem;color:rgba(255,255,255,0.55);text-align:left;">' + desc.replace(/^[^，]+，/, '') + '</td>';
+                html += '</tr>';
+            }
+            html += '</table></div>';
+
+            // 三才配置
+            if (sancai.config) {
+                html += '<div class="section fade-in">';
+                html += '<h3>⚖️ 三才配置</h3>';
+                html += '<div style="background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.12);border-radius:10px;padding:1rem;">';
+                html += '<p style="font-size:1rem;margin-bottom:0.5rem;"><strong>配置：</strong><span style="color:#ffd700;">' + sancai.config + '</span> — <span style="color:' + jxColor(sancai.result) + ';">' + (sancai.result || '—') + '</span></p>';
+                if (sancai.desc) {
+                    html += '<p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.8;">' + sancai.desc + '</p>';
+                }
+                html += '</div></div>';
+            }
+
+            // 五行分布
+            if (data.wuxing_balance && data.wuxing_balance.length) {
+                html += '<div class="section fade-in">';
+                html += '<h3>🌿 五行分布</h3>';
+                html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;">';
+                var wxColors = {'木': '#4caf50', '火': '#f44336', '土': '#ff9800', '金': '#ffd700', '水': '#2196f3'};
+                for (var w = 0; w < data.wuxing_balance.length; w++) {
+                    var item = data.wuxing_balance[w];
+                    var wxName = item.charAt(0);
+                    var isBad = item.indexOf('缺失') >= 0 || item.indexOf('过旺') >= 0;
+                    html += '<span style="display:inline-block;padding:0.4rem 0.8rem;border-radius:20px;font-size:0.8rem;';
+                    html += 'background:' + (wxColors[wxName] || '#555') + '33;';
+                    html += 'border:1px solid ' + (wxColors[wxName] || '#555') + '55;';
+                    html += 'color:' + (isBad ? '#ff8a80' : '#fff') + ';">' + item + '</span>';
+                }
+                html += '</div></div>';
+            }
+
+            // 字义解析
+            if (data.name_meanings && data.name_meanings.length) {
+                html += '<div class="section fade-in">';
+                html += '<h3>📖 字义解析</h3>';
+                for (var n = 0; n < data.name_meanings.length; n++) {
+                    html += '<p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.8;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">' + data.name_meanings[n] + '</p>';
+                }
+                html += '</div>';
+            }
+
+            // 综合分析
+            if (data.analysis) {
+                var analysisLines = data.analysis.split('\n');
+                html += '<div class="section fade-in">';
+                html += '<h3>💡 综合分析</h3>';
+                html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:1.2rem;">';
+                html += '<pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;color:rgba(255,255,255,0.8);line-height:1.9;margin:0;">' + data.analysis + '</pre>';
+                html += '</div></div>';
+            }
+
+            // 事业/健康/社交/建议
+            var extraCards = '';
+            if (data.career) {
+                extraCards += '<div style="background:rgba(33,150,243,0.06);border:1px solid rgba(33,150,243,0.15);border-radius:10px;padding:0.8rem 1rem;flex:1;min-width:200px;">';
+                extraCards += '<h4 style="color:#42a5f5;margin-bottom:0.4rem;font-size:0.85rem;">💼 事业运势</h4>';
+                extraCards += '<p style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.7;">' + data.career + '</p></div>';
+            }
+            if (data.relationships) {
+                extraCards += '<div style="background:rgba(156,39,176,0.06);border:1px solid rgba(156,39,176,0.15);border-radius:10px;padding:0.8rem 1rem;flex:1;min-width:200px;">';
+                extraCards += '<h4 style="color:#ab47bc;margin-bottom:0.4rem;font-size:0.85rem;">🤝 人际关系</h4>';
+                extraCards += '<p style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.7;">' + data.relationships + '</p></div>';
+            }
+            if (data.health) {
+                extraCards += '<div style="background:rgba(76,175,80,0.06);border:1px solid rgba(76,175,80,0.15);border-radius:10px;padding:0.8rem 1rem;flex:1;min-width:200px;">';
+                extraCards += '<h4 style="color:#66bb6a;margin-bottom:0.4rem;font-size:0.85rem;">🏥 健康提示</h4>';
+                extraCards += '<p style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.7;">' + data.health + '</p></div>';
+            }
+            if (data.advice) {
+                extraCards += '<div style="background:rgba(255,152,0,0.06);border:1px solid rgba(255,152,0,0.15);border-radius:10px;padding:0.8rem 1rem;flex:1;min-width:200px;">';
+                extraCards += '<h4 style="color:#ffa726;margin-bottom:0.4rem;font-size:0.85rem;">🌟 改善建议</h4>';
+                extraCards += '<p style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.7;">' + data.advice + '</p></div>';
+            }
+            if (extraCards) {
+                html += '<div class="section fade-in"><div style="display:flex;flex-wrap:wrap;gap:0.8rem;">' + extraCards + '</div></div>';
+            }
+
+            // 重新测试按钮
+            html += '<div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">';
+            html += '<button type="button" class="submit-btn" style="display: inline-block; width: auto; padding: 0.8rem 2rem;" onclick="resetForm()">🔄 重新测试</button>';
+            html += '</div>';
 
             document.getElementById('formArea').style.display = 'none';
             document.getElementById('resultArea').innerHTML = html;

@@ -13,6 +13,10 @@ on:
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   build-windows:
     name: Build Windows Installer (.exe)
@@ -44,15 +48,23 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Rename artifact
+      run: |
+        $exe = Get-ChildItem -Path dist -Filter "*.exe" | Select-Object -First 1
+        if ($exe) {
+          Rename-Item $exe.FullName "dist/玄机算命-Setup.exe"
+        }
+        Get-ChildItem dist
+
     - name: Upload Windows Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: windows-xuanji-installer
-        path: desktop-app/dist/*.{exe,msi}
+        path: desktop-app/dist/玄机算命-Setup.exe
         retention-days: 30
 
-  build-android:
-    name: Build Android App (.apk)
+  build-linux:
+    name: Build Linux AppImage
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -69,222 +81,81 @@ jobs:
         cache: 'npm'
         cache-dependency-path: desktop-app/package-lock.json
 
-    - name: Setup JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+    - name: Install dependencies
+      run: npm ci
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+    - name: Build Linux AppImage
+      run: npm run build:linux
 
-    - name: Install Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: '8.5'
-
-    - name: Create Android Project
+    - name: Rename artifact
       run: |
-        mkdir -p android/app/src/main/java/top/xuanjisuanming/app
-        mkdir -p android/app/src/main/res/layout
-        mkdir -p android/app/src/main/res/values
-        mkdir -p android/app/src/main/res/drawable
-        mkdir -p android/app/src/main/res/mipmap-hdpi
-        mkdir -p android/gradle/wrapper
+        find dist -name "*.AppImage" -exec mv {} dist/玄机算命-Linux.AppImage \;
+        ls -lh dist/
 
-        # Copy icon to Android resources
-        cp assets/icon.png android/app/src/main/res/drawable/
-
-        # AndroidManifest.xml
-        cat > android/app/src/main/AndroidManifest.xml << 'MANIFEST'
-        <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-            package="top.xuanjisuanming.app">
-            <uses-permission android:name="android.permission.INTERNET" />
-            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-            <application
-                android:allowBackup="true"
-                android:label="@string/app_name"
-                android:roundIcon="@drawable/icon"
-                android:icon="@drawable/icon"
-                android:supportsRtl="true"
-                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-                android:usesCleartextTraffic="true">
-                <activity
-                    android:name=".MainActivity"
-                    android:configChanges="orientation|screenSize|smallestScreenSize|keyboardHidden"
-                    android:exported="true">
-                    <intent-filter>
-                        <action android:name="android.intent.action.MAIN" />
-                        <category android:name="android.intent.category.LAUNCHER" />
-                    </intent-filter>
-                </activity>
-            </application>
-        </manifest>
-        MANIFEST
-
-        # MainActivity.java
-        cat > android/app/src/main/java/top/xuanjisuanming/app/MainActivity.java << 'JAVA'
-        package top.xuanjisuanming.app;
-
-        import android.app.Activity;
-        import android.os.Bundle;
-        import android.view.Window;
-        import android.view.WindowManager;
-        import android.webkit.WebSettings;
-        import android.webkit.WebView;
-        import android.webkit.WebViewClient;
-        import android.webkit.WebChromeClient;
-
-        public class MainActivity extends Activity {
-            private WebView webView;
-
-            @Override
-            protected void onCreate(Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                webView = new WebView(this);
-                WebSettings settings = webView.getSettings();
-                settings.setJavaScriptEnabled(true);
-                settings.setDomStorageEnabled(true);
-                settings.setDatabaseEnabled(true);
-                settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-                settings.setUserAgentString(settings.getUserAgentString() + " XuanjiApp/1.0");
-                webView.setWebViewClient(new WebViewClient());
-                webView.setWebChromeClient(new WebChromeClient());
-                webView.loadUrl("https://xuanjisuanming.top");
-                setContentView(webView);
-            }
-
-            @Override
-            public void onBackPressed() {
-                if (webView != null && webView.canGoBack()) {
-                    webView.goBack();
-                } else {
-                    super.onBackPressed();
-                }
-            }
-        }
-        JAVA
-
-        # strings.xml
-        cat > android/app/src/main/res/values/strings.xml << 'XML'
-        <?xml version="1.0" encoding="utf-8"?>
-        <resources>
-            <string name="app_name">玄机算命</string>
-        </resources>
-        XML
-
-        # build.gradle (root project)
-        cat > android/build.gradle << 'GRADLE'
-        buildscript {
-            repositories {
-                google()
-                mavenCentral()
-            }
-            dependencies {
-                classpath 'com.android.tools.build:gradle:8.2.0'
-            }
-        }
-        allprojects {
-            repositories {
-                google()
-                mavenCentral()
-            }
-        }
-        GRADLE
-
-        # build.gradle (app module)
-        cat > android/app/build.gradle << 'GRADLE'
-        apply plugin: 'com.android.application'
-
-        android {
-            namespace 'top.xuanjisuanming.app'
-            compileSdk 34
-
-            defaultConfig {
-                applicationId "top.xuanjisuanming.app"
-                minSdk 21
-                targetSdk 34
-                versionCode 1
-                versionName "1.0.0"
-            }
-
-            buildTypes {
-                release {
-                    minifyEnabled false
-                    shrinkResources false
-                    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-                }
-                debug {
-                    debuggable true
-                }
-            }
-
-            compileOptions {
-                sourceCompatibility JavaVersion.VERSION_17
-                targetCompatibility JavaVersion.VERSION_17
-            }
-        }
-        GRADLE
-
-        # proguard-rules.pro
-        cat > android/app/proguard-rules.pro << 'PROGUARD'
-        # ProGuard rules
-        -keep public class top.xuanjisuanming.app.MainActivity
-        PROGUARD
-
-        # settings.gradle
-        cat > android/settings.gradle << 'GRADLE'
-        rootProject.name = "xuanji-android"
-        include ':app'
-        GRADLE
-
-        # gradle.properties
-        cat > android/gradle.properties << 'PROPS'
-        android.useAndroidX=true
-        android.nonTransitiveRClass=true
-        PROPS
-
-        # Gradle wrapper
-        mkdir -p android/gradle/wrapper
-        cat > android/gradle/wrapper/gradle-wrapper.properties << 'WRAPPER'
-        distributionBase=GRADLE_USER_HOME
-        distributionPath=wrapper/dists
-        distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
-        networkTimeout=10000
-        validateDistributionUrl=true
-        zipStoreBase=GRADLE_USER_HOME
-        zipStorePath=wrapper/dists
-        WRAPPER
-
-        # Download gradle wrapper jar
-        curl -sL -o android/gradle/wrapper/gradle-wrapper.jar \
-          https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradle/wrapper/gradle-wrapper.jar
-        echo "#!/bin/bash" > android/gradlew
-        echo 'exec "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"' >> android/gradlew
-        chmod +x android/gradlew
-
-        # Alternative: use system gradle
-        gradle wrapper --project-dir android --gradle-version 8.5 || true
-
-    - name: Build Android APK
-      working-directory: desktop-app/android
-      run: |
-        # Use system gradle if wrapper failed
-        if [ -f ./gradlew ]; then
-          ./gradlew assembleDebug
-        else
-          gradle assembleDebug
-        fi
-        echo "Build output:"
-        find . -name "*.apk" -type f
-
-    - name: Upload Android APK
+    - name: Upload Linux Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: android-xuanji-apk
-        path: desktop-app/android/app/build/outputs/apk/**/*.apk
+        name: linux-xuanji-appimage
+        path: desktop-app/dist/玄机算命-Linux.AppImage
         retention-days: 30
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-windows, build-linux]
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Read version
+      id: version
+      run: |
+        VERSION=$(cat desktop-app/package.json | grep '"version"' | head -1 | sed 's/.*"version": *"\(.*\)".*/\1/')
+        echo "version=v${VERSION}" >> $GITHUB_OUTPUT
+        echo "version_num=${VERSION}" >> $GITHUB_OUTPUT
+
+    - name: Download Windows artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-xuanji-installer
+        path: release-assets/
+
+    - name: Download Linux artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: linux-xuanji-appimage
+        path: release-assets/
+
+    - name: List release assets
+      run: ls -lh release-assets/
+
+    - name: Delete existing tag (if any)
+      run: |
+        git push origin :refs/tags/${{ steps.version.outputs.version }} 2>/dev/null || true
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: 玄机算命 ${{ steps.version.outputs.version }}
+        body: |
+          ## 玄机算命桌面客户端
+
+          本次构建由 GitHub Actions 自动生成。
+
+          ### 📥 下载
+          - **Windows**: `玄机算命-Setup.exe` — 双击安装，支持 Windows 10/11
+          - **Linux**: `玄机算命-Linux.AppImage` — 下载后 `chmod +x` 即可运行
+
+          ### 🔗 在线使用
+          浏览器访问 https://xuanjisuanming.top 即刻使用，无需安装。
+
+          ---
+          Built by [GitHub Actions](https://github.com/WERLK/suanming/actions)
+        draft: false
+        prerelease: false
+        files: release-assets/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

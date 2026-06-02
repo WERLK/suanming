@@ -156,27 +156,6 @@
             </div>
         </div>
 
-        <!-- 手机端 -->
-        <div class="section-title">📱 手机客户端</div>
-        <div class="platform-grid">
-            <!-- Android -->
-            <div class="platform-card">
-                <div class="pf-icon">🤖</div>
-                <div class="pf-name">Android 安卓版</div>
-                <div class="pf-desc">支持 Android 8.0+ 系统</div>
-                <span class="pf-status coming">即将上线</span>
-                <button class="pf-btn btn-notify" onclick="showNotify('Android')">🔔 上线通知我</button>
-            </div>
-            <!-- iOS -->
-            <div class="platform-card">
-                <div class="pf-icon">🍎</div>
-                <div class="pf-name">iOS 苹果版</div>
-                <div class="pf-desc">支持 iOS 15+ 系统</div>
-                <span class="pf-status coming">即将上线</span>
-                <button class="pf-btn btn-notify" onclick="showNotify('iOS')">🔔 上线通知我</button>
-            </div>
-        </div>
-
         <!-- 桌面端 -->
         <div class="section-title">💻 桌面客户端</div>
         <div class="platform-grid">
@@ -184,17 +163,42 @@
             <div class="platform-card">
                 <div class="pf-icon">🪟</div>
                 <div class="pf-name">Windows 桌面版</div>
-                <div class="pf-desc">支持 Windows 10/11</div>
-                <span class="pf-status planned">规划中</span>
-                <button class="pf-btn btn-disabled" disabled>敬请期待</button>
+                <div class="pf-desc">支持 Windows 10/11 · 安装包</div>
+                <span class="pf-status available">可下载</span>
+                <a class="pf-btn btn-dl" href="https://github.com/WERLK/suanming/releases/latest/download/玄机算命-Setup.exe">
+                    ⬇ 下载安装包
+                </a>
             </div>
-            <!-- macOS -->
+            <!-- Linux -->
             <div class="platform-card">
-                <div class="pf-icon">🍏</div>
-                <div class="pf-name">macOS 桌面版</div>
-                <div class="pf-desc">支持 macOS 13+ (Intel & Apple Silicon)</div>
-                <span class="pf-status planned">规划中</span>
-                <button class="pf-btn btn-disabled" disabled>敬请期待</button>
+                <div class="pf-icon">🐧</div>
+                <div class="pf-name">Linux 桌面版</div>
+                <div class="pf-desc">AppImage 格式 · 免安装</div>
+                <span class="pf-status available">可下载</span>
+                <a class="pf-btn btn-dl" href="https://github.com/WERLK/suanming/releases/latest/download/玄机算命-Linux.AppImage">
+                    ⬇ 下载 AppImage
+                </a>
+            </div>
+        </div>
+
+        <!-- 手机端 -->
+        <div class="section-title">📱 手机客户端</div>
+        <div class="platform-grid">
+            <!-- Android -->
+            <div class="platform-card">
+                <div class="pf-icon">🤖</div>
+                <div class="pf-name">Android 安卓版</div>
+                <div class="pf-desc">支持 Android 8.0+ · APK</div>
+                <span class="pf-status coming">构建中</span>
+                <button class="pf-btn btn-notify" onclick="showNotify('Android')">🔔 上线通知我</button>
+            </div>
+            <!-- iOS -->
+            <div class="platform-card">
+                <div class="pf-icon">🍎</div>
+                <div class="pf-name">iOS / macOS</div>
+                <div class="pf-desc">使用 PWA 添加到主屏幕即可</div>
+                <span class="pf-status available">PWA 可用</span>
+                <a class="pf-btn btn-dl" href="/">🌐 打开网页版</a>
             </div>
         </div>
 

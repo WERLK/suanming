@@ -7,13 +7,14 @@ project_dir = os.path.dirname(api_dir)
 if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
-from flask import Flask, request, jsonify, session, make_response, send_from_directory
+from flask import Flask, request, jsonify, session, make_response, send_from_directory, Response
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import json
 import hashlib
 import smtplib
+import requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
@@ -1643,8 +1644,115 @@ def image_analyze():
         return jsonify({'success': False, 'message': f'分析失败：{str(e)}'}), 500
 
 
-# 自动更新接口
-@app.route('/update-secret-2026')
+# ========== 客户端下载代理（绕过 GitHub 访问限制）==========
+
+# GitHub Release 文件映射 + MIME 类型
+_DOWNLOAD_FILES = {
+    'windows': {
+        'url': 'https://github.com/WERLK/suanming/releases/latest/download/玄机算命-Setup.exe',
+        'filename': '玄机算命-Setup.exe',
+        'mime': 'application/vnd.microsoft.portable-executable'
+    },
+    'linux': {
+        'url': 'https://github.com/WERLK/suanming/releases/latest/download/玄机算命-Linux.AppImage',
+        'filename': '玄机算命-Linux.AppImage',
+        'mime': 'application/octet-stream'
+    },
+    'android': {
+        'url': 'https://github.com/WERLK/suanming/releases/latest/download/玄机算命-Android.apk',
+        'filename': '玄机算命-Android.apk',
+        'mime': 'application/vnd.android.package-archive'
+    }
+}
+
+# 下载缓存目录
+_DOWNLOAD_CACHE_DIR = os.path.join(PROJECT_ROOT, 'downloads')
+_CACHE_MAX_AGE = 24 * 3600  # 缓存24小时
+
+@app.route('/api/download/<platform>')
+def download_proxy(platform):
+    """代理下载：从 GitHub Release 拉取文件，缓存后返回用户"""
+    info = _DOWNLOAD_FILES.get(platform)
+    if not info:
+        return jsonify({'success': False, 'message': f'不支持的平台: {platform}'}), 404
+
+    os.makedirs(_DOWNLOAD_CACHE_DIR, exist_ok=True)
+    cache_path = os.path.join(_DOWNLOAD_CACHE_DIR, info['filename'])
+
+    # 1. 尝试从缓存返回（未过期）
+    if os.path.exists(cache_path):
+        age = time.time() - os.path.getmtime(cache_path)
+        if age < _CACHE_MAX_AGE:
+            return _send_file_response(cache_path, info['filename'], info['mime'])
+
+    # 2. 从 GitHub 流式下载（同时写缓存 + 返回用户）
+    try:
+        resp = requests.get(info['url'], stream=True, timeout=60,
+                           headers={'User-Agent': 'XuanjiDownloadProxy/1.0'})
+        if resp.status_code == 404:
+            return jsonify({'success': False, 'message': '文件尚未构建，请稍后再试'}), 404
+        if resp.status_code != 200:
+            return jsonify({'success': False, 'message': f'下载失败 (HTTP {resp.status_code})'}), 502
+
+        total_size = resp.headers.get('Content-Length')
+
+        def generate():
+            # 边下载边缓存边返回
+            with open(cache_path, 'wb') as f:
+                for chunk in resp.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        yield chunk
+
+        headers = {
+            'Content-Type': info['mime'],
+            'Content-Disposition': f'attachment; filename="{info["filename"]}"'
+        }
+        if total_size:
+            headers['Content-Length'] = total_size
+
+        return Response(generate(), headers=headers, status=200)
+    except requests.RequestException as e:
+        # GitHub 下载失败，尝试用缓存（即使过期）
+        if os.path.exists(cache_path):
+            return _send_file_response(cache_path, info['filename'], info['mime'])
+        return jsonify({'success': False, 'message': f'下载服务暂不可用: {str(e)}'}), 502
+
+
+def _send_file_response(filepath, filename, mime):
+    """发送本地文件响应（支持断点续传）"""
+    file_size = os.path.getsize(filepath)
+    range_header = request.headers.get('Range')
+
+    if range_header:
+        # 简单断点续传支持
+        try:
+            byte_range = range_header.replace('bytes=', '').split('-')
+            start = int(byte_range[0]) if byte_range[0] else 0
+            end = int(byte_range[1]) if len(byte_range) > 1 and byte_range[1] else file_size - 1
+        except (ValueError, IndexError):
+            start, end = 0, file_size - 1
+
+        if start >= file_size:
+            return Response('Range Not Satisfiable', status=416)
+
+        length = end - start + 1
+        with open(filepath, 'rb') as f:
+            f.seek(start)
+            data = f.read(length)
+
+        resp = Response(data, status=206, mimetype=mime)
+        resp.headers['Content-Range'] = f'bytes {start}-{end}/{file_size}'
+        resp.headers['Content-Length'] = str(length)
+    else:
+        with open(filepath, 'rb') as f:
+            data = f.read()
+        resp = Response(data, status=200, mimetype=mime)
+        resp.headers['Content-Length'] = str(file_size)
+
+    resp.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+    resp.headers['Accept-Ranges'] = 'bytes'
+    return resp
 def auto_update():
     import subprocess
     try:

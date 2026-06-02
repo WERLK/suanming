@@ -51,3 +51,6 @@ PythonAnywhere_部署*报告.md
 
 # Data files (user accounts, NEVER commit)
 data/
+
+# Download cache
+downloads/

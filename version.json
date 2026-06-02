@@ -1,9 +1,9 @@
 {
-  "version": "1.15.0",
-  "build_time": "2026-06-02T14:40:00Z",
+  "version": "1.15.1",
+  "build_time": "2026-06-02T14:45:00Z",
   "git_commit": "70b9227",
   "author": "玄机算命网",
-  "description": "v1.15.0 → Android APK 客户端上线 + 柠盟广告全面接入",
+  "description": "v1.15.1 → 下载代理：从网站自身下载，无需访问GitHub",
   "changelog": {
     "1.11.5": "fix: 退出重进头像丢失",
     "1.12.0": "feat: 注册页头像选择器",
@@ -24,6 +24,7 @@
     "1.14.7": "feat: 首页下载横幅+侧边栏下载入口，引导用户下载客户端",
     "1.14.8": "feat: main.js内置设备检测，桌面端自动注入侧边栏，子页桌面适配",
     "1.14.9": "feat: 柠盟广告全面接入，heroBanner(1185)+detailFooter(1186)直链CPA广告",
-    "1.15.0": "feat: Android WebView客户端，Gradle项目+CI自动构建APK，下载页全平台覆盖"
+    "1.15.0": "feat: Android WebView客户端，Gradle项目+CI自动构建APK，下载页全平台覆盖",
+    "1.15.1": "feat: 下载代理路由/api/download/<platform>，服务器缓存+流式代理，免GitHub访问"
   }
 }

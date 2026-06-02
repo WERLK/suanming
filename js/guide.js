@@ -7,11 +7,14 @@
 window.startGuide = (function() {
     'use strict';
 
-    // 仅首页和帮助中心加载
+    // 仅首页加载引导教程（帮助页面仅允许手动跳转触发）
     var path = window.location.pathname;
     var isIndex = /^\/(index\.html)?$/.test(path);
     var isHelp = /help\.html/.test(path);
     if (!isIndex && !isHelp) return function(){};
+
+    // 帮助页面不自动触发引导（页面内容会被覆盖层遮挡）
+    // 用户可点击"重新播放引导教程"按钮跳回首页观看
 
     var overlay = null;
     var spotlight = null;
@@ -338,13 +341,26 @@ window.startGuide = (function() {
           });
     }
 
-    // 导出 startGuide 供手动调用（register/login 成功后）
+    // 导出 startGuide 供手动调用（register/login 成功后, 或帮助页按钮）
     function startGuide() {
+        // 非首页则跳转首页后再启动引导
+        if (!isIndex) {
+            sessionStorage.setItem('__startGuide', '1');
+            window.location.href = '/';
+            return;
+        }
         launch();
     }
 
-    // 页面加载后 600ms 自动检测
-    setTimeout(autoCheck, 600);
+    // 页面加载后自动检测（仅首页）
+    if (isIndex) {
+        setTimeout(autoCheck, 600);
+        // 检查是否有跳转过来的引导标记
+        if (sessionStorage.getItem('__startGuide') === '1') {
+            sessionStorage.removeItem('__startGuide');
+            setTimeout(launch, 800);
+        }
+    }
 
     return startGuide;
 })();

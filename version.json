@@ -1,9 +1,9 @@
 {
-  "version": "1.14.8",
-  "build_time": "2026-06-02T14:08:00Z",
+  "version": "1.14.9",
+  "build_time": "2026-06-02T14:35:00Z",
   "git_commit": "70b9227",
   "author": "玄机算命网",
-  "description": "v1.14.8 → 自动检测设备并适配桌面端布局",
+  "description": "v1.14.9 → 柠盟广告单元全面接入（首页横幅+详情页底部）",
   "changelog": {
     "1.11.5": "fix: 退出重进头像丢失",
     "1.12.0": "feat: 注册页头像选择器",
@@ -22,6 +22,7 @@
     "1.14.5": "feat: 添加图标资源、package-lock和完整CI workflow，支持真实构建",
     "1.14.6": "feat: 下载页Windows/Linux真实下载链接，CI自动发布GitHub Release",
     "1.14.7": "feat: 首页下载横幅+侧边栏下载入口，引导用户下载客户端",
-    "1.14.8": "feat: main.js内置设备检测，桌面端自动注入侧边栏，子页桌面适配"
+    "1.14.8": "feat: main.js内置设备检测，桌面端自动注入侧边栏，子页桌面适配",
+    "1.14.9": "feat: 柠盟广告全面接入，heroBanner(1185)+detailFooter(1186)直链CPA广告"
   }
 }

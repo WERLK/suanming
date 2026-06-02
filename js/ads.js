@@ -12,22 +12,22 @@
  */
 
 var AD_CONFIG = {
-    // ========== 广告位 1：首页 Hero 横幅（大尺寸） ==========
+    // ========== 广告位 1：首页 Hero 横幅（柠盟 1185） ==========
     heroBanner: {
         enabled: true,
-        type: 'image',        // 'image' | 'code' | 'text'
+        type: 'text',        // 'image' | 'code' | 'text'
         // 图片模式
         imageUrl: '',
         imageLink: '',
         imageAlt: '广告合作：support@xuanjisuanming.top',
         // 代码模式（粘贴 AdSense 或其他联盟的代码）
         codeHtml: '',
-        // 文字模式
-        textContent: '🌟 广告位招租 — 联系 support@xuanjisuanming.top',
-        textLink: 'mailto:support@xuanjisuanming.top'
+        // 文字模式 → 柠盟直链广告 (CPA)
+        textContent: '🌟 热门推荐 · 点击了解更多',
+        textLink: 'http://www.huyis.com/link?1185'
     },
 
-    // ========== 广告位 2：模块列表中间（中等尺寸） ==========
+    // ========== 广告位 2：模块列表中间（柠盟 1185 复用） ==========
     listMiddle: {
         enabled: true,
         type: 'text',
@@ -39,7 +39,7 @@ var AD_CONFIG = {
         textLink: 'http://www.huyis.com/link?1185'
     },
 
-    // ========== 广告位 3：详情页底部（小尺寸） ==========
+    // ========== 广告位 3：详情页底部（柠盟 1186） ==========
     detailFooter: {
         enabled: true,
         type: 'text',
@@ -47,8 +47,8 @@ var AD_CONFIG = {
         imageLink: '',
         imageAlt: '广告合作',
         codeHtml: '',
-        textContent: '🔮 精准命理流量 · 广告合作：support@xuanjisuanming.top',
-        textLink: 'mailto:support@xuanjisuanming.top'
+        textContent: '🔮 精准命理流量 · 点击查看详情',
+        textLink: 'http://www.huyis.com/link?1186'
     }
 };
 

@@ -100,6 +100,69 @@
     background: rgba(255,215,0,0.2);
 }
 
+/* 下载客户端横幅 */
+.dl-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 0 0.6rem 0.4rem;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,180,0,0.06));
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 12px;
+    animation: dlBannerIn 0.5s ease;
+    position: relative;
+}
+@keyframes dlBannerIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.dl-banner-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+.dl-banner-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.dl-banner-title {
+    color: #ffd700;
+    font-size: 0.88rem;
+    font-weight: bold;
+}
+.dl-banner-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+}
+.dl-banner-btn {
+    flex-shrink: 0;
+    padding: 0.35rem 0.9rem;
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    border: none;
+    border-radius: 8px;
+    color: #1a1a2e;
+    font-size: 0.78rem;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.dl-banner-btn:hover { opacity: 0.85; }
+.dl-banner-close {
+    position: absolute;
+    top: 4px; right: 8px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.25);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+.dl-banner-close:hover { color: rgba(255,255,255,0.6); }
+
 .quick-access {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -266,6 +329,9 @@
             <a href="/profile.html" class="sidebar-nav-item">
                 <span class="nav-icon">👤</span> 个人中心
             </a>
+            <a href="/download.html" class="sidebar-nav-item">
+                <span class="nav-icon">📥</span> 下载客户端
+            </a>
         </div>
         
         <div class="sidebar-nav-section">
@@ -321,6 +387,17 @@
             <button class="btn-secondary" onclick="openMore()">更多功能</button>
             <button class="btn-secondary" onclick="window.location.href='/download.html'">📱 下载App</button>
         </div>
+    </div>
+
+    <!-- 下载客户端横幅 -->
+    <div class="dl-banner" id="dlBanner">
+        <div class="dl-banner-icon">💻</div>
+        <div class="dl-banner-text">
+            <span class="dl-banner-title">桌面客户端已上线</span>
+            <span class="dl-banner-sub">支持 Windows / Linux · 体验更流畅</span>
+        </div>
+        <a href="/download.html" class="dl-banner-btn">立即下载</a>
+        <button class="dl-banner-close" onclick="document.getElementById('dlBanner').remove()" title="关闭">✕</button>
     </div>
 
     <div class="quick-access">

@@ -1,9 +1,9 @@
 {
-  "version": "1.14.6",
-  "build_time": "2026-06-02T14:00:00Z",
-  "git_commit": "74135c9",
+  "version": "1.14.7",
+  "build_time": "2026-06-02T14:04:00Z",
+  "git_commit": "pending",
   "author": "玄机算命网",
-  "description": "v1.14.6 → 下载页真实链接 + GitHub Release 自动发布",
+  "description": "v1.14.7 → 首页新增下载横幅 + 侧边栏下载入口",
   "changelog": {
     "1.11.5": "fix: 退出重进头像丢失",
     "1.12.0": "feat: 注册页头像选择器",
@@ -20,6 +20,7 @@
     "1.14.3": "feat: 柠盟直链广告接入首页listMiddle广告位",
     "1.14.4": "fix: 修复GitHub Actions工作流位置，重构desktop-app目录结构",
     "1.14.5": "feat: 添加图标资源、package-lock和完整CI workflow，支持真实构建",
-    "1.14.6": "feat: 下载页Windows/Linux真实下载链接，CI自动发布GitHub Release"
+    "1.14.6": "feat: 下载页Windows/Linux真实下载链接，CI自动发布GitHub Release",
+    "1.14.7": "feat: 首页下载横幅+侧边栏下载入口，引导用户下载客户端"
   }
 }

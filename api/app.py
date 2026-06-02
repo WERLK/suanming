@@ -1669,39 +1669,52 @@ _DOWNLOAD_FILES = {
 _DOWNLOAD_CACHE_DIR = os.path.join(PROJECT_ROOT, 'downloads')
 _CACHE_MAX_AGE = 24 * 3600  # 缓存24小时
 
-# ========== 柠盟广告健康检查 ==========
-# 服务器在国内，可准确检测柠盟链接是否可用
-_AD_HEALTH_CACHE = {'alive': None, 'ts': 0}
+# ========== 多平台广告健康检查 ==========
+# 服务器在国内，可准确检测各平台链接是否可用
+_AD_HEALTH_CACHE = {'platforms': {}, 'ts': 0}
 _AD_HEALTH_TTL = 300  # 缓存 5 分钟
-_AD_CHECK_LINKS = [
-    'http://www.huyis.com/link?1185',
-    'http://www.huyis.com/link?1186'
-]
+
+# 各平台检测 URL 列表
+_AD_PLATFORM_URLS = {
+    'ningmeng': [
+        'http://www.huyis.com/link?1185',
+        'http://www.huyis.com/link?1186'
+    ],
+    'huicheng': [
+        'https://www.hczzw.com/'
+    ],
+    'mimeihui': [
+        'https://www.mimeihui.com/'
+    ],
+    'douhao': [
+        'https://union.douhao.com/'
+    ]
+}
 
 @app.route('/api/ad-health')
 def ad_health_check():
-    """检测柠盟广告链接是否可用（由前端 ads.js 调用）"""
+    """检测各广告平台是否可用（由前端 ads.js 调用）"""
     now = time.time()
     if now - _AD_HEALTH_CACHE['ts'] < _AD_HEALTH_TTL:
-        return jsonify({'success': True, 'alive': _AD_HEALTH_CACHE['alive']})
+        return jsonify({'success': True, 'platforms': _AD_HEALTH_CACHE['platforms']})
 
-    # 检测链接
-    alive = False
-    for url in _AD_CHECK_LINKS:
-        try:
-            r = requests.head(url, timeout=5, allow_redirects=True,
-                            headers={'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36'})
-            # 200-399 视为活着（含重定向）
-            if 200 <= r.status_code < 400:
-                alive = True
-                break
-            # 有些广告服务返回 302 也是正常的
-        except Exception:
-            pass
+    platforms = {}
+    for pid, urls in _AD_PLATFORM_URLS.items():
+        alive = False
+        for url in urls:
+            try:
+                r = requests.head(url, timeout=5, allow_redirects=True,
+                                headers={'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36'})
+                if 200 <= r.status_code < 400:
+                    alive = True
+                    break
+            except Exception:
+                pass
+        platforms[pid] = alive
 
-    _AD_HEALTH_CACHE['alive'] = alive
+    _AD_HEALTH_CACHE['platforms'] = platforms
     _AD_HEALTH_CACHE['ts'] = now
-    return jsonify({'success': True, 'alive': alive})
+    return jsonify({'success': True, 'platforms': platforms})
 
 @app.route('/api/download/<platform>')
 def download_proxy(platform):

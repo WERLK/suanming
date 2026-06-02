@@ -1,9 +1,9 @@
 {
-  "version": "1.14.4",
-  "build_time": "2026-06-02T13:50:00Z",
-  "git_commit": "7e826f5",
+  "version": "1.14.5",
+  "build_time": "2026-06-02T13:53:00Z",
+  "git_commit": "be78df7",
   "author": "玄机算命网",
-  "description": "v1.14.4 → 修复桌面/移动端CI结构并添加Electron客户端文件",
+  "description": "v1.14.5 → 完整可构建的桌面+安卓客户端CI",
   "changelog": {
     "1.11.5": "fix: 退出重进头像丢失",
     "1.12.0": "feat: 注册页头像选择器",
@@ -18,6 +18,7 @@
     "1.14.1": "feat: 自建广告系统(三广告位+图片/代码/文字三模式+config热切换)",
     "1.14.2": "feat: 接入柠盟广告联盟，添加网站验证meta标签",
     "1.14.3": "feat: 柠盟直链广告接入首页listMiddle广告位",
-    "1.14.4": "fix: 修复GitHub Actions工作流位置，重构desktop-app目录结构"
+    "1.14.4": "fix: 修复GitHub Actions工作流位置，重构desktop-app目录结构",
+    "1.14.5": "feat: 添加图标资源、package-lock和完整CI workflow，支持真实构建"
   }
 }

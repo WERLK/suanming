@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 启动主题：深色背景 + 金色文字 -->
+    <style name="Theme.Xuanji.Splash" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/primaryDark</item>
+        <item name="android:statusBarColor">@color/primaryDark</item>
+        <item name="android:navigationBarColor">@color/primaryDark</item>
+    </style>
+
+    <!-- 主主题 -->
+    <style name="Theme.Xuanji" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/primary</item>
+        <item name="android:statusBarColor">@color/primaryDark</item>
+        <item name="android:navigationBarColor">@color/primaryDark</item>
+    </style>
+</resources>

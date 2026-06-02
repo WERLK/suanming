@@ -40,6 +40,16 @@
         }
 
         html += '</div></div>';
+
+        // 行3：法律文档链接
+        html += '<div style="margin-top:0.6rem;font-size:0.68rem;">' +
+            '<a href="/privacy-policy.html" style="color:rgba(255,255,255,0.28);text-decoration:none;margin:0 0.4rem;">隐私政策</a>' +
+            '<a href="/terms.html" style="color:rgba(255,255,255,0.28);text-decoration:none;margin:0 0.4rem;">服务条款</a>' +
+            '<a href="/disclaimer.html" style="color:rgba(255,255,255,0.28);text-decoration:none;margin:0 0.4rem;">免责声明</a>' +
+            '<a href="/about.html" style="color:rgba(255,255,255,0.28);text-decoration:none;margin:0 0.4rem;">关于我们</a>' +
+            '</div>';
+
+        html += '</div>';
         return html;
     }
 

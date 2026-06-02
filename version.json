@@ -1,7 +1,7 @@
 {
   "version": "1.14.6",
   "build_time": "2026-06-02T14:00:00Z",
-  "git_commit": "pending",
+  "git_commit": "74135c9",
   "author": "玄机算命网",
   "description": "v1.14.6 → 下载页真实链接 + GitHub Release 自动发布",
   "changelog": {

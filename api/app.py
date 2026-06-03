@@ -3433,6 +3433,23 @@ def classify_history(history_id):
 # 注意：此路由在之前已注册，这里通过修改原函数逻辑来实现增强
 # 由于 Flask 不支持同一路由重复注册，需要修改上方已有的 get_divination_history 函数
 
+# ===== 临时文件上传端点（运维用）=====
+@app.route('/api/upload-file', methods=['POST'])
+def upload_file():
+    """接收上传文件并保存到 downloads 目录"""
+    import hmac as _hmac
+    token = request.headers.get('X-Upload-Token', '')
+    if not _hmac.compare_digest(token, 'xuanji_upload_2026'):
+        return jsonify({'success': False, 'message': '未授权'}), 403
+    fname = request.headers.get('X-Filename', '')
+    if not fname:
+        return jsonify({'success': False, 'message': '缺少文件名'}), 400
+    os.makedirs(_DOWNLOAD_CACHE_DIR, exist_ok=True)
+    dest = os.path.join(_DOWNLOAD_CACHE_DIR, fname)
+    with open(dest, 'wb') as f:
+        f.write(request.get_data())
+    return jsonify({'success': True, 'filename': fname, 'size': os.path.getsize(dest)})
+
 # ===== WSGI 支持（PythonAnywhere 部署）=====
 # 添加 application 对象（WSGI 标准）
 application = app

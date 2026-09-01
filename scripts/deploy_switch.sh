@@ -57,22 +57,51 @@ print('  ✓ 应用创建成功，路由数:', len(list(app.url_map.iter_rules()
     exit 1
 fi
 
-# 6. 跑冒烟测试
+# 6. 跑冒烟测试（服务器未装 pytest 时跳过，上方 import 自检已覆盖核心）
 echo "[测试] 运行冒烟测试..."
-python3 -m pytest tests/test_smoke.py -q || {
-    echo "[错误] 冒烟测试未通过，中止切换"
-    exit 1
-}
+if python3 -m pytest --version >/dev/null 2>&1; then
+    python3 -m pytest tests/test_smoke.py -q || {
+        echo "[错误] 冒烟测试未通过，中止切换"
+        exit 1
+    }
+else
+    echo "  - 服务器未安装 pytest，跳过（可 pip3 install pytest 后重跑）"
+fi
 
-# 7. 平滑重启（gunicorn HUP 信号，与新架构的 auto_update 流程一致）
-echo "[重启] 向 gunicorn 发送 HUP 信号（平滑重载 worker）..."
+# 7. 重启服务（兼容旧入口进程：新入口 HUP 平滑重载 / 旧入口先停再以新入口启动）
 PID=$(pgrep -f "gunicorn.*wsgi:application" | head -1 || true)
 if [ -n "$PID" ]; then
+    echo "[重启] 向新入口 gunicorn 发送 HUP 信号（平滑重载 worker）..."
     kill -HUP "$PID"
     echo "  ✓ 已发送 HUP 到 PID $PID"
 else
-    echo "  - 未发现运行中的 gunicorn（可能由 systemd 管理，请手动重启服务）"
-    echo "    systemctl restart suanming  # 视你的服务名而定"
+    OLD_PID=$(pgrep -f "gunicorn.*api.app" | head -1 || true)
+    if [ -n "$OLD_PID" ]; then
+        echo "[切换] 检测到旧入口进程 (api.app:app, PID $OLD_PID)，停止并以新入口启动..."
+        pkill -f "gunicorn.*api.app" || true
+        sleep 3
+        mkdir -p logs
+        nohup gunicorn -c gunicorn_config.py wsgi:application \
+            >> logs/gunicorn.log 2>> logs/gunicorn_error.log &
+        sleep 5
+        NEW_PID=$(pgrep -f "gunicorn.*wsgi:application" | head -1 || true)
+        if [ -n "$NEW_PID" ]; then
+            echo "  ✓ 新入口 gunicorn 已启动 (PID $NEW_PID)"
+            curl -s -o /dev/null -w "  ✓ 健康检查: HTTP %{http_code}\n" \
+                --max-time 8 "http://127.0.0.1:${PORT:-5000}/api/health"
+        else
+            echo "  [错误] 新入口启动失败，请查看 logs/gunicorn_error.log"
+            echo "  回滚方法：mv wsgi.py.legacy.bak wsgi.py && 重新启动旧入口"
+            exit 1
+        fi
+    else
+        echo "  - 未发现运行中的 gunicorn，直接以新入口启动..."
+        mkdir -p logs
+        nohup gunicorn -c gunicorn_config.py wsgi:application \
+            >> logs/gunicorn.log 2>> logs/gunicorn_error.log &
+        sleep 5
+        echo "  ✓ 已启动 gunicorn (新入口 wsgi:application)"
+    fi
 fi
 
 echo ""

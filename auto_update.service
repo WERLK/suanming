@@ -6,6 +6,8 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/root/suanming/suanming
+# 自动加载项目 .env（文件不存在也不报错；SECRET_KEY 等生产配置放这里）
+EnvironmentFile=-/root/suanming/suanming/.env
 ExecStart=/usr/bin/python3 /root/suanming/suanming/auto_update_daemon.py
 Restart=always
 RestartSec=10

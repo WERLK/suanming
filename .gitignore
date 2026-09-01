@@ -58,3 +58,6 @@ downloads/
 # Keep test suite (overrides test_*.py rule above)
 !tests/
 !tests/**
+
+# Local env (secrets)
+.env

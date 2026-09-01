@@ -1,12 +1,14 @@
-# PythonAnywhere WSGI 配置
+"""生产 WSGI 入口（gunicorn / PythonAnywhere）。
+
+用法：
+    gunicorn -c gunicorn_config.py wsgi:application
+"""
 import sys
-import os
+from pathlib import Path
 
-# 添加项目根目录到 Python 路径
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-# 导入 Flask 应用  
-from api.app import app as application
+from app import create_app
 
-# PythonAnywhere 使用 application 变量名
-application = application
+application = create_app()
+app = application

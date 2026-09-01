@@ -1222,5 +1222,323 @@
     "name": "上任择吉",
     "file": "上任择吉_203.html",
     "path": "/modules/上任择吉_203.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "AI八字分析",
+    "file": "AI八字分析_350.html",
+    "path": "/modules/AI八字分析_350.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "AI智能解梦",
+    "file": "AI智能解梦_360.html",
+    "path": "/modules/AI智能解梦_360.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "bazi",
+    "file": "bazi.html",
+    "path": "/modules/bazi.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "caishen",
+    "file": "caishen.html",
+    "path": "/modules/caishen.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "fengshui",
+    "file": "fengshui.html",
+    "path": "/modules/fengshui.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "heyun",
+    "file": "heyun.html",
+    "path": "/modules/heyun.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "huangdao",
+    "file": "huangdao.html",
+    "path": "/modules/huangdao.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "jiexing",
+    "file": "jiexing.html",
+    "path": "/modules/jiexing.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "liuya",
+    "file": "liuya.html",
+    "path": "/modules/liuya.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "mianxiang",
+    "file": "mianxiang.html",
+    "path": "/modules/mianxiang.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "shengxiao",
+    "file": "shengxiao.html",
+    "path": "/modules/shengxiao.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "shouxiang",
+    "file": "shouxiang.html",
+    "path": "/modules/shouxiang.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "taiyang",
+    "file": "taiyang.html",
+    "path": "/modules/taiyang.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "tarot",
+    "file": "tarot.html",
+    "path": "/modules/tarot.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "xingming",
+    "file": "xingming.html",
+    "path": "/modules/xingming.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "xingzuo",
+    "file": "xingzuo.html",
+    "path": "/modules/xingzuo.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "xuexing",
+    "file": "xuexing.html",
+    "path": "/modules/xuexing.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "zhougong",
+    "file": "zhougong.html",
+    "path": "/modules/zhougong.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "ziwei",
+    "file": "ziwei.html",
+    "path": "/modules/ziwei.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "五行数据建模",
+    "file": "五行数据建模_359.html",
+    "path": "/modules/五行数据建模_359.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "人中分析",
+    "file": "人中分析_383.html",
+    "path": "/modules/人中分析_383.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "全身照看相",
+    "file": "全身照看相_385.html",
+    "path": "/modules/全身照看相_385.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "历史命例库",
+    "file": "历史命例库_363.html",
+    "path": "/modules/历史命例库_363.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "命理图谱",
+    "file": "命理图谱_355.html",
+    "path": "/modules/命理图谱_355.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "命理大数据",
+    "file": "命理大数据_352.html",
+    "path": "/modules/命理大数据_352.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "命理模式识别",
+    "file": "命理模式识别_366.html",
+    "path": "/modules/命理模式识别_366.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "命理问卷分析",
+    "file": "命理问卷分析_358.html",
+    "path": "/modules/命理问卷分析_358.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "唇型分析",
+    "file": "唇型分析_378.html",
+    "path": "/modules/唇型分析_378.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "大数据合婚",
+    "file": "大数据合婚_356.html",
+    "path": "/modules/大数据合婚_356.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "头像吉凶",
+    "file": "头像吉凶_372.html",
+    "path": "/modules/头像吉凶_372.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "实时预测引擎",
+    "file": "实时预测引擎_365.html",
+    "path": "/modules/实时预测引擎_365.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "对比分析",
+    "file": "对比分析_362.html",
+    "path": "/modules/对比分析_362.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "手相拍照解析",
+    "file": "手相拍照解析_369.html",
+    "path": "/modules/手相拍照解析_369.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "掌纹识别",
+    "file": "掌纹识别_370.html",
+    "path": "/modules/掌纹识别_370.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "星象数据融合",
+    "file": "星象数据融合_367.html",
+    "path": "/modules/星象数据融合_367.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "智能择吉引擎",
+    "file": "智能择吉引擎_361.html",
+    "path": "/modules/智能择吉引擎_361.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "气色拍照",
+    "file": "气色拍照_384.html",
+    "path": "/modules/气色拍照_384.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "法令纹分析",
+    "file": "法令纹分析_380.html",
+    "path": "/modules/法令纹分析_380.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "流年数据追踪",
+    "file": "流年数据追踪_364.html",
+    "path": "/modules/流年数据追踪_364.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "照片命理",
+    "file": "照片命理_371.html",
+    "path": "/modules/照片命理_371.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "痣相识别",
+    "file": "痣相识别_374.html",
+    "path": "/modules/痣相识别_374.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "眉形分析",
+    "file": "眉形分析_375.html",
+    "path": "/modules/眉形分析_375.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "眼型分析",
+    "file": "眼型分析_376.html",
+    "path": "/modules/眼型分析_376.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "神经网络算命",
+    "file": "神经网络算命_351.html",
+    "path": "/modules/神经网络算命_351.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "统计命理",
+    "file": "统计命理_354.html",
+    "path": "/modules/统计命理_354.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "耳型分析",
+    "file": "耳型分析_379.html",
+    "path": "/modules/耳型分析_379.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "运势概率预测",
+    "file": "运势概率预测_357.html",
+    "path": "/modules/运势概率预测_357.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "运势趋势图",
+    "file": "运势趋势图_353.html",
+    "path": "/modules/运势趋势图_353.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "面相拍照分析",
+    "file": "面相拍照分析_368.html",
+    "path": "/modules/面相拍照分析_368.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "额头分析",
+    "file": "额头分析_381.html",
+    "path": "/modules/额头分析_381.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "颧骨分析",
+    "file": "颧骨分析_382.html",
+    "path": "/modules/颧骨分析_382.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "风水实拍",
+    "file": "风水实拍_373.html",
+    "path": "/modules/风水实拍_373.html"
+  },
+  {
+    "category": "其他功能",
+    "name": "鼻型分析",
+    "file": "鼻型分析_377.html",
+    "path": "/modules/鼻型分析_377.html"
   }
 ]

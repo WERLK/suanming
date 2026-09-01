@@ -54,3 +54,7 @@ data/
 
 # Download cache
 downloads/
+
+# Keep test suite (overrides test_*.py rule above)
+!tests/
+!tests/**

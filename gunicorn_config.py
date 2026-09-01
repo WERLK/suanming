@@ -1,4 +1,5 @@
-# Gunicorn 配置文件（云端部署适配版）
+# Gunicorn 配置文件
+# 启动：gunicorn -c gunicorn_config.py wsgi:application
 import os
 import multiprocessing
 

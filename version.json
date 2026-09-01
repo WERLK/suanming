@@ -1,9 +1,9 @@
 {
-  "version": "1.16.1",
-  "build_time": "2026-06-02T16:00:00Z",
-  "git_commit": "TBD",
+  "version": "2.0.0",
+  "build_time": "2026-09-02T00:30:00Z",
+  "git_commit": "a1ac0fb+shim",
   "author": "玄机算命网",
-  "description": "v1.16.1 → 服务器本地构建三平台安装包，下载代理优先本地读取，彻底摆脱GitHub依赖",
+  "description": "v2.0.0 后端架构重构：Flask 应用工厂 + 分层架构（repositories/services/api），零宕机自动切换",
   "changelog": {
     "1.11.5": "fix: 退出重进头像丢失",
     "1.12.0": "feat: 注册页头像选择器",
@@ -28,6 +28,7 @@
     "1.15.1": "feat: 下载代理路由/api/download/<platform>，服务器缓存+流式代理，免GitHub访问",
     "1.15.2": "feat: 混合广告系统，/api/ad-health检测柠盟，不可用时自动降级自建招租广告",
     "1.16.0": "feat: 多平台广告系统，支持柠盟/汇成/觅媒汇/逗号四联盟，按优先级自动切换",
-    "1.16.1": "feat: 服务器本地构建Win/Linux/Android三平台安装包，下载代理优先本地读取免GitHub"
+    "1.16.1": "feat: 服务器本地构建Win/Linux/Android三平台安装包，下载代理优先本地读取免GitHub",
+    "2.0.0": "refactor: 后端全面重构 — 应用工厂+分层架构，安全加固，零宕机自动部署"
   }
 }

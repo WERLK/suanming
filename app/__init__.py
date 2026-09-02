@@ -138,7 +138,12 @@ def create_app(config_object=None):
     app.config.from_object(config_object)
     config_object.ensure_dirs()
 
-    CORS(app)
+    # 安全加固：CORS 仅允许本站域名，禁止任意来源跨域读取接口
+    allowed_origins = os.environ.get(
+        'ALLOWED_ORIGINS',
+        'https://xuanjisuanming.top https://www.xuanjisuanming.top'
+    ).split()
+    CORS(app, resources={r'/api/*': {'origins': allowed_origins, 'supports_credentials': True}})
     limiter.storage_uri = app.config.get('RATELIMIT_STORAGE_URI', 'memory://')
     limiter.default_limits = [app.config.get('RATELIMIT_DEFAULT', '100 per minute')]
     limiter.init_app(app)

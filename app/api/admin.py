@@ -22,8 +22,7 @@ def _check_admin():
     expected = os.environ.get('ADMIN_TOKEN', '')
     if not expected:
         return False, (jsonify({'success': False, 'message': '管理端未配置令牌，接口已禁用'}), 503)
-    provided = (request.headers.get('X-Admin-Token')
-                or request.args.get('admin_token', ''))
+    provided = request.headers.get('X-Admin-Token', '')
     if provided != expected:
         return False, (jsonify({'success': False, 'message': '无效的管理令牌'}), 401)
     return True, None

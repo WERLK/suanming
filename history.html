@@ -331,7 +331,7 @@
                 + '</div>'
                 + (tagsHtml ? '<div class="history-tags">' + tagsHtml + '</div>' : '')
                 + (h.input_data ? '<div class="history-input">' + formatInputData(h.input_data) + '</div>' : '')
-                + (h.result_data ? '<div class="history-result">' + truncateText(h.result_data, 100) + '</div>' : '')
+                + (h.result_data ? '<div class="history-result">' + escapeHtml(truncateText(h.result_data, 100)) + '</div>' : '')
                 + '<div class="history-actions">'
                 + '<button class="history-action-btn" onclick="event.stopPropagation(); showHistoryDetail(\'' + h.id + '\')">查看详情</button>'
                 + '<button class="history-action-btn" onclick="event.stopPropagation(); openClassify(\'' + h.id + '\')">🏷 分类</button>'
@@ -549,8 +549,8 @@
     function formatInputData(inputData) {
         try {
             var data = JSON.parse(inputData);
-            return Object.entries(data).map(function(e) { return e[0] + ': ' + e[1]; }).join(', ');
-        } catch (e) { return inputData || ''; }
+            return Object.entries(data).map(function(e) { return escapeHtml(e[0]) + ': ' + escapeHtml(e[1]); }).join(', ');
+        } catch (e) { return escapeHtml(inputData || ''); }
     }
 
     function truncateText(text, maxLen) {
@@ -572,7 +572,7 @@
             document.getElementById('detailModuleName').textContent = history.module_title || history.module_name || '算命详情';
             try {
                 var inputData = JSON.parse(history.input_data);
-                document.getElementById('detailInput').innerHTML = Object.entries(inputData).map(function(e) { return '<div><strong>' + e[0] + ':</strong> ' + e[1] + '</div>'; }).join('');
+                document.getElementById('detailInput').innerHTML = Object.entries(inputData).map(function(e) { return '<div><strong>' + escapeHtml(e[0]) + ':</strong> ' + escapeHtml(e[1]) + '</div>'; }).join('');
             } catch (e) { document.getElementById('detailInput').textContent = history.input_data || '无'; }
 
             try {
@@ -585,13 +585,13 @@
     }
 
     function formatResultData(data) {
-        if (typeof data !== 'object') return String(data);
+        if (typeof data !== 'object') return escapeHtml(String(data));
         var html = '';
         for (var key in data) {
             if (key === 'success') continue;
-            html += '<div style="margin-bottom: 0.5rem;"><strong>' + key + ':</strong> ' + JSON.stringify(data[key]) + '</div>';
+            html += '<div style="margin-bottom: 0.5rem;"><strong>' + escapeHtml(key) + ':</strong> ' + escapeHtml(JSON.stringify(data[key])) + '</div>';
         }
-        return html || JSON.stringify(data, null, 2);
+        return html || escapeHtml(JSON.stringify(data, null, 2));
     }
 
     function closeHistoryDetail() {

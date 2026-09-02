@@ -7,7 +7,10 @@ import multiprocessing
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 绑定 IP 和端口（云端部署使用环境变量 PORT）
-bind = f"0.0.0.0:{os.environ.get('PORT', '5000')}"
+# 安全加固：默认只绑定回环地址，仅允许 nginx 本地反代访问，
+# 避免 Flask 直接暴露公网绕过 nginx 的路径拦截与限流
+_bind_host = os.environ.get('BIND_HOST', '127.0.0.1')
+bind = f"{_bind_host}:{os.environ.get('PORT', '5000')}"
 
 # 工作进程数
 workers = multiprocessing.cpu_count() * 2 + 1

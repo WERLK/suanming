@@ -446,9 +446,18 @@ def fortune_image_analyze():
     if not file.filename:
         raise ValueError('请选择图片文件')
 
-    # Save temporarily
+    # 安全加固：限制上传大小与类型，防 DoS / 恶意文件
+    if request.content_length and request.content_length > 6 * 1024 * 1024:
+        raise ValueError('图片过大，最大 6MB')
+    file.filename = os.path.basename(file.filename)  # 防路径穿越
+    allowed_ext = ('jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp')
+    if not file.filename.lower().endswith(allowed_ext):
+        raise ValueError('不支持的图片格式')
+
+    # Save temporarily（唯一临时文件）
     import os
-    temp_path = f"/tmp/fortune_upload_{int(time.time())}.jpg"
+    import uuid as _uuid
+    temp_path = f"/tmp/fortune_upload_{_uuid.uuid4().hex}.img"
     file.save(temp_path)
 
     try:

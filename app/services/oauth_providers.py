@@ -43,13 +43,14 @@ def get_provider_status():
 
 # ── 工具函数 ──────────────────────────────────────────────
 
-def _normalize_oauth_user_info(provider_key, raw):
+def _normalize_oauth_user_info(provider_key, raw, email_verified=False):
     info = {
         'provider': provider_key,
         'provider_uid': '',
         'nickname': '',
         'avatar': '',
         'email': '',
+        'email_verified': bool(email_verified),  # 安全：标记邮箱是否经 provider 验证
     }
     if provider_key == 'github':
         info['provider_uid'] = str(raw.get('id', ''))
@@ -168,20 +169,28 @@ class GitHubProvider(OAuthProvider):
         raw = resp.json()
 
         email = raw.get('email', '')
+        verified = False
         if not email:
             try:
                 emails_resp = requests.get(self.EMAILS_API, headers=headers, timeout=15)
                 if emails_resp.status_code == 200:
                     emails = emails_resp.json()
+                    # 安全：优先选已验证的邮箱，绝不拿未验证邮箱去自动合并账号
+                    verified_list = [e for e in emails if e.get('verified')]
                     primary = next((e for e in emails if e.get('primary')), None)
-                    verified = next((e for e in emails if e.get('verified')), None)
-                    chosen = primary or verified or (emails[0] if emails else None)
+                    chosen = (verified_list[0] if verified_list
+                              else (primary or (emails[0] if emails else None)))
                     if chosen:
                         email = chosen.get('email', '')
+                        verified = bool(chosen.get('verified'))
             except Exception:
                 pass
+        else:
+            # raw.email 直接来自 /user（通常已验证），保守标记为已验证
+            verified = True
         raw['email'] = email
-        return _normalize_oauth_user_info('github', raw)
+        raw['email_verified'] = verified
+        return _normalize_oauth_user_info('github', raw, email_verified=verified)
 
 
 class WeChatProvider(OAuthProvider):

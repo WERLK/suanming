@@ -44,7 +44,7 @@ def health_check():
     except Exception as e:
         return jsonify({
             'status': 'error',
-            'message': str(e)
+            'message': '系统繁忙'
         }), 500
 
 # ========== 版本信息 ==========
@@ -68,7 +68,7 @@ def get_version():
                 'message': '版本文件不存在'
             }), 404
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'message': '系统繁忙'}), 500
 
 # ========== 静态文件服务 ==========
 
@@ -82,7 +82,19 @@ def serve_static(filename):
     import os.path
     safe_path = os.path.realpath(os.path.join(PROJECT_ROOT, filename))
     real_root = os.path.realpath(PROJECT_ROOT)
-    if not safe_path.startswith(real_root + os.sep) and safe_path != real_root:
+    # 安全加固：仅服务项目根内的文件，用 commonpath 做严谨的目录边界校验
+    try:
+        if os.path.commonpath([safe_path, real_root]) != real_root:
+            return 'Forbidden', 403
+    except ValueError:
+        return 'Forbidden', 403
+    # 安全加固：阻止敏感目录/文件被静态服务直接暴露（纵深防御，nginx 已拦一道）
+    rel = os.path.relpath(safe_path, real_root).replace('\\', '/')
+    for denied in ('data/', 'logs/', 'downloads/', '.git/', '__pycache__/', 'static/avatars/'):
+        if rel.startswith(denied):
+            return 'Forbidden', 403
+    denied_suffix = ('.py', '.pyc', '.bak', '.tar', '.gz', '.zip', '.sqlite', '.db', '.log', '.env')
+    if rel.endswith(denied_suffix):
         return 'Forbidden', 403
     try:
         return send_from_directory(PROJECT_ROOT, filename)
@@ -92,7 +104,7 @@ def serve_static(filename):
         return 'Permission Denied', 403
     except Exception as e:
         current_app.logger.error(f'静态文件服务错误: {filename} - {str(e)}')
-        return f'Internal Server Error: {str(e)}', 500
+        return 'Internal Server Error', 500
 
 # 专用视频服务端点（绕过静态文件路由的潜在问题）
 @bp.route('/video/guide-intro.mp4')
@@ -114,7 +126,7 @@ def serve_guide_video():
         return response
     except Exception as e:
         current_app.logger.error(f'视频服务错误: {str(e)}')
-        return f'Video serve error: {str(e)}', 500
+        return 'Video serve error', 500
 
 @bp.route('/video/guide-poster.jpg')
 def serve_guide_poster():
@@ -127,7 +139,7 @@ def serve_guide_poster():
         return send_from_directory(os.path.dirname(poster_path), os.path.basename(poster_path), mimetype='image/jpeg')
     except Exception as e:
         current_app.logger.error(f'封面服务错误: {str(e)}')
-        return f'Poster serve error: {str(e)}', 500
+        return 'Poster serve error', 500
 
 # ========== API路由 ==========
 
@@ -151,9 +163,18 @@ def image_analyze():
         from PIL import Image
         import io
         from collections import Counter
+
+        # 安全加固：限制解码体积与像素数，防内存/CPU 耗尽（解压炸弹）
+        if len(image_data) > 6 * 1024 * 1024:
+            return jsonify({'success': False, 'message': '图片过大，请压缩后再试'}), 400
+        Image.MAX_IMAGE_PIXELS = 50_000_000  # 限制单图最多 5 千万像素
         
         img_bytes = base64.b64decode(image_data)
         img = Image.open(io.BytesIO(img_bytes))
+        img.verify()  # 触发真实解码校验，防伪造
+        img = Image.open(io.BytesIO(img_bytes))
+        if img.width * img.height > 50_000_000:
+            return jsonify({'success': False, 'message': '图片分辨率过高'}), 400
         
         width, height = img.size
         mode = img.mode
@@ -213,7 +234,7 @@ def image_analyze():
         }), 200
         
     except Exception as e:
-        return jsonify({'success': False, 'message': f'分析失败：{str(e)}'}), 500
+        return jsonify({'success': False, 'message': '分析失败'}), 500
 
 
 # ========== 客户端下载代理（绕过 GitHub 访问限制）==========
@@ -330,7 +351,7 @@ def download_proxy(platform):
 
         return Response(generate(), headers=headers, status=200)
     except requests.RequestException as e:
-        return jsonify({'success': False, 'message': f'下载服务暂不可用: {str(e)}'}), 502
+        return jsonify({'success': False, 'message': '下载服务暂不可用'}), 502
 
 
 def _send_file_response(filepath, filename, mime):
@@ -367,25 +388,6 @@ def _send_file_response(filepath, filename, mime):
     resp.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
     resp.headers['Accept-Ranges'] = 'bytes'
     return resp
-def auto_update():
-    import subprocess
-    try:
-        cwd = '/root/suanming'  # 服务器项目目录
-        # 拉取最新代码
-        r1 = subprocess.run(['git', 'fetch', 'origin'], cwd=cwd, capture_output=True, text=True, timeout=300)
-        # 重置到最新 main 分支
-        r2 = subprocess.run(['git', 'reset', '--hard', 'origin/main'], cwd=cwd, capture_output=True, text=True, timeout=300)
-        # 安装依赖（如果有变化）
-        r3 = subprocess.run(['pip3', 'install', '-r', 'requirements.txt'], cwd=cwd, capture_output=True, text=True, timeout=300)
-        # 重启 Gunicorn
-        subprocess.run(['pkill', '-f', 'gunicorn'], capture_output=True, text=True, timeout=300)
-        import time
-        time.sleep(2)
-        subprocess.Popen(['gunicorn', '-c', 'gunicorn_config.py', 'api.app:app'],
-                        cwd=cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return f'更新成功！{r2.stdout}', 200
-    except Exception as e:
-        return f'更新失败：{str(e)}', 500
 
 # ========== 会员VIP系统（常量从 vip_service 导入）==========
 
@@ -498,19 +500,45 @@ def _ensure_linked_accounts(user):
 
 @bp.route('/api/upload-file', methods=['POST'])
 def upload_file():
-    """接收上传文件并保存到 downloads 目录"""
+    """接收上传文件并保存到 downloads 目录（安全加固版）
+
+    安全修复：
+    1. 令牌改为环境变量注入，不写死源码；缺失时接口默认禁用
+    2. 文件名仅接受白名单内的固定文件名，彻底杜绝路径穿越
+    3. 限制请求体大小（10MB）
+    """
     import hmac as _hmac
-    token = request.headers.get('X-Upload-Token', '')
-    if not _hmac.compare_digest(token, 'xuanji_upload_2026'):
+    # 令牌从环境变量读取；未配置则视为未授权（接口默认关闭）
+    expected_token = os.environ.get('UPLOAD_TOKEN', '')
+    if not expected_token:
         return jsonify({'success': False, 'message': '未授权'}), 403
+    token = request.headers.get('X-Upload-Token', '')
+    if not _hmac.compare_digest(token, expected_token):
+        return jsonify({'success': False, 'message': '未授权'}), 403
+
     fname = request.headers.get('X-Filename', '')
     if not fname:
         return jsonify({'success': False, 'message': '缺少文件名'}), 400
+
+    # 文件名白名单：仅允许 downloads 目录中的固定安装包文件名
+    # 彻底杜绝 X-Filename 头路径穿越（../ 写任意路径）
+    _UPLOAD_ALLOWED_FILENAMES = {
+        'windows', 'linux', 'android',
+    }
+    if fname not in _UPLOAD_ALLOWED_FILENAMES:
+        return jsonify({'success': False, 'message': '非法文件名，仅允许: windows/linux/android'}), 400
+
+    # 限制请求体大小（10MB）
+    if request.content_length and request.content_length > 10 * 1024 * 1024:
+        return jsonify({'success': False, 'message': '文件过大，最大 10MB'}), 413
+
     os.makedirs(_DOWNLOAD_CACHE_DIR, exist_ok=True)
-    dest = os.path.join(_DOWNLOAD_CACHE_DIR, fname)
+    # 根据平台取真实安装包文件名
+    real_fname = _DOWNLOAD_FILES.get(fname, {}).get('filename', fname)
+    dest = os.path.join(_DOWNLOAD_CACHE_DIR, real_fname)
     with open(dest, 'wb') as f:
         f.write(request.get_data())
-    return jsonify({'success': True, 'filename': fname, 'size': os.path.getsize(dest)})
+    return jsonify({'success': True, 'filename': real_fname, 'size': os.path.getsize(dest)})
 
 # ===== WSGI 支持（PythonAnywhere 部署）=====
 # 添加 application 对象（WSGI 标准）

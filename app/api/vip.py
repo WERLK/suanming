@@ -126,7 +126,12 @@ def _save_idcard_image(user_id, image_data, suffix=''):
         try:
             from PIL import Image
             import io
+            Image.MAX_IMAGE_PIXELS = 50_000_000  # 防解压炸弹
             img = Image.open(io.BytesIO(image_bytes))
+            img.verify()
+            img = Image.open(io.BytesIO(image_bytes))
+            if img.width * img.height > 50_000_000:
+                return None
             w, h = img.size
             if w > 1200:
                 ratio = 1200.0 / w
@@ -146,7 +151,7 @@ def _save_idcard_image(user_id, image_data, suffix=''):
             img.save(buf, format='JPEG', quality=85)
             image_bytes = buf.getvalue()
         except Exception:
-            pass  # PIL 处理失败则使用原始 bytes
+            return None  # 安全：PIL 处理失败则拒绝保存，不回退原始 bytes
 
         # 保存图片
         suffix_str = f'_{suffix}' if suffix else ''

@@ -82,7 +82,7 @@ def generate_captcha():
             'captcha_image': f"data:image/png;base64,{img_base64}"
         }), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'生成验证码失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '生成验证码失败'}), 500
 
 @bp.route('/api/captcha/verify', methods=['POST'])
 def verify_captcha():
@@ -96,12 +96,13 @@ def verify_captcha():
         entry = _get_captcha_entry(captcha_id)
         if not entry or entry.get('type') != 'image':
             return jsonify({'success': False, 'message': '验证码已失效，请刷新'}), 200
-        if entry['text'] != captcha_text:
+        import hmac as _hmac
+        if not _hmac.compare_digest(entry['text'].upper(), captcha_text):
             return jsonify({'success': False, 'message': '验证码错误'}), 200
         _delete_captcha_entry(captcha_id)
         return jsonify({'success': True, 'message': '验证成功'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'验证验证码失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '验证码验证失败'}), 500
 
 @bp.route('/api/slider/generate', methods=['GET'])
 def generate_slider():
@@ -124,7 +125,7 @@ def generate_slider():
             'image_height': 150
         }), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'生成滑块验证码失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '生成滑块验证码失败'}), 500
 
 @bp.route('/api/slider/verify', methods=['POST'])
 def verify_slider():
@@ -145,7 +146,7 @@ def verify_slider():
         else:
             return jsonify({'success': False, 'message': '请再试一次'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'验证滑块验证码失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '滑块验证码验证失败'}), 500
 
 # ========== 短信验证码 ==========
 
@@ -203,7 +204,7 @@ def send_sms():
             'code': sms_code if (not aliyun_sent and demo_mode) else None
         }), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'发送失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '发送失败'}), 500
 
 @limiter.limit("5 per minute")
 @bp.route('/api/sms/verify', methods=['POST'])
@@ -220,14 +221,23 @@ def verify_sms():
             return jsonify({'success': False, 'message': '验证码已失效，请重新获取'}), 200
         if entry.get('used'):
             return jsonify({'success': False, 'message': '验证码已使用，请重新获取'}), 200
-        if entry['code'] != code:
+        # 安全：连续失败达到阈值即作废，阻断暴力碰撞
+        fails = entry.get('fail_count', 0)
+        if fails >= 5:
+            entry['used'] = True
+            _set_captcha_entry(sms_id, entry)
+            return jsonify({'success': False, 'message': '尝试次数过多，请重新获取'}), 200
+        import hmac as _hmac
+        if not _hmac.compare_digest(str(entry.get('code', '')), code):
+            entry['fail_count'] = fails + 1
+            _set_captcha_entry(sms_id, entry)
             return jsonify({'success': False, 'message': '验证码错误'}), 200
         # 标记已使用（一次性）
         entry['used'] = True
         _set_captcha_entry(sms_id, entry)
         return jsonify({'success': True, 'message': '验证成功'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'验证失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '验证失败'}), 500
 
 @limiter.limit("5 per minute")  # 注册限制：每分钟 5 次
 
@@ -355,7 +365,7 @@ def register():
             }
         }), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'注册失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '注册失败'}), 500
 
 @limiter.limit("5 per minute")  # 登录限制：每分钟 5 次
 @bp.route('/api/login', methods=['POST'])
@@ -375,9 +385,9 @@ def login():
                 user = u
                 break
         if not user:
-            return jsonify({'success': False, 'message': '用户不存在'}), 200
+            return jsonify({'success': False, 'message': '用户名或密码错误'}), 200
         if not verify_password(password, user['password']):
-            return jsonify({'success': False, 'message': '密码错误'}), 200
+            return jsonify({'success': False, 'message': '用户名或密码错误'}), 200
         if user.get('status') != 'active':
             return jsonify({'success': False, 'message': '账户已被禁用'}), 200
 
@@ -440,12 +450,12 @@ def login():
             }
         })
         if remember:
-            response.set_cookie('token', token, max_age=7*24*3600, httponly=True)
+            response.set_cookie('token', token, max_age=7*24*3600, httponly=True, samesite='Lax', secure=True)
         else:
-            response.set_cookie('token', token, httponly=True)
+            response.set_cookie('token', token, httponly=True, samesite='Lax', secure=True)
         return response, 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'登录失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '登录失败'}), 500
 
 @bp.route('/api/logout', methods=['POST'])
 def logout():
@@ -499,7 +509,7 @@ def forgot_password():
                 'reset_link': reset_link
             }), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'发送重置邮件失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '发送重置邮件失败'}), 500
 
 @bp.route('/api/reset-password', methods=['POST'])
 def reset_password():
@@ -535,4 +545,4 @@ def reset_password():
         save_tokens(tokens)
         return jsonify({'success': True, 'message': '密码重置成功'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'重置密码失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '重置密码失败'}), 500

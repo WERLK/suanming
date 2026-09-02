@@ -56,8 +56,9 @@ def _oauth_login_or_register(provider_key, oauth_info):
         if u.get('linked_accounts', {}).get(provider_key) == provider_uid:
             return u, False
 
-    # 2. 邮箱匹配（自动合并）
-    if email:
+    # 2. 邮箱匹配（自动合并）—— 仅当邮箱已经 provider 验证通过才合并，
+    #    防止攻击者用未验证邮箱接管他人账号
+    if email and oauth_info.get('email_verified'):
         for u in users:
             if u.get('email', '').strip().lower() == email.lower():
                 u = _ensure_linked_accounts(u)
@@ -141,7 +142,10 @@ def oauth_callback(provider):
     error = request.args.get('error', '')
     error_description = request.args.get('error_description', '')
     if error:
-        return f'<script>alert("授权失败: {error_description or error}");window.location.href="/login.html";</script>'
+        # 安全加固：对第三方回调参数做 HTML 转义，阻断反射型 XSS
+        import html as _html
+        safe_desc = _html.escape(error_description or error)
+        return f'<script>alert("授权失败: {safe_desc}");window.location.href="/login.html";</script>'
 
     code = request.args.get('code', '')
     if not code:
@@ -174,5 +178,5 @@ def oauth_callback(provider):
     # 设置 cookie 并跳转首页
     resp = make_response('', 302)
     resp.headers['Location'] = '/'
-    resp.set_cookie('token', token, max_age=7*24*3600, httponly=True, samesite='Lax')
+    resp.set_cookie('token', token, max_age=7*24*3600, httponly=True, samesite='Lax', secure=True)
     return resp

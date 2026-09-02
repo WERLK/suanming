@@ -94,7 +94,7 @@ def get_profile():
         }
         return jsonify({'success': True, 'user': user_info}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'获取用户信息失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '获取用户信息失败'}), 500
 
 @bp.route('/api/profile/tutorial-done', methods=['POST'])
 def tutorial_done():
@@ -119,7 +119,7 @@ def tutorial_done():
         save_users(users)
         return jsonify({'success': True, 'message': '已标记'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'操作失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 @bp.route('/api/notify-subscribe', methods=['POST'])
 def notify_subscribe():
@@ -154,7 +154,7 @@ def notify_subscribe():
 
         return jsonify({'success': True, 'message': '订阅成功！App上线时将通知您'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'操作失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 @bp.route('/api/profile', methods=['PUT'])
 def update_profile():
@@ -176,6 +176,14 @@ def update_profile():
         if user_index is None:
             return jsonify({'success': False, 'message': '用户不存在'}), 404
         allowed_fields = ['username', 'nickname', 'email', 'phone', 'avatar', 'birthday', 'gender']
+        # 唯一性校验：username/email/phone 不得与其他用户冲突（排除自身）
+        for unique_field in ('username', 'email', 'phone'):
+            new_val = data.get(unique_field, '')
+            if new_val:
+                new_val = str(new_val).strip()
+                for u in users:
+                    if u['id'] != user_id and str(u.get(unique_field, '')).strip() == new_val:
+                        return jsonify({'success': False, 'message': f'{unique_field} 已被其他用户占用'}), 409
         for field in allowed_fields:
             if field in data:
                 users[user_index][field] = data[field]
@@ -195,7 +203,7 @@ def update_profile():
         }
         return jsonify({'success': True, 'message': '更新成功', 'user': user_info}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': f'更新用户信息失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '更新用户信息失败'}), 500
 
 
 @limiter.limit("3 per minute")
@@ -345,7 +353,7 @@ def verify_realname():
         }), 200
 
     except Exception as e:
-        return jsonify({'success': False, 'message': f'认证失败: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': '认证失败'}), 500
 
 
 @bp.route('/api/profile/realname-status', methods=['GET'])
@@ -385,7 +393,7 @@ def realname_status():
             return jsonify({'success': True, 'verified': False, 'message': '未认证'}), 200
 
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 
 @bp.route('/api/profile/upload-idcard', methods=['POST'])
@@ -448,7 +456,7 @@ def upload_idcard():
         }), 200
 
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 @limiter.limit("3 per minute")  # 忘记密码限制：每分钟 3 次
 
@@ -518,7 +526,7 @@ def upload_avatar():
     except Exception as e:
         import traceback
         print(f'[Avatar Upload Error] {traceback.format_exc()}', flush=True)
-        return jsonify({'success': False, 'message': f'头像上传失败：{str(e)}'}), 500
+        return jsonify({'success': False, 'message': '头像上传失败'}), 500
 
 @bp.route('/api/avatar/set-preset', methods=['POST'])
 def set_preset_avatar():
@@ -557,7 +565,7 @@ def set_preset_avatar():
         }), 200
 
     except Exception as e:
-        return jsonify({'success': False, 'message': f'头像设置失败：{str(e)}'}), 500
+        return jsonify({'success': False, 'message': '头像设置失败'}), 500
 
 # ========== 收藏功能 ==========
 FAVORITES_FILE = os.path.join(DATA_DIR, 'favorites.json')
@@ -594,7 +602,7 @@ def get_notification_settings():
             'settings': settings
         }), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 @bp.route('/api/notifications/settings', methods=['PUT'])
 def update_notification_settings():
@@ -621,7 +629,7 @@ def update_notification_settings():
         
         return jsonify({'success': True, 'message': '设置已保存'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 # ========== 隐私设置 ==========
 PRIVACY_FILE = os.path.join(DATA_DIR, 'privacy.json')
@@ -655,7 +663,7 @@ def get_privacy_settings():
             'settings': settings
         }), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 @bp.route('/api/privacy/settings', methods=['PUT'])
 def update_privacy_settings():
@@ -682,7 +690,7 @@ def update_privacy_settings():
         
         return jsonify({'success': True, 'message': '隐私设置已保存'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({'success': False, 'message': '操作失败'}), 500
 
 # ========== 帮助中心 ==========
 
@@ -710,7 +718,12 @@ def _save_idcard_image(user_id, image_data, suffix=''):
         try:
             from PIL import Image
             import io
+            Image.MAX_IMAGE_PIXELS = 50_000_000  # 防解压炸弹
             img = Image.open(io.BytesIO(image_bytes))
+            img.verify()
+            img = Image.open(io.BytesIO(image_bytes))
+            if img.width * img.height > 50_000_000:
+                return None
             w, h = img.size
             if w > 1200:
                 ratio = 1200.0 / w
@@ -730,7 +743,7 @@ def _save_idcard_image(user_id, image_data, suffix=''):
             img.save(buf, format='JPEG', quality=85)
             image_bytes = buf.getvalue()
         except Exception:
-            pass  # PIL 处理失败则使用原始 bytes
+            return None  # 安全：PIL 处理失败则拒绝保存，不回退原始 bytes
 
         # 保存图片
         suffix_str = f'_{suffix}' if suffix else ''

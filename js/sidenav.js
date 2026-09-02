@@ -215,10 +215,17 @@
     function init() {
         buildSidebar();
         buildExpandTab();
-        removeConflictingNavs();
 
-        // 默认展开
-        openSidebar();
+        var isDesktop = window.innerWidth >= 1024;
+
+        if (isDesktop) {
+            // 桌面端：接管原始导航，默认展开
+            removeConflictingNavs();
+            openSidebar();
+        } else {
+            // 移动端：默认折叠，保留原始 bottom-nav
+            closeSidebar();
+        }
 
         // ESC 关闭
         document.addEventListener('keydown', function(e) {
@@ -227,6 +234,17 @@
 
         // 窗口 resize 时更新布局
         window.addEventListener('resize', function() {
+            var nowDesktop = window.innerWidth >= 1024;
+            if (nowDesktop) {
+                // 切换到桌面端：接管导航并展开
+                removeConflictingNavs();
+                if (!isOpen) openSidebar();
+            } else {
+                // 切换到移动端：折叠侧边栏，恢复 bottom-nav
+                if (isOpen) closeSidebar();
+                var navs = document.querySelectorAll('.bottom-nav');
+                navs.forEach(function(nav) { nav.style.display = ''; });
+            }
             updateBodyLayout();
         });
 

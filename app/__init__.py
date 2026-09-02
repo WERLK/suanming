@@ -16,12 +16,14 @@ from flask_cors import CORS
 
 from app.extensions import limiter
 from app.repositories import CaptchaRepo, OAuthStateRepo, TokenRepo, UserRepo
+from app.repositories.hybrid_user_store import HybridUserRepo
 
 
 def _register_repositories(app):
     """把仓储实例挂到 app.extensions，供 deps 层按请求访问。"""
     cfg = app.config
-    app.extensions['user_repo'] = UserRepo(cfg['USERS_FILE'])
+    # 并存式用户存储：存量老用户读 USERS_FILE(JSON)，新注册用户写 USERS_DB(SQLite)
+    app.extensions['user_repo'] = HybridUserRepo(cfg['USERS_FILE'], cfg['USERS_DB'])
     app.extensions['token_repo'] = TokenRepo(cfg['TOKENS_FILE'])
     app.extensions['captcha_repo'] = CaptchaRepo(cfg['CAPTCHA_FILE'])
     app.extensions['oauth_state_repo'] = OAuthStateRepo(cfg['OAUTH_STATE_FILE'])

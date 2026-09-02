@@ -25,6 +25,8 @@ class BaseConfig:
 
     # 数据文件（JSON 存储层，后续可平滑切换 SQLite/MySQL）
     USERS_FILE = os.path.join(DATA_DIR, 'users.json')
+    # 并存式新用户库（SQLite）：存量老用户在 USERS_FILE，新注册用户写入 USERS_DB
+    USERS_DB = os.environ.get('USERS_DB', os.path.join(DATA_DIR, 'users.db'))
     TOKENS_FILE = os.path.join(DATA_DIR, 'tokens.json')
     CAPTCHA_FILE = os.path.join(DATA_DIR, 'captcha_store.json')
     OAUTH_STATE_FILE = os.path.join(DATA_DIR, 'oauth_states.json')
@@ -135,6 +137,7 @@ NOTIFICATIONS_FILE = BaseConfig.NOTIFICATIONS_FILE
 DATASETS_FILE = BaseConfig.DATASETS_FILE
 PROJECT_ROOT = BaseConfig.PROJECT_ROOT
 USERS_FILE = BaseConfig.USERS_FILE
+USERS_DB = BaseConfig.USERS_DB
 TOKENS_FILE = BaseConfig.TOKENS_FILE
 
 # 确保数据目录存在（首次 clone / 新环境部署时 data/ 不在版本库内，

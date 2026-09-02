@@ -223,8 +223,9 @@
             removeConflictingNavs();
             openSidebar();
         } else {
-            // 移动端：默认折叠，保留原始 bottom-nav
+            // 移动端：默认折叠，保留原始 bottom-nav，隐藏展开标签
             closeSidebar();
+            if (expandTab) expandTab.style.display = 'none';
         }
 
         // ESC 关闭

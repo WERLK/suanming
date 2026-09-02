@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ffd700">
+    <meta name="theme-color" content="#e8b84b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="玄机算命">
     <link rel="apple-touch-icon" href="/icon-192.png">
     <meta name="msapplication-TileImage" content="/icon-192.png">
-    <meta name="msapplication-TileColor" content="#ffd700">
+    <meta name="msapplication-TileColor" content="#e8b84b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>数据表格 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
@@ -18,22 +18,22 @@
         .datasets-container { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
 
         .datasets-header { text-align: center; padding: 1.5rem 1rem; margin-bottom: 1rem; }
-        .datasets-header h2 { color: #ffd700; margin: 0 0 0.3rem; font-size: 1.3rem; }
+        .datasets-header h2 { color: #e8b84b; margin: 0 0 0.3rem; font-size: 1.3rem; }
         .datasets-header p { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 0; }
 
         .toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: flex-end; }
         .btn-primary {
             padding: 0.6rem 1.2rem; border-radius: 8px; border: none;
-            background: linear-gradient(135deg, #ffd700, #ffaa00);
-            color: #1a1a2e; font-weight: bold; font-size: 0.9rem; cursor: pointer;
+            background: linear-gradient(135deg, #e8b84b, #d4a017);
+            color: #101828; font-weight: bold; font-size: 0.9rem; cursor: pointer;
         }
         .btn-primary:hover { opacity: 0.9; }
         .btn-outline {
             padding: 0.5rem 1rem; border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.3); background: transparent;
-            color: #ffd700; font-size: 0.85rem; cursor: pointer;
+            border: 1px solid rgba(232,184,75,0.3); background: transparent;
+            color: #e8b84b; font-size: 0.85rem; cursor: pointer;
         }
-        .btn-outline:hover { background: rgba(255,215,0,0.1); }
+        .btn-outline:hover { background: rgba(232,184,75,0.1); }
         .btn-danger {
             padding: 0.5rem 1rem; border-radius: 8px;
             border: 1px solid rgba(255,80,80,0.3); background: transparent;
@@ -44,12 +44,12 @@
         /* 数据集卡片 */
         .dataset-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
         .dataset-card {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.1);
+            background: linear-gradient(135deg, rgba(232,184,75,0.05), rgba(232,184,75,0.02));
+            border: 1px solid rgba(232,184,75,0.1);
             border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.3s;
         }
-        .dataset-card:hover { background: rgba(255,215,0,0.08); transform: translateY(-2px); }
-        .dataset-card-name { color: #ffd700; font-size: 1.05rem; font-weight: bold; margin-bottom: 0.3rem; }
+        .dataset-card:hover { background: rgba(232,184,75,0.08); transform: translateY(-2px); }
+        .dataset-card-name { color: #e8b84b; font-size: 1.05rem; font-weight: bold; margin-bottom: 0.3rem; }
         .dataset-card-desc { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 0.8rem; }
         .dataset-card-meta { display: flex; gap: 1rem; font-size: 0.75rem; color: rgba(255,255,255,0.4); }
         .dataset-card-actions { display: flex; gap: 0.3rem; margin-top: 0.8rem; }
@@ -61,22 +61,22 @@
         /* 记录表格视图 */
         .record-view { display: none; }
         .record-view-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .record-view-title { color: #ffd700; font-size: 1.1rem; flex: 1; }
+        .record-view-title { color: #e8b84b; font-size: 1.1rem; flex: 1; }
         .record-table-wrap { overflow-x: auto; margin-bottom: 1rem; }
         .record-table {
             width: 100%; border-collapse: collapse;
             background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden;
         }
         .record-table th {
-            padding: 0.6rem 0.8rem; text-align: left; color: #ffd700;
-            font-size: 0.8rem; border-bottom: 1px solid rgba(255,215,0,0.15);
-            background: rgba(255,215,0,0.05); white-space: nowrap;
+            padding: 0.6rem 0.8rem; text-align: left; color: #e8b84b;
+            font-size: 0.8rem; border-bottom: 1px solid rgba(232,184,75,0.15);
+            background: rgba(232,184,75,0.05); white-space: nowrap;
         }
         .record-table td {
             padding: 0.5rem 0.8rem; color: rgba(255,255,255,0.8); font-size: 0.85rem;
-            border-bottom: 1px solid rgba(255,215,0,0.05); white-space: nowrap;
+            border-bottom: 1px solid rgba(232,184,75,0.05); white-space: nowrap;
         }
-        .record-table tr:hover td { background: rgba(255,215,0,0.03); }
+        .record-table tr:hover td { background: rgba(232,184,75,0.03); }
         .record-table .actions-col { text-align: center; }
 
         /* 弹窗 */
@@ -85,11 +85,11 @@
         .form-group label { display: block; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.3rem; }
         .form-group input, .form-group select, .form-group textarea {
             width: 100%; padding: 0.55rem 0.7rem; border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(232,184,75,0.2); background: rgba(255,255,255,0.05);
             color: #fff; font-size: 0.9rem; outline: none; box-sizing: border-box;
         }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #ffd700; }
-        .form-group select option { background: #1a1a2e; color: #fff; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e8b84b; }
+        .form-group select option { background: #101828; color: #fff; }
         .form-group textarea { resize: vertical; min-height: 60px; }
 
         .field-def-row {
@@ -98,7 +98,7 @@
         }
         .field-def-row input, .field-def-row select {
             padding: 0.45rem 0.5rem; border-radius: 6px;
-            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(232,184,75,0.2); background: rgba(255,255,255,0.05);
             color: #fff; font-size: 0.85rem; outline: none;
         }
         .field-def-row .field-name { flex: 1; min-width: 80px; }
@@ -113,18 +113,18 @@
         .field-remove-btn:hover { background: rgba(255,80,80,0.15); }
         .add-field-btn {
             padding: 0.3rem 0.7rem; border-radius: 6px;
-            border: 1px dashed rgba(255,215,0,0.3); background: transparent;
-            color: #ffd700; font-size: 0.8rem; cursor: pointer; margin-top: 0.3rem;
+            border: 1px dashed rgba(232,184,75,0.3); background: transparent;
+            color: #e8b84b; font-size: 0.8rem; cursor: pointer; margin-top: 0.3rem;
         }
-        .add-field-btn:hover { background: rgba(255,215,0,0.05); }
+        .add-field-btn:hover { background: rgba(232,184,75,0.05); }
 
         .pagination { display: flex; gap: 0.3rem; justify-content: center; margin-top: 1rem; }
         .page-btn {
             padding: 0.4rem 0.7rem; border-radius: 6px;
-            border: 1px solid rgba(255,215,0,0.2); background: transparent;
+            border: 1px solid rgba(232,184,75,0.2); background: transparent;
             color: rgba(255,255,255,0.6); cursor: pointer; font-size: 0.8rem;
         }
-        .page-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-color: #ffd700; }
+        .page-btn.active { background: rgba(232,184,75,0.2); color: #e8b84b; border-color: #e8b84b; }
         .page-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     </style>

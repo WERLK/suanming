@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ffd700">
+    <meta name="theme-color" content="#e8b84b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>注册 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
@@ -11,21 +11,21 @@
     <link rel="stylesheet" href="/css/oauth-buttons.css">
     <style>
         .auth-body { min-height:calc(100vh - 56px); display:flex; align-items:center; justify-content:center; padding:1rem; }
-        .auth-card { width:100%; max-width:400px; background:linear-gradient(135deg,rgba(26,26,46,0.95),rgba(22,33,62,0.95)); border:1px solid rgba(255,215,0,0.2); border-radius:16px; padding:2rem; }
-        .auth-title { text-align:center; color:#ffd700; font-size:1.5rem; margin-bottom:0.3rem; }
+        .auth-card { width:100%; max-width:400px; background:linear-gradient(135deg,rgba(16,24,40,0.95),rgba(15,29,51,0.95)); border:1px solid rgba(232,184,75,0.2); border-radius:16px; padding:2rem; }
+        .auth-title { text-align:center; color:#e8b84b; font-size:1.5rem; margin-bottom:0.3rem; }
         .auth-subtitle { text-align:center; color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:1.5rem; }
         .auth-msg { display:none; padding:0.7rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.9rem; text-align:center; }
         .auth-msg.error { display:block; background:rgba(255,59,48,0.15); border:1px solid rgba(255,59,48,0.3); color:#ff6b6b; }
         .auth-msg.success { display:block; background:rgba(76,217,100,0.15); border:1px solid rgba(76,217,100,0.3); color:#4cd964; }
         .form-group { margin-bottom:1rem; }
         .form-group label { display:block; color:rgba(255,255,255,0.7); font-size:0.85rem; margin-bottom:0.4rem; }
-        .form-input { width:100%; padding:0.75rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,215,0,0.15); border-radius:10px; color:#fff; font-size:0.95rem; box-sizing:border-box; }
-        .form-input:focus { outline:none; border-color:rgba(255,215,0,0.5); }
+        .form-input { width:100%; padding:0.75rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(232,184,75,0.15); border-radius:10px; color:#fff; font-size:0.95rem; box-sizing:border-box; }
+        .form-input:focus { outline:none; border-color:rgba(232,184,75,0.5); }
         .btn { width:100%; padding:0.85rem; border:none; border-radius:10px; font-size:1rem; font-weight:bold; cursor:pointer; }
-        .btn-primary { background:linear-gradient(135deg,#ffd700,#ffc107); color:#000; }
+        .btn-primary { background:linear-gradient(135deg,#e8b84b,#d4a017); color:#000; }
         .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
         .auth-links { text-align:center; margin-top:1rem; font-size:0.9rem; }
-        .auth-links a { color:#ffd700; text-decoration:none; }
+        .auth-links a { color:#e8b84b; text-decoration:none; }
         .strength-bar { height:4px; border-radius:2px; margin-top:0.3rem; transition:width 0.3s,background 0.3s; }
 
         /* ── Avatar Section ── */
@@ -34,13 +34,13 @@
         .avatar-preview-wrap { display:inline-block; position:relative; cursor:pointer; }
         .avatar-preview {
             width:72px; height:72px; border-radius:50%;
-            border:2px solid rgba(255,215,0,0.3);
+            border:2px solid rgba(232,184,75,0.3);
             background:rgba(255,255,255,0.05);
             display:flex; align-items:center; justify-content:center;
             font-size:2.2rem; transition:all 0.3s;
             overflow:hidden; position:relative;
         }
-        .avatar-preview:hover { border-color:rgba(255,215,0,0.6); box-shadow:0 0 15px rgba(255,215,0,0.15); }
+        .avatar-preview:hover { border-color:rgba(232,184,75,0.6); box-shadow:0 0 15px rgba(232,184,75,0.15); }
         .avatar-preview img { width:100%; height:100%; object-fit:cover; }
         .avatar-preview-hint {
             position:absolute; bottom:-2px; left:-2px; right:-2px;
@@ -51,11 +51,11 @@
         .avatar-actions { display:flex; gap:0.5rem; justify-content:center; margin-top:0.5rem; }
         .avatar-btn-sm {
             padding:0.3rem 0.8rem; border-radius:14px; font-size:0.75rem; cursor:pointer;
-            border:1px solid rgba(255,215,0,0.2); background:rgba(255,215,0,0.06); color:#ffd700;
+            border:1px solid rgba(232,184,75,0.2); background:rgba(232,184,75,0.06); color:#e8b84b;
             transition:all 0.2s;
         }
-        .avatar-btn-sm:hover { background:rgba(255,215,0,0.14); }
-        .avatar-btn-sm.active { background:rgba(255,215,0,0.2); border-color:rgba(255,215,0,0.4); }
+        .avatar-btn-sm:hover { background:rgba(232,184,75,0.14); }
+        .avatar-btn-sm.active { background:rgba(232,184,75,0.2); border-color:rgba(232,184,75,0.4); }
 
         /* ── Avatar Picker Panel (expandable) ── */
         .avatar-picker-panel {
@@ -64,7 +64,7 @@
         }
         .avatar-picker-panel.open { max-height:420px; margin-top:0.5rem; }
         .avatar-picker-inner {
-            background:rgba(255,255,255,0.03); border:1px solid rgba(255,215,0,0.1);
+            background:rgba(255,255,255,0.03); border:1px solid rgba(232,184,75,0.1);
             border-radius:10px; padding:0.7rem;
         }
         .avatar-cat-tabs { display:flex; gap:0.3rem; margin-bottom:0.5rem; flex-wrap:wrap; }
@@ -73,22 +73,22 @@
             border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03);
             color:rgba(255,255,255,0.5); transition:all 0.2s;
         }
-        .avatar-cat-tab.active { background:rgba(255,215,0,0.12); border-color:rgba(255,215,0,0.3); color:#ffd700; }
+        .avatar-cat-tab.active { background:rgba(232,184,75,0.12); border-color:rgba(232,184,75,0.3); color:#e8b84b; }
         .avatar-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:0.35rem; max-height:160px; overflow-y:auto; }
         .avatar-opt {
             padding:0.4rem; text-align:center; cursor:pointer; border-radius:8px;
             font-size:1.4rem; transition:all 0.15s;
             background:rgba(255,255,255,0.02); border:1px solid transparent;
         }
-        .avatar-opt:hover { background:rgba(255,215,0,0.08); border-color:rgba(255,215,0,0.15); }
-        .avatar-opt.selected { background:rgba(255,215,0,0.15); border-color:rgba(255,215,0,0.35); }
+        .avatar-opt:hover { background:rgba(232,184,75,0.08); border-color:rgba(232,184,75,0.15); }
+        .avatar-opt.selected { background:rgba(232,184,75,0.15); border-color:rgba(232,184,75,0.35); }
         .avatar-upload-row { text-align:center; margin-top:0.5rem; }
         .avatar-upload-btn-sm {
             display:inline-block; padding:0.3rem 1rem; border-radius:14px; font-size:0.75rem; cursor:pointer;
-            border:1px dashed rgba(255,215,0,0.25); background:rgba(255,215,0,0.04); color:#ffd700;
+            border:1px dashed rgba(232,184,75,0.25); background:rgba(232,184,75,0.04); color:#e8b84b;
             transition:all 0.2s;
         }
-        .avatar-upload-btn-sm:hover { background:rgba(255,215,0,0.1); border-style:solid; }
+        .avatar-upload-btn-sm:hover { background:rgba(232,184,75,0.1); border-style:solid; }
         .avatar-upload-btn-sm.uploading { opacity:0.6; pointer-events:none; }
     </style>
 </head>
@@ -231,7 +231,7 @@
             if (l === 0) bar.style.cssText = 'width:0';
             else if (l < 4) bar.style.cssText = 'width:25%;background:#ff3b30';
             else if (l < 6) bar.style.cssText = 'width:50%;background:#ff9500';
-            else if (l < 8) bar.style.cssText = 'width:75%;background:#ffd700';
+            else if (l < 8) bar.style.cssText = 'width:75%;background:#e8b84b';
             else bar.style.cssText = 'width:100%;background:#4cd964';
         });
 

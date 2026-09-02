@@ -242,7 +242,7 @@
 
             var html = '<div class="beginner-result">';
             html += '<div class="beginner-card"><h3>📋 ' + moduleName + '</h3><p>' + tip + '</p></div>';
-            html += '<div class="beginner-card"><h3>💡 温馨提示</h3><p>切换到<strong style="color:#ffd700">专业模式</strong>可查看完整分析内容，包括详细数据、历史文化和实用技巧。</p></div>';
+            html += '<div class="beginner-card"><h3>💡 温馨提示</h3><p>切换到<strong style="color:#e8b84b">专业模式</strong>可查看完整分析内容，包括详细数据、历史文化和实用技巧。</p></div>';
             html += '</div>';
             target.innerHTML = html;
         }

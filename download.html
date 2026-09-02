@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#ffd700">
+    <meta name="theme-color" content="#e8b84b">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon-192.png">
     <title>下载客户端 - 玄机算命网</title>
@@ -13,22 +13,22 @@
 
         /* 头部 */
         .dl-hero { text-align: center; padding: 1.5rem 1rem; }
-        .dl-hero h2 { color: #ffd700; font-size: 1.4rem; margin-bottom: 0.3rem; }
+        .dl-hero h2 { color: #e8b84b; font-size: 1.4rem; margin-bottom: 0.3rem; }
         .dl-hero p { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
 
         /* PWA 即时使用卡片 */
         .pwa-banner {
-            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,180,0,0.05));
-            border: 1px solid rgba(255,215,0,0.25); border-radius: 16px;
+            background: linear-gradient(135deg, rgba(232,184,75,0.1), rgba(255,180,0,0.05));
+            border: 1px solid rgba(232,184,75,0.25); border-radius: 16px;
             padding: 1.2rem 1.4rem; margin-bottom: 1.8rem; text-align: center;
         }
-        .pwa-banner-title { color: #ffd700; font-size: 1rem; font-weight: bold; margin-bottom: 0.4rem; }
+        .pwa-banner-title { color: #e8b84b; font-size: 1rem; font-weight: bold; margin-bottom: 0.4rem; }
         .pwa-banner-desc { color: rgba(255,255,255,0.6); font-size: 0.82rem; line-height: 1.6; margin-bottom: 0.8rem; }
         .pwa-steps {
             display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;
         }
         .pwa-step {
-            background: rgba(255,215,0,0.06); border-radius: 12px;
+            background: rgba(232,184,75,0.06); border-radius: 12px;
             padding: 0.7rem 1rem; text-align: center; min-width: 100px; flex: 1; max-width: 150px;
         }
         .pwa-step .step-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
@@ -36,9 +36,9 @@
 
         /* 平台卡片 */
         .section-title {
-            color: #ffd700; font-size: 0.95rem; font-weight: bold;
+            color: #e8b84b; font-size: 0.95rem; font-weight: bold;
             margin: 1.5rem 0 0.8rem; padding-left: 0.4rem;
-            border-left: 3px solid #ffd700;
+            border-left: 3px solid #e8b84b;
         }
         .platform-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;
@@ -48,14 +48,14 @@
         }
 
         .platform-card {
-            background: linear-gradient(135deg, rgba(255,215,0,0.04), rgba(255,215,0,0.01));
-            border: 1px solid rgba(255,215,0,0.1); border-radius: 14px;
+            background: linear-gradient(135deg, rgba(232,184,75,0.04), rgba(232,184,75,0.01));
+            border: 1px solid rgba(232,184,75,0.1); border-radius: 14px;
             padding: 1.2rem; text-align: center; position: relative;
             transition: all 0.3s;
         }
-        .platform-card:hover { border-color: rgba(255,215,0,0.25); }
+        .platform-card:hover { border-color: rgba(232,184,75,0.25); }
         .platform-card .pf-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .platform-card .pf-name { color: #ffd700; font-size: 0.95rem; font-weight: bold; margin-bottom: 0.2rem; }
+        .platform-card .pf-name { color: #e8b84b; font-size: 0.95rem; font-weight: bold; margin-bottom: 0.2rem; }
         .platform-card .pf-desc { color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-bottom: 0.8rem; }
         .pf-status {
             display: inline-block; padding: 0.25rem 0.7rem; border-radius: 20px;
@@ -65,7 +65,7 @@
             background: rgba(76,175,80,0.15); color: #4caf50; border: 1px solid rgba(76,175,80,0.25);
         }
         .pf-status.coming {
-            background: rgba(255,215,0,0.08); color: #ffd700; border: 1px solid rgba(255,215,0,0.15);
+            background: rgba(232,184,75,0.08); color: #e8b84b; border: 1px solid rgba(232,184,75,0.15);
         }
         .pf-status.planned {
             background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.35);
@@ -78,14 +78,14 @@
             text-decoration: none; border: none;
         }
         .btn-dl {
-            background: linear-gradient(135deg, #ffd700, #ffaa00); color: #1a1a2e;
+            background: linear-gradient(135deg, #e8b84b, #d4a017); color: #101828;
         }
         .btn-dl:hover { opacity: 0.9; }
         .btn-notify {
-            background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2);
-            color: #ffd700;
+            background: rgba(232,184,75,0.08); border: 1px solid rgba(232,184,75,0.2);
+            color: #e8b84b;
         }
-        .btn-notify:hover { background: rgba(255,215,0,0.15); }
+        .btn-notify:hover { background: rgba(232,184,75,0.15); }
         .btn-disabled {
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
             color: rgba(255,255,255,0.2); cursor: not-allowed;
@@ -94,24 +94,24 @@
         /* 通知订阅 */
         .notify-section {
             margin-top: 2rem; padding: 1.2rem;
-            background: linear-gradient(135deg, rgba(255,215,0,0.04), transparent);
-            border: 1px solid rgba(255,215,0,0.1); border-radius: 14px;
+            background: linear-gradient(135deg, rgba(232,184,75,0.04), transparent);
+            border: 1px solid rgba(232,184,75,0.1); border-radius: 14px;
             text-align: center;
         }
-        .notify-title { color: #ffd700; font-size: 0.9rem; margin-bottom: 0.3rem; }
+        .notify-title { color: #e8b84b; font-size: 0.9rem; margin-bottom: 0.3rem; }
         .notify-desc { color: rgba(255,255,255,0.5); font-size: 0.78rem; margin-bottom: 0.8rem; }
         .notify-form { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
         .notify-input {
             padding: 0.55rem 0.8rem; border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(232,184,75,0.2); background: rgba(255,255,255,0.04);
             color: #fff; font-size: 0.85rem; outline: none; min-width: 200px;
         }
-        .notify-input:focus { border-color: #ffd700; }
+        .notify-input:focus { border-color: #e8b84b; }
         .notify-input::placeholder { color: rgba(255,255,255,0.25); }
         .btn-sub {
             padding: 0.55rem 1.2rem; border-radius: 8px; border: none;
-            background: linear-gradient(135deg, #ffd700, #ffaa00);
-            color: #1a1a2e; font-weight: bold; font-size: 0.85rem; cursor: pointer;
+            background: linear-gradient(135deg, #e8b84b, #d4a017);
+            color: #101828; font-weight: bold; font-size: 0.85rem; cursor: pointer;
         }
         .btn-sub:hover { opacity: 0.9; }
     </style>
@@ -134,7 +134,7 @@
         <div class="pwa-banner">
             <div class="pwa-banner-title">⚡ 无需下载，即刻使用</div>
             <div class="pwa-banner-desc">
-                玄机算命网已支持 <b style="color:#ffd700">PWA 渐进式应用</b>，可添加到手机主屏幕，<br>打开即用，无需下载安装，不占存储空间。
+                玄机算命网已支持 <b style="color:#e8b84b">PWA 渐进式应用</b>，可添加到手机主屏幕，<br>打开即用，无需下载安装，不占存储空间。
             </div>
             <div class="pwa-steps">
                 <div class="pwa-step">

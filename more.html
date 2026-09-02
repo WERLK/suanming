@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ffd700">
+    <meta name="theme-color" content="#e8b84b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="玄机算命">
@@ -15,23 +15,23 @@
     <style>
         .content-area { padding: 1rem; max-width: 1400px; margin: 0 auto; }
         .section-title {
-            color: #ffd700;
+            color: #e8b84b;
             font-size: 1.1rem;
             margin: 0;
             padding: 0.85rem 1rem;
-            border-bottom: 1px solid rgba(255,215,0,0.15);
+            border-bottom: 1px solid rgba(232,184,75,0.15);
             display: flex; align-items: center; gap: 0.5rem;
             cursor: pointer;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95));
+            background: linear-gradient(135deg, rgba(16,24,40,0.95), rgba(15,29,51,0.95));
             border-radius: 12px;
-            border: 1px solid rgba(255,215,0,0.12);
+            border: 1px solid rgba(232,184,75,0.12);
             transition: all 0.25s;
             margin-bottom: 0;
         }
         .section-title:hover {
-            border-color: rgba(255,215,0,0.35);
+            border-color: rgba(232,184,75,0.35);
             background: linear-gradient(135deg, rgba(30,30,55,0.98), rgba(28,40,70,0.98));
         }
         .section-title:active {
@@ -74,8 +74,8 @@
             margin: 0.4rem 0 0.6rem 0;
         }
         .mod-card {
-            background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95));
-            border: 1px solid rgba(255,215,0,0.12);
+            background: linear-gradient(135deg, rgba(16,24,40,0.95), rgba(15,29,51,0.95));
+            border: 1px solid rgba(232,184,75,0.12);
             border-radius: 14px;
             padding: 1rem 0.7rem;
             text-align: center;
@@ -87,18 +87,18 @@
             min-height: 100px; justify-content: center;
         }
         .mod-card:hover {
-            border-color: rgba(255,215,0,0.45);
+            border-color: rgba(232,184,75,0.45);
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(255,215,0,0.12);
+            box-shadow: 0 6px 20px rgba(232,184,75,0.12);
         }
         .mod-card .icon { font-size: 2rem; margin-bottom: 0.35rem; line-height: 1; }
-        .mod-card .name { color: #ffd700; font-size: 0.88rem; font-weight: 600; }
+        .mod-card .name { color: #e8b84b; font-size: 0.88rem; font-weight: 600; }
         .mod-card .desc { color: rgba(255,255,255,0.45); font-size: 0.68rem; margin-top: 0.25rem; line-height: 1.35; max-width: 130px; }
 
         /* 新功能高亮 */
         .mod-card.new-feature {
             border-color: rgba(0,200,255,0.3);
-            background: linear-gradient(135deg, rgba(0,200,255,0.06), rgba(22,33,62,0.95));
+            background: linear-gradient(135deg, rgba(0,200,255,0.06), rgba(15,29,51,0.95));
         }
         .mod-card.new-feature::after {
             content: 'NEW'; position: absolute; top: 6px; right: 8px;

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffd700">
+<meta name="theme-color" content="#e8b84b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="玄机算命">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="msapplication-TileImage" content="/icon-192.png">
-<meta name="msapplication-TileColor" content="#ffd700">
+<meta name="msapplication-TileColor" content="#e8b84b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>姓名测试 - 玄机算命网</title>
     <link rel="stylesheet" href="/css/style.css">
@@ -20,18 +20,18 @@
             align-items: center;
             gap: 1rem;
             padding: 1rem;
-            background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
-            border-bottom: 1px solid rgba(255,215,0,0.15);
+            background: linear-gradient(180deg, rgba(10,14,31,0.98), rgba(16,24,40,0.95));
+            border-bottom: 1px solid rgba(232,184,75,0.15);
         }
         .page-header h1 {
             font-size: 1.2rem;
-            color: #ffd700;
+            color: #e8b84b;
             font-weight: 600;
         }
         .back-btn {
             background: none;
             border: none;
-            color: #ffd700;
+            color: #e8b84b;
             font-size: 1.2rem;
             cursor: pointer;
             padding: 0.5rem;
@@ -58,7 +58,7 @@
             width: 100%;
             padding: 0.8rem 1rem;
             border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.2);
+            border: 1px solid rgba(232,184,75,0.2);
             background: rgba(255,255,255,0.05);
             color: #fff;
             font-size: 0.9rem;
@@ -66,7 +66,7 @@
             transition: border-color 0.3s;
         }
         .form-input:focus {
-            border-color: rgba(255,215,0,0.5);
+            border-color: rgba(232,184,75,0.5);
             background: rgba(255,255,255,0.08);
         }
         .submit-btn {
@@ -74,7 +74,7 @@
             padding: 1rem;
             border-radius: 8px;
             border: none;
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            background: linear-gradient(135deg, #e8b84b, #f0d78c);
             color: #000;
             font-size: 1rem;
             font-weight: 600;
@@ -98,11 +98,11 @@
         .wuge-table td {
             padding: 0.8rem;
             text-align: center;
-            border: 1px solid rgba(255,215,0,0.2);
+            border: 1px solid rgba(232,184,75,0.2);
         }
         .wuge-table th {
-            background: rgba(255,215,0,0.1);
-            color: #ffd700;
+            background: rgba(232,184,75,0.1);
+            color: #e8b84b;
             font-weight: 600;
         }
         .wuge-table td {
@@ -111,14 +111,14 @@
         .score-display {
             text-align: center;
             padding: 2rem;
-            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+            background: linear-gradient(135deg, rgba(232,184,75,0.1), rgba(232,184,75,0.03));
             border-radius: 12px;
             margin: 1rem 0;
         }
         .score-number {
             font-size: 3rem;
             font-weight: 700;
-            color: #ffd700;
+            color: #e8b84b;
             margin-bottom: 0.5rem;
         }
         .score-text {
@@ -182,7 +182,7 @@ function showToast(msg) {
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.textContent = msg;
-    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
+    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(232,184,75,0.9);color:#000;padding:0.8rem 1.5rem;border-radius:8px;z-index:9999;font-size:0.9rem;';
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
@@ -316,7 +316,7 @@ function triggerImageUpload(moduleType) {
             if (mode === 'simple') {
                 var simpleHtml = '<div class="beginner-result">';
                 simpleHtml += '<div class="beginner-card"><h3>📝 ' + data.name + ' 分析结果</h3>';
-                simpleHtml += '<p style="font-size:2rem;font-weight:bold;color:#ffd700;margin:0.5rem 0;">' + (data.score || '--') + '分</p>';
+                simpleHtml += '<p style="font-size:2rem;font-weight:bold;color:#e8b84b;margin:0.5rem 0;">' + (data.score || '--') + '分</p>';
                 simpleHtml += '<p>' + (data.summary || '分析完成，切换到专业模式可查看完整详情。') + '</p>';
                 simpleHtml += '</div></div>';
                 document.getElementById('formArea').style.display = 'none';
@@ -353,11 +353,11 @@ function triggerImageUpload(moduleType) {
                 return '#ffd740';
             };
 
-            var html = '<div class="section fade-in" style="text-align:center;"><h3 style="font-size:1.5rem;color:#ffd700;">📝 ' + data.name + '</h3></div>';
+            var html = '<div class="section fade-in" style="text-align:center;"><h3 style="font-size:1.5rem;color:#e8b84b;">📝 ' + data.name + '</h3></div>';
 
             // 综合评分
             html += '<div class="score-display fade-in">';
-            html += '<div class="score-number" style="color:' + (score >= 80 ? '#ffd700' : score >= 60 ? '#ffd740' : '#ff5252') + ';">' + score + '分</div>';
+            html += '<div class="score-number" style="color:' + (score >= 80 ? '#e8b84b' : score >= 60 ? '#ffd740' : '#ff5252') + ';">' + score + '分</div>';
             html += '<div class="score-text" style="color:' + jxColor(scoreLabel) + ';">' + scoreLabel + '</div>';
             if (data.summary) {
                 html += '<p style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-top:0.5rem;">' + data.summary + '</p>';
@@ -379,7 +379,7 @@ function triggerImageUpload(moduleType) {
                 var gd = grids[gn];
                 var desc = (gd && gd.desc) ? gd.desc : '';
                 html += '<tr>';
-                html += '<td style="color:#ffd700;font-weight:600;">' + gn + '</td>';
+                html += '<td style="color:#e8b84b;font-weight:600;">' + gn + '</td>';
                 html += '<td>' + num + '</td>';
                 html += '<td style="color:rgba(255,255,255,0.7);">' + wx + '</td>';
                 html += '<td style="color:' + jxColor(jx) + ';font-weight:600;">' + jx + '</td>';
@@ -392,8 +392,8 @@ function triggerImageUpload(moduleType) {
             if (sancai.config) {
                 html += '<div class="section fade-in">';
                 html += '<h3>⚖️ 三才配置</h3>';
-                html += '<div style="background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.12);border-radius:10px;padding:1rem;">';
-                html += '<p style="font-size:1rem;margin-bottom:0.5rem;"><strong>配置：</strong><span style="color:#ffd700;">' + sancai.config + '</span> — <span style="color:' + jxColor(sancai.result) + ';">' + (sancai.result || '—') + '</span></p>';
+                html += '<div style="background:rgba(232,184,75,0.04);border:1px solid rgba(232,184,75,0.12);border-radius:10px;padding:1rem;">';
+                html += '<p style="font-size:1rem;margin-bottom:0.5rem;"><strong>配置：</strong><span style="color:#e8b84b;">' + sancai.config + '</span> — <span style="color:' + jxColor(sancai.result) + ';">' + (sancai.result || '—') + '</span></p>';
                 if (sancai.desc) {
                     html += '<p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.8;">' + sancai.desc + '</p>';
                 }
@@ -405,7 +405,7 @@ function triggerImageUpload(moduleType) {
                 html += '<div class="section fade-in">';
                 html += '<h3>🌿 五行分布</h3>';
                 html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;">';
-                var wxColors = {'木': '#4caf50', '火': '#f44336', '土': '#ff9800', '金': '#ffd700', '水': '#2196f3'};
+                var wxColors = {'木': '#4caf50', '火': '#f44336', '土': '#ff9800', '金': '#e8b84b', '水': '#2196f3'};
                 for (var w = 0; w < data.wuxing_balance.length; w++) {
                     var item = data.wuxing_balance[w];
                     var wxName = item.charAt(0);

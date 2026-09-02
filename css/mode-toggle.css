@@ -40,7 +40,7 @@
 }
 
 .mode-toggle-option.active {
-    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    background: linear-gradient(135deg, #e8b84b, #ffaa00);
     color: #000;
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
@@ -67,7 +67,7 @@
 }
 
 .beginner-card h3 {
-    color: #ffd700;
+    color: #e8b84b;
     font-size: 0.9rem;
     margin-bottom: 0.6rem;
     padding-bottom: 0.4rem;
@@ -82,7 +82,7 @@
 }
 
 .beginner-card .highlight {
-    color: #ffd700;
+    color: #e8b84b;
     font-weight: 600;
 }
 
@@ -109,7 +109,7 @@
 .beginner-score-item .score-value {
     font-size: 1rem;
     font-weight: 700;
-    color: #ffd700;
+    color: #e8b84b;
 }
 
 /* ===== 专业模式专属元素（初学模式隐藏） ===== */

@@ -23,7 +23,7 @@
         mouseRadius: 120,
         mouseForce: 0.03,
         colors: [
-            'rgba(255,215,0,OPACITY)',     // 金色
+            'rgba(232,184,75,OPACITY)',     // 金色
             'rgba(200,180,255,OPACITY)',    // 淡紫
             'rgba(100,180,255,OPACITY)',    // 淡蓝
             'rgba(255,255,255,OPACITY)',    // 白色
@@ -107,7 +107,7 @@
                 var dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < config.connectDistance) {
                     var alpha = (1 - dist / config.connectDistance) * config.lineAlpha;
-                    ctx.strokeStyle = 'rgba(255,215,0,' + alpha.toFixed(3) + ')';
+                    ctx.strokeStyle = 'rgba(232,184,75,' + alpha.toFixed(3) + ')';
                     ctx.lineWidth = 0.4;
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x, particles[i].y);

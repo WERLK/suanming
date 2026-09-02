@@ -230,10 +230,10 @@ function initSearch() {
         if (document.querySelector('.site-footer')) return;
         var container = document.body;
         if (!container) return;
-        var html = '<div class="site-footer" style="text-align:center;padding:1.5rem 1rem 4rem;margin-top:2rem;border-top:1px solid rgba(255,215,0,0.08);">' +
+        var html = '<div class="site-footer" style="text-align:center;padding:1.5rem 1rem 4rem;margin-top:2rem;border-top:1px solid rgba(232,184,75,0.08);">' +
             '<div style="margin-bottom:0.5rem;">' +
-            '<span style="display:inline-block;background:rgba(255,215,0,0.08);border-radius:4px;padding:0.15rem 0.5rem;' +
-            'font-family:monospace;font-size:0.68rem;color:rgba(255,215,0,0.5);letter-spacing:0.5px;">' +
+            '<span style="display:inline-block;background:rgba(232,184,75,0.08);border-radius:4px;padding:0.15rem 0.5rem;' +
+            'font-family:monospace;font-size:0.68rem;color:rgba(232,184,75,0.5);letter-spacing:0.5px;">' +
             version + ' · ' + commit + '</span></div>' +
             '<div style="font-size:0.7rem;">' +
             '<a href="' + ICP_URL + '" target="_blank" rel="noopener" ' +
@@ -555,15 +555,15 @@ function triggerImageUpload(moduleType) {
 }
 
 function showImageAnalysisResult(analysisText, imageInfo) {
-    let html = '<div class="image-analysis-result" style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.5rem;margin-top:1rem;">';
-    html += '<h3 style="color:#ffd700;margin-bottom:1rem;">📷 图片分析结果</h3>';
+    let html = '<div class="image-analysis-result" style="background:linear-gradient(135deg,rgba(232,184,75,0.08),rgba(232,184,75,0.02));border:1px solid rgba(232,184,75,0.15);border-radius:12px;padding:1.5rem;margin-top:1rem;">';
+    html += '<h3 style="color:#e8b84b;margin-bottom:1rem;">📷 图片分析结果</h3>';
     html += '<pre style="white-space:pre-wrap;font-family:inherit;color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.9rem;">' + analysisText + '</pre>';
     if (imageInfo) {
-        html += '<div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);color:rgba(255,255,255,0.5);font-size:0.8rem;">';
+        html += '<div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid rgba(232,184,75,0.1);color:rgba(255,255,255,0.5);font-size:0.8rem;">';
         html += '图片信息：' + imageInfo.width + '×' + imageInfo.height + ' | 主色调：' + imageInfo.dominant_color + ' | 亮度：' + imageInfo.brightness;
         html += '</div>';
     }
-    html += '<button onclick="this.parentElement.remove();" style="margin-top:1rem;background:rgba(255,215,0,0.2);color:#ffd700;border:1px solid rgba(255,215,0,0.3);border-radius:8px;padding:0.5rem 1rem;cursor:pointer;">关闭</button>';
+    html += '<button onclick="this.parentElement.remove();" style="margin-top:1rem;background:rgba(232,184,75,0.2);color:#e8b84b;border:1px solid rgba(232,184,75,0.3);border-radius:8px;padding:0.5rem 1rem;cursor:pointer;">关闭</button>';
     html += '</div>';
 
     // 尝试插入到结果区域
@@ -631,7 +631,7 @@ function openMore() { window.location.href = '/more.html'; }
             var badge = document.createElement('span');
             badge.className = 'nav-badge';
             badge.textContent = u.vip_level === 'premium' ? '高级' : '基础';
-            badge.style.cssText = 'margin-left:auto;font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:10px;background:rgba(255,215,0,0.15);color:#ffd700;';
+            badge.style.cssText = 'margin-left:auto;font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:10px;background:rgba(232,184,75,0.15);color:#e8b84b;';
             var sidebarUserEl = document.getElementById('sidebarUser');
             if (sidebarUserEl && !sidebarUserEl.querySelector('.nav-badge')) {
                 sidebarUserEl.querySelector('.user-info').appendChild(badge);

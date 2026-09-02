@@ -2,13 +2,13 @@
 <html lang="zh-CN">
 <head>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffd700">
+<meta name="theme-color" content="#e8b84b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="玄机算命">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="msapplication-TileImage" content="/icon-192.png">
-<meta name="msapplication-TileColor" content="#ffd700">
+<meta name="msapplication-TileColor" content="#e8b84b">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>姓名评分 - 玄机算命网</title>
@@ -89,24 +89,24 @@
 
         <div class="section">
             <h2>⚡ 大数据联网实时分析</h2>
-            <p style="color: rgba(255,215,0,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
+            <p style="color: rgba(232,184,75,0.8); font-size: 0.85rem; line-height: 1.8; margin-bottom: 1.5rem;">
                 输入你的个人信息，系统将通过<strong>大数据联网实时分析引擎</strong>为你提供详细的姓名评分分析。
             </p>
             
             <div style="max-width: 500px; margin: 0 auto;">
                 <div style="margin-bottom: 1.2rem;">
                     <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的姓名</label>
-                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
+                    <input type="text" id="userName" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(232,184,75,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;" placeholder="例如：张三">
                 </div>
                 
                 <div style="margin-bottom: 1.2rem;">
                     <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生日期</label>
-                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                    <input type="date" id="userBirth" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(232,184,75,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
                 </div>
                 
                 <div style="margin-bottom: 1.2rem;">
                     <label style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 500;">请输入你的出生时间（可选）</label>
-                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
+                    <input type="time" id="userTime" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(232,184,75,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9rem; outline: none;">
                 </div>
                 
                                 <!-- 专业/初学模式切换 -->
@@ -118,7 +118,7 @@
                     </div>
                 </div>
 
-                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
+                <button id="analyzeBtn" style="width: 100%; padding: 1rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #e8b84b, #f0d78c); color: #000; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;" onclick="runAnalysis()">⚡ 开始联网分析</button>
             </div>
             
             <!-- API 结果区 -->
@@ -196,7 +196,7 @@ async function runAnalysis() {
             // 初学模式：渲染简化卡片
             var simpleHtml = '<div class="beginner-result">';
             simpleHtml += '<div class="beginner-card"><h3>📊 ' + MODULE_NAME + ' 分析结果</h3>';
-            simpleHtml += '<p style="font-size:0.9rem;line-height:1.7;">' + (data.summary || '分析完成，切换到<strong style="color:#ffd700">专业模式</strong>可查看完整详情。') + '</p>';
+            simpleHtml += '<p style="font-size:0.9rem;line-height:1.7;">' + (data.summary || '分析完成，切换到<strong style="color:#e8b84b">专业模式</strong>可查看完整详情。') + '</p>';
             simpleHtml += '</div>';
             
             if (data.scores && typeof data.scores === 'object') {
@@ -224,13 +224,13 @@ async function runAnalysis() {
             resultArea.innerHTML = simpleHtml;
         } else {
             // 专业模式：渲染完整结果
-            var html = '<div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:1.2rem;">';
-            html += '<h3 style="color:#ffd700;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
+            var html = '<div style="background:linear-gradient(135deg,rgba(232,184,75,0.08),rgba(232,184,75,0.02));border:1px solid rgba(232,184,75,0.15);border-radius:12px;padding:1.2rem;">';
+            html += '<h3 style="color:#e8b84b;margin-bottom:0.8rem;">📊 ' + MODULE_NAME + ' 分析结果</h3>';
             
             // 评分显示
             if (data.score) {
                 var sl = data.score >= 90 ? '大吉' : data.score >= 80 ? '吉' : data.score >= 65 ? '中吉' : data.score >= 50 ? '一般' : '较差';
-                html += '<div style="text-align:center;margin:0.8rem 0;"><span style="font-size:2rem;font-weight:bold;color:#ffd700;">' + data.score + '</span><span style="color:rgba(255,255,255,0.5);font-size:0.9rem;"> 分 · ' + sl + '</span></div>';
+                html += '<div style="text-align:center;margin:0.8rem 0;"><span style="font-size:2rem;font-weight:bold;color:#e8b84b;">' + data.score + '</span><span style="color:rgba(255,255,255,0.5);font-size:0.9rem;"> 分 · ' + sl + '</span></div>';
             }
             
             if (data.summary) {
@@ -239,29 +239,29 @@ async function runAnalysis() {
             
             // 三才配置
             if (data.sancai && data.sancai.config) {
-                html += '<div style="margin:0.8rem 0;padding:0.6rem;background:rgba(255,215,0,0.04);border-radius:8px;">';
-                html += '<span style="color:#ffd700;font-size:0.85rem;">⚖️ 三才：' + data.sancai.config + '（' + (data.sancai.result || '—') + '）</span>';
+                html += '<div style="margin:0.8rem 0;padding:0.6rem;background:rgba(232,184,75,0.04);border-radius:8px;">';
+                html += '<span style="color:#e8b84b;font-size:0.85rem;">⚖️ 三才：' + data.sancai.config + '（' + (data.sancai.result || '—') + '）</span>';
                 html += '</div>';
             }
             
             if (data.scores) {
                 html += '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">';
                 for (var k in data.scores) {
-                    html += '<span style="background:rgba(255,215,0,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
+                    html += '<span style="background:rgba(232,184,75,0.1);padding:0.3rem 0.7rem;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.8);">' + k + ': ' + data.scores[k] + '分</span>';
                 }
                 html += '</div>';
             }
             
             // 详细分析
             if (data.analysis) {
-                html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);">';
+                html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(232,184,75,0.1);">';
                 html += '<pre style="white-space:pre-wrap;font-family:inherit;font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.9;margin:0;">' + data.analysis + '</pre>';
                 html += '</div>';
             }
             
             if (data.lucky_elements) {
                 var le = data.lucky_elements;
-                html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,215,0,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
+                html += '<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(232,184,75,0.1);display:flex;flex-wrap:wrap;gap:0.5rem;">';
                 if (le.colors) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🎨 幸运色: ' + le.colors + '</span>';
                 if (le.numbers) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🔢 幸运数字: ' + le.numbers + '</span>';
                 if (le.directions) html += '<span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">🧭 吉方: ' + le.directions + '</span>';

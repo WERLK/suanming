@@ -176,24 +176,24 @@ var AD_CONFIG = {
         }
         // 文字链接（默认）
         return '<div style="text-align:center;padding:0.8rem 1rem;margin:0.8rem 0;' +
-            'background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;">' +
+            'background:rgba(232,184,75,0.06);border:1px solid rgba(232,184,75,0.2);border-radius:10px;">' +
             '<a href="' + (provider.url || '#') + '" target="_blank" rel="noopener sponsored" ' +
-            'style="color:rgba(255,215,0,0.6);text-decoration:none;font-size:0.82rem;' +
+            'style="color:rgba(232,184,75,0.6);text-decoration:none;font-size:0.82rem;' +
             'transition:color 0.2s;" ' +
-            'onmouseover="this.style.color=\'rgba(255,215,0,0.85)\'" ' +
-            'onmouseout="this.style.color=\'rgba(255,215,0,0.6)\'">' +
+            'onmouseover="this.style.color=\'rgba(232,184,75,0.85)\'" ' +
+            'onmouseout="this.style.color=\'rgba(232,184,75,0.6)\'">' +
             (provider.text || '点击查看') + '</a></div>';
     }
 
     function renderFallbackAd(fb) {
         if (!fb) return '';
         return '<div style="text-align:center;padding:0.8rem 1rem;margin:0.8rem 0;' +
-            'background:rgba(255,215,0,0.02);border:1px dashed rgba(255,215,0,0.06);border-radius:10px;">' +
+            'background:rgba(232,184,75,0.02);border:1px dashed rgba(232,184,75,0.06);border-radius:10px;">' +
             '<a href="' + (fb.link || '#') + '" target="_blank" rel="noopener" ' +
-            'style="color:rgba(255,215,0,0.3);text-decoration:none;font-size:0.78rem;' +
+            'style="color:rgba(232,184,75,0.3);text-decoration:none;font-size:0.78rem;' +
             'transition:color 0.2s;" ' +
-            'onmouseover="this.style.color=\'rgba(255,215,0,0.6)\'" ' +
-            'onmouseout="this.style.color=\'rgba(255,215,0,0.3)\'">' +
+            'onmouseover="this.style.color=\'rgba(232,184,75,0.6)\'" ' +
+            'onmouseout="this.style.color=\'rgba(232,184,75,0.3)\'">' +
             (fb.text || '广告位招租') + '</a></div>';
     }
 

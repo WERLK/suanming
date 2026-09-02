@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#ffd700">
+    <meta name="theme-color" content="#e8b84b">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon-192.png">
     <title>帮助中心 - 玄机算命网</title>
@@ -16,15 +16,15 @@
 
         /* 教程视频 */
         .tutorial-section {
-            background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.2);
+            background: linear-gradient(135deg, rgba(232,184,75,0.06), rgba(232,184,75,0.02));
+            border: 1px solid rgba(232,184,75,0.2);
             border-radius: 16px; padding: 1.2rem; margin-bottom: 1.5rem; text-align: center;
         }
         .tutorial-header { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .tutorial-title { color: #ffd700; font-size: 1.05rem; font-weight: bold; }
+        .tutorial-title { color: #e8b84b; font-size: 1.05rem; font-weight: bold; }
         .tutorial-badge {
-            background: linear-gradient(135deg, #ffd700, #ffaa00);
-            color: #1a1a2e; font-size: 0.7rem; font-weight: bold;
+            background: linear-gradient(135deg, #e8b84b, #d4a017);
+            color: #101828; font-size: 0.7rem; font-weight: bold;
             padding: 0.2rem 0.6rem; border-radius: 20px;
         }
         .tutorial-desc { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 0.8rem; }
@@ -33,20 +33,20 @@
         .tutorial-actions { display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.8rem; flex-wrap: wrap; }
         .btn-replay-tutorial {
             padding: 0.5rem 1.2rem; border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.3); background: rgba(255,215,0,0.08);
-            color: #ffd700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+            border: 1px solid rgba(232,184,75,0.3); background: rgba(232,184,75,0.08);
+            color: #e8b84b; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
         }
-        .btn-replay-tutorial:hover { background: rgba(255,215,0,0.15); }
+        .btn-replay-tutorial:hover { background: rgba(232,184,75,0.15); }
 
         /* 搜索框 */
         .help-search-wrap { position: relative; margin-bottom: 1.2rem; }
         .help-search {
             width: 100%; padding: 0.7rem 1rem 0.7rem 2.6rem;
-            border-radius: 12px; border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 12px; border: 1px solid rgba(232,184,75,0.2);
             background: rgba(255,255,255,0.04); color: #fff; font-size: 0.9rem;
             outline: none; box-sizing: border-box; transition: border-color 0.2s;
         }
-        .help-search:focus { border-color: #ffd700; }
+        .help-search:focus { border-color: #e8b84b; }
         .help-search::placeholder { color: rgba(255,255,255,0.3); }
         .help-search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); font-size: 1rem; }
 
@@ -54,34 +54,34 @@
         .help-categories { display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .help-cat {
             padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer;
-            border: 1px solid rgba(255,215,0,0.15); background: transparent;
+            border: 1px solid rgba(232,184,75,0.15); background: transparent;
             color: rgba(255,255,255,0.5); transition: all 0.2s; white-space: nowrap;
         }
-        .help-cat:hover { color: #ffd700; border-color: rgba(255,215,0,0.3); }
-        .help-cat.active { background: rgba(255,215,0,0.12); color: #ffd700; border-color: #ffd700; }
+        .help-cat:hover { color: #e8b84b; border-color: rgba(232,184,75,0.3); }
+        .help-cat.active { background: rgba(232,184,75,0.12); color: #e8b84b; border-color: #e8b84b; }
         .help-cat .count { font-size: 0.65rem; opacity: 0.5; margin-left: 0.2rem; }
 
         /* FAQ 分类标题 */
         .help-category-title {
-            color: #ffd700; font-size: 0.95rem; font-weight: bold;
+            color: #e8b84b; font-size: 0.95rem; font-weight: bold;
             margin: 1.2rem 0 0.6rem; padding-left: 0.4rem;
-            border-left: 3px solid #ffd700;
+            border-left: 3px solid #e8b84b;
         }
         .help-category-title:first-child { margin-top: 0; }
 
         /* FAQ 项目 */
         .help-item {
-            background: linear-gradient(135deg, rgba(255,215,0,0.04), rgba(255,215,0,0.01));
-            border: 1px solid rgba(255,215,0,0.08);
+            background: linear-gradient(135deg, rgba(232,184,75,0.04), rgba(232,184,75,0.01));
+            border: 1px solid rgba(232,184,75,0.08);
             border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.5rem;
             cursor: pointer; transition: all 0.2s;
         }
-        .help-item:hover { background: rgba(255,215,0,0.06); border-color: rgba(255,215,0,0.15); }
+        .help-item:hover { background: rgba(232,184,75,0.06); border-color: rgba(232,184,75,0.15); }
         .help-question {
             color: rgba(255,255,255,0.85); font-size: 0.9rem; font-weight: 500;
             display: flex; align-items: center; gap: 0.5rem;
         }
-        .help-q-icon { color: #ffd700; font-size: 0.85rem; flex-shrink: 0; }
+        .help-q-icon { color: #e8b84b; font-size: 0.85rem; flex-shrink: 0; }
         .help-arrow {
             margin-left: auto; font-size: 0.7rem; color: rgba(255,255,255,0.3);
             transition: transform 0.2s;
@@ -93,9 +93,9 @@
         }
         .help-item.expanded .help-answer {
             max-height: 600px; margin-top: 0.6rem; padding-top: 0.6rem;
-            border-top: 1px solid rgba(255,215,0,0.06);
+            border-top: 1px solid rgba(232,184,75,0.06);
         }
-        .help-highlight { color: #ffd700; }
+        .help-highlight { color: #e8b84b; }
 
         /* 无结果 */
         .help-no-result { text-align: center; padding: 2rem; color: rgba(255,255,255,0.3); display: none; }
@@ -103,21 +103,21 @@
 
         /* 联系我们 */
         .contact-box {
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.2); border-radius: 16px; padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(232,184,75,0.05), rgba(232,184,75,0.02));
+            border: 1px solid rgba(232,184,75,0.2); border-radius: 16px; padding: 1.5rem;
             margin-top: 2rem; text-align: center;
         }
-        .contact-title { color: #ffd700; font-size: 1rem; margin-bottom: 0.3rem; }
+        .contact-title { color: #e8b84b; font-size: 1rem; margin-bottom: 0.3rem; }
         .contact-sub { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 0.8rem; }
         .contact-links { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
         .contact-link {
             display: flex; align-items: center; gap: 0.3rem;
             padding: 0.5rem 1rem; border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.15); background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(232,184,75,0.15); background: rgba(255,255,255,0.03);
             color: rgba(255,255,255,0.7); font-size: 0.85rem;
             text-decoration: none; cursor: pointer; transition: all 0.2s;
         }
-        .contact-link:hover { border-color: #ffd700; color: #ffd700; }
+        .contact-link:hover { border-color: #e8b84b; color: #e8b84b; }
 
         @media (max-width: 480px) {
             .help-categories { gap: 0.3rem; }
@@ -151,7 +151,7 @@
                     <p style="font-size:2rem;margin-bottom:0.5rem;">▶️</p>
                     <p style="margin-bottom:0.8rem;">视频暂时无法加载</p>
                     <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:1rem;">请尝试以下方法：</p>
-                    <a href="/video/guide-intro.mp4" download style="display:inline-block;padding:0.6rem 1.5rem;background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);border-radius:8px;color:#ffd700;text-decoration:none;font-size:0.85rem;">📥 下载视频观看</a>
+                    <a href="/video/guide-intro.mp4" download style="display:inline-block;padding:0.6rem 1.5rem;background:rgba(232,184,75,0.15);border:1px solid rgba(232,184,75,0.3);border-radius:8px;color:#e8b84b;text-decoration:none;font-size:0.85rem;">📥 下载视频观看</a>
                     <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:0.8rem;">或刷新页面重试</p>
                 </div>
             </div>
@@ -357,7 +357,7 @@ function filterHelp() {
     document.getElementById('helpList').innerHTML = filtered.map(function(t) {
         // 显示分类
         var catName = (helpCategories.find(function(c) { return c.id === t.category; }) || {}).label || '';
-        return '<span style="font-size:0.7rem;color:rgba(255,215,0,0.5);">' + catName + '</span>' + renderItem(t);
+        return '<span style="font-size:0.7rem;color:rgba(232,184,75,0.5);">' + catName + '</span>' + renderItem(t);
     }).join('');
 
     document.getElementById('helpNoResult').style.display = filtered.length === 0 ? 'block' : 'none';

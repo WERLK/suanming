@@ -2,13 +2,13 @@
 <html lang="zh-CN">
 <head>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffd700">
+<meta name="theme-color" content="#e8b84b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="玄机算命">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="msapplication-TileImage" content="/icon-192.png">
-<meta name="msapplication-TileColor" content="#ffd700">
+<meta name="msapplication-TileColor" content="#e8b84b">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>星座运势 - 玄机算命网</title>
@@ -25,7 +25,7 @@ body {
 .back-btn {
     background: none;
     border: none;
-    color: #ffd700;
+    color: #e8b84b;
     font-size: 1.2rem;
     cursor: pointer;
     padding: 0.5rem;
@@ -36,13 +36,13 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: linear-gradient(180deg, rgba(15,12,41,0.98), rgba(26,26,46,0.95));
-    border-bottom: 1px solid rgba(255,215,0,0.15);
+    background: linear-gradient(180deg, rgba(10,14,31,0.98), rgba(16,24,40,0.95));
+    border-bottom: 1px solid rgba(232,184,75,0.15);
 }
 
 .page-header h1 {
     font-size: 1.2rem;
-    color: #ffd700;
+    color: #e8b84b;
     font-weight: 600;
 }
 
@@ -52,19 +52,19 @@ body {
 }
 
 .section {
-    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.1);
+    background: linear-gradient(135deg, rgba(232,184,75,0.05), rgba(232,184,75,0.02));
+    border: 1px solid rgba(232,184,75,0.1);
     border-radius: 12px;
     padding: 1rem;
     margin-bottom: 1rem;
 }
 
 .section h2 {
-    color: #ffd700;
+    color: #e8b84b;
     font-size: 1rem;
     margin-bottom: 0.8rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255,215,0,0.1);
+    border-bottom: 1px solid rgba(232,184,75,0.1);
 }
 
 .section p {
@@ -83,8 +83,8 @@ body {
 }
 
 .zodiac-card {
-    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.12);
+    background: linear-gradient(135deg, rgba(232,184,75,0.08), rgba(232,184,75,0.02));
+    border: 1px solid rgba(232,184,75,0.12);
     border-radius: 12px;
     padding: 0.8rem 0.4rem;
     text-align: center;
@@ -93,14 +93,14 @@ body {
 }
 
 .zodiac-card:hover {
-    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+    background: linear-gradient(135deg, rgba(232,184,75,0.15), rgba(232,184,75,0.05));
     transform: translateY(-2px);
 }
 
 .zodiac-card.active {
-    border-color: rgba(255,215,0,0.6);
-    background: linear-gradient(135deg, rgba(255,215,0,0.22), rgba(255,215,0,0.12));
-    box-shadow: 0 0 15px rgba(255,215,0,0.15);
+    border-color: rgba(232,184,75,0.6);
+    background: linear-gradient(135deg, rgba(232,184,75,0.22), rgba(232,184,75,0.12));
+    box-shadow: 0 0 15px rgba(232,184,75,0.15);
 }
 
 .zodiac-emoji {
@@ -121,7 +121,7 @@ body {
     margin-bottom: 1rem;
     border-radius: 10px;
     overflow: hidden;
-    border: 1px solid rgba(255,215,0,0.15);
+    border: 1px solid rgba(232,184,75,0.15);
 }
 
 .period-tab {
@@ -132,27 +132,27 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
-    background: rgba(255,215,0,0.05);
+    background: rgba(232,184,75,0.05);
     color: rgba(255,255,255,0.6);
     border: none;
 }
 
 .period-tab:hover {
-    background: rgba(255,215,0,0.1);
+    background: rgba(232,184,75,0.1);
     color: rgba(255,255,255,0.85);
 }
 
 .period-tab.active {
-    background: rgba(255,215,0,0.2);
-    color: #ffd700;
+    background: rgba(232,184,75,0.2);
+    color: #e8b84b;
     font-weight: 600;
 }
 
 /* ===== 运势结果卡片 ===== */
 .fortune-result {
     display: none;
-    background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.12);
+    background: linear-gradient(135deg, rgba(232,184,75,0.06), rgba(232,184,75,0.02));
+    border: 1px solid rgba(232,184,75,0.12);
     border-radius: 12px;
     padding: 1.2rem;
     margin-top: 0.5rem;
@@ -184,7 +184,7 @@ body {
 
 .fortune-zodiac-name {
     font-size: 1.1rem;
-    color: #ffd700;
+    color: #e8b84b;
     font-weight: 600;
 }
 
@@ -193,8 +193,8 @@ body {
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
-    background: rgba(255,215,0,0.15);
-    color: #ffd700;
+    background: rgba(232,184,75,0.15);
+    color: #e8b84b;
 }
 
 .fortune-header-actions {
@@ -203,9 +203,9 @@ body {
 }
 
 .fortune-refresh-btn {
-    background: rgba(255,215,0,0.1);
-    border: 1px solid rgba(255,215,0,0.2);
-    color: #ffd700;
+    background: rgba(232,184,75,0.1);
+    border: 1px solid rgba(232,184,75,0.2);
+    color: #e8b84b;
     border-radius: 8px;
     padding: 0.35rem 0.7rem;
     font-size: 0.8rem;
@@ -214,7 +214,7 @@ body {
 }
 
 .fortune-refresh-btn:hover {
-    background: rgba(255,215,0,0.2);
+    background: rgba(232,184,75,0.2);
 }
 
 .fortune-content {
@@ -232,7 +232,7 @@ body {
     text-align: right;
     margin-top: 0.8rem;
     padding-top: 0.6rem;
-    border-top: 1px solid rgba(255,215,0,0.08);
+    border-top: 1px solid rgba(232,184,75,0.08);
 }
 
 /* ===== Loading 状态 ===== */
@@ -248,8 +248,8 @@ body {
 .fortune-spinner {
     width: 36px;
     height: 36px;
-    border: 3px solid rgba(255,215,0,0.15);
-    border-top-color: #ffd700;
+    border: 3px solid rgba(232,184,75,0.15);
+    border-top-color: #e8b84b;
     border-radius: 50%;
     animation: fortune-spin 0.8s linear infinite;
 }
@@ -300,13 +300,13 @@ body {
 }
 
 .fortune-btn-retry {
-    background: rgba(255,215,0,0.15);
-    color: #ffd700;
-    border-color: rgba(255,215,0,0.3);
+    background: rgba(232,184,75,0.15);
+    color: #e8b84b;
+    border-color: rgba(232,184,75,0.3);
 }
 
 .fortune-btn-retry:hover {
-    background: rgba(255,215,0,0.25);
+    background: rgba(232,184,75,0.25);
 }
 
 .fortune-btn-fallback {
@@ -338,9 +338,9 @@ body {
 }
 
 .badge-cached {
-    background: rgba(255,215,0,0.1);
-    color: #ffd700;
-    border: 1px solid rgba(255,215,0,0.2);
+    background: rgba(232,184,75,0.1);
+    color: #e8b84b;
+    border: 1px solid rgba(232,184,75,0.2);
 }
 
 .badge-fallback {
@@ -355,9 +355,9 @@ body {
     font-size: 0.8rem;
     text-align: center;
     padding: 1rem;
-    background: rgba(255,215,0,0.03);
+    background: rgba(232,184,75,0.03);
     border-radius: 8px;
-    border: 1px dashed rgba(255,215,0,0.08);
+    border: 1px dashed rgba(232,184,75,0.08);
 }
 
 /* ===== 百科区域 ===== */
@@ -369,20 +369,20 @@ body {
 }
 
 .element-card {
-    background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,215,0,0.02));
-    border: 1px solid rgba(255,215,0,0.1);
+    background: linear-gradient(135deg, rgba(232,184,75,0.05), rgba(232,184,75,0.02));
+    border: 1px solid rgba(232,184,75,0.1);
     border-radius: 12px;
     padding: 1rem;
     transition: all 0.3s;
 }
 
 .element-card:hover {
-    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.03));
+    background: linear-gradient(135deg, rgba(232,184,75,0.1), rgba(232,184,75,0.03));
     transform: translateY(-2px);
 }
 
 .element-card h3 {
-    color: #ffd700;
+    color: #e8b84b;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
 }

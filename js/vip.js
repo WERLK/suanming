@@ -227,7 +227,7 @@ window.VipModule = (function() {
         // Progress bar & status text (left-right layout)
         if (v.vip_level === 'permanent') {
             dom.vipProgressBar.style.width = '100%';
-            dom.vipProgressBar.style.background = 'linear-gradient(90deg, #ffd700, #ffed4a)';
+            dom.vipProgressBar.style.background = 'linear-gradient(90deg, #e8b84b, #ffed4a)';
             dom.vipRemaining.textContent = '🎉 永久会员';
             if (dom.vipStatusSub) dom.vipStatusSub.textContent = '今日可看广告 ' + maxAds + ' 次';
         } else if (v.vip_remaining) {
@@ -527,7 +527,7 @@ window.VipModule = (function() {
     // ═══════════════════════════════════════════
     //  SECTION: Lucky Wheel
     // ═══════════════════════════════════════════
-    var wheelColors = ['#ff6b35','#ff9f43','#ffd700','#feca57','#54a0ff','#5f27cd','#00d2d3','#1dd1a1'];
+    var wheelColors = ['#ff6b35','#ff9f43','#e8b84b','#feca57','#54a0ff','#5f27cd','#00d2d3','#1dd1a1'];
     var wheelPrizes = ['1hVIP','2hVIP','5分','10分','免广卡x1','免广卡x3','24hVIP','50分'];
 
     function drawWheel() {
@@ -561,9 +561,9 @@ window.VipModule = (function() {
 
         ctx.beginPath();
         ctx.arc(cx, cy, 14, 0, 2 * Math.PI);
-        ctx.fillStyle = '#1a1a2e';
+        ctx.fillStyle = '#101828';
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,215,0,0.5)';
+        ctx.strokeStyle = 'rgba(232,184,75,0.5)';
         ctx.lineWidth = 3;
         ctx.stroke();
     }

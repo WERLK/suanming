@@ -46,19 +46,19 @@
         sidebar.id = '__sideNav';
         sidebar.style.cssText =
             'position:fixed;top:0;left:0;bottom:0;width:220px;z-index:9991;'
-            + 'background:linear-gradient(180deg,rgba(20,20,35,0.98) 0%,rgba(15,12,41,0.98) 100%);'
-            + 'backdrop-filter:blur(20px);border-right:1px solid rgba(255,215,0,0.12);'
+            + 'background:linear-gradient(180deg,rgba(20,20,35,0.98) 0%,rgba(10,14,31,0.98) 100%);'
+            + 'backdrop-filter:blur(20px);border-right:1px solid rgba(232,184,75,0.12);'
             + 'transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);'
             + 'display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;';
 
         // 标题行（含折叠按钮）
         var header = document.createElement('div');
         header.style.cssText =
-            'padding:1rem 0.8rem 0.6rem;border-bottom:1px solid rgba(255,215,0,0.1);'
+            'padding:1rem 0.8rem 0.6rem;border-bottom:1px solid rgba(232,184,75,0.1);'
             + 'display:flex;align-items:flex-start;justify-content:space-between;';
         header.innerHTML =
             '<div>'
-            + '<div style="font-size:1rem;color:#ffd700;font-weight:bold;display:flex;align-items:center;gap:6px;">'
+            + '<div style="font-size:1rem;color:#e8b84b;font-weight:bold;display:flex;align-items:center;gap:6px;">'
             + '🔮 玄机算命网</div>'
             + '<div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:3px;">导航菜单</div>'
             + '</div>';
@@ -74,7 +74,7 @@
             + 'transition:all 0.2s;flex-shrink:0;';
         collapseBtn.innerHTML = '◀';
         collapseBtn.title = '折叠菜单';
-        collapseBtn.onmouseenter = function() { this.style.color = '#ffd700'; this.style.borderColor = 'rgba(255,215,0,0.3)'; };
+        collapseBtn.onmouseenter = function() { this.style.color = '#e8b84b'; this.style.borderColor = 'rgba(232,184,75,0.3)'; };
         collapseBtn.onmouseleave = function() { this.style.color = 'rgba(255,255,255,0.5)'; this.style.borderColor = 'rgba(255,255,255,0.1)'; };
         collapseBtn.onclick = function(e) { e.stopPropagation(); closeSidebar(); };
         header.appendChild(collapseBtn);
@@ -91,14 +91,14 @@
             var active = isActive(item);
             a.style.cssText =
                 'display:flex;align-items:center;gap:10px;padding:0.7rem 1rem;'
-                + 'color:' + (active ? '#ffd700' : 'rgba(255,255,255,0.75)') + ';'
+                + 'color:' + (active ? '#e8b84b' : 'rgba(255,255,255,0.75)') + ';'
                 + 'text-decoration:none;font-size:0.88rem;'
                 + 'transition:all 0.2s;cursor:pointer;'
-                + (active ? 'background:rgba(255,215,0,0.08);border-right:2px solid #ffd700;' : '');
+                + (active ? 'background:rgba(232,184,75,0.08);border-right:2px solid #e8b84b;' : '');
             a.innerHTML =
                 '<span style="font-size:1.2rem;">' + item.icon + '</span>'
                 + '<span>' + item.label + '</span>';
-            a.onmouseenter = function() { if (!active) this.style.background = 'rgba(255,215,0,0.06)'; };
+            a.onmouseenter = function() { if (!active) this.style.background = 'rgba(232,184,75,0.06)'; };
             a.onmouseleave = function() { if (!active) this.style.background = ''; };
             nav.appendChild(a);
         });
@@ -108,10 +108,10 @@
         // 底部用户信息区
         var footer = document.createElement('div');
         footer.style.cssText =
-            'padding:0.8rem 1rem;border-top:1px solid rgba(255,215,0,0.08);';
+            'padding:0.8rem 1rem;border-top:1px solid rgba(232,184,75,0.08);';
         footer.innerHTML =
             '<a href="/profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:rgba(255,255,255,0.6);">'
-            + '<div style="width:32px;height:32px;border-radius:50%;background:rgba(255,215,0,0.1);'
+            + '<div style="width:32px;height:32px;border-radius:50%;background:rgba(232,184,75,0.1);'
             + 'display:flex;align-items:center;justify-content:center;font-size:1rem;">👤</div>'
             + '<div><div id="__sideUserName" style="font-size:0.8rem;color:rgba(255,255,255,0.8);">未登录</div>'
             + '<div style="font-size:0.65rem;color:rgba(255,255,255,0.4);">点击登录</div></div></a>';
@@ -132,7 +132,7 @@
             + 'transform:translateY(-50%);'
             + 'width:24px;height:60px;border-radius:0 8px 8px 0;'
             + 'background:rgba(20,20,35,0.9);'
-            + 'border:1px solid rgba(255,215,0,0.2);border-left:none;'
+            + 'border:1px solid rgba(232,184,75,0.2);border-left:none;'
             + 'color:rgba(255,255,255,0.5);font-size:0.8rem;'
             + 'display:none;align-items:center;justify-content:center;'
             + 'cursor:pointer;transition:all 0.2s;'
@@ -141,7 +141,7 @@
         expandTab.innerHTML = '菜 单';
         expandTab.title = '展开菜单';
         expandTab.onclick = openSidebar;
-        expandTab.onmouseenter = function() { this.style.color = '#ffd700'; };
+        expandTab.onmouseenter = function() { this.style.color = '#e8b84b'; };
         expandTab.onmouseleave = function() { this.style.color = 'rgba(255,255,255,0.5)'; };
         document.body.appendChild(expandTab);
     }

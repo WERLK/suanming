@@ -67,11 +67,11 @@ profile-container {
 
 .vip-progress-bar {
     height: 100%;
-    background: #ffd700; /* 回退方案：纯色 */
-    background: -webkit-linear-gradient(left, #ffd700, #ffed4e);
-    background: -moz-linear-gradient(left, #ffd700, #ffed4e);
-    background: -o-linear-gradient(left, #ffd700, #ffed4e);
-    background: linear-gradient(90deg, #ffd700, #ffed4e);
+    background: #e8b84b; /* 回退方案：纯色 */
+    background: -webkit-linear-gradient(left, #e8b84b, #f0d78c);
+    background: -moz-linear-gradient(left, #e8b84b, #f0d78c);
+    background: -o-linear-gradient(left, #e8b84b, #f0d78c);
+    background: linear-gradient(90deg, #e8b84b, #f0d78c);
     border-radius: 3px;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
@@ -168,7 +168,7 @@ profile-container {
 .btn-save:hover,
 .vip-ad-btn:hover {
     /* 为不支持 transform 的浏览器 */
-    background: #ffed4e;
+    background: #f0d78c;
 }
 
 /* ===== 弹窗（兼容性优化） ===== /* **/

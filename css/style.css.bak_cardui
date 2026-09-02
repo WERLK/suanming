@@ -54,16 +54,16 @@ body {
         width: 240px;
         height: 100vh;
         flex-direction: column;
-        background: linear-gradient(180deg, rgba(5,8,15,0.95), rgba(16,24,40,0.9) 40%, rgba(15,29,51,0.9) 100%);
-        border-right: 1px solid rgba(232,184,75,0.12);
+        background: linear-gradient(180deg, rgba(5,8,15,0.9), rgba(16,24,40,0.85) 40%, rgba(15,29,51,0.85) 100%);
+        border-right: 1px solid rgba(232,184,75,0.15);
         z-index: 200;
         padding: 0;
         overflow-y: auto;
-        box-shadow: 4px 0 40px rgba(0,0,0,0.4);
+        box-shadow: 2px 0 30px rgba(0,0,0,0.3);
     }
     .desktop-sidebar::-webkit-scrollbar { width: 4px; }
     .desktop-sidebar::-webkit-scrollbar-thumb { background: rgba(232,184,75,0.2); border-radius: 2px; }
-
+    
     .sidebar-logo {
         padding: 1.5rem 1.2rem;
         border-bottom: 1px solid rgba(232,184,75,0.1);
@@ -95,7 +95,7 @@ body {
         color: rgba(255,255,255,0.4);
         display: block;
     }
-
+    
     .sidebar-nav {
         flex: 1;
         padding: 1rem 0.8rem;
@@ -116,24 +116,22 @@ body {
         align-items: center;
         gap: 0.8rem;
         padding: 0.7rem 0.8rem;
-        border-radius: 10px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition: all 0.2s;
         text-decoration: none;
         color: rgba(255,255,255,0.7);
         font-size: 0.9rem;
         margin-bottom: 0.2rem;
     }
     .sidebar-nav-item:hover {
-        background: rgba(232,184,75,0.1);
+        background: rgba(232,184,75,0.08);
         color: #e8b84b;
-        transform: translateX(2px);
     }
     .sidebar-nav-item.active {
-        background: rgba(232,184,75,0.15);
+        background: rgba(232,184,75,0.12);
         color: #e8b84b;
-        border: 1px solid rgba(232,184,75,0.25);
-        box-shadow: 0 2px 8px rgba(232,184,75,0.1);
+        border: 1px solid rgba(232,184,75,0.2);
     }
     .sidebar-nav-item .nav-icon {
         font-size: 1.1rem;
@@ -148,7 +146,7 @@ body {
         background: rgba(232,184,75,0.15);
         color: #e8b84b;
     }
-
+    
     .sidebar-footer {
         padding: 1rem 0.8rem;
         border-top: 1px solid rgba(232,184,75,0.08);
@@ -158,13 +156,13 @@ body {
         align-items: center;
         gap: 0.6rem;
         padding: 0.5rem 0.8rem;
-        border-radius: 10px;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s;
         text-decoration: none;
     }
     .sidebar-user:hover {
-        background: rgba(232,184,75,0.1);
+        background: rgba(232,184,75,0.08);
     }
     .sidebar-user .user-avatar {
         width: 32px;
@@ -192,21 +190,13 @@ body {
         font-size: 0.7rem;
         color: rgba(255,255,255,0.4);
     }
-
+    
     /* 当侧边栏存在时，主内容区偏移 */
     .app {
         margin-left: 240px;
         width: calc(100% - 240px);
         min-height: 100vh;
         box-shadow: none;
-    }
-}
-
-/* 移动端/平板端：确保 sidebar 不干扰布局 */
-@media (max-width: 1023px) {
-    body.has-desktop-sidebar .app {
-        margin-left: 0 !important;
-        width: 100% !important;
     }
 }
 
@@ -220,7 +210,7 @@ body {
     .app {
         overflow-y: auto;
     }
-
+    
     /* 页面内容区最大宽度（防止太宽难读） */
     .content-area,
     .profile-container,
@@ -229,86 +219,78 @@ body {
     .forgot-container,
     .reset-container,
     .more-content {
-        max-width: 1200px;
+        max-width: 1100px;
         margin: 0 auto;
     }
     .content-area {
-        padding: 2.5rem 3rem;
+        padding: 2rem 2.5rem;
         padding-bottom: 2rem;
     }
-
+    
     /* 手机端底部导航在桌面隐藏 */
     .bottom-nav {
         display: none !important;
     }
-
+    
     /* 手机端顶部导航在桌面隐藏（用侧边栏替代） */
     .top-nav {
         display: none !important;
     }
-
+    
     /* Hero区域 - 桌面端 */
     .hero-section {
-        padding: 4rem 2rem !important;
+        padding: 3rem 2rem !important;
         border-radius: 0;
     }
     .hero-title {
-        font-size: 3rem !important;
-        letter-spacing: 0.05em;
+        font-size: 2.5rem !important;
     }
     .hero-subtitle {
-        font-size: 1.15rem !important;
+        font-size: 1.1rem !important;
     }
-    .hero-clock {
-        font-size: 1.3rem !important;
-    }
-
+    
     /* 快捷入口 - 桌面端4列 */
     .quick-access {
         grid-template-columns: repeat(4, 1fr) !important;
-        gap: 1.5rem !important;
+        gap: 1.2rem !important;
         padding: 1.5rem 2rem !important;
     }
     .quick-card {
-        padding: 2rem 1rem !important;
-        border-radius: 16px !important;
+        padding: 1.5rem !important;
     }
     .quick-card .icon {
-        font-size: 2.8rem !important;
-        margin-bottom: 0.5rem !important;
+        font-size: 2.5rem !important;
     }
     .quick-card h3 {
-        font-size: 1.05rem !important;
+        font-size: 1rem !important;
     }
     .quick-card p {
         font-size: 0.85rem !important;
     }
-
+    
     /* 热门模块 - 桌面端4列 */
     .module-grid {
         grid-template-columns: repeat(4, 1fr) !important;
         gap: 1.2rem !important;
     }
     .module-card {
-        padding: 1.5rem 1rem !important;
-        border-radius: 16px !important;
+        padding: 1.2rem !important;
     }
     .module-card .icon {
-        font-size: 2.4rem !important;
-        margin-bottom: 0.5rem !important;
+        font-size: 2.2rem !important;
     }
     .module-card h3 {
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
     }
     .module-card p {
-        font-size: 0.8rem !important;
+        font-size: 0.78rem !important;
     }
-
+    
     /* 知识卡片 - 桌面端双栏 */
     .knowledge-preview {
         padding: 1rem 2rem !important;
     }
-
+    
     /* 宫格 - 桌面端6列 */
     .grid {
         grid-template-columns: repeat(6, 1fr) !important;
@@ -317,7 +299,6 @@ body {
     }
     .item {
         padding: 1.2rem 0.5rem !important;
-        border-radius: 14px !important;
     }
     .item .ic {
         font-size: 2.2rem !important;
@@ -325,7 +306,7 @@ body {
     .item .lb {
         font-size: 0.8rem !important;
     }
-
+    
     /* 更多页面 - 模块列表桌面端5列 */
     .module-list {
         grid-template-columns: repeat(5, 1fr) !important;
@@ -333,7 +314,7 @@ body {
     .category-section {
         display: block !important;
     }
-
+    
     /* 表单页面 - 桌面端居中卡片 */
     .form-page {
         display: flex;
@@ -345,23 +326,23 @@ body {
         max-width: 500px;
         margin: 0 auto 1rem;
     }
-
+    
     /* 个人中心 - 桌面端布局 */
     .profile-stats {
         grid-template-columns: repeat(3, 1fr) !important;
-        gap: 1.5rem !important;
+        gap: 1.2rem !important;
     }
-
+    
     /* 按钮桌面端优化 */
     button, .btn, .submit-btn, .tab-btn {
         min-height: 40px;
     }
-
+    
     /* 知识科普区桌面端双栏 */
     .knowledge-card-large {
         padding: 2rem !important;
     }
-
+    
     /* 搜索结果区 */
     .search-box .search-input {
         font-size: 1rem !important;
@@ -375,8 +356,8 @@ body {
         max-width: 100%;
     }
     .content-area {
-        padding: 1.5rem 2rem;
-        max-width: 900px;
+        padding: 1.5rem;
+        max-width: 800px;
         margin: 0 auto;
     }
     .grid {
@@ -399,7 +380,7 @@ body {
         max-width: 100%;
     }
     .hero-title {
-        font-size: 2rem !important;
+        font-size: 1.8rem !important;
     }
     body {
         font-size: 15px;
@@ -430,7 +411,7 @@ body {
     textarea {
         font-size: 16px !important;
     }
-
+    
     /* 手机端内容区底部留空给底部导航 */
     .content-area {
         padding-bottom: 80px;
@@ -471,13 +452,13 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: linear-gradient(180deg, rgba(10,14,31,0.95), rgba(16,24,40,0.9));
+    background: linear-gradient(180deg, rgba(10,14,31,0.9), rgba(16,24,40,0.85));
     backdrop-filter: blur(20px);
     padding: 0.8rem 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(232,184,75,0.12);
+    border-bottom: 1px solid rgba(232,184,75,0.15);
 }
 
 .logo {
@@ -530,11 +511,11 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0.8rem 0.2rem;
-    border-radius: 14px;
+    border-radius: 12px;
     background: linear-gradient(135deg, rgba(232,184,75,0.08), rgba(232,184,75,0.02));
     border: 1px solid rgba(232,184,75,0.1);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
 }
 
 .item:active {
@@ -544,8 +525,7 @@ body {
 
 .item:hover {
     background: linear-gradient(135deg, rgba(232,184,75,0.12), rgba(232,184,75,0.04));
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(232,184,75,0.1);
+    transform: translateY(-2px);
 }
 
 .item .ic {
@@ -585,19 +565,17 @@ body {
 
 /* ===== 知识卡片 ===== */
 .know-card {
-    background: linear-gradient(135deg, rgba(232,184,75,0.06), rgba(232,184,75,0.02));
+    background: linear-gradient(135deg, rgba(232,184,75,0.05), rgba(232,184,75,0.02));
     border: 1px solid rgba(232,184,75,0.1);
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 1rem;
     margin-bottom: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
 }
 
 .know-card:hover {
     background: linear-gradient(135deg, rgba(232,184,75,0.1), rgba(232,184,75,0.03));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
 }
 
 .know-card h3 {
@@ -673,37 +651,29 @@ body {
 .f-input {
     width: 100%;
     padding: 0.8rem;
-    border-radius: 10px;
+    border-radius: 8px;
     border: 1px solid rgba(232,184,75,0.2);
     background: rgba(255,255,255,0.05);
     color: #fff;
     font-size: 0.9rem;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .f-input:focus {
     border-color: rgba(232,184,75,0.5);
-    box-shadow: 0 0 0 3px rgba(232,184,75,0.1);
 }
 
 .f-btn {
     width: 100%;
     padding: 0.8rem;
-    border-radius: 10px;
+    border-radius: 8px;
     border: none;
-    background: linear-gradient(135deg, #e8b84b, #d4a017);
+    background: linear-gradient(135deg, #e8b84b, #f0d78c);
     color: #000;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     margin-top: 1rem;
-    transition: all 0.2s ease;
-}
-
-.f-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(232,184,75,0.3);
 }
 
 .f-btn:active {
@@ -761,16 +731,11 @@ body {
 }
 
 .result-section {
-    background: linear-gradient(135deg, rgba(232,184,75,0.06), rgba(232,184,75,0.02));
+    background: linear-gradient(135deg, rgba(232,184,75,0.05), rgba(232,184,75,0.02));
     border: 1px solid rgba(232,184,75,0.1);
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 1rem;
     margin-bottom: 1rem;
-    transition: all 0.3s ease;
-}
-
-.result-section:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 }
 
 .result-section h3 {
@@ -887,9 +852,9 @@ body {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
-    background: linear-gradient(180deg, rgba(10,14,31,0.95), rgba(16,24,40,0.9));
+    background: linear-gradient(180deg, rgba(10,14,31,0.9), rgba(16,24,40,0.85));
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(232,184,75,0.12);
+    border-bottom: 1px solid rgba(232,184,75,0.15);
     display: flex;
     z-index: 100;
 }
@@ -937,9 +902,9 @@ body {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
-    background: linear-gradient(180deg, rgba(16,24,40,0.98), rgba(10,14,31,0.98));
+    background: linear-gradient(180deg, rgba(16,24,40,0.95), rgba(10,14,31,0.98));
     backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(232,184,75,0.12);
+    border-top: 1px solid rgba(232,184,75,0.15);
     display: flex;
     z-index: 100;
 }
@@ -1028,7 +993,7 @@ body {
     background: rgba(0,0,0,0.85);
     color: #fff;
     padding: 1rem 2rem;
-    border-radius: 12px;
+    border-radius: 8px;
     font-size: 0.9rem;
     z-index: 1000;
     display: none;
@@ -1050,17 +1015,11 @@ body {
 
 /* ===== 模块区块样式 ===== */
 .section {
-    background: linear-gradient(135deg, rgba(232,184,75,0.06), rgba(232,184,75,0.02));
-    border: 1px solid rgba(232,184,75,0.12);
-    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(232,184,75,0.05), rgba(232,184,75,0.02));
+    border: 1px solid rgba(232,184,75,0.15);
+    border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-}
-
-.section:hover {
-    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
 }
 
 /* ===== 页面头部（模块/子页面通用） ===== */
@@ -1069,8 +1028,8 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: linear-gradient(180deg, rgba(10,14,31,0.95), rgba(16,24,40,0.9));
-    border-bottom: 1px solid rgba(232,184,75,0.12);
+    background: linear-gradient(180deg, rgba(10,14,31,0.9), rgba(16,24,40,0.85));
+    border-bottom: 1px solid rgba(232,184,75,0.15);
     position: sticky;
     top: 0;
     z-index: 50;
@@ -1083,7 +1042,7 @@ body {
 .back-btn {
     background: rgba(232,184,75,0.1);
     border: 1px solid rgba(232,184,75,0.3);
-    border-radius: 10px;
+    border-radius: 8px;
     color: #e8b84b;
     font-size: 1rem;
     cursor: pointer;
@@ -1091,11 +1050,10 @@ body {
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s;
 }
 .back-btn:hover {
     background: rgba(232,184,75,0.2);
-    transform: translateY(-1px);
 }
 
 /* ===== 桌面端有侧边栏时隐藏page-header ===== */
@@ -1194,7 +1152,7 @@ body {
 .fortune-error-state {
     background: linear-gradient(135deg, rgba(244,67,54,0.08), rgba(244,67,54,0.02));
     border: 1px solid rgba(244,67,54,0.2);
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 2rem;
     text-align: center;
     margin: 1rem 0;
@@ -1217,12 +1175,12 @@ body {
 }
 .fortune-btn {
     padding: 0.6rem 1.2rem;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 0.85rem;
     cursor: pointer;
     border: none;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 .fortune-btn-retry {
     background: linear-gradient(135deg, #d4a017, #e8b84b);
@@ -1245,7 +1203,7 @@ body {
 .image-analysis-result {
     background: linear-gradient(135deg, rgba(232,184,75,0.08), rgba(232,184,75,0.02));
     border: 1px solid rgba(232,184,75,0.15);
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 1.5rem;
     margin-top: 1rem;
 }
@@ -1262,19 +1220,19 @@ body {
     font-size: 0.9rem;
     background: rgba(0,0,0,0.2);
     padding: 1rem;
-    border-radius: 10px;
+    border-radius: 8px;
     margin: 0.8rem 0;
 }
 .image-analysis-result .close-btn {
     background: rgba(232,184,75,0.15);
     color: #e8b84b;
     border: 1px solid rgba(232,184,75,0.3);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 0.6rem 1.2rem;
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: bold;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 .image-analysis-result .close-btn:hover {
     background: rgba(232,184,75,0.25);
@@ -1308,7 +1266,7 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 999;
-    background: linear-gradient(135deg, rgba(10,14,31,0.98), rgba(16,24,40,0.98));
+    background: linear-gradient(135deg, rgba(10,14,31,0.95), rgba(16,24,40,0.95));
     border-bottom: 1px solid rgba(232,184,75,0.2);
     backdrop-filter: blur(10px);
     animation: bannerSlideDown 0.4s ease;
@@ -1348,9 +1306,9 @@ body {
 }
 .desktop-app-banner-btn {
     padding: 0.4rem 1rem;
-    background: linear-gradient(135deg, #e8b84b, #d4a017);
+    background: linear-gradient(135deg, #e8b84b, #ffaa00);
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     color: #101828;
     font-size: 0.8rem;
     font-weight: bold;

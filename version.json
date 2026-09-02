@@ -1,9 +1,9 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "build_time": "2026-09-02T00:30:00Z",
   "git_commit": "a1ac0fb+shim",
   "author": "玄机算命网",
-  "description": "v2.0.0 后端架构重构：Flask 应用工厂 + 分层架构（repositories/services/api），零宕机自动切换",
+  "description": "v2.0.1 — 触发服务器自动恢复（拉起 gunicorn）",
   "changelog": {
     "1.11.5": "fix: 退出重进头像丢失",
     "1.12.0": "feat: 注册页头像选择器",

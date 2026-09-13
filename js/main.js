@@ -20,69 +20,8 @@
     document.body.classList.add('is-' + device);
     document.cookie = 'device=' + device + ';path=/;max-age=86400';
 
-    // 桌面端：注入侧边栏（如果页面没有的话）
-    if (device === 'desktop' && !document.querySelector('.desktop-sidebar')) {
-        var sidebarHTML =
-            '<aside class="desktop-sidebar" id="desktopSidebar">' +
-            '  <div class="sidebar-logo">' +
-            '    <div class="logo-icon">🔮</div>' +
-            '    <div><span class="logo-text">玄机算命网</span><span class="logo-sub">传承千年智慧</span></div>' +
-            '  </div>' +
-            '  <nav class="sidebar-nav">' +
-            '    <div class="sidebar-nav-section">' +
-            '      <div class="sidebar-nav-title">主导航</div>' +
-            '      <a href="/" class="sidebar-nav-item ' + (location.pathname === '/' || location.pathname === '/index.html' ? 'active' : '') + '"><span class="nav-icon">🏠</span> 首页</a>' +
-            '      <a href="/more.html" class="sidebar-nav-item ' + (location.pathname === '/more.html' ? 'active' : '') + '"><span class="nav-icon">🔮</span> 更多模块</a>' +
-            '      <a href="/vip.html" class="sidebar-nav-item ' + (location.pathname === '/vip.html' ? 'active' : '') + '"><span class="nav-icon">👑</span> 会员中心</a>' +
-            '      <a href="/profile.html" class="sidebar-nav-item ' + (location.pathname === '/profile.html' ? 'active' : '') + '"><span class="nav-icon">👤</span> 个人中心</a>' +
-            '      <a href="/download.html" class="sidebar-nav-item ' + (location.pathname === '/download.html' ? 'active' : '') + '"><span class="nav-icon">📥</span> 下载客户端</a>' +
-            '    </div>' +
-            '    <div class="sidebar-nav-section">' +
-            '      <div class="sidebar-nav-title">热门功能</div>' +
-            '      <a href="/modules/bazi.html" class="sidebar-nav-item"><span class="nav-icon">🎴</span> 八字排盘</a>' +
-            '      <a href="/modules/ziwei.html" class="sidebar-nav-item"><span class="nav-icon">⭐</span> 紫微斗数</a>' +
-            '      <a href="/modules/heyun.html" class="sidebar-nav-item"><span class="nav-icon">💑</span> 合婚配对</a>' +
-            '      <a href="/modules/shengxiao.html" class="sidebar-nav-item"><span class="nav-icon">🐉</span> 生肖运势</a>' +
-            '      <a href="/modules/tarot.html" class="sidebar-nav-item"><span class="nav-icon">🃏</span> 塔罗牌</a>' +
-            '      <a href="/modules/zhougong.html" class="sidebar-nav-item"><span class="nav-icon">😴</span> 周公解梦</a>' +
-            '      <a href="/modules/fengshui.html" class="sidebar-nav-item"><span class="nav-icon">🏠</span> 风水堪舆</a>' +
-            '      <a href="/modules/huangdao.html" class="sidebar-nav-item"><span class="nav-icon">📅</span> 黄道吉日</a>' +
-            '    </div>' +
-            '  </nav>' +
-            '  <div class="sidebar-footer">' +
-            '    <a href="/profile.html" class="sidebar-user" id="sidebarUser">' +
-            '      <div class="user-avatar">👤</div>' +
-            '      <div class="user-info">' +
-            '        <div class="user-name" id="sidebarUserName">未登录</div>' +
-            '        <div class="user-status">点击登录</div>' +
-            '      </div>' +
-            '    </a>' +
-            '  </div>' +
-            '</aside>';
-        var wrapper = document.createElement('div');
-        wrapper.innerHTML = sidebarHTML;
-        document.body.insertBefore(wrapper.firstChild, document.body.firstChild);
-        document.body.classList.add('has-desktop-sidebar');
-
-        // 隐藏移动端导航
-        var tn = document.querySelector('.top-nav');
-        if (tn) tn.style.display = 'none';
-        var bn = document.querySelector('.bottom-nav');
-        if (bn) bn.style.display = 'none';
-        var ph = document.querySelector('.page-header');
-        if (ph) ph.style.display = 'none';
-
-        // 同步登录状态
-        try {
-            var user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-            if (user && user.username) {
-                var nameEl = document.getElementById('sidebarUserName');
-                var statusEl = document.querySelector('.sidebar-user .user-status');
-                if (nameEl) nameEl.textContent = user.username;
-                if (statusEl) statusEl.textContent = '已登录';
-            }
-        } catch (_) {}
-    }
+    // 注：侧边栏统一由 sidenav.js 负责渲染与布局接管。
+    // 此处不再注入 .desktop-sidebar，避免与 sidenav 冲突导致双重偏移。
 })();
 
 // ===== XSS 防护工具 =====

@@ -12,6 +12,10 @@
     var expandTab = null;
     var isOpen = false;
 
+    // 侧边栏宽度（与 CSS 中 .app 的 margin-left 保持一致）
+    var SIDEBAR_W = 240;
+    var BREAKPOINT = 1024;
+
     var path = window.location.pathname;
 
     var navItems = [
@@ -45,7 +49,7 @@
         sidebar = document.createElement('nav');
         sidebar.id = '__sideNav';
         sidebar.style.cssText =
-            'position:fixed;top:0;left:0;bottom:0;width:220px;z-index:9991;'
+            'position:fixed;top:0;left:0;bottom:0;width:' + SIDEBAR_W + 'px;z-index:9991;'
             + 'background:linear-gradient(180deg,rgba(20,20,35,0.98) 0%,rgba(10,14,31,0.98) 100%);'
             + 'backdrop-filter:blur(20px);border-right:1px solid rgba(232,184,75,0.12);'
             + 'transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);'
@@ -191,12 +195,24 @@
     // ===== 根据侧边栏开关调整 body 布局 =====
     function updateBodyLayout() {
         var isDesktop = window.innerWidth >= 1024;
+        var app = document.querySelector('.app');
         if (isDesktop) {
-            document.body.style.paddingLeft = isOpen ? '220px' : '';
-            document.body.style.transition = 'padding-left 0.3s cubic-bezier(0.4,0,0.2,1)';
-        } else {
-            document.body.style.overflow = isOpen ? 'hidden' : '';
+            // 桌面端：通过 .app 的 margin-left 让出侧边栏宽度（不使用 body padding，避免双重偏移）
             document.body.style.paddingLeft = '';
+            document.body.style.overflow = '';
+            if (app) {
+                app.style.transition = 'margin-left 0.3s cubic-bezier(0.4,0,0.2,1)';
+                app.style.marginLeft = isOpen ? SIDEBAR_W + 'px' : '0px';
+                app.style.width = isOpen ? 'calc(100% - ' + SIDEBAR_W + 'px)' : '100%';
+            }
+        } else {
+            // 移动端：侧边栏以覆盖层形式出现，不占布局空间
+            document.body.style.paddingLeft = '';
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+            if (app) {
+                app.style.marginLeft = '';
+                app.style.width = '';
+            }
         }
     }
 
@@ -216,10 +232,13 @@
         buildSidebar();
         buildExpandTab();
 
-        var isDesktop = window.innerWidth >= 1024;
+        // 标记 sidenav 已接管布局，使 CSS 中的静态兜底偏移规则失效，避免双重偏移
+        document.body.classList.add('sidenav-ready');
+
+        var isDesktop = window.innerWidth >= BREAKPOINT;
 
         if (isDesktop) {
-            // 桌面端：接管原始导航，默认展开
+            // 桌面端：接管导航，默认展开
             removeConflictingNavs();
             openSidebar();
         } else {
@@ -235,7 +254,7 @@
 
         // 窗口 resize 时更新布局
         window.addEventListener('resize', function() {
-            var nowDesktop = window.innerWidth >= 1024;
+            var nowDesktop = window.innerWidth >= BREAKPOINT;
             if (nowDesktop) {
                 // 切换到桌面端：接管导航并展开
                 removeConflictingNavs();
@@ -245,6 +264,7 @@
                 if (isOpen) closeSidebar();
                 var navs = document.querySelectorAll('.bottom-nav');
                 navs.forEach(function(nav) { nav.style.display = ''; });
+                if (expandTab) expandTab.style.display = 'none';
             }
             updateBodyLayout();
         });

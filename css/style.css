@@ -194,7 +194,8 @@ body {
     }
 
     /* 当侧边栏存在时，主内容区偏移 */
-    .app {
+    /* 注：实际偏移由 sidenav.js 通过内联样式动态控制，此处仅作为 JS 未加载时的兜底 */
+    body.has-desktop-sidebar:not(.sidenav-ready) .app {
         margin-left: 240px;
         width: calc(100% - 240px);
         min-height: 100vh;
@@ -229,12 +230,21 @@ body {
     .forgot-container,
     .reset-container,
     .more-content {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
     }
     .content-area {
         padding: 2.5rem 3rem;
         padding-bottom: 2rem;
+    }
+
+    /* 首页（hero/快捷入口/模块网格）充分利用侧边栏之外的剩余宽度 */
+    .dl-banner,
+    .quick-access,
+    .featured-section {
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     /* 手机端底部导航在桌面隐藏 */
@@ -1379,7 +1389,8 @@ body.has-desktop-banner {
    ============================================================ */
 @media (min-width: 1024px) {
     /* 侧边栏注入后的主内容区 */
-    body.has-desktop-sidebar .app {
+    /* 注：偏移量由 sidenav.js 动态控制；此处仅兜底 */
+    body.has-desktop-sidebar:not(.sidenav-ready) .app {
         margin-left: 240px;
         width: calc(100% - 240px);
     }
@@ -1412,7 +1423,7 @@ body.has-desktop-banner {
     }
 
     /* 结果页面 */
-    body.has-desktop-sidebar .result-page {
+    body.has-desktop-sidebar:not(.sidenav-ready) .result-page {
         left: 240px;
         width: calc(100% - 240px);
     }

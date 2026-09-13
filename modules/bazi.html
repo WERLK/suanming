@@ -704,14 +704,17 @@ function normalizeBaziData(apiData){
     }else{Object.assign(wuxing,d.wuxing_stats);}
   }
 
-  // 解析大运
-  const dayun=(d.dayun||[]).map(dy=>({
-    year:dy.year,age:dy.age,ganzhi:dy.ganzhi,shishen:dy.shishen
+  // 解析大运（后端字段为 start_age/end_age/order）
+  const dayun=(d.dayun||[]).map((dy,i)=>({
+    year:dy.year||(birthYear+(dy.start_age||0)),
+    age:dy.age!=null?dy.age:(dy.start_age!=null?dy.start_age:i*10),
+    ganzhi:dy.ganzhi||'',
+    shishen:dy.shishen||''
   }));
 
   // 解析流年
   const liunian=(d.liunian||[]).map(ln=>({
-    year:ln.year,ganzhi:ln.ganzhi,shishen:ln.shishen
+    year:ln.year,ganzhi:ln.ganzhi||'',shishen:ln.shishen||''
   }));
 
   // 解析十神
@@ -722,27 +725,94 @@ function normalizeBaziData(apiData){
     }else{shishenMap=d.shishen;}
   }
 
+  // 解析农历（兼容字符串/对象两种格式）
+  let lunar={year:birthYear,month:'',day:''};
+  if(d.lunar&&typeof d.lunar==='object'){
+    lunar={year:d.lunar.year,month:d.lunar.month||'',day:d.lunar.day||''};
+  }else if(typeof d.lunar_date==='string'&&d.lunar_date){
+    // 兜底：从 "农历1980年九月十七" 解析
+    const m=d.lunar_date.match(/农历?(\d{4})年(.+?)月(.+)/);
+    if(m){lunar={year:parseInt(m[1]),month:m[2]+'月',day:m[3]};}
+  }else if(typeof d.lunar_date==='object'&&d.lunar_date){
+    lunar=d.lunar_date;
+  }
+
+  // 解析喜用神（兼容 {xiyong:[],jishen:[],season} 与 {xi_shen,yong_shen,desc}）
+  let xiyong={xiyong:[],jishen:[],season:'',desc:''};
+  if(d.xiyong&&typeof d.xiyong==='object'){
+    const xs=d.xiyong.xi_shen?[d.xiyong.xi_shen].filter(Boolean):(d.xiyong.xiyong||[]);
+    const js=d.xiyong.ji_shen?[d.xiyong.ji_shen].filter(Boolean):(d.xiyong.jishen||[]);
+    xiyong={
+      xiyong:Array.isArray(xs)?xs:(xs?[xs]:[]),
+      jishen:Array.isArray(js)?js:(js?[js]:[]),
+      season:d.xiyong.season||'',
+      desc:d.xiyong.desc||''
+    };
+    // 用日主五行推算季节（后端未返回时）
+    if(!xiyong.season){
+      const seasonMap={'木':'春','火':'夏','土':'四季','金':'秋','水':'冬'};
+      xiyong.season=seasonMap[d.day_master_element]||'';
+    }
+  }
+
+  // 解析神煞（后端为 [{name,desc}]，前端渲染需要字符串数组）
+  const shensha=(d.shensha||[]).map(s=>{
+    if(typeof s==='string')return s;
+    return s.name||'';
+  }).filter(Boolean);
+
+  // 解析长生（后端按地支索引，前端需要按柱位索引）
+  let changsheng=d.changsheng||{};
+  const csByPillar={};
+  if(changsheng&&typeof changsheng==='object'){
+    const hasPillarKeys=['year','month','day','hour'].some(k=>k in changsheng);
+    if(hasPillarKeys){
+      csByPillar=changsheng;
+    }else{
+      // 按地支索引 -> 转换为柱位索引
+      const keyMap={year:zhis.year,month:zhis.month,day:zhis.day,hour:zhis.hour};
+      Object.keys(keyMap).forEach(k=>{
+        if(keyMap[k])csByPillar[k]=changsheng[keyMap[k]]||'';
+      });
+    }
+  }
+
+  // 解析纳音（后端按干支索引，前端需要按柱位索引）
+  const nayinRaw=d.nayin||{};
+  const nayin={};
+  const nayinHasPillarKeys=['year','month','day','hour'].some(k=>k in nayinRaw);
+  if(nayinHasPillarKeys){
+    Object.assign(nayin,nayinRaw);
+  }else{
+    ['year','month','day','hour'].forEach(k=>{
+      nayin[k]=nayinRaw[pillars[k]]||'';
+    });
+  }
+  nayin.taiyuan=nayinRaw[d.taiyuan]||nayinRaw.taiyuan||'';
+  nayin.minggong=nayinRaw[d.minggong]||nayinRaw.minggong||'';
+  nayin.shengong=nayinRaw[d.shengong]||nayinRaw.shengong||'';
+
   return{
     name:d.name||'未知',
     gender:d.gender||'unknown',
     pillars,gans,zhis,
-    dayMaster:d.day_master,
-    dayMasterElement:d.day_master_element,
+    dayMaster:d.day_master||'',
+    dayMasterElement:d.day_master_element||'',
     shishenMap,
     wuxing,
-    taiyuan:d.taiyuan,
-    minggong:d.minggong,
-    shengong:d.shengong,
-    nayin:d.nayin||{},
-    changsheng:d.changsheng||{},
+    taiyuan:d.taiyuan||'',
+    minggong:d.minggong||'',
+    shengong:d.shengong||'',
+    nayin,
+    changsheng:csByPillar,
     xunkong:d.xunkong||[],
-    xiyong:d.xiyong||{xiyong:[],jishen:[],season:''},
-    zodiac:d.zodiac,
-    constellation:d.constellation,
+    xiyong,
+    zodiac:d.zodiac||'',
+    constellation:d.constellation||'',
     jieqi:d.jieqi||{prev:null,next:null},
-    lunar:d.lunar_date||{year:birthYear,month:'',day:''},
+    lunar,
     dayun,liunian,
-    shensha:d.shensha||[],
+    shensha,
     solarTime:d.solar_time||{region:120,sign:'+',hour:0,min:0},
     birthInfo:{year:birthYear,month:birthMonth,day:birthDay,time:d.birth_time||''}
   };
@@ -802,16 +872,26 @@ async function calculateBazi(){
     document.getElementById('tab-fenxi').style.display='';
   }else{
     ['tab-xipan','tab-hengban','tab-shuban','tab-fenxi','tab-zhishi'].forEach(id=>{
-      document.getElementById(id).style.display='';
+      const el=document.getElementById(id);if(el)el.style.display='';
     });
     document.getElementById('wuxingStats').style.display='block';
-    renderUserInfo(data);
-    renderWuxingStats(data);
-    renderXipan(data);
-    renderHengban(data);
-    renderShuban(data);
-    renderFenxi(data);
-    renderZhishi(data);
+    // 每个渲染函数独立容错，避免单个失败导致整个结果区空白
+    const safeRender=(fn,name)=>{
+      try{fn(data);}catch(err){
+        console.error('[八字] '+name+' 渲染失败:',err);
+        const target=document.getElementById('view-'+name);
+        if(target&&!target.innerHTML){
+          target.innerHTML='<div style="padding:1.5rem;text-align:center;color:rgba(255,255,255,0.5)">该模块数据暂不可用</div>';
+        }
+      }
+    };
+    try{renderUserInfo(data);}catch(e){console.error('[八字] 用户信息渲染失败:',e);}
+    try{renderWuxingStats(data);}catch(e){console.error('[八字] 五行渲染失败:',e);}
+    safeRender(renderXipan,'xipan');
+    safeRender(renderHengban,'hengban');
+    safeRender(renderShuban,'shuban');
+    safeRender(renderFenxi,'fenxi');
+    safeRender(renderZhishi,'zhishi');
     switchView('xipan');
   }
 }
@@ -827,7 +907,7 @@ function renderUserInfo(data){
     </div>
     <div class="date-info">
       <span><span class="label">公历</span>${data.birthInfo.year}年${String(data.birthInfo.month).padStart(2,'0')}月${String(data.birthInfo.day).padStart(2,'0')}日 ${data.birthInfo.time}</span>
-      <span><span class="label">农历</span>${data.lunar.year}年${data.lunar.month}${data.lunar.day}</span>
+      <span><span class="label">农历</span>${data.lunar&&data.lunar.year?`${data.lunar.year}年${data.lunar.month||''}${data.lunar.day||''}`:'—'}</span>
     </div>
     <div class="solar-time-info">
       <span class="label">太阳时校正</span>
@@ -1009,15 +1089,21 @@ function getDayunCharacter(gan,element){
 }
 
 function renderFenxi(data){
+  const xy=(data.xiyong&&data.xiyong.xiyong)||[];
+  const js=(data.xiyong&&data.xiyong.jishen)||[];
+  const season=(data.xiyong&&data.xiyong.season)||'';
+  const ss=data.shensha||[];
+  const dmElem=data.dayMasterElement||'';
+  const dmCount=(data.wuxing&&data.wuxing[dmElem])||0;
   let html='<div class="analysis-section">';
   html+='<div class="analysis-title">&#9775; 命局分析</div>';
   html+='<div class="analysis-grid">';
-  html+=`<div class="analysis-card"><h4>日主分析</h4><p>日主<strong class="highlight">${data.dayMaster}</strong>，五行属<strong class="highlight">${data.dayMasterElement}</strong></p><p>生于${data.xiyong.season}季，${data.wuxing[data.dayMasterElement]>=2?'日主偏旺':'日主偏弱'}</p></div>`;
-  html+=`<div class="analysis-card"><h4>喜用神</h4><p>喜用神：<strong class="highlight">${data.xiyong.xiyong.join('、')}</strong></p><p>忌神：<strong class="highlight">${data.xiyong.jishen.join('、')}</strong></p></div>`;
-  html+=`<div class="analysis-card"><h4>十神分析</h4><p>年干${data.gans.year}为${data.shishenMap[data.gans.year]}，月干${data.gans.month}为${data.shishenMap[data.gans.month]}</p><p>时干${data.gans.hour}为${data.shishenMap[data.gans.hour]}</p></div>`;
-  html+=`<div class="analysis-card"><h4>神煞</h4><p>${data.shensha.length>0?data.shensha.join('、'):'无明显神煞'}</p></div>`;
-  html+=`<div class="analysis-card"><h4>空亡</h4><p>日柱旬空：<strong class="highlight">${data.xunkong.join('、')||'无'}</strong></p><p>空亡代表该柱所主之事有缺失或延迟之象</p></div>`;
-  html+=`<div class="analysis-card"><h4>命宫胎元</h4><p>命宫${data.minggong}，主一生之归宿</p><p>胎元${data.taiyuan}，主先天之根基</p></div>`;
+  html+=`<div class="analysis-card"><h4>日主分析</h4><p>日主<strong class="highlight">${data.dayMaster}</strong>，五行属<strong class="highlight">${dmElem}</strong></p><p>${season?'生于'+season+'季，':''}${dmCount>=2?'日主偏旺':'日主偏弱'}</p></div>`;
+  html+=`<div class="analysis-card"><h4>喜用神</h4><p>喜用神：<strong class="highlight">${xy.length?xy.join('、'):'待定'}</strong></p><p>忌神：<strong class="highlight">${js.length?js.join('、'):'待定'}</strong></p>${data.xiyong&&data.xiyong.desc?`<p class="analysis-note">${data.xiyong.desc}</p>`:''}</div>`;
+  html+=`<div class="analysis-card"><h4>十神分析</h4><p>年干${data.gans.year}为${data.shishenMap[data.gans.year]||'—'}，月干${data.gans.month}为${data.shishenMap[data.gans.month]||'—'}</p><p>时干${data.gans.hour}为${data.shishenMap[data.gans.hour]||'—'}</p></div>`;
+  html+=`<div class="analysis-card"><h4>神煞</h4><p>${ss.length>0?ss.join('、'):'无明显神煞'}</p></div>`;
+  html+=`<div class="analysis-card"><h4>空亡</h4><p>日柱旬空：<strong class="highlight">${(data.xunkong||[]).join('、')||'无'}</strong></p><p>空亡代表该柱所主之事有缺失或延迟之象</p></div>`;
+  html+=`<div class="analysis-card"><h4>命宫胎元</h4><p>命宫${data.minggong||'—'}，主一生之归宿</p><p>胎元${data.taiyuan||'—'}，主先天之根基</p>${data.shengong?`<p>身宫${data.shengong}，主后天之发展</p>`:''}</div>`;
   html+='</div></div>';
   document.getElementById('view-fenxi').innerHTML=html;
 }

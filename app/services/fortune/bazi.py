@@ -199,72 +199,80 @@ class BaziCalculator:
     # --- 核心计算方法 ---
 
     @classmethod
-    def _lunar_year_days(cls, year):
-        """计算农历年总天数"""
-        total = 0
-        for i in range(12):
-            if cls.LUNAR_INFO[year - 1900] & (0x10000 >> i):
-                total += 30
-            else:
-                total += 29
-        leap_month = (cls.LUNAR_INFO[year - 1900] >> 16) & 0xf
-        if leap_month > 0:
-            if cls.LUNAR_INFO[year - 1900] & (0x10000 >> (leap_month - 1 + 12)):
-                total += 30
-            else:
-                total += 29
-        return total
+    def _leap_month(cls, year):
+        """返回该农历年的闰月月份，0 表示无闰月"""
+        return cls.LUNAR_INFO[year - 1900] & 0xf
+
+    @classmethod
+    def _leap_days(cls, year):
+        """返回该农历年闰月的天数，无闰月返回 0"""
+        if cls._leap_month(year):
+            return 30 if (cls.LUNAR_INFO[year - 1900] & 0x10000) else 29
+        return 0
 
     @classmethod
     def _lunar_month_days(cls, year, month):
-        """计算农历月天数"""
-        if cls.LUNAR_INFO[year - 1900] & (0x10000 >> (month - 1)):
-            return 30
-        return 29
+        """返回该农历年第 month 个常规月的天数（1-12）"""
+        return 30 if (cls.LUNAR_INFO[year - 1900] & (0x10000 >> month)) else 29
+
+    @classmethod
+    def _lunar_year_days(cls, year):
+        """计算农历年总天数"""
+        total = 348  # 12 * 29
+        info = cls.LUNAR_INFO[year - 1900]
+        i = 0x8000
+        while i > 0x8:
+            if info & i:
+                total += 1
+            i >>= 1
+        return total + cls._leap_days(year)
 
     @classmethod
     def _solar_to_lunar(cls, dt):
-        """公历转农历"""
+        """公历转农历（标准算法）"""
         try:
-            base_date = datetime(1900, 1, 31)
+            base_date = datetime(1900, 1, 31)  # 1900年农历正月初一
             offset = (dt - base_date).days
 
             year = 1900
-            days_in_year = cls._lunar_year_days(year)
-            while offset >= days_in_year:
+            while True:
+                days_in_year = cls._lunar_year_days(year)
+                if offset < days_in_year:
+                    break
                 offset -= days_in_year
                 year += 1
-                days_in_year = cls._lunar_year_days(year)
 
-            leap_month = (cls.LUNAR_INFO[year - 1900] >> 16) & 0xf
+            leap = cls._leap_month(year)
             is_leap = False
-
             month = 1
-            for i in range(1, 13):
-                if leap_month > 0 and i == leap_month + 1 and not is_leap:
-                    month_days = cls._lunar_month_days(year, leap_month) if cls.LUNAR_INFO[year - 1900] & (0x10000 >> (leap_month - 1 + 12)) else 29
-                    if offset < month_days:
+
+            while month <= 12:
+                # 闰月插在第 leap 个常规月之后
+                if leap > 0 and month == leap + 1 and not is_leap:
+                    days = cls._leap_days(year)
+                    if offset < days:
                         is_leap = True
-                        month_name = f'闰{cls.LUNAR_MONTH_NAMES[leap_month - 1]}月'
-                        day = offset + 1
-                        return year, month, day, is_leap, month_name
-                    offset -= month_days
+                        month = leap
+                        break
+                    offset -= days
                     is_leap = True
 
-                month_days = cls._lunar_month_days(year, i)
-                if offset < month_days:
-                    month = i
-                    day = offset + 1
-                    month_name = f'{cls.LUNAR_MONTH_NAMES[month - 1]}月'
-                    return year, month, day, is_leap, month_name
-                offset -= month_days
+                days = cls._lunar_month_days(year, month)
+                if offset < days:
+                    break
+                offset -= days
+                month += 1
 
-            month = 12
             day = offset + 1
-            month_name = f'{cls.LUNAR_MONTH_NAMES[11]}月'
+
+            if month > 12:
+                month = 1
+                year += 1
+
+            month_name = f'{"闰" if is_leap else ""}{cls.LUNAR_MONTH_NAMES[month - 1]}月'
             return year, month, day, is_leap, month_name
         except Exception:
-            return dt.year, dt.month, dt.day, False, ''
+            return dt.year, dt.month, dt.day, False, f'{dt.month}月'
 
     @classmethod
     def _get_year_ganzhi(cls, year):
@@ -337,6 +345,71 @@ class BaziCalculator:
                 if wx:
                     stats[wx] += 0.5  # 藏干权重降低
         return stats
+
+    @classmethod
+    def _calc_taiyuan(cls, month_tg_idx, month_dz_idx):
+        """胎元：月柱天干进一位，地支进三位"""
+        tg = cls.TIANGAN[(month_tg_idx + 1) % 10]
+        dz = cls.DIZHI[(month_dz_idx + 3) % 12]
+        return tg + dz, (month_tg_idx + 1) % 10, (month_dz_idx + 3) % 12
+
+    @classmethod
+    def _calc_minggong(cls, year_tg_idx, month_dz_idx, hour_dz_idx):
+        """
+        命宫（传统算法，以寅为1起数）：
+          月序 = 月支距寅宫的序号（正月=寅=1，卯=2 ...）
+          时序 = 时支距子时的序号（子=1，丑=2，寅=3 ...）
+          命宫序 = 14 - (月序 + 时序)；若结果 <= 0 则加 12
+          再由序号反推地支（以寅为1）。
+        天干用五虎遁推之。
+        """
+        YIN_IDX = 2  # 寅在地支中的索引
+        # 月序：寅=1, 卯=2, ... 丑=12
+        month_seq = ((month_dz_idx - YIN_IDX) % 12) + 1
+        # 时序：子=1, 丑=2, ... 亥=12
+        hour_seq = hour_dz_idx + 1
+
+        mg_seq = 14 - (month_seq + hour_seq)
+        while mg_seq <= 0:
+            mg_seq += 12
+        while mg_seq > 12:
+            mg_seq -= 12
+
+        # 序号 -> 地支索引（寅=1 -> idx 2）
+        mg_dz_idx = (YIN_IDX + mg_seq - 1) % 12
+
+        # 命宫天干：五虎遁，以年干推寅月天干，再顺数到命宫地支
+        year_tian = cls.TIANGAN[year_tg_idx]
+        yin_month_tg = cls.MONTH_TIAN_START.get(year_tian, cls.TIANGAN[0])
+        yin_tg_idx = cls.TIANGAN.index(yin_month_tg)
+        steps = (mg_dz_idx - YIN_IDX) % 12
+        mg_tg_idx = (yin_tg_idx + steps) % 10
+        return cls.TIANGAN[mg_tg_idx] + cls.DIZHI[mg_dz_idx], mg_tg_idx, mg_dz_idx
+
+    @classmethod
+    def _calc_shengong(cls, year_tg_idx, month_dz_idx, hour_dz_idx):
+        """
+        身宫（传统算法，以寅为1起数）：
+          身宫序 = 月序 + 时序；若 > 12 则减 12
+          再由序号反推地支（以寅为1）。
+        天干用五虎遁推之。
+        """
+        YIN_IDX = 2
+        month_seq = ((month_dz_idx - YIN_IDX) % 12) + 1
+        hour_seq = hour_dz_idx + 1
+
+        sg_seq = month_seq + hour_seq
+        while sg_seq > 12:
+            sg_seq -= 12
+
+        sg_dz_idx = (YIN_IDX + sg_seq - 1) % 12
+
+        year_tian = cls.TIANGAN[year_tg_idx]
+        yin_month_tg = cls.MONTH_TIAN_START.get(year_tian, cls.TIANGAN[0])
+        yin_tg_idx = cls.TIANGAN.index(yin_month_tg)
+        steps = (sg_dz_idx - YIN_IDX) % 12
+        sg_tg_idx = (yin_tg_idx + steps) % 10
+        return cls.TIANGAN[sg_tg_idx] + cls.DIZHI[sg_dz_idx], sg_tg_idx, sg_dz_idx
 
     @classmethod
     def _calc_shishen(cls, day_master, pillars_data):
@@ -640,15 +713,32 @@ class BaziCalculator:
             # 喜用神
             xiyong = cls._calc_xiyong(day_master, wuxing_stats)
 
+            # 胎元 / 命宫 / 身宫
+            taiyuan, _, _ = cls._calc_taiyuan(month_tg_idx, month_dz_idx)
+            minggong, _, _ = cls._calc_minggong(year_tg_idx, month_dz_idx, hour_dz_idx)
+            shengong, _, _ = cls._calc_shengong(year_tg_idx, month_dz_idx, hour_dz_idx)
+
             # 生肖
             zodiac = cls.SHENGXIAO[year_dz_idx]
 
             # 星座
             constellation = cls._get_constellation(dt.month, dt.day)
 
-            # 农历日期字符串
+            # 农历日期（字符串 + 结构化对象，前端两种格式都兼容）
             lunar_day_name = cls.LUNAR_DAY_NAMES[lunar_day - 1] if 1 <= lunar_day <= 30 else ''
-            lunar_date = f'农历{lunar_year}年{cls.LUNAR_MONTH_NAMES[lunar_month - 1]}月{lunar_day_name}'
+            lunar_month_name = cls.LUNAR_MONTH_NAMES[lunar_month - 1]
+            lunar_date = f'农历{lunar_year}年{lunar_month_name}月{lunar_day_name}'
+            lunar_obj = {
+                'year': lunar_year,
+                'month_num': lunar_month,
+                'month': f'{lunar_month_name}月',
+                'day': lunar_day_name,
+                'is_leap': is_leap,
+                'text': lunar_date,
+            }
+
+            # 起运信息（大运起始年龄）
+            qiyun_age = dayun[0].get('start_age') if dayun else 0
 
             return {
                 'name': name,
@@ -669,6 +759,17 @@ class BaziCalculator:
                 'zodiac': zodiac,
                 'constellation': constellation,
                 'lunar_date': lunar_date,
+                'lunar': lunar_obj,
+                'taiyuan': taiyuan,
+                'minggong': minggong,
+                'shengong': shengong,
+                'qiyun_age': qiyun_age,
+                'solar_time': {
+                    'region': region_lon,
+                    'sign': '+' if (region_lon - 120) >= 0 else '-',
+                    'hour': int(abs(region_lon - 120) * 4 // 60),
+                    'min': int(abs(region_lon - 120) * 4 % 60),
+                },
                 'canggan': {p['dz']: cls.DIZHI_CANGGAN.get(p['dz'], []) for p in pillars}
             }
         except Exception as e:

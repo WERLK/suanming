@@ -368,8 +368,10 @@ function selectGender(el){document.querySelectorAll('.gender-btn').forEach(b=>b.
 function switchView(view){
   document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view-content').forEach(c=>c.classList.remove('active'));
-  document.getElementById('tab-'+view).classList.add('active');
-  document.getElementById('view-'+view).classList.add('active');
+  const tab=document.getElementById('tab-'+view);
+  const content=document.getElementById('view-'+view);
+  if(tab)tab.classList.add('active');
+  if(content)content.classList.add('active');
 }
 
 // ========== 十神计算 ==========
@@ -852,29 +854,33 @@ async function calculateBazi(){
   }
 
   window.baziData=data;
-  document.getElementById('formSection').classList.add('hidden');
-  document.getElementById('resultArea').classList.remove('hidden');
+  const fSec=document.getElementById('formSection');
+  const rArea=document.getElementById('resultArea');
+  if(fSec)fSec.classList.add('hidden');
+  if(rArea)rArea.classList.remove('hidden');
 
   // 显示数据来源标识
   showDataBadge(apiSource,'resultArea', apiResult ? apiResult.meta : null);
 
   // 根据模式渲染
   if(mode==='simple'){
-    document.getElementById('tab-xipan').style.display='none';
-    document.getElementById('tab-hengban').style.display='none';
-    document.getElementById('tab-shuban').style.display='none';
-    document.getElementById('tab-zhishi').style.display='none';
-    document.getElementById('wuxingStats').style.display='block';
-    renderUserInfo(data);
-    renderWuxingStats(data);
-    renderSimpleAnalysis(data);
+    ['tab-xipan','tab-hengban','tab-shuban','tab-zhishi'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.style.display='none';
+    });
+    const ws=document.getElementById('wuxingStats');
+    if(ws)ws.style.display='block';
+    try{renderUserInfo(data);}catch(e){console.error('[八字] 用户信息渲染失败:',e);}
+    try{renderWuxingStats(data);}catch(e){console.error('[八字] 五行渲染失败:',e);}
+    try{renderSimpleAnalysis(data);}catch(e){console.error('[八字] 简要分析渲染失败:',e);}
     switchView('fenxi');
-    document.getElementById('tab-fenxi').style.display='';
+    const tf=document.getElementById('tab-fenxi');
+    if(tf)tf.style.display='';
   }else{
     ['tab-xipan','tab-hengban','tab-shuban','tab-fenxi','tab-zhishi'].forEach(id=>{
       const el=document.getElementById(id);if(el)el.style.display='';
     });
-    document.getElementById('wuxingStats').style.display='block';
+    const ws2=document.getElementById('wuxingStats');
+    if(ws2)ws2.style.display='block';
     // 每个渲染函数独立容错，避免单个失败导致整个结果区空白
     const safeRender=(fn,name)=>{
       try{fn(data);}catch(err){
